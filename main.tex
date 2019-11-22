@@ -1,0 +1,537 @@
+\documentclass[a4paper,10pt,fullpage]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{fullpage}
+\usepackage{verbatim}
+\usepackage{multirow}
+\usepackage{csquotes}
+\usepackage{tikz}
+\usetikzlibrary{matrix,arrows.meta,fit,positioning,shapes,automata}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage[titletoc,title]{appendix}
+\usepackage[hidelinks]{hyperref}%
+\usepackage[section,numberedsection, acronym, toc]{glossaries}
+\makeglossaries
+\bibliographystyle{apalike}
+
+\input{glossary.tex}
+\makeatletter
+\protected\def\vvv#1{\leavevmode\bgroup\vbox\bgroup\xvvv#1\relax}
+
+\def\xvvv{\afterassignment\xxvvv\let\tmp= }
+
+\def\xxvvv{%
+\ifx\tmp\@sptoken\egroup\ \vbox\bgroup\let\next\xvvv
+\else\ifx\tmp\relax\egroup\egroup\let\next\relax
+\else
+%\hbox{\tmp}%original
+\hbox to 1.1em{\hfill\tmp\hfill}% centred
+\let\next\xvvv\fi\fi
+\next}
+\numberwithin{equation}{section}
+\makeatother
+%\newacronym{grant}{GRANT}{Global Resource Allocation via Network Topology}
+%\longnewglossaryentry{chequebook}{name=chequebook}{a wallet smart contract that allows cashing cheques}
+\newcommand\gloss[1]{\emph{\gls{#1}}}
+\newcommand\PO{\mathit{PO}}
+\newcommand\fork[2]{\phi(#1,#2)}
+\newcommand\Nodes{\mathit{Nodes}}
+\newcommand\Top{\mathit{Top}}
+\newcommand\Pot{\mathit{Pot}}
+\newcommand\Val{\mathit{Val}}
+\newcommand\Key{\mathit{Key}}
+\newcommand\Edges{\overset{\rightarrow}{\mathit{Edges}}}
+\newcommand\Keys{\mathcal{K}}
+\newcommand\Values{\mathcal{V}}
+\newcommand\key{\kappa}
+\newcommand\nil{\varnothing}
+\newcommand\Instructions{\mathcal{I}*}
+
+\newcommand\defeq{\overset{\textrm{\tiny  def}}{=}}
+\providecommand{\xor}{\veebar}
+% \newcommand{\xor}{%
+%   \mathbin{%
+%     {\vee}\mspace{-2.9mu}\nonscript\mspace{0.3mu}{\vee}%
+%   }%
+% }
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{corollary}{Corollary}[section]
+
+
+\title{\Huge swarm\\
+\Large a decentralised peer-to-peer network for messaging and
+storage}
+\author{Viktor Trón, Daniel A. Nagy, Rinke Hendriksen}
+\date{draft of \today}
+\begin{document}
+
+\newcommand\pot[3]{}
+\maketitle
+% \hline
+\begin{abstract}
+          
+\end{abstract}
+% \hline
+\setcounter{tocdepth}{2}
+\tableofcontents
+
+\section{Introduction}
+
+The swarm project is set out to build censorship resistant storage and communication infrastructure for a truly sovereign digital society. Such a system needs  to provide a web interface, which makes it an alternative world wide web.
+From a developer's perspective, swarm provides tools to build realtime interactive web applications, and therefore constitute a web3 dev stack.
+
+permissionless fault tolerant 
+protocols and strategies
+incentives are to align individual strategy with 
+
+\section{Network}
+\subsection{Underlay transport}
+\subsection{Overlay addressing}
+
+\subsection{Kademlia routing}
+\label{sec:kademlia-flavours}
+
+\label{sec:kademlia} 
+
+The properties of a kademlia graph can be used for routing messages between nodes in a network using overlay addressing. Nodes in the swarm network are identified by the hash of the ethereum address of the swarm base account. This serves as their overlay address, the proximity order bins are calculated based on these addresses. 
+
+In the following we apply kademlia graph properties to nodes in an overlay network. In particular we show that two relations over nodes can be used to support two flavours of routing, \emph{iterative} and \emph{recursive}.
+
+
+For instance, take $R$ as the 'know about' relation:
+$x$ 'knows about' $y$ if $x$ has both overlay and underlay address information on $y$. 
+
+
+Peers known to any particular node $x$ can be indexed by their proximity order relative to $x$. This is called the \gloss{kademlia table} of the node (see figure \ref{fig:kademliatable}). 
+Node $x$ has a \gloss{saturated kademlia table} if there is a $0<=d_x<=l$ such that (1) the node has at least one peer in each bin up to and excluding PO $d_x$ and (2) all peers at least as near as $d_x$ are known to $x$. 
+If each node in a set has a saturated kademlia table given $R$, then $R$ has kademlia topology.
+
+
+The iterative kademlia routing the requestor node iteratively extends its 'know-about' graph. Using their underlay address (usually UDP) contact their direct peers for further peers, on each successive iteration the peer is at least one order closer to the destination. Because of kademlia criteria, the requestor will end up knowing about the destination node's underlay address and can communicate. This iterative strategy%
+%
+\footnote{The iterative protocol is equivalent to   the original kademlia routing that is described in \cite{maymounkov2002kademlia}.
+}
+%
+critically depends on the nodes' ability to find peers that are online. In order to find one, a node needs to collect several candidate peers for each bin. The best predictor of availability is the recency of the peer's last response, so peers in a bin should be prioritised according to this ordering.
+
+
+
+
+\begin{figure}[htbp]
+   \centering
+   \caption{Kademlia table:  peers of node $x$ partitioned into proximity order bins. Saturated kademlia connectivity is 
+   characterised by a live kademlia table of directly connected TCP peers such that (1) there is at least $k$ peers in each bin up to but excluding saturation depth $d_x$ and (2) no peers in the entire network that are not in the node's most proximate bin $d_x$. }
+   \label{fig:kademliatable}
+\end{figure}
+
+An alternative flavour of kademlia routing is described in \cite{heep2010r}. Here, a recursive method is employed, whereby the successive steps of the iteration are outsourced to a downstream peer.
+Each node recursively calls a direct peer to pass a message to the destination. If kademlia routing is used, this directly translates to relaying messages via a chain of peers ever closer to the destination.
+
+Swarm uses the ethereum devp2p rlpx  as the underlay transport. This uncommon variant allows semi-stable peer connections (over TCP), with authenticated, encrypted, synchronous data stream. Peers connected to a node define another, \emph{live} kademlia table, 
+where the graph edges represent devp2p rlpx connections. 
+The two criteria of healthy kademlia connectivity translate as: for each node $x$, there exists a $d_x$ such that (1) the node $x$ is connected to at least one peer for each PO bin up to but excluding      $d_x$ and (2) connected to all the nodes at least as near as $d_x$.
+If each node in a set has a saturated kademlia table of connected peers, then the nodes `live connection' graph has kademlia topology.
+Since one does not need to select peers that are online, the recursive step consists solely of forwarding the message to a connected peer strictly closer to the destination. We can call this alternative \gloss{forwarding kademlia}. 
+
+In a forwarding kademlia network, a message is said to be \emph{routable} if there exists a path from sender to destination through which the message could be relayed. 
+In a mature subnetwork with kademlia topology every message is routable. 
+
+
+A message is said to be \emph{practically routable} if it can be routed to its destination within the typical timeframe of a request. If all peer connections are stably online, all routable messages are practically routable. It is expected however, that a large proportion of nodes are not stably online. Keeping several connected peers in each PO bin, each node can guarantee that it can forward any message at any point in time, even if their peer drops after the message is received but before it is forwarded. Healthy nodes could commit to being able to forward within a (very short) time we can call \emph{forwarding lag}. In case a downstream peer disconnects before this forwarding lag passes, then upstream peers can reforward the message to an alternative peer, thereby keeping the message passing unbroken. 
+
+In a stable network with stable connectivity, a slim kademlia table, i.e., one peer for each bin up to $d$, is sufficient to guarantee routing between nodes.
+However, to guarantee \gloss{practical routability}, it is best to keep several connections in each bin (see also section \ref{sec:bindensity}) so that the kademlia table remains saturated even if there are disconnections. Given a model of node dropouts, we can calculate the minimum number of peers needed per bin to guarantee that  nodes are saturated $x\%$ of the time.
+
+
+advantages of forwarding kademlia:
+- lot less bandwidth
+- anonymity 
+
+\subsection{Bootstrapping connectivity}
+\label{sec:bootstrapping} 
+
+This  section discusses how a stable kademlia topology  can emerge. 
+In particular, what is the exact bootstrapping protocol each node  needs to follow to reach a redundantly saturated kademlia connectivity and maintain it. Nodes joining a decentralised network  are supposed to be  naive, i.e., potentially connect via a single known peer. For this reason, the bootstrapping process  will need to include a discovery component with the help of which nodes exchange information about each other.  
+
+The protocol is as follows:
+Initially, each node has zero as their saturation depth. Nodes keep advertising their saturation depth as it changes to their connected peers. If a node establishes a new connection, it notifies each of its peers about it if the new connection's proximity order relative to the respective peer is not lower than the peer's advertised saturation depth. The notification is always sent to each peer that shares a PO bin with the new connection.  Formally, $x$ notifies $p\in\mathit{PeersOf}(x)$ of its new connection to $y$ if $\mathit{PO}(x, p) = \mathit{PO}(x, y)$ or $d_p <= \mathit{PO}(y, p)$. In particular, notification contains  full overlay and underlay address information.%
+%
+\footnote{Light nodes that do not wish to relay messages and do not aspire to build up a healthy  kademlia are discounted, see section \ref{sec:light}. }
+
+As a node is being notified of new peer addresses, it stores them in  a kademlia table of known peers. 
+While it listens to incoming connections, it also proactively attempts to connect to nodes in order to achieve saturation: it tries to connect to each known node that is within the PO boundary of $n$ nearest neighbours ($nd$, \gloss{nearest neighbour depth}) and (2) it tries to fill each bin up to $nd$ with healthy peers. To satisfy (1) most efficiently, it attempts to connect to the peer that is most needed at any point in time. Low (far) bins are more important to fill than high (near) ones since they handle more volume. Filling an empty bin with one peer is more important than adding new peer to a non-empty bin, since it leads to a saturated kademlia earlier. Therefore the protocol uses a \emph{bottom-up, depth-first strategy} to choose a peer to connect to.  Nodes that are tried but failed to get connected are retried after a time interval that doubles after each attempt. After a certain number of attempts such nodes are no longer considered.
+
+After a sufficient number of nodes are connected, a bin becomes saturated, and the bin saturation depth can increase.
+Nodes keep advertising their current saturation depth to their peers if it changes. 
+As their saturation depth increases, nodes will get notified of fewer and fewer peers. Once the node finds all their nearest neighbours and has saturated all the bins, no new peers are expected. For this reason, a node can conclude  a saturated kademlia state if it receives no new peers (for some time).%
+%
+\footnote{The node does not need to know the number of nodes in the network. In fact, some time after the node stops receiving new peer addresses, the node can effectively estimate the size of the network: $\log_2(n+1)+ nd$}
+%
+Instead of having a hard deadline and a binary state of
+saturation, we can quantify certainty of saturation by the age of the last new peer received.
+
+When there are no new peers received for a while and all bins are saturated, the node notifies its peers of the \gloss{age of saturation} (the time the last new peer was received). If the node receives a new peer after this, peers are notified again.
+
+Assuming stable connections, eventually each node online will get to know its nearest neighbours and connect to them while keeping each bin up to $nd$ non-empty. Therefore each node will converge on the saturated state. 
+After a node and all its peers have been saturated for a while, the node can advertise \gloss{age of health}, 
+that is the time of the most recent age of saturation among all the saturated peers. 
+
+If no new nodes join, health (kademlia topology) is maintained even if peer connections change. A node is not supposed to go back to a lower saturation state for instance. This is achieved by requiring several peers in each PO bin. 
+If new peers do arrive, all nodes reissue the age of saturation and reset the age of health. The delay before advertising saturation should be long enough so that this regression of state only happens in case there is actually a new node joining the network.
+
+
+\subsection{Chunk addressing and storage}
+
+\subsubsection{Distributed storage}
+ 
+\gloss{Distributed hash tables (DHTs)} use an overlay network to implement a key-value store distributed over the nodes. The basic idea is that the keyspace is mapped onto the overlay address space, and information about an element in the container is to be found with nodes whose address is in the proximity of the key. In the simplest case, let us say that the closest node to the key stores the value. In a network with kademlia connectivity, any node can route to a node whose address is closest to the key, therefore looking up the value belonging to a key is reduced to routing a request to the node closest to the key and retrieving the value.
+Both flavours of kademlia are perfectly suited to serve as routing data requests in the DHT. 
+
+DHTs for decentralised content address storage typically associate content fingerprints (key) with a changing list of seeders (value) that can serve that content \cite{ipfs2014, bittorrent}. However, the same structure can be used directly: it is not information about the location of content that is stored at the node closest to the address, but the content itself. We call this structure \gloss{distributed preimage archive} (DPA).
+
+A DPA is opinionated about which nodes store what content and this implies a few more restrictions. (1) load balancing of content is required among nodes and is realised by splitting content into equal sized units called a \gloss{chunks}. (2) there has to be a process whereby chunks get to where they are supposed to be stored (\gloss{syncing}); and (3) since nodes do not have a say in what they store, measures of \gloss{plausible deniability} should be employed serving as the basis of legal protection for node operators. 
+
+\subsubsection{Chunk addressing}
+
+Chunks in swarm are 4k. Not much hinges on this choice and it is only a parameter.
+The advantages are: (1) given 32 byte hashes, of them a 4k chunk can hold 128, (2) concurrent downloads for small files. 
+The chunk address is calculated using a binary merkle tree hash with length protection. The collision free nature of hashes make sure that a chunk is immutable as  a key-value association. If there exists a chunk with an address, then no other valid chunk can have the same address; this assumption is crucial since it makes the DPA immutable on the chunk level, ie., there is no replace/update operation. 
+
+Since the distribution of hashes of a random sample of preimage data is uniform, the immutable items are evenly spread among nodes, resulting in load-balancing for retrieval. 
+
+Apart from content addressed chunks, we introduce another chunk type:
+% \gloss{design}
+\emph{deterministically-address with signer attestation (Designer)} chunk. This type of chunk serves to assign arbitrary data to a deterministically designed address that is the hash of a topic, an index and a signer address. Validity of the chunk is checked by (1) recovering the signer address from the signature using the plaintext constructed from the topic and index from the chunk data and the hash of the payload, then (2) check if the address is the hash of the topic, index and signer address.
+In other words part of the address space is partitioned to belong to key-pairs and validity check practically constitutes authentication if the chunk can be written to the address. 
+
+\begin{definition}{Designer chunk}\label{def:designer-chunk}
+designer
+\end{definition}
+
+Designer chunks form the basis of swarm feeds, which represent a single owner pub-sub system. Interpreting the indexes as versions, serial numbers or timestamps, a publisher can post updates to a topic by constructing and signing the content belonging to the index, while consumers can follow by constructing the address for the request which only requires the user to know the topic, the publisher address and the index to look up the content. This solves the problem of versioning, or representing mutable resources. 
+
+Integrity checking of designer chunks may seem a stretch, after all, it is, in principle possible to sign more than one content for the same topic, index, signer address.
+
+Although the same designer address allows for writing any payload into the chunk, the fact that it can only be created with the private key, it is reasonable to expect that uniqueness can be guaranteed. If the owner of the private key signs and sends two different payloads with the same address, the behaviour of the network is unpredictable.%
+%
+\footnote{If the chunk is uploaded using the same route, the designer chunk that comes later will be rejected as already known. If the two chunks originate from different addresses in the network, they might both end up in their local neighbourhood. This scenario will result in inconsistent retrievals depending on which node the request ends up with.}
+%
+The most important property is that the signer has no systematic way to control the network response to a designer chunk request. It is impossible to respond with particular versions to particular requestors even if they are the closest node to the designer address. This is the result of anonymous retrievals enabled by forwarding kademlia. In fact by sending several requests from random addresses, a requestor can be sure of the uniqueness of the designer payload with any desired degree of certainty. In other words, designer chunk integrity is guaranteed even in the face of the publishers desire to change history.
+As a consequence, publishers are not expected to create designer chunk collisions, since consumers are able to detect it.  
+Publishers can further increase their credibility by staking a deposit on the blockchain they stand to  lose if they double sign.
+
+
+
+\begin{figure}[htbp]
+   \centering
+%   \includegraphics{}
+   \caption{}
+   \label{fig:designchunk-integrity}
+\end{figure}
+
+Update feeds enforcing integrity can be used as an authoritive audit trail or a truthline of a   mutable resource.%
+%
+\footnote{Design chunks can also be used to provide soft consensus. If a debitor keeps publishing deposit allocation table for an exhaustive list of creditors, guaranteed uniqueness is effectively preventing debitors to double spend. In the case of soft deposit increase, the creditor must check that the reallocations are correct, the total increases are covered by countersigned decreases. If they can be sure that there is no alternative allocation, they effectively rule out double spend.}
+
+
+
+\subsection{Retrieval}
+
+
+In a distributed chunk store, a chunk is said to be \emph{retrievable} for a  requestor node if it can reach a storer node and have the content delivered using the chunk address only.
+Assuming a protocol with 2 messages: retrieve requests and chunk delivery responses, it is already possible to do network retrieval.
+
+A chunk is said to be \emph{practically retrievable} if a path can be found for requests to travel from requestor to storer and for deliveries to travel from storer back to requestor. 
+
+
+
+In a DPA with healthy kademlia overlay topology, every chunk  is retrievable to every node. This assumes only that a node stays online for the short period between receiving a message and forwarding it. Let us take this for granted. 
+
+So far we showed that using the retrieval protocol and maintaining kademlia connectivity, nodes in the network are capable of retrieving content. 
+However, since forwarding request and chunks is using scarce resource (bandwidth), without accounting will be contingent on the proportion of freeriding and altruism. Instead, we need to provide a system of economic incentives that align with correct operation of the network. In other words simple profit maximising behaviour by node operators gives rise to or at least does not contradict with a strategy that is beneficial for users of the network as a whole.
+
+Independent routes for requests and deliveries presuppose that the requestor's address is known. With forwarding kademlia this can be relaxed: forwarding nodes remember which of their peers requested which chunk and when the delivery arrives they just pass it back to their immediate requestors. This makes it possible to not disclose requestor identity in any form, ie., implements anonymous retrieval. 
+
+Remembering the request has another advantage, namely it can recognise unsolicited chunk deliveries: if a received chunk has not been requested, sending peers can expect being disconnected and blacklisted. Such local sanctions are the easiest and simplest way to incentivise adherence to the protocol. 
+
+In order to remember requests, the forwarding node needs to create a resource which bears some cost (takes space in memory). The requests that are not followed by delivery should eventually be garbage collected, so there needs to be a time period while they are active. Chunks that are delivered after the request expires will be treated as unsolicited. Since sending unsolicited chunks is an offence as it can lead to DDOS, downstream peers need to be informed about the timeout of the request.
+This makes more sense since the originator of the request want to attach a time to live duration to the request.
+
+It is expected that a large proportion of swarm nodes are not stably online. Such a high churn situation is problematic if we use the naive strategy of forwarding requests to any one closer node. If a node on the path drops offline during the request-delivery roundtrip, the forwarding is broken, effectively rendering the chunk requested not practically retrievable. Commitments to pay for a chunk is considered 
+void if the requested peer is dropped there is no harm in rerequesting the chunk from another node.
+
+The goal of incentivisation is primarily to allow accounting for actions when and where cost is incurred and that cost should ultimately be borne by the initiator  as directly as possible. 
+
+Retrieval of a chunk is ultimately initiated by someone accessing content and therefore all costs should be accounted for by them.
+
+If accepting a retrieve request by itself constititutes revenue for forwarding nodes (in the sense of triggering an accounting event), then it creates a perverse incentive not to forward. 
+
+Conditioning the request revenue on successful retrieval is a potential solution.
+If however there is no cost to request then spamming with requests becomes possible.
+This can be mitigated by simply disconnecting from peers that send requests for chunks that do not exist. 
+It is not exactly clear how to measure this, but a major deviation from the average should be enough.
+Note that policing requestors is much easier than policing forwarders, since the latter requires positive evidence from other nodes while the former only requires forwarding.
+
+Once a node forwards the request it commits to pay for it if and when delivered within the TTL, therefore there is never an incentive to block timely deliveries.
+
+If the cost of a chunk is the same at all proximities, then there is no real incentive for nodes to forward requests other than the potential to cache the chunk and earn revenue by reselling it. This option is hard to justify for new chunks especially if they are in the shallow proximity orders. More importantly, if pricing of chunks is uniform across proximity orders, colluding nodes can generate chunk traffic  and pocket exactly as much as they send, virtually a free ddos attack.
+
+We need to have a pricing scheme that rewards forwarding nodes more if they are further from the chunk address, i.e., rewards chunk deliveries as a decreasing function of proximity between the delivering peer and the chunk address.
+
+Linear function
+
+a-B*PO(self, T)
+
+no negative so a>B*maxPO
+a=32 b=price
+
+Any such scheme creates a positive incentive for forwarding-only nodes to enter the network:
+nodes that dont cache are now able to earn by simply forwarding. Such nodes are not inherently beneficial to the network as they are creating unnecessary bandwidth overhead. Their presence could in principle unburden storer nodes from relaying traffic so using them in shallow proximity bins may not be detrimental.
+Closer to neighbourhood depth, their peers will favour caching/storing nodes to them because of their disadvantage at least for chunks in their hypothetical area of responsibility.
+
+Charging based on the deliverers proximity to the chunk has the important consequence that the net revenue earned from a single act of non-local delivery to a single requestor is a monotonically increasing function of the difference between the PO of the chunk with self vs the closer peer. In other words, the closer to its destination we can forward the request, the more we earn. 
+This incentive aligns with all requestors interest to save hops in serving requests leading to lower latency requests with less bandwidth overhead.
+
+This scheme incentivises nodes to keep a gap-free balanced set of addresses in their kademlia bins as deep as possible.
+
+% The idea to charge for requests but not making them revenue was discarded.
+% Proof of burn attached to the request by the downloader creates prohibitive administrative overhead in more than one way. First of all, correctly tracking payments to a burn address requires a separate address per peer. 
+% This is not strictly speaking necessary, it is enough to require nodes to check if the requestor increases their cumulative balance. 
+%  you either store proofs and then you store from all nodes (non just peers, non-logarithmic) or you lose verifiability.
+
+
+% There was an idea to require attaching the original postage stamp to retrieved chunks. This means that forwarding nodes would block chunks whose postage validity is expired. This would solve the problem of colluding requestor and storer nodes to generate DOS attack for free but seems too restrictive by itself as we do not want to block delivery of existing content. 
+\subsection{Syncing}
+
+\section{Incentivisation}
+
+\subsection{Pricing of chunk retrieval}
+
+We describe a protocol which nodes use to communicate their price for delivering chunks in the Swarm network. On top of this protocol, strategies can be implemented by nodes who wish to compete with other nodes on quality/price. 
+The price signalling is closely coupled with actual retrieve requests and therefore is formulated as part of the retrieve protocol. The main merit of the protocol is that it allows for price discovery on local decisions, which is essential for the following reasons:
+(1) Bandwidth costs are not heterogeneous around the world. Allowing nodes to express their cost structure via their price will enable competition on price and quality, ultimately benefiting the end-user. (2) the demand for bandwidth resource are constantly changing due to changes in usage or connectivity: being able to react directly to these changes creates a self-regulating system. 
+Practically, without this possibility, a node operator might decide to shut down their node when costs go up or conversely end-users might overpay for an extended period of time when costs or demand decrease and there is no competitive pressure for nodes to reduce their price accordingly. In general, we believe that bandwidth is a service that comes with 'instant gratification' therefore immediate acknowledgement and accounting of its cost is justified. Also, since it is hard to think of any externality or non-linearity in their overall demand and supply, a pricing mechanism which provides for both efficient and immediate signalling as well as competitive choice with minimal switching or discovery cost is likely to accomodate strategies that result in optimal resource allocation globally.
+
+We introduce into the retrieval protocol a new message that can communicate the new price table to upstream peers. We can conceptualise this message as an alternative response to a request. Nodes maintain the price tables associated with each peer so when they issue a retrieve request they know the price they commit to pay in the event of downstream peer delivers the valid chunk within the time to live period.
+However, there is no point in restricting the price signal to responses, for whatever reason a peer decides to change the prices, it is in the interest of both parties to exchange this information. Even if there is nothing to respond to. Surely, in order to prevent DDOs attacks by flooding upstream peers with price change messages, the rate of price messages is limited to a small finite number between any two requests. In order to prevent catastrophic connectivity changes as a result of radical price fluctuations, the rate of change might need to be limited.
+
+For simplicity of reasoning we posit that the default price table is all zeroes, corresponding to a free service (= altruistic strategy),
+In the following we describe 3 strategies: each is more complex than the previous.
+
+passive: weak cartell - hard wired fix price table
+minimal responsiveness: if margin is not guaranteed, the peer is not forwarded to. 
+
+reactive - respond to downstream price increase with exploring alternative peers. If there is no alternative it raises the price. If downstream peers drop the price, it follows suit.
+
+proactive: respond to 
+
+
+% ## Basic strategy
+% The following strategy is a basic way on how nodes *can* use the protocol described above. The strategy intends to be as easy as possible to implement, while balbalbala
+
+% ## Margin
+% A nodes price for a `ChunkDeliveryRequest` is always at least his desired `margin` + the price of the cheapest upstream peer. 
+
+% ## Filling the priceInformationRegistry
+% Initially, nodes only know the price for serving content from the most proximate bin (price == `margin`). When this node gets his first request for serving content that is one proximity order away from the border of his most proximate bin, he will first of all check that the price for this request is more than his margin. If this is the case, he will forward the `RetrieveRequest` with a price of 0 (since the state is not initialized yet). If the upstream peer in the appropriate bin did not change his price, this peer will get back a `NewPrice` message, where the price equals the `margin` of the downstream peer. If the original price is at least 2x the `margin`, the node can forward the request with a price of `margin` (and pocket the other marin himself). From this point onwards, the `state` is initialized for one peer and one proximity. Subsequent `RetrieveRequests` to this peer will be send with a `price` of `margin`. Chunks which are further away will have a higher price. The peer will quickly learn about this via this iterative process. If all peers apply the same `margin`, the price of a `ChunkDelivery` equals the proximity order between the requestor and the chunk times the `margin`. If a peer get's a request for a chunk with a price that is less than his `margin` + the price of the cheapest upstream peer in that bin, the request is not forwarded, but immediately answered by a `NewPrice` message with a price equal to the `margin` + the price of the cheapest upstream peer in that bin.
+
+% ## Reacting to price differences
+% In a network where no peer ever charges a `margin` different than the default margin, `NewPrice` messages will be only send to peers who have not fully initialized their `state` and, given equal proximity between the requested chunk and the peer in a particular bin, a node does not have a preferred supplier of a chunk based on the price. If any peer in the network would change his price, however, a preference based on price will emerge:
+
+% For any chunk request:
+% - Select the bin to forward the request to
+% - Select the peers who are closest to the chunk in terms of PO
+% - Select the peer with the lowest price
+% - Do a round-robin load balancing if there are multiple peers with the same price
+
+% From this, we can conclude that if a peer lowers his price, he is expected to receive more `RetrieveRequests` and if a peer increases his price, he is expected to receive fewer `RetrieveRequests`. A node who is connected to an upstream peer with a lower price may decide to lower his price for this distance as well in order to receive more requests.
+
+% ## Notifying about price changes
+% It is in the interest of the network, that when there is a price change this gets propagated as soon as possible to the relevant parties. A price change can be initiated by a change of `margin`, or by a change of the price from upstream peers. In both cases, a peer might decide not to notify other peers about the decrease in price--the only thing which changes is that it will accept `RetrieveRequests` with a lower price than before. Without notifying the downstream peers, however, a node might not get the expected amount of additional clients directly, as the downstream peers might never propose a lower price than before. For this reason, we propose that nodes pro-actively send `NewPrice` messages to his peers, essentially requesting them to update their `priceInformationRegistry`. In the case of pro-active `NewPrice` messages, the `chunkReference` may be synthetic, meaning it does not have to respond to an actual chunk; all that is important is that peers update their `priceInformationRegistry`.
+
+% ### Overpriced bins
+% Since the price of a node depends on the price of his upstream peers, it might happen that by change, all his upstream peer-connections in a certain bin are populated by expensive peers—effectively making the node itself to be too expensive as well for his downstream peers. To solve this issue, we propose to do statistical analysis: if a node has sensible prices across his bins, it is expected that he receives an equal amount of requests for all his bins. If a node receives statistically significantly less requests for one bin compared to his other bins, he marks the supposedly overpriced peers as non-functional and the hive protocol should kick in to suggest new peer connections. 
+
+% ### Reacting to demand increases/decreases
+
+% A node that decreases its price such that he is the cheapest, is expected to get much more traffic. Without an adequate response to an increase in traffic, a node might be forced to go offline as D
+
+% ## Configuration options
+% The following configuration options will be added. 
+
+% | name | unit | default |
+% | -------- | -------- | -------- |
+% | `margin`     | base currency of chequebook     | 0     |
+% | `period`      | duration in seconds    | 300     |
+% | `maximum_upstream_bandwidth`      | bandwidth usage in bytes per `period`     | TODO     |
+% |`high_water_mark`    | percentage: (upstream bandwidth used / `period`) / (`maximum_upstream_bandwidth`)     | 80%     |
+% | `low_water_mark`    | percentage: (upstream bandwidth used / `period`) / (`maximum_upstream_bandwidth`)      | 20%     |
+% | `margin_change`    | percentage    | 1%     |
+% See below for how these veriables are used.
+
+
+% ## Behavior of a node
+% 1) Given a particular `chunkReference`, a node chooses to send the `ChunkRequestMessage`, usually, to the peer with the lowest price of all peers in that bin.
+% 2) If a `newPrice` message is returned from a `chunkRequestMessage`, the node updates the `priceInformationRegistry` and sends the `chunkRequestMessage` again, choosing a peer on the basis of the updated `priceInformationRegistry`. 
+% 4) When a peer requests a certain `ChunkRequestMessage` and does not have the `chunkContent` in its local storage, it forwards the `chunkRequestMessage` (see 1) with a price equal to the `chunkRequestMessage` it received minus his `margin`.
+% 5) A node keeps track of his `bandWidth_usage` ((upstream bandwidth used / `period`) / (`maximum_upstream_bandwidth`))
+% 6) Whenever `bandWidth_usage` > `high_water_mark`, the `margin` will be (1+`margin_change`) * `margin`
+% 7) Whenever `bandWidth_usage` < `low_water_mark`, the `margin` will be (1-`margin_change`) * `margin`. `margin_change` indicates the 
+% 8) Whenever a node can get a `chunk` for a cheaper price than requested by a `ChunkRequestMessage` (upstream peers changed prices, amount of hops are less than the average request for the same distance), he answers with a `ChunkDeliveryMessage`, which will be priced based on the `ChunkRequestMessage`. 
+% 9) Whenever a node expects to be able to deliver long-term lower prices than currently known by his peers, he sends a `NewPrice` message to his peers. 
+
+\subsection{Peer to peer Accounting}
+\subsection{Honey}
+\subsection{Settlement with chequebook}
+\subsection{Sanctions and Blacklisting}
+\subsection{Spam protection with postage stamps}
+
+\section{Persistence}
+\subsection{Caching and auto-scaling}
+\subsection{Pinning content}
+\subsection{Re-upload and missing chunk notification}
+\subsection{Redundancy, Latency and repair}
+\subsection{Positive incentives for storage and syncing: Postage lottery}
+\subsection{Insurance against content loss}
+
+\section{High-level data access}
+
+\subsection{Data structures over chunks}
+\subsection{Files and the swarm hash}
+\subsection{Collections and Manifests}
+\subsection{URL-based addressing and name resolution}
+\subsection{Feeds and mutable resource updates}
+\subsection{Maps and key-value stores}
+\subsection{Encryption and access control}
+\subsection{Communication with pss and feeds}
+
+\cite{ethersphere2016smash}
+\cite{ethersphere2016sw3}
+\cite{maymounkov2002kademlia}
+\cite{heep2010r}
+  
+\bibliography{../refs.bib}
+\appendix
+\section{Kademlia graph theory}
+\subsection{Logarithmic distance and proximity order}
+Consider the set of bit sequences with fixed length $d$ as points in a space. We can define a distance metric $\chi$ such that
+the distance between two such sequences is defined as the bigendian  numerical value of their bitwise XOR ($\xor$).
+
+\begin{definition}{XOR distance ($\chi$)}\label{def:xor}
+\begin{equation}
+\chi(x, y) \defeq \mathit{Uint}(x  \xor y)
+\end{equation}
+\end{definition}
+
+Given the fixed length $d>0$, there is a maximum distance in this space, and thus we can define the notion of \emph{normalised distance} and its inverse, \emph{proximity}:
+
+\begin{definition}{normalised XOR distance ($\overline{\chi}$)}\label{def:normalisedxor}
+\begin{equation}
+\overline{\chi}(x, y) \defeq \frac{\chi(x,y)}{2^d-1}
+\end{equation}
+\end{definition}
+
+\begin{definition}{proximity}\label{def:proximity}
+\begin{equation}
+\mathit{Proximity}(x, y) \defeq \frac{1}{\overline{\chi}(x,y)}
+\end{equation}{}
+\end{definition}
+
+
+\emph{Proximity order (PO)} is a discrete logarithmic scaling of proximity.
+
+
+\begin{definition}{Proximity order ($\PO$)}\label{def:xorPO}
+\begin{equation}
+\begin{split}
+\PO&: \Keys \times\Keys\mapsto\overline{0,d}\\
+\PO(x,y) &\defeq 
+\begin{cases}
+d & \text{ if } x=y\\
+\mathit{int}(\log_2(\mathit{Proximity}(x, y)))&\text{otherwise}\\
+\end{cases}
+\end{split}
+\end{equation}
+\end{definition}
+
+
+In practice, $\PO(x,y)$ is the length of the longest common prefix in the bigendian binary representation of $x$ and $y$. So in practice it is calculated by counting the matching bits from the left. The maximum value of proximity is the number of bits $d$.
+
+Taking the proximity order relative to a fixed point $x_0$ partitions the points in
+the space (of bit sequences of length $d$) into equivalence classes. Points in each class are at
+most half as distant from $x_0$ as items in the previous class. Furthermore, any two points belonging to the same class are at most half as distant from each other as they are from $x_0$. We can generalise the important properties of the proximity order function as follows:
+
+\begin{definition}{Proximity order definitional properties}\label{def:PO}
+\begin{equation}
+\PO: \Keys\times \Keys\mapsto \overline{0,d}
+\end{equation}
+
+% \begin{equation}
+\begin{subequations}
+  \begin{align}
+    \label{eq:PO-constraint-symmetry} \text{reflexivity:  }&\forall x,y\in \mathcal{K}, \PO(x,y)=\PO(y,x)\\
+    \label{eq:PO-constraint-monotonicity}\text{monotonicity:   }&\forall x,y,z\in \mathcal{K}, \PO(x,y)=k \land  \PO(x,z)=k \Rightarrow  \PO(y,z)>k\\
+\label{eq:PO-constraint-transitivity}\text{transitsivity:   }&\forall x,y,z\in \mathcal{K}, \PO(x,y)<\PO(y,z) \Rightarrow \PO(x,z)=\PO(x,y)
+   \end{align}
+\end{subequations}
+% \end{equation}
+\end{definition}
+
+Given a set of points uniformly distributed in the space (e.g., the results of a hash function), proximity orders map onto a series of subsets with cardinalities on a negative exponential scale, i.e., PO bin 0 has half of the points of any random sample, PO bin 1 has one fourth, PO bin 2 one eighth, etc.
+
+\subsection{Proximity orders in graph topology}
+
+Consider a set of points $V$ in the space with a logarithmic distance and 
+a binary relation $R$. Define a directed graph where every point in the set is a vertex and any two vertices $x$ and $y$ are  connected with an edge if they are in relation $R$. 
+
+
+Points that are in relation $R$ with a particular point $x_0$ can be indexed by their proximity order relative to $x_0$. This index is called \gloss{kademlia table}.
+The kademlia table can serve as the basis for local decisions in graph traversal where the task is to find a path between two points. 
+
+
+\begin{definition}{Kademlia table}\label{def:kademlia-table}
+\mathit{Kad}_x): \overline{0,d}\mapsto \mathcal{P}(\mathit{V})\\
+\forall y, \langle x, y\rangle \in \mathit{Edges}(G) \rightarrow y \in \mathit{Kad}_x(p) \Longleftrigharrow \PO(x,y)=p 
+\end{definition}
+
+We say that a point has \emph{kademlia connectivity} (or the point's connectivity has  the kademlia property) if (1) it is connected to at least one node for each proximity order up to (but excluding) some maximum value $d$ (called the \gloss{saturation depth}) and (2) it is connected to all nodes whose proximity order relative to the node is greater or equal to $d$.
+
+\begin{definition}{Kademlia connectivity}\label{sec:kademlia-connectivity}
+\begin{equation}
+\exists d, 0\leq d \leq l, \text{such that}
+\begin{subequations}
+(1)\forall p<d, |\mathit{Kad}_x(p)|>0 \\
+(2)\forall y\in V, PO(x,y)=p\geq d \longrightarrow y\in\mathit{Kad}_x(p) 
+\end{subequations}
+\end{definition}
+
+
+If each point of a connected subgraph has kademlia connectivity, then we say the subgraph has a \gloss{kademlia topology}. In a graph with kademlia topology, (1) a path between any two points exists, (2) it can be found using only local decisions on each hop and (3) is guaranteed to terminate in no more steps than the depth of the destination plus one. 
+
+The procedure is as follows. Given point $x$ and $y$, construct the path $x_0=x , x_1, ..., x_k=y$ such that $x_{i+1}\in \mathit{PO}(x_i, x_{i+1})=\mathit{PO}(x_i, y)$, i.e., starting from the source point, choose the next point from the PO bin that the destination address falls into: because of the assumption of kademlia connectivity (1) such a point exists. Due to our previous conjecture, the actual bin is monotonically increasing at each step and can start with zero, therefore for every $0<i<=l$, $\mathit{PO}(x_{i}, y)\geq i$. So there exists a $d\leq d_y$, such that 
+$\mathit{PO}(x_{d}, y)\geq d_y$, which together with kademlia connectivity criterion (2) entails that either $x_d=y$ and $k=d$, or $y$ is connected to $x_d$, so we can choose $x_{d+1}=y$, and $k=d+1\leq d_y+1$.
+
+\begin{theorem}{In graphs with kademlia topology, any two points are connected and traversal path can be constructed based on local kademlia tables where the path length upper bound is logarithmic in the number of nodes.}
+
+\begin{proof}
+
+
+
+\qed
+\end{proof}
+\end{theorem}
+
+Given a set of points uniformly distributed in the space (e.g., the results of a hash function applied to some data) the proximity bins map onto a series of subsets with cardinalities on a negative exponential scale, i.e., PO bin 0 has half of the points of any random sample, PO bin 1 has one fourth, PO bin 2 on eighth, etc.
+The expected value of saturation depth in the network is $\log_2(N)$. 
+
+\subsection{Constructing kademlia topology}
+
+\section{}
+\printglossary
+
+\end{document}
