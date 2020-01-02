@@ -1,0 +1,167 @@
+% Waivers diagram 
+% Author: Fabio Barone, based on Pascal Seppecher taken from http://www.texample.net/tikz/examples/sequence-diagram/
+
+% Agents
+\def\A{A}
+\def\B{B}
+\def\FaceVal{Amount due}
+\def\Contract{Contract value}
+\def\Totals{Cumulative Sum}
+
+% Message Flows
+\def\ChequeA{Cheque $c0$}
+\def\ChequeB{Cheque $c1$}
+\def\ChequeC{Cheque $c2$}
+\def\RedeemC{Redeem Cheque $c1$}
+\def\ChequeD{Cheque $c3$}
+\def\WFailCumTotTooHigh{Waive attempt $w_4$}
+\def\WaiverA{Waive $w_4$}
+\def\RedeemFailWrongSN{Redeem $c3$}
+\def\WaiverB{Waive $w_5$}
+\def\ChequeE{Cheque $c6$}
+\def\ChequeF{Cheque $c7$}
+\def\RedeemF{Redeem $c7$}
+\def\ChequeG{Cheque $c8$}
+\def\RedeemG{Redeem $c8$}
+
+% Legend 
+%\def\LegendOnChain{On-chain}
+%\def\LegendOffChain{Off-chain}
+
+\begin{tikzpicture}[every node/.style={font=\small,
+  minimum height=.35cm,minimum width=.5cm}]
+ \useasboundingbox (-1cm,-7cm) rectangle (3.5cm,7cm);
+   \scope[transform canvas={scale=.75}]
+
+
+%
+% Matrix
+\node [matrix, very thin,column sep=2.0cm,row sep=0.4cm] (matrix) at (0,0) {
+  &  & \node(0,0) (\A) {}; &                        & \node(0,0) (\B) {};        & \node(0,0) {Serial};               & \node(0,0) (\FaceVal) {};  & \node(0,0) (\Contract) {}; & \node(0,0) (\Totals) {}; \\
+  &  & & & & & & &  \\
+  &  & & & & & & &  \\
+  &  & & & & & & & \\
+  &  & \node(0,0) (\A 1) {}; & \node(0,0) (\ChequeA) {}; & \node(0,0) (\B 1) {};& \node(0,0) {0};                    & \node(0,0) {6};          & \node(0,0) {6};            & \node(0,0) {6}; \\
+  &  & & & & & & & \\
+  &  & \node(0,0) (\A 2) {}; & \node(0,0) (\ChequeB) {}; & \node(0,0) (\B 2) {};& \node(0,0) {1};                     & \node(0,0) {9};          & \node(0,0) {15};            & \node(0,0) {15}; \\ 
+  &  & & & & & & & \\
+  &  & \node(0,0) (\A 3) {}; & \node(0,0) (\ChequeC) {}; & \node(0,0) (\B 3) {};& \node(0,0) {2};                     & \node(0,0) {13};          & \node(0,0) {28};            & \node(0,0) {28}; \\
+  &  & & & & & & & \\
+  &  & \node(0,0) (\A 4) {}; & \node(0,0) (\RedeemC) {}; & \node(0,0) (\B 4) {};& \node(0,0) {1};                 & \node(0,0) {15};          & \node(0,0) {19};            & \node(0,0) {28}; \\
+  &  & & & & & & & \\
+  &  & \node(0,0) (\A 5) {}; & \node(0,0) (\ChequeD) {}; & \node(0,0) (\B 5) {};& \node(0,0) {3};                     & \node(0,0) {14};          & \node(0,0) {33};            & \node(0,0) {42}; \\
+  & & & & & & & & \\
+  & \node(0,0) {Fails as exceeds Contract value} ;  & \node(0,0) (\A 6) {}; & \node(0,0) (\WFailCumTotTooHigh) {}; & \node(0,0) (\B 6) {}; & \node(0,0) {4};    & \node(0,0) {100};          & \node(0,0) {33};            & \node(0,0) {42}; \\
+  &  & & & & & & & \\
+  &  & \node(0,0) (\A 7) {}; & \node(0,0) (\WaiverA) {}; & \node(0,0) (\B 7) {};& \node(0,0) {4};                     & \node(0,0) {7};          & \node(0,0) {26};            & \node(0,0) {42}; \\
+  &  & & & & & & & \\
+  & \node(0,0) {Fails due to wrong s/n}; & \node(0,0) (\A 8) {}; & \node(0,0) (\RedeemFailWrongSN) {}; & \node(0,0) (\B 8) {};& \node(0,0) {3};      & \node(0,0) {42};          & \node(0,0) {26};            & \node(0,0) {42}; \\
+  &  & & & & & & & \\
+  &  & \node(0,0) (\A 9) {}; & \node(0,0) (\WaiverB) {}; & \node(0,0) (\B 9) {};& \node(0,0) {5};                     & \node(0,0) {26};          & \node(0,0) {0};            & \node(0,0) {42}; \\
+  &  & & & & & & & \\
+  &  & \node(0,0) (\A 10) {}; & \node(0,0) (\ChequeE) {}; & \node(0,0) (\B 10) {};& \node(0,0) {6};                     & \node(0,0) {11};          & \node(0,0) {11};            & \node(0,0) {53}; \\
+  &  & & & & & & & \\
+  &  & \node(0,0) (\A 11) {}; & \node(0,0) (\ChequeF) {}; & \node(0,0) (\B 11) {};& \node(0,0) {7};                     & \node(0,0) {15};          & \node(0,0) {26};            & \node(0,0) {68}; \\
+  &  & & & & & & & \\
+  &  & \node(0,0) (\A 12) {}; & \node(0,0) (\RedeemF) {}; & \node(0,0) (\B 12) {};& \node(0,0) {7};               & \node(0,0) {68};          & \node(0,0) {0};            & \node(0,0) {68}; \\
+  &  & & & & & & & \\
+  & \node(0,0) {Exchange in other direction ok};   & \node(0,0) (\A 13) {}; & \node(0,0) (\ChequeG) {}; & \node(0,0) (\B 13) {};& \node(0,0) {0};                     & \node(0,0) {};          & \node(0,0) {};            & \node(0,0) {}; \\
+  &  & & & & & & & \\
+  &  & \node(0,0) (\A 14) {}; & \node(0,0) (\RedeemG) {}; & \node(0,0) (\B 14) {}; & \node(0,0) {1};              & \node(0,0) {};          & \node(0,0) {};            & \node(0,0) {}; \\
+  &  & & & & & & & \\
+  &  & \node(0,0) (\A 15) {}; &                          ; & \node(0,0) (\B 15) {};&                               &                           &                             &                  \\
+};
+
+% Agents labels
+\fill 
+	(\A) node[draw,fill=white] {\A}
+	(\B) node[draw,fill=white] {\B}
+	(\FaceVal) node[] {\FaceVal}
+	(\Contract) node[] {\Contract}
+	(\Totals) node[] {\Totals};
+
+\draw [dashed] 
+  (\A) -- (\A 15)
+  (\B) -- (\B 15);
+
+% Horizontal flows 
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\A 1) -- (\B 1);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\A 2) -- (\B 2);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\A 3) -- (\B 3);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\B 4) -- (\A 4);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\A 5) -- (\B 5);
+\draw [-{Latex[length=1.5mm,width=2.5mm]},color=red] (\B 6) -- (\A 6);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\B 7) -- (\A 7);
+\draw [-{Latex[length=1.5mm,width=2.5mm]},color=red] (\B 8) -- (\A 8);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\B 9) -- (\A 9);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\A 10) -- (\B 10);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\A 11) -- (\B 11);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\B 12) -- (\A 12);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\A 13) -- (\B 13);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\B 14) -- (\A 14);
+
+% Flows Labels 
+\fill
+  (\ChequeA) 
+    node[above] {\ChequeA}
+  (\ChequeB) 
+    node[above] {\ChequeB}
+  (\ChequeC) 
+    node[above] {\ChequeC}
+  (\RedeemC) 
+    node[above] {\RedeemC}
+  (\ChequeD) 
+    node[above] {\ChequeD}
+  (\WFailCumTotTooHigh) 
+    node[above] {\WFailCumTotTooHigh}
+  (\WaiverA) 
+    node[above] {\WaiverA}
+  (\RedeemFailWrongSN) 
+    node[above] {\RedeemFailWrongSN}
+  (\WaiverB) 
+    node[above] {\WaiverB}
+  (\ChequeE) 
+    node[above] {\ChequeE}
+  (\ChequeF) 
+    node[above] {\ChequeF}
+  (\RedeemF) 
+    node[above] {\RedeemF}
+  (\ChequeG) 
+    node[above] {\ChequeG}
+  (\RedeemG) 
+    node[above] {\RedeemG};
+
+% Interaction points 
+\draw 
+  (\A 1) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\B 1) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\A 2) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\B 2) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\A 3) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\B 3) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\A 4) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\B 4) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\A 5) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\B 5) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\A 6) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\B 6) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\A 7) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\B 7) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\A 8) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\B 8) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\A 9) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\B 9) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\A 10) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\B 10) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\A 11) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\B 11) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\A 12) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\B 12) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\A 13) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\B 13) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\A 14) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\B 14) node[minimum size=0.25cm, draw,circle,fill=red!20] {};
+
+% Vertical lifelines
+\endscope
+\end{tikzpicture}

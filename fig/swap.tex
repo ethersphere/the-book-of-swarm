@@ -1,0 +1,101 @@
+% Agents
+\def\IssuerLocal{A client}
+\def\IssuerSwapContract{A swap}
+\def\BeneficiarySwapContract{B swap}
+\def\BeneficiaryLocal{B client}
+
+% Message Flows
+\def\Issue{issue cheque}% \def\Cheque{Cheque}
+\def\Redeem{redeem cheque} %\def\Cheque{Cheque}
+\def\Clear{clear ETH} %\def\ETH{ETH}
+\def\NW{withdrawal event} %\def\Msg{Log Event}
+\def\ND{deposit event} %\def\Msg{Log Event}
+
+% Legend 
+\def\LegendOnChain{On-chain}
+\def\LegendOffChain{Off-chain}
+
+
+\begin{tikzpicture}[every node/.style={font=\small,
+  minimum height=.35cm,minimum width=.5cm},]
+
+%
+% Matrix
+\node [matrix, very thin,column sep=1.0cm,row sep=0.2cm] (matrix) at (0,0) {
+  & \node(0,0) (\IssuerLocal) {};   &                         & \node(0,0) (\IssuerSwapContract) {};   & & \node(0,0) (\BeneficiarySwapContract) {};   & & \node(0,0) (\BeneficiaryLocal) {}; \\
+  & & & & & & & \\
+  & & & & & & & \\
+  & & & & & & & \\
+  & \node(0,0) (\IssuerLocal 1) {}; & \node(0,0) (\Issue) {}; & \node(0,0) (\IssuerSwapContract 1) {}; & & \node(0,0) (\BeneficiarySwapContract 1) {}; & & \node(0,0) (\BeneficiaryLocal 1) {}; \\
+  & & & & & & & \\
+  & & & & & & & \\
+  & \node(0,0) (\IssuerLocal 2) {}; &                         & \node(0,0) (\IssuerSwapContract 2) {}; & & \node(0,0) (\BeneficiarySwapContract 2) {}; & \node(0,0) (\Redeem) {};  &  \node(0,0) (\BeneficiaryLocal 2) {}; \\ 
+  & & & & & & & \\
+  & & & & & & & \\
+  & \node(0,0) (\IssuerLocal 3) {}; &                         & \node(0,0) (\IssuerSwapContract 3) {}; & \node(0,0) (\Clear) {}; & \node(0,0) (\BeneficiarySwapContract 3) {}; &                    ; & \node(0,0) (\BeneficiaryLocal 3) {}; \\
+  & & & & & & & \\
+  & \node(0,0) (\IssuerLocal 4) {}; & \node(0,0) (\NW) {}   ; & \node(0,0) (\IssuerSwapContract 4) {}; &                         & \node(0,0) (\BeneficiarySwapContract 4) {}; & \node(0,0) (\ND) {}; & \node(0,0) (\BeneficiaryLocal 4) {}; \\
+  & & & & & & & \\
+  & \node(0,0) (\IssuerLocal 5) {}; &                         & \node(0,0) (\IssuerSwapContract 5) {};  & & \node(0,0) (\BeneficiarySwapContract 5) {};& & \node(0,0) (\BeneficiaryLocal 5) {}; \\
+  & & & & & & & \\
+  & \node(0,0) (\IssuerLocal 6) {}; &                         & \node(0,0) (\IssuerSwapContract 6) {};  & & \node(0,0) (\BeneficiarySwapContract 6) {};& & \node(0,0) (\BeneficiaryLocal 6) {}; \\
+  & & & & & & & \\
+  & \node(0,0) (\IssuerLocal 7) {}; & \node(0,0) (\LegendOnChain) {};  & & & & & \\
+  & \node(0,0) (\IssuerLocal 8) {}; & \node(0,0) (\LegendOffChain) {}; & & & & & \\
+};
+
+% Agents labels
+\fill 
+	(\IssuerLocal) node[draw,fill=white] {\IssuerLocal}
+	(\IssuerSwapContract) node[draw,fill=white] {\IssuerSwapContract}
+	(\BeneficiarySwapContract) node[draw,fill=white] {\BeneficiarySwapContract}
+	(\BeneficiaryLocal) node[draw,fill=white] {\BeneficiaryLocal};
+
+\draw [dashed] 
+  (\IssuerLocal) -- (\IssuerLocal 6)
+  (\BeneficiaryLocal) -- (\BeneficiaryLocal 6)
+  (\IssuerSwapContract) -- (\IssuerSwapContract 6)
+  (\BeneficiarySwapContract) -- (\BeneficiarySwapContract 6);
+
+% Horizontal flows (Monetary interactions)
+%\draw [-latex] (\IssuerLocal 1) -- (\IssuerSwapContract 1.west) arc(180:0:0.37cm) -- (\BeneficiarySwapContract 1.west) arc(180:0:0.37cm) -- (\BeneficiaryLocal 1);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\IssuerLocal 1) -- (\BeneficiaryLocal 1);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\BeneficiaryLocal 2) -- (\IssuerSwapContract 2);
+%\draw [-latex] (\BeneficiaryLocal 2) -- (\BeneficiarySwapContract 2.east) arc(0:180:0.37cm) -- (\IssuerSwapContract 2);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\IssuerSwapContract 3) -- (\BeneficiarySwapContract 3);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\IssuerSwapContract 3) -- (\IssuerLocal 4);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\BeneficiarySwapContract 3) -- (\BeneficiaryLocal 5);
+
+% Flows Labels 
+\fill
+  (\Issue) 
+    node[above, font=\footnotesize ] {\Issue}
+  (\Redeem) 
+    node[above, font=\footnotesize] {\Redeem}
+  (\Clear) 
+    node[above, font=\footnotesize] {\Clear}
+  (\NW) 
+    node[above, font=\footnotesize, text width=1.4cm, text height=1.5cm, align=center,fill=white] {\NW}
+  (\ND) 
+    node[above, font=\footnotesize, text width=1.5cm,align=center,fill=white] {\ND};
+
+% Interaction points 
+\draw 
+  (\IssuerLocal 1) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\BeneficiaryLocal 1) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\BeneficiaryLocal 2) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\IssuerSwapContract 2) node[minimum size=0.25cm, draw,circle,fill=green!20] {}
+  (\IssuerSwapContract 3) node[minimum size=0.25cm, draw,circle,fill=green!20] {}
+  (\IssuerLocal 4) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\BeneficiarySwapContract 3) node[minimum size=0.25cm, draw,circle,fill=green!20] {}
+  (\BeneficiaryLocal 5) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\IssuerLocal 7) node[minimum height=.1cm, minimum size=0.1cm, draw,circle,fill=green!20] {}
+  (\IssuerLocal 8) node[minimum height=.1cm, minimum size=0.1cm, draw,circle,fill=red!20] {};
+
+% Vertical lifelines
+\draw [-{Latex[length=1.5mm,width=2mm]}] (\IssuerSwapContract 2) -- (\IssuerSwapContract 3);
+ Legend labels
+\draw
+	(\LegendOnChain) node[minimum height=.1cm] {\LegendOnChain}
+	(\LegendOffChain) node[minimum height=.1cm] {\LegendOffChain};
+\end{tikzpicture}

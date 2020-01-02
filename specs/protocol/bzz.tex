@@ -1,0 +1,36 @@
+\subsection{Messages}
+The bzz protocol consists of a single message type: handshake.
+
+The bzz handshake is the first message to be exchanged between peers after the p2p transport protocol has been successfully negotiated. The handshake message consists of four data fields:
+
+\begin{definition}{Bzz handshake message}\label{def:bzz-handshake}
+
+\begin{tabular}{r|l|r|l|l}
+\multicolumn{2}{c|}{field}& 
+\multicolumn{2}{c|}{format}& 
+\\
+pos & name  & len & type & description \\\hline
+0  & version & 8 & UINT64 & swarm protocol suite version\\\hline
+1  & network ID & 8 & UINT64 & swarm network identifier\\\hline
+2 & bzz address & <1024 & BYTES & bzz address \ref{def:bzz-address}\\\hline
+3 & light & 4 & BOOL & light (as opposed to full) mode of operation
+\end{tabular}
+\end{definition}
+
+\subsection{Protocol}
+
+Upon connection, the peer who initiated the connection sends a handshake message to the other. If more than one handshake is received from the same peer, the peer is disconnected.
+Connecting peers must have the same network ID; mismatch entails disconnection.
+Connecting peers must have compatible versions, incompatibility entails disconnection.
+The bzz address is verified and overlay, underlay and signature are extracted.
+light is a boolean field indicating whether the node is operating as a light (as opposed to full) node.
+
+After the handshake,  each peer should remember the following data about the other:
+
+\begin{itemize}
+    \item the overlay address - used in forwarding  (see  \ref{spec:strategy:forwarding})
+    \item the underlay address - used for dialing, passed to the underlay network protocol when the connectivity driver needs to connect to the peer (see \ref{spec:strategy:connection})
+    \item the bzz address signature - needed by the hive protocol to pass information about the node to other peers (see \ref{spec:protocol:hive})
+    \item whether the peer is a light node
+\end{itemize}
+

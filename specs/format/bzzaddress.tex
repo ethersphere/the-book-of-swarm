@@ -1,0 +1,48 @@
+\subsection{Overlay address}
+
+Swarm's overlay network uses 32-byte addresses. In order to help  uniform utilisation of the address space,  these addresses must be derived using a hash function. A Swarm node must be associated with an Ethereum account called the \gloss{swarm base account} or \gloss{bzz account}.
+The node's overlay address is derived as hash of the corresponding  public key.
+ of the 
+
+\begin{definition}{Swarm overlay address of a node}\label{def:overlay}
+\begin{equation}
+\mathit{OverlayAddress}(n) \defeq \mathit{H}(p^\mathit{id})
+\end{equation}
+where
+\begin{itemize}
+    \item $H$ is the 256-bit Keccak SHA3 hash function
+    \item $P$ is the \emph{uncompressed} form of the public key corresponding to the node's bzz account, \emph{including} its $04$ (uncompressed) prefix.
+    \item $\mathit{id}$ is the network id of the swarm network
+\end{itemize}
+\end{definition}
+
+\subsection{Underlay address}
+
+To enable peers to locate the a node on the network, the overlay address is paired with an underlay address. The underlay address is a string representation of the node's network location on the underlying transport layer. 
+
+As long as swarm runs of devp2p, we use the \gloss{enode url scheme} representation \cite{ETHWIKI:ENODE}
+
+\begin{definition}{devp2p underlay address of a node}\label{def:underlay}
+$\mathit{underlay}(n) \defeq $
+\begin{verbatim}
+    "enode://"<NODEID>"@"<HOST>(":"<TCPPORT>("?udp="<UDPPORT>))
+\end{verbatim}
+\end{definition}
+
+\subsection{BZZ address}
+
+Bzz address is functionally the pairing of overlay and underlay addresses. In order to ensure that an address is derived from an account the node possesses as well as verifiably attest to an underlay address a node can be called on, bzz addresses are communicated in the following transfer format:
+
+\begin{definition}{Swarm bzz address transfer format} \label{def:bzz-address}
+
+\begin{tabular}{r|l|r|l|l}
+\multicolumn{2}{c|}{field}& 
+\multicolumn{2}{c|}{format}& 
+\\
+pos & name  & len & type & description \\\hline
+0  & signature & 65 & RSV & RSV encoded signature of field 1 with bzz account private key\\\hline
+1  & underlay & <959 & string & devp2p V5 enode encoded underlay address
+\end{tabular}
+\end{definition}
+
+In order to get the overlay address from the transfer format peer info, one applies ECRecover on the signature with the underlay and hashes the resulting public key. 

@@ -1,0 +1,38 @@
+
+\begin{center}
+\begin{tabular}{ccc}
+\begin{tikzpicture}
+\node (middle)[draw, rectangle, fill=orange!50, minimum height=1em, minimum width=4em]{};
+\node (leftred) [draw, rectangle, fill=red!70, minimum height=1em, minimum width=1em, node distance=2.5em, left of=middle]{};
+\node (rightred)[draw, rectangle, fill=red!70, minimum height=1em, minimum width=1em, node distance=2.5em, right of=middle]{};
+\node (zero) [above of=middle,node distance=2em, text height=1em] {};
+\node (zerod) [below of=zero, node distance=3.5em] {};
+\node (balance) [right of=zero,node distance=2em, text height=1.5em] {$n$};
+\node (balanced) [below of=balance,node distance=3.5em] {};
+\draw [dashed](zero)--(zerod);
+\draw [very thick](balance)--(balanced);
+\node (payment) [below of=zerod, node distance=1em]{};
+\node (cheqeue) [draw, left of=payment, node distance=.7em, minimum height=1em, minimum width=1.4em, fill=blue!30, rectangle]{$C$};
+
+\node (swap) [left of=leftred,minimum width=1em,align=right]{swap};
+\node (cheques) [below of=swap,minimum width=1em, node distance= 2.5em, align=right]{cheques};
+\end{tikzpicture}
+&
+\begin{tabular}{c}
+  $\Longrightarrow$
+\\ \\ \\ \\
+\end{tabular}
+&
+\begin{tikzpicture}
+\node (middle)[draw, rectangle, fill=orange!50, minimum height=1em, minimum width=4em]{};
+\node (leftred) [draw, rectangle, fill=red!70, minimum height=1em, minimum width=1em, node distance=2.5em, left of=middle]{};
+\node (rightred)[draw, rectangle, fill=red!70, minimum height=1em, minimum width=1em, node distance=2.5em, right of=middle]{};
+\node (zero) [above of=middle,node distance=2em, text height=1.5em] {$0$};
+\node (zerod) [below of=zero, node distance=3.5em] {};
+% \draw [dashed](zero)--(zerod);
+\draw [very thick](zero)--(zerod);
+\node (payment) [below of=zerod, node distance=1em]{};
+\node (cheque) [draw, left of=payment, node distance=1.7em, minimum height=1em, minimum width=3.4em, fill=blue!30, rectangle]{$C+n$};
+\end{tikzpicture}
+\end{tabular}
+\end{center}

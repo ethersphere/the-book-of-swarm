@@ -1,0 +1,118 @@
+
+\chapter{Kademlia graph theory}
+\section{Logarithmic distance and proximity order}\label{sec:proximity}
+Consider the set of bit sequences with fixed length $d$ as points in a space. We can define a distance metric $\chi$ such that
+the distance between two such sequences is defined as the bigendian  numerical value of their bitwise XOR ($\xor$).
+
+\begin{definition}{XOR distance ($\chi$)}\label{def:xor}
+\begin{equation}
+\chi(x, y) \defeq \mathit{Uint}(x  \xor y)
+\end{equation}
+\end{definition}
+
+Given the fixed length $d>0$, there is a maximum distance in this space, and thus we can define the notion of \emph{normalised distance} and its inverse, \emph{proximity}:
+
+\begin{definition}{normalised XOR distance ($\overline{\chi}$)}\label{def:normalisedxor}
+\begin{equation}
+\overline{\chi}(x, y) \defeq \frac{\chi(x,y)}{2^d-1}
+\end{equation}
+\end{definition}
+
+\begin{definition}{proximity}\label{def:proximity}
+\begin{equation}
+\mathit{Proximity}(x, y) \defeq \frac{1}{\overline{\chi}(x,y)}
+\end{equation}{}
+\end{definition}
+
+
+\emph{Proximity order (PO)} is a discrete logarithmic scaling of proximity.
+
+
+\begin{definition}{Proximity order ($\PO$)}\label{def:xorPO}
+\begin{equation}
+\begin{split}
+\PO&: \Keys \times\Keys\mapsto\overline{0,d}\\
+\PO(x,y) &\defeq 
+\begin{cases}
+d & \text{ if } x=y\\
+\mathit{int}(\log_2(\mathit{Proximity}(x, y)))&\text{otherwise}\\
+\end{cases}
+\end{split}
+\end{equation}
+\end{definition}
+
+
+In practice, $\PO(x,y)$ is the length of the longest common prefix in the bigendian binary representation of $x$ and $y$. So in practice it is calculated by counting the matching bits from the left. The maximum value of proximity is the number of bits $d$.
+
+Taking the proximity order relative to a fixed point $x_0$ partitions the points in
+the space (of bit sequences of length $d$) into equivalence classes. Points in each class are at
+most half as distant from $x_0$ as items in the previous class. Furthermore, any two points belonging to the same class are at most half as distant from each other as they are from $x_0$. We can generalise the important properties of the proximity order function as follows:
+
+\begin{definition}{Proximity order definitional properties}\label{def:PO}
+\begin{equation}
+\PO: \Keys\times \Keys\mapsto \overline{0,d}
+\end{equation}
+
+% \begin{equation}
+\begin{subequations}
+  \begin{align}
+    \label{eq:PO-constraint-symmetry} \text{reflexivity:  }&\forall x,y\in \mathcal{K}, \PO(x,y)=\PO(y,x)\\
+    \label{eq:PO-constraint-monotonicity}\text{monotonicity:   }&\forall x,y,z\in \mathcal{K}, \PO(x,y)=k \land  \PO(x,z)=k \Rightarrow  \PO(y,z)>k\\
+\label{eq:PO-constraint-transitivity}\text{transitsivity:   }&\forall x,y,z\in \mathcal{K}, \PO(x,y)<\PO(y,z) \Rightarrow \PO(x,z)=\PO(x,y)
+   \end{align}
+\end{subequations}
+% \end{equation}
+\end{definition}
+
+Given a set of points uniformly distributed in the space (e.g., the results of a hash function), proximity orders map onto a series of subsets with cardinalities on a negative exponential scale, i.e., PO bin 0 has half of the points of any random sample, PO bin 1 has one fourth, PO bin 2 one eighth, etc.
+
+\section{Proximity orders in graph topology}
+
+Consider a set of points $V$ in the space with a logarithmic distance and 
+a binary relation $R$. Define a directed graph where every point in the set is a vertex and any two vertices $x$ and $y$ are  connected with an edge if they are in relation $R$. 
+
+
+Points that are in relation $R$ with a particular point $x_0$ can be indexed by their proximity order relative to $x_0$. This index is called \gloss{kademlia table}.
+The kademlia table can serve as the basis for local decisions in graph traversal where the task is to find a path between two points. 
+
+
+\begin{definition}{Kademlia table}\label{def:kademlia-table}
+\begin{equation}
+\mathit{Kad}_x): \overline{0,d}\mapsto \mathcal{P}(\mathit{V})\\
+\forall y, \langle x, y\rangle \in \mathit{Edges}(G) \rightarrow y \in \mathit{Kad}_x(p) \Longleftrigharrow \PO(x,y)=p 
+\end{equation}
+\end{definition}
+
+We say that a point has \emph{kademlia connectivity} (or the point's connectivity has  the kademlia property) if (1) it is connected to at least one node for each proximity order up to (but excluding) some maximum value $d$ (called the \gloss{saturation depth}) and (2) it is connected to all nodes whose proximity order relative to the node is greater or equal to $d$.
+
+\begin{definition}{Kademlia connectivity}\label{sec:kademlia-connectivity}
+\begin{equation}
+\exists d, 0\leq d \leq l, \text{such that}
+\begin{subequations}
+(1)\forall p<d, |\mathit{Kad}_x(p)|>0 \\
+(2)\forall y\in V, PO(x,y)=p\geq d \longrightarrow y\in\mathit{Kad}_x(p) 
+\end{subequations}
+\end{equation}
+\end{definition}
+
+
+If each point of a connected subgraph has kademlia connectivity, then we say the subgraph has a \gloss{kademlia topology}. In a graph with kademlia topology, (1) a path between any two points exists, (2) it can be found using only local decisions on each hop and (3) is guaranteed to terminate in no more steps than the depth of the destination plus one. 
+
+The procedure is as follows. Given point $x$ and $y$, construct the path $x_0=x , x_1, ..., x_k=y$ such that $x_{i+1}\in \mathit{PO}(x_i, x_{i+1})=\mathit{PO}(x_i, y)$, i.e., starting from the source point, choose the next point from the PO bin that the destination address falls into: because of the assumption of kademlia connectivity (1) such a point exists. Due to our previous conjecture, the actual bin is monotonically increasing at each step and can start with zero, therefore for every $0<i<=l$, $\mathit{PO}(x_{i}, y)\geq i$. So there exists a $d\leq d_y$, such that 
+$\mathit{PO}(x_{d}, y)\geq d_y$, which together with kademlia connectivity criterion (2) entails that either $x_d=y$ and $k=d$, or $y$ is connected to $x_d$, so we can choose $x_{d+1}=y$, and $k=d+1\leq d_y+1$.
+
+\begin{theorem}{In graphs with kademlia topology, any two points are connected and traversal path can be constructed based on local kademlia tables where the path length upper bound is logarithmic in the number of nodes.}
+
+\begin{proof}
+
+
+
+\qed
+\end{proof}
+\end{theorem}
+
+\section{Constructing kademlia topology}
+
+
+\chapter{Implementers' guide}
+\input{implementers-guide.tex}

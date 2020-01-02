@@ -1,0 +1,89 @@
+
+
+
+
+
+\subsubsection{Routing with full address} \label{sec:routing-with-full-address}
+
+By full address we mean that the recipient address contains the full 32 bytes of the intended recipient node.
+
+\begin{enumerate}
+\item If the recipient address falls within the \emph{most proximate bin} of the node, the content should be forwarded to \emph{all} the node's \emph{nearest neighbors}.
+\item Otherwise the node \emph{MUST} attempt to send to exactly \emph{one} peer in the bin that is the closest match to the recipient.
+\item If this is not successful, the node \emph{MUST} try to forward to each remaining peer in that bin in order from closest to farthest to the recipient, until one is successful.
+\item If this is not successful, the node should retain the content and retry later.
+\end{enumerate}
+
+\subsubsection{Routing with partial address}
+
+\begin{enumerate}
+\item Identify the \emph{farthest} peer that matches the partial address.
+\item If that peer is in the \emph{most proximate bin}, the content should be forwarded to \emph{all} the node's \emph{nearest neighbors}.
+\item Otherwise, if the bitlength of the recipient address equals the proximity order of its matching bin, the content should be forwarded to \emph{all} peers that are in the matching bin or closer to the recipient\footnote{Notice that in this context, the matching bin becomes the \emph{most proximate bin}}.
+\item Otherwise the bitlength of the recipient address is \emph{longer} than the promixity order of its matching bin. In this case the node \emph{MUST} attempt to send to exactly \emph{one} peer in the bin that is the closest match to the recipient address.
+\item If this is not successful, the node \emph{MUST} try to forward to each remaining peer in that bin in order from closest to farthest to the recipient address, until one is successful.
+\item If this is not successful, the node should retain the content and retry later.
+\end{enumerate}
+
+\subsubsection{Routing with empty address}
+
+\begin{enumerate}
+\item Content should be forwarded to \emph{all} peers.
+\item If \emph{none} of the peers can successfully be forwarded to, the node should retain the content and retry later.
+\end{enumerate}
+
+\subsection{Evaluating recipients}
+
+Any node receiving content has to evaluate whether it can be the intended recipient, or one of the indended recipients, of the content.
+
+The first condition that must be fulfilled is a matching recipient address on the content. Matching may happen in one of two forms:
+
+\paragraph{Literal matching}
+
+As described in \ref{sec:routing-with-full-address}, if the full 32-byte recipient address matches the node address, the node is the only intended recipient and \emph{MUST} process the content.
+
+If the recipient address is a partial address, and it matches the node address, the node \emph{may} be one of the intended recipients and \emph{MUST} process the content.
+
+\paragraph{Proximity matching}
+
+This method provides a way to send content with a full 32 byte recipient address to more than one recipient.\footnote{This is the matching method used for the \emph{Push Sync} feature, where content addressed chunks are routed to their neighborhood in the network.} The procedure is as follows.
+
+\begin{enumerate}
+\item The proximity order of the recipient address with respect to the node is calculated
+\item If the proximity order is within the node's depth, the node \emph{may} be one of the intended recipient and \emph{MUST} process the content.
+\end{enumerate}
+
+
+
+
+1. Get rid of `hopcount` and make sure we have forwarding of chunk requests without loops in a DAG
+2. Add somehow retry mechanism for chunks in the syncer, possibly through the `FetcherItem` and the `NetStore` retry mechanism used for RetrieveRequests
+3. Pass information on who has offered a given chunk from the syncer to the fetchers.
+4. Extract all logic that selects the `next` peer at one place - this decision is based on:
+    - Kademlia
+    - historic information of the Fetcher (such as PeerToSkip ; who has been tried already)
+    - syncer information - who has offered a given chunk
+    - path info - minimally, who requested the chunk
+
+In particular, 4 is achieved by finding the closest peer to the chunk address such that
+    
+    
+- NEW: 
+    - it has not yet been selected earlier by the fetcher
+    
+- KNOWN SOURCE:
+    - peer that offered the chunk via syncing, such a peer is a reat candidate as it guarantees the chunk in one hop
+    
+- ON ROUTE: 
+    - if the chunk falls outside of the area of responsibility, it strictly increases proximity to the chunk (in other words, we choose from the same PO bin the chunk falls into). 
+    - if the chunk falls within our area of responsibility, then choose a nearest neighbour - ideally all the nearest neighbours at once - note that there are gonna be nearest neighbours further from the chunk than us
+
+- REVERSE: if the request comes from a node not strictly further from the chunk, then
+  - do not select any peer and forward to noone
+      this can happen 
+      - if we are the requesting peer's nearest neighbours:
+        we don't have the chunk and all other neighbours are asked, so makes no sense to forward
+      - we offered the hash via syncing to the requesting node. If we get here, it means we deleted a chunk we offered or the  requesor 
+      
+      This algotithm is strict in that the forwarding path created by nodes following these rules have the properties explicitly used in the paper's claim to logN steps to get the chunk from anywhere. 
+      In particular it is guaranteed to be without loops. It is guaranteed to succeed with the sole assumption of kademlia health. However, modifications will need to be made to take care of the situations with unhealthy kademlia.

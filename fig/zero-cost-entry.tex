@@ -1,0 +1,85 @@
+% Chequebook diagram 
+% Author: Fabio Barone, based on Pascal Seppecher taken from http://www.texample.net/tikz/examples/sequence-diagram/
+
+
+% Agents
+\def\Legend{}
+\def\Newcomer{Newcomer}
+\def\NewcomerSwap{Newcomer swap}
+\def\Insider{Insider}
+\def\InsiderSwap{}
+
+% Message Flows
+\def\Connect{Connect}
+\def\Consume{Consume service}
+\def\CreateContract{Create contract} 
+
+% Legend 
+\def\ContractCreationThreshold{Contract creation threshold reached} 
+   
+\begin{tikzpicture}[every node/.style={font=\small,
+  minimum height=.35cm,minimum width=.5cm},]
+
+%
+% Matrix
+\node [matrix, very thin,column sep=1.2cm,row sep=0.8cm] (matrix) at (0,0) {
+  & \node(0,0) (\Legend)[column sep=2cm] {};   & \node(0,0) (\Newcomer) {};   &                           & \node(0,0) (\NewcomerSwap) {};   &                          & \node(0,0) (\Insider) {}; & & \node(0,0) (\InsiderSwap) {}; \\
+  & & & & & & & & \\
+  & \node(0,0) (\Legend 1) {}; & \node(0,0) (\Newcomer 1) {}; & \node(0,0) (\Connect){};  & \node(0,0) (\NewcomerSwap 1) {}; &                          & \node(0,0) (\Insider 1) {}; & & \node(0,0) (\InsiderSwap 1) {}; \\
+  & \node(0,0) (\Legend 2) {}; & \node(0,0) (\Newcomer 2) {}; &                           & \node(0,0) (\NewcomerSwap 2) {}; & \node(0,0) (\Consume){}; & \node(0,0) (\Insider 2) {}; & &  \node(0,0) (\InsiderSwap 2) {}; \\ 
+  & \node(0,0) (\Legend 3) {}; & \node(0,0) (\Newcomer 3) {}; &                           & \node(0,0) (\NewcomerSwap 3) {}; & \node(0,0) (\Consume 1){}; & \node(0,0) (\Insider 3) {}; & &  \node(0,0) (\InsiderSwap 3) {}; \\ 
+  & & & & & & & & \\
+  & \node(0,0) (\ContractCreationThreshold) {}; & \node(0,0) (\Newcomer 4) {}; &          & \node(0,0) (\NewcomerSwap 4) {}; & \node(0,0) (\Consume 2){}; & \node(0,0) (\Insider 4) {}; & &  \node(0,0) (\InsiderSwap 4) {}; \\ 
+  & \node(0,0) (\Legend 5) {}; & \node(0,0) (\Newcomer 5) {}; &                           & \node(0,0) (\NewcomerSwap 5) {}; & \node(0,0) (\CreateContract){};  & \node(0,0) (\Insider 5) {}; & &  \node(0,0) (\InsiderSwap 4) {}; \\ 
+  & \node(0,0) (\Legend 6) {}; & \node(0,0) (\Newcomer 6) {}; &                           & \node(0,0) (\NewcomerSwap 6) {}; &                          & \node(0,0) (\Insider 6) {};& & \node(0,0) (\InsiderSwap 6) {}; \\
+};
+
+% Agents labels
+\fill 
+	(\Newcomer) node[draw,fill=white] {\Newcomer}
+	(\NewcomerSwap) node[draw,fill=white] {\NewcomerSwap}
+	(\Insider) node[draw,fill=white] {\Insider};
+
+\draw [dashed] 
+  (\NewcomerSwap) -- (\NewcomerSwap 6)
+  (\Newcomer) -- (\Newcomer 6)
+  (\Insider) -- (\Insider 6);
+
+% Horizontal flows (Monetary interactions)
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\Newcomer 1) -- (\Insider 1);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\Insider 2) -- (\Newcomer 2);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\Insider 3) -- (\Newcomer 3);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\Insider 4) -- (\Newcomer 4);
+\draw [-{Latex[length=1.5mm,width=2.5mm]}] (\Insider 5) -- (\NewcomerSwap 5);
+
+% Flows Labels 
+\fill
+  (\Connect) 
+    node[above] {\Connect}
+  (\Consume) 
+    node[above] {\Consume}
+  (\Consume 1) 
+    node[above] {\Consume}
+  (\Consume 2) 
+    node[above] {\Consume}
+  (\CreateContract) 
+    node[above] {\CreateContract}
+  (\ContractCreationThreshold) 
+    node[text width=1.5cm] {\ContractCreationThreshold};
+
+% Interaction points 
+\draw 
+  (\Newcomer 1) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\Insider 1) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\Newcomer 2) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\Insider 2) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\Newcomer 3) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\Insider 3) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\Newcomer 4) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\Insider 4) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\NewcomerSwap 5) node[minimum size=0.25cm, draw,circle,fill=red!20] {}
+  (\Insider 5) node[minimum size=0.25cm, draw,circle,fill=red!20] {};
+
+% Vertical lifelines
+
+\end{tikzpicture}

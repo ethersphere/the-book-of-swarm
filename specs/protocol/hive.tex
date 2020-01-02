@@ -1,0 +1,35 @@
+
+Nodes get information about other peers relevant to them through the hive protocol.
+
+The protocol is based on the idea that nodes advertise their \emph{saturation  depth} (\ref{sec:bootstrapping}) to their peers, which is considered as a subscription by their peers. Peers respond to the subscription by sending information about their own peers to the subscriber.
+
+\subsection{Messages}
+
+
+\begin{definition}{Subscribe message}\label{def:hive-subscribe-msg}
+
+| id | def |
+| :--- | :---- |
+| DEPTH | LIST(UINT8) |
+\end{definition}
+
+
+
+\begin{definition}{Peers message}\label{def:hive-peers-msg}
+
+| id | def |
+| :--- | :---- |
+| PEERS | LIST(LIST(*BZZADDRESS)) |
+\end{definition}
+
+\subsection{Protocol}
+
+When two peers connect and the hive protocol is started on the peer connection a subscribe message is sent.
+On receiving this subscribe message from the peer, nodes respond with a peers message right away. This peers message is meant to contain bzz addresses of a maximum of \texttt{MAX_HIVE_PEERS_COUNT}=50 peers.
+
+At later stages, a subscribe message is sent (only) if the node's saturation depth changes. There is not meant to be a direct response to a subscribe message.
+
+If a node establishes a new peer connection with a full node, it notifies some of its existing peers about the new peer. Those existing peers get notified that, based on their advertised saturation depth, are interested in the new peer. 
+Formally, when a node $s$ (sender) connects with another node $p$, $s$ notifies an existing peer $r$ (recipient) if $\mathit{PO}(s, r) = \mathit{PO}(s, p)$ or $\mathit{depth}(r)\leq \mathit{PO}(r, p)$. The notification is a peers message containing $r$'s bzz address.
+
+Upon receiving a peers message, nodes are meant to store the peer information in their \gloss{address book}, i.e., a data structure containing info about peers known to the node. The address book is meant to be used to suggest peers  to a connectivity manager according to a connection strategy (\ref{spec:strategy:connection}) in order to bootstrap kademlia topology (\ref{sec:kademlia-connectivity}). 

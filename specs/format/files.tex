@@ -1,0 +1,53 @@
+
+This table gives an overview of data sizes a chunk span represents, depending on the level of recursion.
+
+\begin{table}[h]
+\begin{tabular}{|l|l|l|l|}
+\hline
+Level & Span in chunks & Span in bytes & $--human$ \\
+\hline
+0 (data) & 1 & 4,096 & (4KB) \\
+1 & 128 & 524,288 & (500KB) \\
+2 & 16,384 & 67,108,864 & (67MB) \\
+3 & 2,097,152 & 8,589,934,592 & (8.5GB) \\
+4 & 268,435,456 & 1,099,511,627,776 & (1.1TB) \\
+5 & 34,359,738,368 & 140,737,488,355,328 & (140TB) \\
+6 & 4,398,046,511,104 & 18,014,398,509,481,984 & (18PB) \\
+7 & 562,949,953,421,312 & 2,305,843,009,213,693,952 & (2.3EB) \\
+\hline
+\end{tabular}
+\caption{Some Chunk Span data size boundaries}
+\end{table}
+
+\subsubsection{Calculating the Swarm Hash}
+
+To calculate the Swarm Hash the following method is used:
+
+\begin{enumerate}
+	\item Determine the \texttt{Chunk Reference} of each \texttt{Chunk} into an \emph{intermediate result} \footnote{Remember, use the actual size of represented data}
+	\item If the $log_{128}$ of the number of \texttt{Chunks} minus one is an even number, the last \texttt{Chunk Reference} should be stored and not included in the following step
+	\item Otherwise, if the $log_{128}$ of the number of \texttt{Chunks} is an even number, remove the stored \texttt{Chunk Reference} and concatenate it to the \emph{intermediate result}
+	\item If the data size of the \texttt{Chunk References} of the \texttt{Chunks} (including the stored \texttt{Chunk Reference} is greater than \texttt{Segment Size}, group all the \texttt{Chunk References} in the \emph{intermediate result} and repeat from step 1 with this as the data
+\end{enumerate}
+
+Note that the \texttt{Swarm Hash} of data up to a single chunk in total size is identical to its \texttt{BMT Hash}.
+
+\subsection{Chunk Reference}
+
+The Chunk storage in Swarm is \emph{content addressed}. This means that the identifier of each individual \texttt{Chunk} in the store is a function of the content itself.
+
+This identifier always contains the address of the \texttt{Chunk}. This address is a \texttt{Swarm Overlay Address}, which means that \emph{nodes} and \emph{content} have comparable identifiers. \ref{sec:distance-and-proximity}.
+
+Retrieval and interpretation of a \texttt{Chunk} from the store \emph{may} require more information than merely its identifier in the store. The entity encaspulating this information is called the \texttt{Chunk Reference}.
+
+In its simplest form, the \texttt{Chunk Reference} is the same as the address of the \texttt{Chunk}. 
+
+\subsection{Encrypted Chunk References}
+
+Currently, the only other defined \texttt{Chunk Reference} is used with an intra-node convenience crypto scheme.
+
+Here all references are double the \texttt{Segment Size}. The first \texttt{Segment Size} bytes is a key to decrypt the latter \texttt{Segment Size} bytes into an actual valid address that can be retrieved from the store.
+
+The symmetric key provided by the caller when adding the content is used as the seed to derive all decryption keys for the \texttt{Intermediate Chunks} \ref{intermediate-chunks}. It is also used as the encryption key for the \texttt{Swarm Hash} \ref{swarm-hash}.
+
+\todo{Describe the crypto algo}
