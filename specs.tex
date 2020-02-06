@@ -1,28 +1,12 @@
 \chapter{Introduction}
 \input{specs/introduction.tex}
 
-\chapter{Protocol}
-\section{Bzz  handshake protocol}\label{spec:protocol:bzz}
-\input{specs/protocol/bzz.tex}
-\section{Hive discovery protocol}\label{spec:protocol:hive}
-\input{specs/protocol/hive.tex}
-\section{Retrieval protocol}\label{spec:protocol:retrieval}
-\input{specs/protocol/retrieval.tex}
-\section{Push-syncing protocol}\label{spec:protocol:push-sync}
-\input{specs/protocol/push-sync.tex}
-\section{Stream protocol}\label{spec:protocol:stream}
-\input{specs/protocol/stream.tex}
-\section{Pull-syncing as a stream provider}\label{spec:protocol:pull-sync}
-\input{specs/protocol/pull-sync.tex}
-\section{SWAP settlement protocol}\label{spec:protocol:swap}
-\input{specs/protocol/swap.tex}
-
-\chapter{Format}
+\chapter{Convention}\label{spec:convention}
 \section{Bzz address}\label{spec:format:bzzaddress}
 \input{specs/format/bzzaddress.tex}
 \section{Chunk and Binary Merkle Tree Hash}\label{spec:format:bmt}
 \input{specs/format/bmt.tex}
-\section{Files and the swarm hash}\label{spec:format:files}
+\section{Files and the Swarm hash}\label{spec:format:files}
 \input{specs/format/files.tex}
 \section{Manifests}\label{spec:format:manifests}
 \input{specs/format/manifests.tex}
@@ -49,24 +33,25 @@
 \section{Honey token and multi-chain support}\label{spec:format:honey}
 %\input{specs/format/honey.tex}
 
-\chapter{API}
-\section{Storage API URL schemes}\label{spec:api:storage}
-\input{specs/api/storage-http.tex}
-\section{Communications API}\label{spec:api:communications}
-\input{specs/api/comms-http.tex}
-\section{Access Control API}\label{spec:api:access-control}
-\input{specs/api/access-control-http.tex}
-\section{Tags API}\label{spec:api:tags}
-\input{specs/api/tags-http.tex}
-\section{Pinning API}\label{spec:api:pinning}
-\input{specs/api/pinning-http.tex}
-\section{Swap API}\label{spec:api:swap}
-\input{specs/api/swap-rpc.tex}
-\section{Node admin API}\label{spec:api:admin}
-\input{specs/api/node-admin-rpc.tex}
+
+\chapter{Protocol}\label{spec:protocol}
+\section{Bzz  handshake protocol}\label{spec:protocol:bzz}
+\input{specs/protocol/bzz.tex}
+\section{Hive discovery protocol}\label{spec:protocol:hive}
+\input{specs/protocol/hive.tex}
+\section{Retrieval protocol}\label{spec:protocol:retrieval}
+\input{specs/protocol/retrieval.tex}
+\section{Push-syncing protocol}\label{spec:protocol:push-sync}
+\input{specs/protocol/push-sync.tex}
+\section{Stream protocol}\label{spec:protocol:stream}
+\input{specs/protocol/stream.tex}
+\section{Pull-syncing as a stream provider}\label{spec:protocol:pull-sync}
+\input{specs/protocol/pull-sync.tex}
+\section{SWAP settlement protocol}\label{spec:protocol:swap}
+\input{specs/protocol/swap.tex}
 
 
-\chapter{Strategy}\label{spec:strategy:}
+\chapter{Strategy}\label{spec:strategy}
 \section{Connection strategy}\label{spec:strategy:connection}
 %\input{specs/strategy/connection.tex}
 \section{Forwarding strategy}\label{spec:strategy:forwarding}
@@ -82,7 +67,27 @@
 \input{specs/strategy/pull-sync.tex}
 \section{Garbage collection strategy}\label{spec:strategy:garbage-collection}
 \input{specs/strategy/garbage-collection.tex}
-\section{Upload strategy}\label{spec:strategy:upload}
-\input{specs/strategy/upload.tex}
-\section{Download strategy}\label{spec:strategy:download}
-\input{specs/strategy/download.tex}
+% \section{Upload strategy}\label{spec:strategy:upload}
+% \input{specs/strategy/upload.tex}
+% \section{Download strategy}\label{spec:strategy:download}
+% \input{specs/strategy/download.tex}
+
+\chapter{API}\label{spec:api}
+\section{Storage API URL schemes}\label{spec:api:storage}
+\input{specs/api/storage.tex}
+\section{Communications API}\label{spec:api:communications}
+\input{specs/api/comms.tex}
+\section{Access Control API}\label{spec:api:access-control}
+\input{specs/api/access-control.tex}
+\section{Local APIs}
+\subsection{Tags API}\label{spec:api:tags}
+\input{specs/api/tags.tex}
+\subsection{Pinning API}\label{spec:api:pinning}
+\input{specs/api/pinning.tex}
+\subsection{Swap API}\label{spec:api:swap}
+\input{specs/api/swap.tex}
+\subsection{Postage API}\label{spec:api:postage}
+\input{specs/api/postage.tex}
+\subsection{Node admin API}\label{spec:api:admin}
+\input{specs/api/node-admin.tex}
+

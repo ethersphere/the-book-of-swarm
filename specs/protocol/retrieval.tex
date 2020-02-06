@@ -1,13 +1,13 @@
-## Simple Summary
+\subsection{Simple Summary}
 Standardisation of the bzz-retrieve protocol which allows for nodes to issue requests for content addressed data and for their counterparts to deliver that content
 
-## Abstract
+\subsection{Abstract}
 Every node that fully participates in the Swarm is expected to request, deliver or forward requests for chunk retrievals. This is to be done using a simple p2p protocol that negotiates the delivery of those data chunks.
 
-## Motivation
+\subsection{Motivation}
 Different Swarm implementations must standardise the way chunk delivery is made. In order for the devp2p protocols on these nodes to correctly negotiate and establish normal operations, the underlying protocol messages and exchange rules must be thoroughly defined. Doing so should pave the way for a simplified reimplementation of Swarm in other clients and languages.
 
-## Specification
+\subsection{Specification}
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for the current Swarm platform and future client implementations.-->
 The Swarm retrieval protocol is defined as a `devp2p` protocol with the following parameters:
 Protocol name:    bzz-retrieve
@@ -62,7 +62,7 @@ c. SData - an arbitrary byte array containing the chunk data
 
 
 Notes:
-1. The requester node _MUST_ check that a Ruid on an incoming ChunkDelivery message exists for the specific peer from which the chunk was delivered. If the given Ruid cannot be found - that peer should be treated as a misbehaving node and should be dropped
-2. The requester node _MUST_ check that the address on an incoming ChunkDelivery is identical to the requested chunk address that is associated with the request's unique idenfitier (Ruid). If the chunk addresses do not match - that node should be treated as a misbehaving node and should be dropped
-3. The requester node _MUST_ verify that the content of the delivered chunk, after hashing, corresponds to the requested chunk address. If the hashes do not match - the node from which the chunk delivery was recieved should be treated as a misbehaving node and should be dropped.
+1. The requester node \textit{MUST} check that a Ruid on an incoming ChunkDelivery message exists for the specific peer from which the chunk was delivered. If the given Ruid cannot be found - that peer should be treated as a misbehaving node and should be dropped
+2. The requester node \textit{MUST} check that the address on an incoming ChunkDelivery is identical to the requested chunk address that is associated with the request's unique identifier (Ruid). If the chunk addresses do not match - that node should be treated as a misbehaving node and should be dropped
+3. The requester node \textit{MUST} verify that the content of the delivered chunk, after hashing, corresponds to the requested chunk address. If the hashes do not match - the node from which the chunk delivery was received should be treated as a misbehaving node and should be dropped.
 

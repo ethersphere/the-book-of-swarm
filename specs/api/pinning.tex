@@ -2,7 +2,7 @@ Content can be pinned in two different ways. One is during the content upload an
 
     Pinning during upload
 
-    Add a header “x-swarm-pin” and set it to “true” when uploading content. This will upload the file and then pin it too. This method can be used for Tar, Multipart and RAW file uploads too.
+    Add a header “x-swarm-pin” and set it to “true” when uploading content. This will upload the file and then pin it too. This method can be used for Tar, Multipart and raw file uploads too.
 
 curl -H "Content-Type: application/x-tar" -H "x-swarm-pin: true"  --data-binary @files.tar http://localhost:8500/bzz:/
 
@@ -10,10 +10,10 @@ curl -H "Content-Type: application/x-tar" -H "x-swarm-pin: true"  --data-binary 
 
     If an already uploaded content needs to be pinned, the following HTTP API should be used.
 
-# to pin a Swarm collection
+to pin a Swarm collection
 POST /bzz-pin:/<MANIFEST OR ENS NAME>
 
-# to pin a RAW file in Swarm
+to pin a RAW file in Swarm
 POST /bzz-pin:/<SWARM RAW FILE HASH>/?raw=true
 
 Note
@@ -27,7 +27,12 @@ DELETE /bzz-pin:/<MANIFEST OR ENS NAME OR SWARM RAW FILE HASH>
 
 Listing Pinning Info
 
-Pinned contents and their information can be viewed at any point using this API. Information includes The pinned hash, wether the pinned content is a collection or RAW file, the pinned content size in bytes and the no of time the content is pinned.
+Pinned contents and their information can be viewed at any point using this API. Information includes The pinned hash, whether the pinned content is a collection or RAW file, the pinned content size in bytes and the no of time the content is pinned.
+
+% \lstset{basicstyle=\footnotesize}
+% \lstinline{GET /bzz-pin:/}
+
+\begin{lstlisting}
 
 GET /bzz-pin:/
 
@@ -44,6 +49,8 @@ GET /bzz-pin:/
  },
 ]
 
+    
+\end{lstlisting}
 Note
 
 The information will be returned in json format shown above

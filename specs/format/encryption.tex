@@ -1,14 +1,14 @@
 
 Plaintext chunks consist of a 8-byte length field encoding the size of the binary blob accessible through a Merkle structure for which this chunk is the root, followed by the chunk payload which is at most 4096 bytes. Before encrypting, each chunk payload is padded to exactly 4096 bytes, as its actual length can be deduced from the length field as follows:
 
-\begin{verbatim}
+\begin{lstlisting}
 
 payloadLength := length
 while payloadLength > 4096
         payloadLength := payloadLength + 4095
         payloadLength := payloadLength / 4096
         payloadLength := payloadLength * refSize
-\end{verbatim}
+\end{lstlisting}
 
 Where length is the content of the length field and refSize is the sum of size of the referencing hash value and that of the decryption key, which is currently 64, as we use 256-bit hashes and 256-bit keys.
 

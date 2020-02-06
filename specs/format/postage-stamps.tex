@@ -5,7 +5,7 @@ Witness type 0 stands for ECDSA witness, which is an ECDSA signature on the 128 
 
 The ECDSA witness is the simplest and cheapest solution both in terms of gas consumed by the stamp verification contract and in terms of computational resources used off chain. Also, it does not rely on cryptographic assumptions in addition to those on which Ethereum critically relies, therefore as long as Ethereum is considered cryptographically secure, no advance in cryptorgraphy can render this witness type insecure. This is the justification for this witness type to be the only mandatory witness type to be implemented.
 
-Witness type `1` refers to the RSA witness, which is an RSA signature on the same 128 bytes as above. The binary encoding of the RSA signature is of variable length, and is an Solidity ABI encoded array of the RSA signature `s` (as defined in [PKCS #1](https://tools.ietf.org/html/rfc8017)) and the RSA public key parameters `n` (RSA modulus) and `e` (public exponent).
+Witness type `1` refers to the RSA witness, which is an RSA signature on the same 128 bytes as above. The binary encoding of the RSA signature is of variable length, and is an Solidity ABI encoded array of the RSA signature `s` (as defined in [PKCS \#1](https://tools.ietf.org/html/rfc8017)) and the RSA public key parameters `n` (RSA modulus) and `e` (public exponent).
 
 The RSA witness is specified so that blind stamping services can be implemented in a simple fashion, in order to mitigate the privacy issues arising from the ability to link chunks signed with the same private key. Even though blind ECDSA signatures also exist, their protocol requires more rounds of communication, making the implementation of such a service more complex, more error-prone and less performant. The specification of such blind stamping services is outside of the scope of this SWIP, requiring a separate one.
 
@@ -13,7 +13,7 @@ The inclusion of the entire public key in each RSA witness rather than storing t
 
 Note that cryptographic advances can render RSA witnesses insecure without rendering Ethereum insecure, therefore RSA witnesses can be phased out in future versions of the protocol, if the security of RSA signatures gets compromised. Note, furthermore, that such blind signing services are not entirely trustless, through the damage they can incur is bounded. Trustless blind stamping services based on ZK proofs are not feasible at this stage, as the current algorithms are not sufficiently performant for the purpose, but given the rapid advances in the field, the development of suitable algorithms can be expected in the future, in which case a corresponding witness type will have to be specified in a separate SWIP.
 
-### Contract Upgrades
+\subsubsection{Contract Upgrades}
 
 In order to facilitate the upgrade of the contract either in case of a discovered vulnerability or some feature extension (such as adding new witness types), it is recommended that the part holding the funds with the database of payments and the part that verifies witnesses are in separate contracts so that a backwards-compatible upgrade can be performed with minimal disruption.
 
@@ -22,6 +22,9 @@ In order to avoid centralized control, it is also recommended that it is the wit
 
 Nodes participating in the same postage system are configured to reference the same contract on the same blockchain. This contract
 *must* have an accessor call with the following ABI signature:
+
+\begin{lstlisting}
+
 ```json
 {
   "name": "postage",
@@ -61,7 +64,9 @@ Nodes participating in the same postage system are configured to reference the s
 }
 ```
 
-This accessor method returns `true` iff the proof embodied by `witness` checks out for all other arguments within the claimed 
+\end{lstlisting}
+
+This accessor method returns `true` if the proof embodied by `witness` checks out for all other arguments within the claimed 
 validity period, i.e. when `block.timestamp` (the output of `TIMESTAMP` EVM opcode) is between `beginValidity` (inclusive) and 
 `endValidity`, (exclusive). Outside of the validity period, the return value is undefined.
 

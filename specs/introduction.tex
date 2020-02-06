@@ -1,53 +1,17 @@
-\section{Conventions}\label{spec:conventions}
-\section{Notation}\label{spec:notation}
+\section{Structure}\label{spec:conventions}
 
-This document uses the \texttt{ABNF} convention for defining data types, as described in the IETF RFC 5234. \cite{IETF:ABNF}
+\ref{spec:convention} enlists all the conventions relating data types, formats and processes.
+The specifications are given under four headings. Protocols 
+(\ref{spec:protocol}) specify wire protocols: message formats and serialisation and encapsulation are hard requirements that is crucial for  cross client compatibility.
+Strategies (\ref{spec:strategy} are meant to be recommended  behaviour that is supposed to be aligned with economic incentives.
+Strategies may not be optimal, in some cases, the directions focused on simplicity and ease of reasoning.
+APIs (\ref{spec:api}) gives a formal specification of the high level interfaces of Swarm. Different client implementations are going to be tested against a standard suite of API tests.
 
 
-The basic identifiers are defined as follows:
+\subsubsection{Notation}\label{spec:notation}
 
-\begin{lstlisting}[numbers=none]
-UINT64MAX	= 18446744073709551615
-UINT32MAX	= 4294967295
-UINT16MAX	= 65535
-UINT8MAX	= 255
-UINT64		= %d0-UINT64MAX
-UINT32		= %d0-UINT32MAX
-UINT16		= %d0-UINT16MAX
-UINT8		= %d0-UINT8MAX
+\subsection{Data types}
 
-BOOL		= BIT
+Protobuf JSON mapping \url{https://developers.google.com/protocol-buffers/docs/proto3#json}
 
-TIMESTAMP	= UINT32
-\end{lstlisting}
-
-The construct \texttt{LIST} explicitly defines a list of elements. Elements may be of any type, and are separated by spaces. This identifier has implications for the serialization of data. 
-
-\section{SSerialisation} \label{sec:rlp}
-
-Swarm uses devp2p/RLPX for underlay p2p transport (see \ref{sec:underlay-transport}) which in turn uses \gloss{RLP} \cite{ETHWIKI:RLP} for serialisation. 
-In this document, protocol message payload data will be specified in ABNF format. We define the following mappings from ABNF data type definitions to RLP data types:
-
-\begin{definition}{Mapping of ABNF data types to RLP data types}\label{sec:abnf-rlp}
-\begin{description}
-\item [BOOL] is encoded as an RLP encoded integer with length of one byte
-\item [OCTET] is encoded as an RLP encoded integer with length of one byte
-\item [TIMESTAMP] is encoded as an RLP encoded variable length integer
-\item [\%x\#\#] hexadecimal literals are encoded as encoded integers with length of one byte, corresponding to its hexadecimal (not its string) value
-\item [LIST] as defined in \ref{abnf-list-definition} will be RLP encoded as RLP lists.
-\end{description}
-\end{definition}
-
-All other data is encoded as RLP lists.
-
-The outermost element of a serialization is always a LIST item%
-%
-\footnote{This is due to the fact that the reference implementation is written in golang, and the default RLP deserialization of golang structs treats the struct itself as a list.}
-
-For example, a message structure with only one field of \texttt{3OCTET} data will in reality be \texttt{LIST(3OCTET)}. If  the data is \texttt{0x666f6f} it will serialize to \texttt{0xc4 83 66 6f 6f}, which breaks down to:
-
-\begin{lstlisting}[numbers=none]
-LIST:	0xc4 (list, 4 bytes long)
-3OCTET:	0x83 (string, 3 bytes long)
-data: 	0x66 0x6f 0x6f
-\end{lstlisting}
+https://github.com/ethereum/eth2.0-specs/blob/master/specs/phase0/p2p-interface.md

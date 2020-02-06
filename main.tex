@@ -1,3 +1,4 @@
+
 \documentclass[a4paper,12pt,fullpage,openany,hyperfootnotes,hidelinks]{scrbook}
 \usepackage[utf8]{inputenc}
 \usepackage[linedheaders,parts,pdfspacing,manychapters]{classicthesis}
@@ -20,24 +21,28 @@
 	stringstyle=\color{ForestGreen},
 	commentstyle=\color{Gray},
 }
+\usepackage{listings-golang} % import this package after listings
 \usepackage{verbatim}
 \usepackage{multirow}
 \usepackage{csquotes}
 \usepackage{tikz}
 \usetikzlibrary{matrix,arrows.meta,fit,positioning,shapes,automata}
 
-
+\usepackage{breakcites} % splits long citations to several lines
 
 \makeglossaries
 \input{glossary.tex}
 
 \bibliographystyle{apalike}
 
-% \newcommand\gloss[1]{\emph{\gls{#1}}}
-\newcommand\gloss[1]{\emph{#1}}
-
+% \newcommand\gloss[1]{\emph{#1 -- [\gls{#1}]}}
+% \newcommand\gloss[1]{\emph{#1}}
+\newcommand\gloss[1]{\emph{\gls{#1}}} %singular
+\newcommand\glossupper[1]{\emph{\Gls{#1}}} %singular uppercase
+\newcommand\glossplural[1]{\emph{\glspl{#1}}} % plural
 
 \newcommand\PO{\mathit{PO}}
+\newcommand\Keys{\mathcal{K}}
 \newcommand\nil{\varnothing}
 \newcommand\swip[1]{\url[SWIP-#1]{https://github.com/ethersphere/SWIPs/blob/master/SWIPs/swip-#1.md}}
 \newcommand\defeq{\overset{\textrm{\tiny  def}}{=}}
@@ -49,8 +54,17 @@
 \newtheorem{lemma}{Lemma}[section]
 \newtheorem{corollary}{Corollary}[section]
 
+\makeatletter % legacy /sc command support
+%\DeclareOldFontCommand{\rm}{\normalfont\rmfamily}{\mathrm}
+%\DeclareOldFontCommand{\sf}{\normalfont\sffamily}{\mathsf}
+%\DeclareOldFontCommand{\tt}{\normalfont\ttfamily}{\mathtt}
+%\DeclareOldFontCommand{\bf}{\normalfont\bfseries}{\mathbf}
+%\DeclareOldFontCommand{\it}{\normalfont\itshape}{\mathit}
+%\DeclareOldFontCommand{\sl}{\normalfont\slshape}{\@nomath\sl}
+\DeclareOldFontCommand{\sc}{\normalfont\scshape}{\@nomath\sc}
+\makeatother
 
-\title{\Huge\sc the book of swarm\\
+\title{\Huge\sc the book of Swarm\\
 \Large infrastructure for the decentralised web}
 % \author{Viktor Trón, Daniel A. Nagy, Louis Holbrook, Rinke Hendriksen}
 \author{}
@@ -60,13 +74,18 @@
 \maketitle
 \setcounter{tocdepth}{2}
 \tableofcontents
-\part{Prelude}
-\input{preface.tex}
-% \part{What is swarm?}
+
+\listoffigures
+
+% \listoftables % remove if less than 5 tables?
+
+\part{Prelude} \label{part:preface}
+\input{preface.tex} 
+% \part{What is Swarm?}
 \input{intro.tex}
-\part{Design and architecture}
+\part{Design and architecture} \label{part:designarchitecture}
 \input{body.tex}
-\part{Specifications}
+\part{Specifications} \label{part:specifications}
 \input{specs.tex}
 
 \cite{ethersphere2016smash}
@@ -78,6 +97,9 @@
 \appendix
 \part{Appendix}
 \input{appendix.tex}
+
+\newpage
 \printglossary
+\printglossary[type=\acronymtype,title={List of Acronyms}]
 
 \end{document}

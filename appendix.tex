@@ -2,7 +2,7 @@
 \chapter{Kademlia graph theory}
 \section{Logarithmic distance and proximity order}\label{sec:proximity}
 Consider the set of bit sequences with fixed length $d$ as points in a space. We can define a distance metric $\chi$ such that
-the distance between two such sequences is defined as the bigendian  numerical value of their bitwise XOR ($\xor$).
+the distance between two such sequences is defined as the bigendian numerical value of their bitwise XOR ($\xor$).
 
 \begin{definition}{XOR distance ($\chi$)}\label{def:xor}
 \begin{equation}
@@ -31,7 +31,7 @@ Given the fixed length $d>0$, there is a maximum distance in this space, and thu
 \begin{definition}{Proximity order ($\PO$)}\label{def:xorPO}
 \begin{equation}
 \begin{split}
-\PO&: \Keys \times\Keys\mapsto\overline{0,d}\\
+\PO&: \Keys \times\Keys\mapsto \overline{0,d}\\
 \PO(x,y) &\defeq 
 \begin{cases}
 d & \text{ if } x=y\\
@@ -58,7 +58,7 @@ most half as distant from $x_0$ as items in the previous class. Furthermore, any
   \begin{align}
     \label{eq:PO-constraint-symmetry} \text{reflexivity:  }&\forall x,y\in \mathcal{K}, \PO(x,y)=\PO(y,x)\\
     \label{eq:PO-constraint-monotonicity}\text{monotonicity:   }&\forall x,y,z\in \mathcal{K}, \PO(x,y)=k \land  \PO(x,z)=k \Rightarrow  \PO(y,z)>k\\
-\label{eq:PO-constraint-transitivity}\text{transitsivity:   }&\forall x,y,z\in \mathcal{K}, \PO(x,y)<\PO(y,z) \Rightarrow \PO(x,z)=\PO(x,y)
+\label{eq:PO-constraint-transitivity}\text{transitivity:   }&\forall x,y,z\in \mathcal{K}, \PO(x,y)<\PO(y,z) \Rightarrow \PO(x,z)=\PO(x,y)
    \end{align}
 \end{subequations}
 % \end{equation}
@@ -72,14 +72,16 @@ Consider a set of points $V$ in the space with a logarithmic distance and
 a binary relation $R$. Define a directed graph where every point in the set is a vertex and any two vertices $x$ and $y$ are  connected with an edge if they are in relation $R$. 
 
 
-Points that are in relation $R$ with a particular point $x_0$ can be indexed by their proximity order relative to $x_0$. This index is called \gloss{kademlia table}.
+Points that are in relation $R$ with a particular point $x_0$ can be indexed by their proximity order relative to $x_0$. This index is called \gloss{Kademlia table}.
 The kademlia table can serve as the basis for local decisions in graph traversal where the task is to find a path between two points. 
 
 
 \begin{definition}{Kademlia table}\label{def:kademlia-table}
 \begin{equation}
-\mathit{Kad}_x): \overline{0,d}\mapsto \mathcal{P}(\mathit{V})\\
-\forall y, \langle x, y\rangle \in \mathit{Edges}(G) \rightarrow y \in \mathit{Kad}_x(p) \Longleftrigharrow \PO(x,y)=p 
+\begin{split}
+&\mathit{Kad}_x): \overline{0,d} \mapsto \mathcal{P}(\mathit{V})\\
+&\forall y, \langle x, y \rangle \in \mathit{Edges}(G) \rightarrow y \in \mathit{Kad}_x(p) \Longleftrightarrow \PO(x,y)=p 
+\end{split}
 \end{equation}
 \end{definition}
 
@@ -96,7 +98,7 @@ We say that a point has \emph{kademlia connectivity} (or the point's connectivit
 \end{definition}
 
 
-If each point of a connected subgraph has kademlia connectivity, then we say the subgraph has a \gloss{kademlia topology}. In a graph with kademlia topology, (1) a path between any two points exists, (2) it can be found using only local decisions on each hop and (3) is guaranteed to terminate in no more steps than the depth of the destination plus one. 
+If each point of a connected subgraph has kademlia connectivity, then we say the subgraph has a \gloss{Kademlia topology}. In a graph with kademlia topology, (1) a path between any two points exists, (2) it can be found using only local decisions on each hop and (3) is guaranteed to terminate in no more steps than the depth of the destination plus one. 
 
 The procedure is as follows. Given point $x$ and $y$, construct the path $x_0=x , x_1, ..., x_k=y$ such that $x_{i+1}\in \mathit{PO}(x_i, x_{i+1})=\mathit{PO}(x_i, y)$, i.e., starting from the source point, choose the next point from the PO bin that the destination address falls into: because of the assumption of kademlia connectivity (1) such a point exists. Due to our previous conjecture, the actual bin is monotonically increasing at each step and can start with zero, therefore for every $0<i<=l$, $\mathit{PO}(x_{i}, y)\geq i$. So there exists a $d\leq d_y$, such that 
 $\mathit{PO}(x_{d}, y)\geq d_y$, which together with kademlia connectivity criterion (2) entails that either $x_d=y$ and $k=d$, or $y$ is connected to $x_d$, so we can choose $x_{d+1}=y$, and $k=d+1\leq d_y+1$.

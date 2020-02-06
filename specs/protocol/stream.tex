@@ -1,7 +1,7 @@
 
 The BZZ Stream Protocol facilitates data transmission between two swarm nodes, specifically targeting sequential data in the form of a sequence of chunks as defined by swarm.
 
-## Abstract
+\subsection{Abstract}
 <!--A short (~200 word) description of the technical issue being addressed.-->
 A short (~200 word) description of the technical issue being addressed.
 
@@ -12,20 +12,22 @@ The protocol should cater for the following requirements:
 
 To mitigate duplicate data transmission the stream protocol provides a configurable message roundtrip before executing a batch delivery which allows the downstream peer to selectively request the chunks which it does not store at the time of the request. 
 
-When delivery batches are pre-negotiated (i.e. when the client selectively tells the server which chunks it would like to receive), we can conclude that the delivery batches are optimsed for urgency rather than for maximising batch utilisation (since the server sends a certain batch that potentially gets reduced into a smaller one by the client before actually being transmitted)
+When delivery batches are pre-negotiated (i.e. when the client selectively tells the server which chunks it would like to receive), we can conclude that the delivery batches are optimised for urgency rather than for maximising batch utilisation (since the server sends a certain batch that potentially gets reduced into a smaller one by the client before actually being transmitted)
 
-## Motivation
+\subsection{Motivation}
 <!--The motivation is critical for SWIPs that want to change the Swarm protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the SWIP solves. SWIP submissions without sufficient motivation may be rejected outright.-->
 
 This SWIP is motivated by providing a clear definition how the dataexchange between swarm nodes is taking place. This is the first specification of this process.
 
-## Specification
+\subsection{Specification}
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for the current Swarm platform and future client implementations.-->
 
 Wire Protocol Specifications
 ============================
 
-### The wire protocol defines the following messages:
+\subsubsection{The wire protocol defines the following messages:}
+
+\begin{lstlisting}
 
 | Msg Name | From->To | Params   | Example |
 | -------- | -------- | -------- | ------- |
@@ -38,14 +40,17 @@ Wire Protocol Specifications
 | BatchDone | Server->Client| Ruid `uint`<br>Last `uint` | `Ruid: 21321, Last: 113331` |
 | StreamState | Client<->Server | Stream`string`<br>Code`uint16`<br>Message`string`| `Stream: SYNC\|6, Code:1, Message:"Stream became bounded"`<br>`Stream: SYNC\|5, Code:2, Message: "No such stream"` |
 
+\end{lstlisting}
+
 Notes:
 * communicating the last bin index when roundtrip is configured - can be done on top of OfferedHashes message (alongside the hashes), or to reuse the ACK from the no-roundtrip config
 * two notions of bounded - on the stream level and on the localstore
 * if TO is not specified - we assume unbounded stream, and we just send whatever, until at most, we fill up an entire batch.
 
-### Message and interface definitions:
+\subsubsection{Message and interface definitions:}
 
-
+\lstset{basicstyle=\scriptsize, language=Golang}
+\begin{lstlisting}
 ```go
 // StreamProvider interface provides a lightweight abstraction that allows an easily-pluggable
 // stream provider as part of the Stream! protocol specification.
@@ -63,6 +68,8 @@ type StreamProvider interface {
 	Boundedness() bool
 }
 ```
+\end{lstlisting}
+
 
 ```go
 type StreamInitBehavior int
@@ -175,21 +182,21 @@ GetRange (unbounded) - client requests an unbounded range (specifies only `From`
 GetRange (no roundtrip) - client requests an unbounded or bounded range with no roundtrip configured<br>
 ![unbounded-range](stream-no-roundtrip.png)
 
-## Rationale
+\subsection{Rationale}
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
-There are several occasions for nodes to exchange data with each other where the data is defined of a squence of chunks of Swarm nodes. There are significant bandwith savings by having a formalised protocol functionality which allows to check for offered hashes and already available hashes of existing chunks for the retrieving node.
+There are several occasions for nodes to exchange data with each other where the data is defined of a sequence of chunks of Swarm nodes. There are significant bandwidth savings by having a formalised protocol functionality which allows to check for offered hashes and already available hashes of existing chunks for the retrieving node.
 
 Example 1: 
 A pull sync
- * Simultanous streams
+ * Simultaneous streams
  * Stream of chunks is defined by the upstreams peers database
 
 Example 2:
 To sync a current state of a database e.g. Ethereum State on Swarm
 
 Example 3:
-Torrent-like download of files. e.g. Light-Clients which ask serveral nodes to serve them chunks from specific hash ranges.
-While they compete, they will save bandwith by only requested specfic chunks still due for transmission instead of full hash-ranges.
+Torrent-like download of files. e.g. Light-Clients which ask several nodes to serve them chunks from specific hash ranges.
+While they compete, they will save bandwidth by only requested specific chunks still due for transmission instead of full hash-ranges.
 
-## Backwards Compatibility
+\subsection{Backwards Compatibility}

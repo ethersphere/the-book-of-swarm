@@ -1,16 +1,17 @@
-The hashing method used to obtain the address of the default content addressed chunk is called the \gloss{Binary Merkle Tree Hash}, or \emph{BMT Hash} for short. The base segments of the binary tree are subsequences of the chunk content data. 
+The hashing method used to obtain the address of the default content addressed chunk is called the \gloss{binary Merkle tree hash}, or \emph{BMT Hash} for short. The base segments of the binary tree are subsequences of the chunk content data. 
 
-Using this hash enables compact 3rd  party verifiable segment inclusion proofs.
-The size of segments is 32  bytes the digest size of the \emph{base hash} used to construct the tree. 
-Given the swarm hash to represent files (see \ref{spec:format:files}) assumes that some chunks package references to other chunks. Having the segments align with the hashes packaged in these chunks one can extend the notion of inclusion proofs to files. 
+Using this hash enables compact 3rd party verifiable segment inclusion proofs.
+The size of segments is 32  bytes, which is the digest size of the \emph{base hash} used to construct the tree. 
+Given the Swarm hash to represent files (see \ref{spec:format:files}) assumes that intermediate chunks package references to other chunks. Having the segments align with the hashes packaged in these chunks one can extend the notion of inclusion proofs to files. 
 
 Obtaining the BMT hash of a sequence involves the following steps:
 
 \begin{enumerate}
 \item \emph{padding} - If the content is shorter than the maximum chunk Size  (4096 bytes, \ref{sec:content-addressed-chunks}), it is padded with zeros up to chunk size.
-\item \emph{chunk data layer} - Calculate the base hash of \emph{pairs of segments} in the padded, i.e., segment size ($2 * 32$) units of data and concatenate the results
+\item \emph{chunk data layer} - Calculate the base hash of \emph{pairs of segments} in the padded chunk, i.e., segment size ($2 * 32$) units of data and concatenate the results.
 \item \emph{building the tree} - Repeat previous step on the result until the result is just one section
 \item \emph{calculate span} - Calculate the span of the data, i.e., the size of the data that is subsumed under the chunk represented by the unpadded data as a 64-bit little-endian integer value (see  \ref{spec:format:files})
 \item \emph{integrity protection} - Prepend the span to the root hash of the binary tree and calculate the \emph{base hash} of the data
 \end{enumerate}
 
+\subsection{Inclusion proofs}

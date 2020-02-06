@@ -25,7 +25,9 @@ The protocol is based on the idea that nodes advertise their \emph{saturation  d
 \subsection{Protocol}
 
 When two peers connect and the hive protocol is started on the peer connection a subscribe message is sent.
-On receiving this subscribe message from the peer, nodes respond with a peers message right away. This peers message is meant to contain bzz addresses of a maximum of \texttt{MAX_HIVE_PEERS_COUNT}=50 peers.
+\subsection{Push Syncing}\label{sec:push-syncing}
+
+On receiving this subscribe message from the peer, nodes respond with a peers message right away. This peers message is meant to contain bzz addresses of a maximum of \texttt{MAX\_HIVE\_PEERS\_COUNT}=50 peers.
 
 At later stages, a subscribe message is sent (only) if the node's saturation depth changes. There is not meant to be a direct response to a subscribe message.
 
