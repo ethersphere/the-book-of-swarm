@@ -1,0 +1,65 @@
+% not sure about these colours!
+\definecolor{c1}{HTML}{FF7F00}
+\definecolor{c2}{HTML}{048BA8}
+\definecolor{c3}{HTML}{16DB93}
+\definecolor{c4}{HTML}{EFEA5A}
+\definecolor{c5}{HTML}{F29E4C}
+\definecolor{c6}{HTML}{256EFF}
+\definecolor{c7}{HTML}{46237A}
+
+\scalebox{1.35}{
+\begin{forest}
+rt/.style={draw=blue,line width=1pt},
+peer/.style={draw=blue!60,edge={blue!60,line width=0.7pt}},
+peerleaf/.style={edge={blue!60,line width=0.7pt}},
+self/.style={draw=blue,fill=blue,edge={blue,line width=1pt}},
+selfpeer/.style={draw=blue,line width=1pt,edge={blue,line width=1pt}},
+unused/.style={draw=blue!20,edge={blue!20,line width=0.7pt}},
+[{},rt,for tree={circle,draw, l sep=20pt}
+  [{},selfpeer,edge label={node[midway,left] {0}}
+    [{},selfpeer,edge label={node[midway,left] {0}}
+      [{},selfpeer,edge label={node[midway,left] {0}}
+        [{},self,edge label={node[midway,left] {0}}]
+        [{},draw=c3,fill=c3,peerleaf,edge label={node[midway,right] {1}}]
+      ]
+      [{},peer,edge label={node[midway,right] {1}}
+        [{},draw=c4,fill=c5,peerleaf,edge label={node[midway,left] {0}}]
+        [{},draw=c4,fill=c4,peerleaf,edge label={node[midway,right] {1}}]
+      ]
+    ]
+    [{},peer,edge label={node[midway,right] {1}} 
+      [{},peer,edge label={node[midway,left] {0}}
+        [{},draw=c1,fill=c1,peerleaf,edge label={node[midway,left] {0}}]
+        [{},unused,edge label={node[midway,right] {1}}]
+      ]
+      [{},peer,edge label={node[midway,right] {1}}
+        [{},unused,edge label={node[midway,left] {0}}]
+        [{},draw=c2,fill=c2,peerleaf,edge label={node[midway,right] {1}}]
+      ]
+    ] 
+  ]
+  [{},peer,edge label={node[midway,right] {1}}
+    [{},peer,edge label={node[midway,left] {0}}
+      [{},peer,edge label={node[midway,left] {0}}
+        [{},unused,edge label={node[midway,left] {0}}]
+        [{},draw=c6,fill=c6,peerleaf,edge label={node[midway,right] {1}}]
+      ]
+      [{},peer,edge label={node[midway,right] {1}}
+        [{},unused,edge label={node[midway,left] {0}}]
+        [{},draw=c7,fill=c7,peerleaf,edge label={node[midway,right] {1}}]
+      ]
+    ]
+    [{},unused,edge label={node[midway,right] {1}} 
+      [{},unused,edge label={node[midway,left] {0}}
+        [{},unused,edge label={node[midway,left] {0}}]
+        [{},unused,edge label={node[midway,right] {1}}]
+      ]
+      [{},unused,edge label={node[midway,right] {1}}
+        [{},unused,edge label={node[midway,left] {0}}]
+        [{},unused,edge label={node[midway,right] {1}}]
+      ]
+    ]
+  ] 
+]
+\end{forest}
+}

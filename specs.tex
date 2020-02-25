@@ -1,7 +1,14 @@
-\chapter{Introduction}
-\input{specs/introduction.tex}
+
+The Swarm specification is presented in four chapters. \ref{spec:convention} enlists all the conventions relating data types, formats and processes. Protocols 
+(\ref{spec:protocol}) specify wire protocols: message formats and serialisation and encapsulation are hard requirements that are crucial for  cross client compatibility.
+Strategies (\ref{spec:strategy}) are meant to be recommended  behaviour that is supposed to be aligned with economic incentives.
+Strategies may not be optimal, in some cases, the directions focused on simplicity and ease of reasoning.
+APIs (\ref{spec:api}) gives a formal specification of the high level interfaces of Swarm. Different client implementations are going to be tested against a standard suite of API tests.
+
 
 \chapter{Convention}\label{spec:convention}
+
+\red{}
 \section{Bzz address}\label{spec:format:bzzaddress}
 \input{specs/format/bzzaddress.tex}
 \section{Chunk and Binary Merkle Tree Hash}\label{spec:format:bmt}
@@ -35,23 +42,35 @@
 
 
 \chapter{Protocol}\label{spec:protocol}
+
+\section{Introduction}\label{spec:protocol:intro}
+\green{}
+\input{specs/protocol/protocols.tex}
 \section{Bzz  handshake protocol}\label{spec:protocol:bzz}
+\green{}
 \input{specs/protocol/bzz.tex}
 \section{Hive discovery protocol}\label{spec:protocol:hive}
+\green{}
 \input{specs/protocol/hive.tex}
 \section{Retrieval protocol}\label{spec:protocol:retrieval}
+\red{}
 \input{specs/protocol/retrieval.tex}
 \section{Push-syncing protocol}\label{spec:protocol:push-sync}
+\ref{}
 \input{specs/protocol/push-sync.tex}
 \section{Stream protocol}\label{spec:protocol:stream}
 \input{specs/protocol/stream.tex}
 \section{Pull-syncing as a stream provider}\label{spec:protocol:pull-sync}
+\red{}
 \input{specs/protocol/pull-sync.tex}
 \section{SWAP settlement protocol}\label{spec:protocol:swap}
+\red{}
 \input{specs/protocol/swap.tex}
 
 
 \chapter{Strategy}\label{spec:strategy}
+
+\red{}
 \section{Connection strategy}\label{spec:strategy:connection}
 %\input{specs/strategy/connection.tex}
 \section{Forwarding strategy}\label{spec:strategy:forwarding}
@@ -73,6 +92,9 @@
 % \input{specs/strategy/download.tex}
 
 \chapter{API}\label{spec:api}
+
+\red{}
+
 \section{Storage API URL schemes}\label{spec:api:storage}
 \input{specs/api/storage.tex}
 \section{Communications API}\label{spec:api:communications}

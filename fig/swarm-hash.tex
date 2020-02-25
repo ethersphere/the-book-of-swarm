@@ -2,7 +2,7 @@
 level/.style={sibling distance=15mm, line width=0.6pt, level distance=18mm},
 hash/.style={fill=white, rounded corners=2pt,draw,minimum size=1.2cm},
 chunk/.style={fill=lightgray, rounded corners=2pt,draw,minimum size=1.2cm},
-midchunk/.style={fill=lightgray!50, rounded corners=2pt,draw,minimum size=1.2cm}
+midchunk/.style={draw=none,minimum size=0.2cm}
 ]
 
 % root node
@@ -20,10 +20,10 @@ midchunk/.style={fill=lightgray!50, rounded corners=2pt,draw,minimum size=1.2cm}
     % level n-2
     child {node [hash] (n-2l0) {$H_{0}$} edge from parent[draw=none]
       % level 2
-      child[thick] {node [midchunk] (2l0) {$C$} edge from parent[draw=none]
+      child[thick] {node [midchunk] (2l0) {} edge from parent[draw=none]
         % level 1
-        child[grow=down,draw=none] { node {} edge from parent[<-, shorten >=18pt, ultra thick]}
-        child {node [hash] (1l0) {$H_{0}$} edge from parent[draw=none]
+        % child[grow=down,draw=none] { node {} edge from parent[<-, shorten >=18pt, ultra thick]}
+        child {node [hash] at (0,1.2) (1l0) {$H_{0}$} edge from parent[draw=none]
           % level 0
           child[grow=down,draw=none] { node {} edge from parent[<-, shorten >=12pt]}
           child {node [hash] (0l0) {$H_{0}$} edge from parent[<-, draw=none]
@@ -34,15 +34,15 @@ midchunk/.style={fill=lightgray!50, rounded corners=2pt,draw,minimum size=1.2cm}
           }
           child[missing]
           child {node [hash] (0ll) {$H_{127}$} edge from parent[<-, draw=none]
-            child {node [chunk] (cll) {$C_{i}$}}
+            child {node [chunk] (cll) {}}
           }
         }
         % level 1 siblings
-        child {node [hash] (1l1) {$H_{1}$} edge from parent[draw=none]
+        child {node [hash] at (0,1.2) (1l1) {$H_{1}$} edge from parent[draw=none]
           child[thick,loosely dotted, shorten >=6mm, thick,<-] {node {}}
         }
         child[missing]
-        child {node [hash] (1ll) {$H_{127}$} edge from parent[draw=none]
+        child {node [hash] at (0,1.2) (1ll) {$H_{127}$} edge from parent[draw=none]
           child[thick,loosely dotted, shorten >=6mm, thick,<-] {node {}}
         }
       }
@@ -71,31 +71,29 @@ midchunk/.style={fill=lightgray!50, rounded corners=2pt,draw,minimum size=1.2cm}
     child {node [hash] (n-2r0) {$H_{0}$} edge from parent[draw=none]
       child[thick,loosely dotted, shorten >=6mm, thick,<-] {node {}}
     }
-    child[missing]
-    child {node [hash] (n-2r1) {$H_{i}$} edge from parent[draw=none]
+    % child[missing]
+    child {node [hash] (n-2r1) {$H_{1}$} edge from parent[draw=none]
       child[thick,loosely dotted, shorten >=6mm, thick,<-] {node {}}
     }
     child[missing]
     child {node [hash] (n-2rl) {$H_{127}$} edge from parent[draw=none]
       % level 2 siblings
-      child[grow=down] {node [midchunk] (2rl) {$C$} edge from parent[draw=none]
-        child[grow=down,draw=none] { node {} edge from parent[<-, shorten >=18pt, ultra thick]}
-        child {node [hash] (1r0) {$H_{0}$} edge from parent[draw=none]
+      child[grow=down] {node [midchunk] (2rl) {} edge from parent[draw=none]
+        % child[grow=down,draw=none] { node {} edge from parent[<-, shorten >=18pt, ultra thick]}
+        child {node [hash] at (0,1.2) (1r0) {$H_{0}$} edge from parent[draw=none]
+          child[thick,loosely dotted, shorten >=6mm, thick,<-] {node {}}
+        }
+        child {node [hash] at (0,1.2) (1r1) {$H_{1}$} edge from parent[draw=none]
           child[thick,loosely dotted, shorten >=6mm, thick,<-] {node {}}
         }
         child[missing]
-        child {node [hash] (1r1) {$H_{i}$} edge from parent[draw=none]
-          child[thick,loosely dotted, shorten >=6mm, thick,<-] {node {}}
-        }
-        % child[missing]
-        child[missing]
-        child {node [hash] (1rl) {$H_{127}$} edge from parent[draw=none]
+        child {node [hash] at (0,1.2) (1rl) {$H_{127}$} edge from parent[draw=none]
           child[grow=down,draw=none] { node {} edge from parent[<-, shorten >=12pt]}
-          child {node [hash] (0r0) {$H^_{0}$} edge from parent[<-, draw=none]
-            child {node [chunk] (cr0) {$C_{i}$}}
+          child {node [hash] (0r0) {$H_{0}$} edge from parent[<-, draw=none]
+            child {node [chunk] (cr0) {}}
           }
-          child {node [hash] (0r1) {$H^_{1}$} edge from parent[<-, draw=none]
-            child {node [chunk] (cr1) {$C_{i}$}}
+          child {node [hash] (0r1) {$H_{1}$} edge from parent[<-, draw=none]
+            child {node [chunk] (cr1) {}}
           }
           child[missing]
           child {node [hash] (0rl) {$H_{127}$} edge from parent[<-, draw=none]
@@ -104,13 +102,9 @@ midchunk/.style={fill=lightgray!50, rounded corners=2pt,draw,minimum size=1.2cm}
                 child [grow=right] {node[align=center] {leaf chunks\\data level} edge from parent[draw=none]
                   child [grow=up] {node {level $0$} edge from parent[draw=none]
                     child [grow=up] {node {level $1$} edge from parent[draw=none]
-                      child [grow=up] {node (l2) {level $2$} edge from parent[draw=none]
-                        child [grow=up] {node (ln-2) {level $n-2$} edge from parent[draw=none]
-                          child [grow=up] {node {level $n-1$} edge from parent[draw=none]
-                            child [grow=up] {node {root = level $n$} edge from parent[draw=none]}
-                          }
+                        child [grow=up] {node at (0,0.8) {level $n-1$} edge from parent[draw=none]
+                          child [grow=up] {node {root = level $n$} edge from parent[draw=none]}
                         }
-                      }
                     }
                   }
                 }
@@ -126,7 +120,6 @@ midchunk/.style={fill=lightgray!50, rounded corners=2pt,draw,minimum size=1.2cm}
 \path (n-11) -- (n-1l) node [midway,font=\large] {$\ldots$};
 \path (n-2l0) -- (2l0) node [midway,font=\large,sloped] {$\ldots$};
 \path (n-2rl) -- (2rl) node [midway,font=\large,sloped] {$\ldots$};
-\path (ln-2) -- (l2) node [midway,font=\large,sloped] {$\ldots$};
 \path (1l1) -- (1ll) node [midway,font=\large] {$\ldots$};
 \path (1r1) -- (1rl) node [midway,font=\large] {$\ldots$};
 \path (1ll) -- (1r0) node [midway,font=\large] {$\ldots$};
@@ -139,8 +132,7 @@ midchunk/.style={fill=lightgray!50, rounded corners=2pt,draw,minimum size=1.2cm}
 \path (cl1) -- (cll) node [midway,font=\large] {$\ldots$};
 \path (cr1) -- (crl) node [midway,font=\large] {$\ldots$};
 \path (cll) -- (cr0) node [midway,font=\large] {$\ldots$};
-\path (2l0) -- (2rl) node [midway,font=\large] {$\ldots$};
- 
+
 
 % arrows from annotations
 \begin{scope}[shorten >=.5cm,thin]

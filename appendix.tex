@@ -79,7 +79,7 @@ The kademlia table can serve as the basis for local decisions in graph traversal
 \begin{definition}{Kademlia table}\label{def:kademlia-table}
 \begin{equation}
 \begin{split}
-&\mathit{Kad}_x): \overline{0,d} \mapsto \mathcal{P}(\mathit{V})\\
+&\mathit{Kad}_x: \overline{0,d} \mapsto \mathcal{P}(\mathit{V})\\
 &\forall y, \langle x, y \rangle \in \mathit{Edges}(G) \rightarrow y \in \mathit{Kad}_x(p) \Longleftrightarrow \PO(x,y)=p 
 \end{split}
 \end{equation}
@@ -115,6 +115,109 @@ $\mathit{PO}(x_{d}, y)\geq d_y$, which together with kademlia connectivity crite
 
 \section{Constructing kademlia topology}
 
+\section{Complexity of filling up a postage stamp batch}\label{sec:complexity-filling}
+
+A postage batch is utilised optimally if each of its collision slots are filled. Although hashes are uniform, due to variance one cannot guarantee that $2^d$ independent hashes map to the collision slots of a batch of depth $d$.
+We presented various ways of mining chunks: by (1) choosing the nonce of a trojan chunk (see \ref{sec:trojan}), (2) choosing the encryption key (see \ref{sec:postage-stamps}), or choosing the index of a single owner chunk (see \ref{sec:addressed-envelopes}). Whichever way we are mining the chunks, the chance of finding an address that takes the $i$-th collision slot of the stamp, i.e., 
+
+
+\begin{equation}
+\mathit{PO}(\mathit{H}(\mathit{Enc}(k, c)), \mathit{CS}(i))\geq\mathit{D},
+\text{ where }\mathit{CS}(i)\defeq i*2^{256-D}
+\text{ for }0\leq i\leq  2^D.
+\end{equation}
+
+Now, if the user wishes to always fill their postage stamp batch before using another one, for each new chunk there is one less choice to pick a free collision slot. Let the probabilistic variable $X^n_i$ denote  the number of trials one needed to find a slot when $i$ out of $n$ slots are free. The probability that it is at least 1 is $\frac{n-i}{n}$, and in general:
+
+
+\begin{equation}\label{eq:conditional}
+\mathit{P}(X^n_i\geq j+1|X^n_i\geq j)=\frac{n-i}{n}\\
+\end{equation}
+
+The expected number of trials for the $i$-th chunk is 
+
+ \begin{subequations}   \begin{align}
+\mathit{E}(X^n_i)&=\sum^\infty_{j=1}j\mathit{P}(X^n_i=j)\\
+&=\mathit{P}(X^n_i\geq 1)-\mathit{P}(X^n_i\geq 2)+2(\mathit{P}(X^n_i\geq 2)-P(X^n_i\geq 3))+\ldots\\
+&= \mathit{P}(X^n_i\geq 1)+\mathit{P}(X^n_i\geq 2)+\ldots
+\end{align} \end{subequations}
+
+Multiplying both sides with $\frac{n-i}{n}$, then using  the equivalence in  \ref{eq:conditional}:
+
+ \begin{subequations}   \begin{align}
+\mathit{E}(X^n_i)\frac{n-i}{n}&=\mathit{P}(X^n_i\geq 1)\mathit{P}(X^n_i\geq 2|X^n_i\geq 1)+\mathit{P}(X^n_i\geq 2)\mathit{P}(X^n_i\geq 3|X^n_i\geq 2)+\ldots\\
+&=\mathit{P}(X^n_i\geq 2)+\mathit{P}(X^n_i\geq 3)+\ldots\\
+&=\mathit{E}(X^n_i)-\mathit{P}(X^n_i\geq 1)\\
+&=\mathit{E}(X^n_i)-\frac{n-i}{n}
+\end{align} \end{subequations}
+
+From this, we solve to $\mathit{E}(X^n_i)$:
+
+ \begin{subequations}   \begin{align}
+\mathit{E}(X^n_i)(1-\frac{n-i}{n})&=1\\
+\mathit{E}(X^n_i)&=\frac{n}{i}
+\end{align} \end{subequations}
+
+Averaging for the whole batch ($n=2^D$) gives%
+%
+\footnote{see harmonic series 
+\url{https://en.wikipedia.org/wiki/Harmonic\_series\_(mathematics)\#Rate\_of\_divergence}.}
+
+ \begin{subequations}   \begin{align}
+\sum_{i=1}^{2^D}\frac{2^D}{i}\frac{1}{2^D}
+&=\sum_{i=1}^{2^D}\frac{1}{i}\\
+&=\mathit{ln}(2^D)+1\\
+&=\frac{\mathit{log}_2(2^D)}{\mathit{log}_2(e)}+1\\
+&=D*0.6931+1
+\end{align} \end{subequations}
+
+
+\section{Latest update lookup algorithm for time based feeds}\label{sec:feeds-lookup-algo}
+
+This section gives a walkthrough about the steps of the algorithm that finds the latest update of a time-based feed  (see \ref{sec:time-based-feeds}).
+
+\begin{figure}[htbp]
+\centering
+\begin{tabular}{c|c}
+\includegraphics[width=.5\textwidth]{fig/feeds/0.png}&\includegraphics[width=.5\textwidth]{fig/feeds/1.png}\\
+\includegraphics[width=.5\textwidth]{fig/feeds/2.png}&\includegraphics[width=.5\textwidth]{fig/feeds/3.png}\\
+\includegraphics[width=.5\textwidth]{fig/feeds/4.png}&\includegraphics[width=.5\textwidth]{fig/feeds/5.png}\\
+\includegraphics[width=.5\textwidth]{fig/feeds/6.png}&\includegraphics[width=.5\textwidth]{fig/feeds/7.png}
+\end{tabular}
+\caption[Latest update lookup algorithm for time based feeds]{Latest update lookup algorithm for time based feeds: steps. Known updates (U1) are marked in yellow. The hint is light orange (U2). Updates marked in grey (U3-U9) are unknown. $t=14$ indicates the current time, Step 1: lookahead (LA1) area (blue) and lookback (LB1) area (pink); }
+\label{fig:feeds-lookup-1}
+\end{figure}
+
+The \gloss{lookahead area} indicates the area that will continue to be explored if R1 succeeds, while the \gloss{lookback area} highlights what will be continued to be explored if R1 fails to find an update in at their location. After a short interval (configurable parameter \gloss{head start}) waiting for R1 to resolve, the algorithm sets out to explore both lookahead and lookback areas, headed by  $\langle  12, 2 \rangle$ and $\langle  4, 2 \rangle$ respectively. These two simultaneous lookups are labeled R2 in the figure below, and are active together with R1. Also, recursively, 4 more lookup areas (labeled LA2 and LB2) are defined that depend on the result of each instance of R2:
+Once R1 resolves we can prune one area or the other. This is implemented by recursively cancelling a context, which aborts all chunk retrievals associated with it. the found update U9 can then be used as a hint for future lookups
+
+In our example, R1 returns update U6, therefore our status is as below. Note that U6 is now marked as "known" in yellow, thus we're certain that the area in dark red, while it could contain other updates, **does not contain the latest one**, which is the one we care about:
+
+
+Again, after a short head start, the algorithm proceeds to look up the lookback and lookahead headers $\langle  8, 2 \rangle$ and $\langle  14, 1 \rangle$, marked as active (purple), with the label R3 below. These come, recursively, with their own lookahead and lookback areas, labeled LA3 and LB3:
+
+In our example, R2 finally resolves, finding update U8. This means we can cancel lookback area LB2 as we are now sure the last update can't be there:
+
+
+To shorten up the example, if R3 resolved immediately with no update found ($\langle  14, 1 \rangle$ did not contain an update), that would cancel LA3 family of lookups, while LB3 continues (now marked as R4):
+
+
+Altough not drawn above, it is easy to see the pattern: LA4 and LB5 would then be scanned as R5 and R6 respectively, and in this case, fail, thus leaving $\langle  12, 1 \rangle$ (U9), as the found update:
+
+
+.
+
+This example is simplified -- with the current algorithm parameters, there can potentially be around 30 lookups taking place concurrently, exploring the search space for updates and pruning entire branches recursively once a better path is found. This can be configured by adjusting the lookup timeout and headstart times.
+
+If the algorithm failed to find an update (i.e., if U3-U9 did not actually exist), then the hint in $\langle  0, 3 \rangle$ (U2) would be challenged for validity: In this situation if the hint actually contains an update, that is then returned the last update and we're done. If the hint, however, is proven false then the algorithm restarts without hint at that point.
+
 
 \chapter{Implementers' guide}
 \input{implementers-guide.tex}
+
+
+\chapter{About the project}\label{sec:about}
+\section{History}
+\section{Organisation}
+\section{Community}
+\section{Ecosystem}

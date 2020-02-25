@@ -4,7 +4,10 @@
 \usepackage[linedheaders,parts,pdfspacing,manychapters]{classicthesis}
 \usepackage{fullpage}
 \usepackage[titletoc,title]{appendix}
-\usepackage[section,numberedsection, acronym, toc]{glossaries}
+\usepackage[section,numberedsection, acronym, toc, nonumberlist, index]{glossaries}
+\usepackage[stylemods=bookindex, abbreviations]{glossaries-extra} % index style
+
+ \usepackage{epigraph} % quotations (at start of chapter)
 
 \usepackage{amsmath}
 \usepackage{amsthm}
@@ -27,19 +30,51 @@
 \usepackage{csquotes}
 \usepackage{tikz}
 \usetikzlibrary{matrix,arrows.meta,fit,positioning,shapes,automata}
+\usepackage{forest}
 
 \usepackage{breakcites} % splits long citations to several lines
 
 \makeglossaries
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% make first use \emph
+% see: https://tex.stackexchange.com/questions/449104/how-to-style-first-acronym-and-first-glossary-appearance
+\newcommand{\firstuseformat}[1]{\emph{#1}}
+
+\renewcommand{\glslinkpresetkeys}{% requires v1.26+
+  \ifglsused{\glslabel}%
+  {\letcs\glstextformat{@firstofone}}%
+  {\let\glstextformat\firstuseformat}%
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setabbreviationstyle{short-em-nolong} % abbreviation / acronym should be just short form and emphasis = short-em-nolong
+
 \input{glossary.tex}
+
 
 \bibliographystyle{apalike}
 
+
+
 % \newcommand\gloss[1]{\emph{#1 -- [\gls{#1}]}}
 % \newcommand\gloss[1]{\emph{#1}}
-\newcommand\gloss[1]{\emph{\gls{#1}}} %singular
-\newcommand\glossupper[1]{\emph{\Gls{#1}}} %singular uppercase
-\newcommand\glossplural[1]{\emph{\glspl{#1}}} % plural
+\newcommand\gloss[1]{\gls{#1}} %singular
+\newcommand\glossupper[1]{\Gls{#1}} %singular uppercase
+\newcommand\glossplural[1]{\glspl{#1}} % plural
+\newcommand\glossupperplural[1]{\Glspl{#1}} % plural uppercase
+
+\newcommand\wip[1]{
+\todo[inline,size=\Large]{work in progress: #1}}
+\newcommand\orange[1]{
+\todo[inline,size=\Large]{work in progress: #1}}
+\newcommand\green[1]{
+\todo[inline,size=\Large,backgroundcolor=green]{complete }}
+\newcommand\yellow[1]{
+\todo[inline,size=\Large,backgroundcolor=yellow]{incomplete:  #1}}
+\newcommand\red[1]{
+\todo[inline,size=\Large,backgroundcolor=red]{incomplete}}
 
 \newcommand\PO{\mathit{PO}}
 \newcommand\Keys{\mathcal{K}}
@@ -95,11 +130,21 @@
   
 \bibliography{refs.bib}
 \appendix
-\part{Appendix}
+\part{Appendix} \label{part:appendix}
 \input{appendix.tex}
 
-\newpage
-\printglossary
+\chapter{Indexes}
+% \newpage
+\printglossary \label{sec:glossary}
+
+
+%\printglossary[type=abbreviations, title={List of Acronyms}] \label{sec:acronyms}
+
+%%\printglossary[type=main, category=abb] % not working
+
+\printglossary[nonumberlist=false, style=bookindex, title=Index] \label{sec:index}
+
+\glsaddall % adds all terms, even if not mentioned in text
 \printglossary[type=\acronymtype,title={List of Acronyms}]
 
 \end{document}

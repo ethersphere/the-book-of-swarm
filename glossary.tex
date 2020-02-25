@@ -1,3 +1,4 @@
+\longnewglossaryentry{node}{name=node}{TBD}
 
 \longnewglossaryentry{fingerpointing}{name=fingerpointing}{Litigation scheme allowing upstream peers to shift blame to downstream peer.}
 % \longnewglossaryentry{certified delivery}{name=certified delivery}{Message delivery with signed receipt from recipient.}
@@ -12,7 +13,6 @@
 \longnewglossaryentry{resource update chunk}{name=resource update chunk}{}
 \longnewglossaryentry{forwarding Kademlia}{name=forwarding Kademlia}{Recursive flavour of Kademlia routing involving message relay.}
 % \longnewglossaryentry{scale-free graphs}{name=}{scale-free graphs}
-% \longnewglossaryentry{kademlia}{name=kademlia}{}
 \longnewglossaryentry{Kademlia table}{name=Kademlia table}{Indexing of peers based on proximity order of peer address relative to local overlay address.}
 \longnewglossaryentry{saturated Kademlia table}{name=saturated Kademlia table}{Nodes with saturated Kademlia table realise Kademlia connectivity.}
 \longnewglossaryentry{retrieve request}{name=retrieve request, plural=retrieve requests}{Peer to peer protocol message asking for the delivery of a chunk based on the chunk address.}
@@ -24,17 +24,17 @@
 % \longnewglossaryentry{practical routability}{name=practical routability}{TBD}
 \longnewglossaryentry{redundant retrievability}{name=redundant retrievability}{A chunk is said to be redundantly retrievable with degree $r$ if it is retrievable and would remain so after any $r$ nodes responsible for it leave the network.}
 % \longnewglossaryentry{practical retrievability}{name=practical retrievability}{TBD}
-\longnewglossaryentry{synchronisation}{name=synchronisation}{TBD}
+\longnewglossaryentry{chunk synchronisation}{name=chunk synchronisation}{TBD}
 \longnewglossaryentry{history sync state}{name=history sync state}{TBD}
 \longnewglossaryentry{live sync state}{name=live sync state}{TBD}
-\longnewglossaryentry{chunk}{name=chunk, plural=chunks}{TBD}
+\longnewglossaryentry{chunk}{name=chunk, plural=chunks}{A part of a file stored in a decentralized / distributed manner. All chunks are of equal size. Chunks are the basic storage units used in Swarm's network layer.}
 % \longnewglossaryentry{availability lag}{name=availability lag}{TBD}
 \longnewglossaryentry{proximity}{name=proximity}{TBD}
 % \longnewglossaryentry{most proximate bin}{name=most proximate bin}{TBD}
 \longnewglossaryentry{saturation depth}{name=saturation depth}{TBD}
 % \longnewglossaryentry{age of saturation}{name=age of saturation}{TBD}
 % \longnewglossaryentry{age of health}{name=age of health}{TBD}
-\longnewglossaryentry{neighbourhood depth}{name=neighbourhood depth}{TBD}
+
 \longnewglossaryentry{area of responsibility}{name=area of responsibility}{TBD}
 \longnewglossaryentry{radius of responsibility}{name=radius of responsibility}{TBD}
 \longnewglossaryentry{history syncing}{name=history syncing}{TBD}
@@ -44,12 +44,12 @@
 \longnewglossaryentry{guaranteed delivery}{name=guaranteed delivery}{TBD}
 \longnewglossaryentry{eventual consistency}{name=eventual consistency}{TBD}
 \longnewglossaryentry{erasure code}{name=erasure code}{TBD}
-\longnewglossaryentry{storer node}{name=storer node, plural=storer nodes}{TBD}
+\longnewglossaryentry{storer node}{name=storer node, plural=storer nodes, parent={node}}{TBD}
 \longnewglossaryentry{relaying node}{name=relaying node, plural=relaying nodes}{TBD}
 \longnewglossaryentry{syncing}{name=syncing}{TBD}
 \longnewglossaryentry{chunking}{name=chunking}{TBD}
 % \longnewglossaryentry{distributed preimage archive}{name=distributed preimage archive}{TBD}
-\longnewglossaryentry{swap}{name=swap}{TBD}
+\longnewglossaryentry{swap}{name=swap}{swap is a Swarm accounting protocol with tit-for-tat accounting scheme that scales microtransactions. Includes a network protocol also called swap.}
 \longnewglossaryentry{plausible deniability}{name=plausible deniability}{TBD}
 % \longnewglossaryentry{bee-line delivery}{name=bee-line delivery}{TBD}
 
@@ -62,34 +62,33 @@
 \longnewglossaryentry{network ID}{name=network ID}{TBD}
 \longnewglossaryentry{overlay topology}{name=overlay topology}{The connectivity graph realising a particular topology over the underlay network connections.}
 \longnewglossaryentry{kademlia}{name=kademlia}{TBD}
-\longnewglossaryentry{proximity order bins}{name=proximity order bins}{TBD}
+\longnewglossaryentry{proximity order bin}{name=proximity order bin, plural={proximity order bins}}{TBD}
 \longnewglossaryentry{churn}{name=network churn, text=churn}{Attrition of nodes from the network.}
 \longnewglossaryentry{hive protocol}{name=hive protocol}{The protocol nodes joining a decentralised network use to discover their peers.}
 \longnewglossaryentry{address book}{name=address book}{Kademlia table of known peer addresses.}
-\longnewglossaryentry{chunks}{name=chunks}{TBD}
 \longnewglossaryentry{immutable}{name=immutable chunk store, text=immutable}{No replace/update operation is available on chunks.}
 \longnewglossaryentry{content addressed chunk}{name=content addressed chunk, plural=content addressed chunks}{TBD}
 \longnewglossaryentry{single owner chunk}{name=single owner chunk, plural=single owner chunks}{TBD}
-\longnewglossaryentry{assoc}{name=assoc}{See \gloss{addressed and signed single-owner content}.}
+\longnewglossaryentry{addressed and signed single-owner content}{name=addressed and signed single-owner content}{A structure of chunk content composed of identifier, payload and signature attesting to the association of identifier and payload.}
+\longnewglossaryentry{assoc}{name=assoc, parent={addressed and signed single-owner content}}{TBD}
 \longnewglossaryentry{garbage collection}{name=garbage collection}{The process that purges chunks from their local storage.}
 \longnewglossaryentry{garbage collection strategy}{name=garbage collection strategy}{The process that dictates which chunks are chosen for garbage collection.}
 \longnewglossaryentry{direct delivery}{name=direct delivery}{Chunk delivery happens in one step via some lower level network protocol.}
 \longnewglossaryentry{pass-back delivery}{name=pass-back delivery}{TBD}
 \longnewglossaryentry{routed delivery}{name=routed delivery}{TBD}
 \longnewglossaryentry{opportunistic caching}{name=opportunistic caching}{When a forwarding node receives a chunk, then the chunk is saved in case it will be requested again.}
-\longnewglossaryentry{light node}{name=light node}{Concept of light node refer to a special mode of operation necessitated by poor bandwidth environments, e.g., mobile devices on low throughput networks or devices allowing only transient or low-volume storage.}
-\longnewglossaryentry{chequebook}{name=chequebook}{TBD}
+\longnewglossaryentry{light node}{name=light node, plural={light nodes}}{Concept of light node refer to a special mode of operation necessitated by poor bandwidth environments, e.g., mobile devices on low throughput networks or devices allowing only transient or low-volume storage.}
+\longnewglossaryentry{chequebook contract}{name=chequebook contract}{Smart contract that allows the beneficiary to choose when payments are to be processed.}
 \longnewglossaryentry{global balance}{name=global balance}{TBD}
 \longnewglossaryentry{newcomer}{name=newcomer}{TBD}
 \longnewglossaryentry{insider}{name=insider}{TBD}
 \longnewglossaryentry{postage stamp}{name=postage stamp}{Proof of payment for pre-paid delivery and storage.}
-\longnewglossaryentry{batch}{name=batch}{ A
-group of chunks referenced under an intermediate node.}
-\longnewglossaryentry{chunk span}{name=chunk span}{TBD}
+\longnewglossaryentry{batch}{name=batch}{A group of chunks referenced under an intermediate node.}
+\longnewglossaryentry{chunk span}{name=chunk span}{The length of data subsumed under an intermediate chunk.}
 \longnewglossaryentry{Swarm manifest}{name=Swarm manifest}{A structure that defines a mapping between arbitrary paths and files to handle collections.}
 \longnewglossaryentry{manifest entry}{name=manifest entry}{Contains a reference to the Swarm root chunk of the representation of a file and also specifies the media mime type of file.}
-\longnewglossaryentry{root access}{name=root access}{TBD}
-\longnewglossaryentry{granted access}{name=granted access}{TBD}
+\longnewglossaryentry{root access}{name=root access}{Non-privileged access to encrypted content based on meta-information encoded in root manifest entry for a document.}
+\longnewglossaryentry{granted access}{name=granted access}{A type of selective access to encrypted content requiring \gloss{root access} as well as access credentials: authorized private key or passphrase.}
 \longnewglossaryentry{encrypted reference}{name=encrypted reference}{TBD}
 \longnewglossaryentry{access key}{name=access key}{TBD}
 \longnewglossaryentry{session key}{name=session key}{TBD}
@@ -100,10 +99,12 @@ group of chunks referenced under an intermediate node.}
 \longnewglossaryentry{RLP}{name=RLP}{TBD}
 
 \longnewglossaryentry{Distributed Immutable Store for Chunks}{name=Distributed Immutable Store for Chunks}{TBD}
-\longnewglossaryentry{DISC}{name=DISC}{See \gloss{Distributed Immutable Store for Chunks}.}
+% \longnewglossaryentry{DISC}{name=DISC}{See \gloss{Distributed Immutable Store for Chunks}.} DELETE LATER AS UNDER ACRONYMS
 \longnewglossaryentry{distributed hash table}{name=distributed hash table,plural=distributed hash tables}{TBD}
-\longnewglossaryentry{DHT}{name=DHT}{TBD See \gloss{distributed hash table}}
-\longnewglossaryentry{BMT chunk}{name=BMT chunk}{TBD}
+% \longnewglossaryentry{DHT}{name=DHT}{TBD See \gloss{distributed hash table}} DELETE
+\longnewglossaryentry{binary Merkle tree}{name={binary Merkle tree}}{TBD}
+\longnewglossaryentry{binary Merkle tree chunk}{name=binary Merkle tree chunk}{TBD}
+\longnewglossaryentry{BMT chunk}{name=BMT chunk, parent={binary Merkle tree chunk}}{TBD}
 \longnewglossaryentry{binary Merkle tree hash}{name=binary Merkle tree hash}{TBD}
 
 \longnewglossaryentry{BMT hash}{name=BMT hash}{TBD See \gloss{binary Merkle tree hash}}
@@ -112,34 +113,48 @@ group of chunks referenced under an intermediate node.}
 \longnewglossaryentry{bzz account}{name=bzz account}{TBD}
 \longnewglossaryentry{enode url scheme}{name=enode url scheme}{TBD}
 
-\longnewglossaryentry{mining chunks}{name=mining chunks}{TBD}
-\longnewglossaryentry{addressed and signed single-owner content}{name=addressed and signed single-owner content}{A structure of chunk content composed of identifier, payload and signature attesting to the association of identifier and payload.}
+\longnewglossaryentry{mining chunks}{name=mining chunks}{An example of chunk mining is generating an encrypted variant of chunk content so that the resulting chunk address satisfies certain constraints, e.g., is close to or farther away from a particular address.}
+
 \longnewglossaryentry{chunk value}{name=chunk value}{TBD}
-\longnewglossaryentry{postage lottery}{name=postage lottery}{TBD}
+\longnewglossaryentry{postage lottery}{name=postage lottery}{A scheme for compensation through redistributing the revenue coming from postage stamps among the registered storers in a fair way.}
 \longnewglossaryentry{postage batch references}{name=postage batch references}{TBD}
 \longnewglossaryentry{security deposit}{name=security deposit}{TBD}
 \longnewglossaryentry{litigation}{name=litigation}{TBD}
-\longnewglossaryentry{challenge}{name=challenge}{TBD}
+\longnewglossaryentry{challenge}{name=challenge}{User can submit a challenge when they attempt to retrieve insured content and fail to find a chunk.}
 
 \longnewglossaryentry{access control trie}{name=access control trie}{TBD}
 \longnewglossaryentry{pinning}{name=pinning}{TBD}
-\longnewglossaryentry{SWINDLE}{name=SWINDLE}{TBD}
+% \longnewglossaryentry{SWINDLE}{name=SWINDLE}{TBD} DELETE
 \longnewglossaryentry{Secured With INsurance Deposit Litigation and Escrow}{name=Secured With INsurance Deposit Litigation and Escrow}{TBD See \gloss{SWINDLE}.}
 \longnewglossaryentry{update notification}{name=update notification}{TBD}
 \longnewglossaryentry{upload tag}{name=upload tag}{TBD}
-\longnewglossaryentry{singleton manifest}{name=singleton manifest}{TBD}
+\longnewglossaryentry{singleton manifest}{name=singleton manifest}{A manifest that contains a single entry to a file.}
 \longnewglossaryentry{range queries}{name=range queries}{TBD}
 %\longnewglossaryentry{zzz}{name=zzz}{TBD}
 \longnewglossaryentry{BZZ network ID}{name=BZZ network ID}{TBD}
 \longnewglossaryentry{Kademlia}{name=Kademlia}{TBD}
-\longnewglossaryentry{reference count}{name=reference count}{TBD}
+\longnewglossaryentry{reference count}{name=reference count}{A property of a chunk to prevent it from being garbage collected. It is increased and decreased when the chunk is pinned and unpinned, respectively.}
 \longnewglossaryentry{recovery identifier}{name=recovery identifier}{TBD}
-%\longnewglossaryentry{zzz}{name=zzz}{TBD}
-%\longnewglossaryentry{zzz}{name=zzz}{TBD}
-%\longnewglossaryentry{zzz}{name=zzz}{TBD}
-%\longnewglossaryentry{zzz}{name=zzz}{TBD}
-%\longnewglossaryentry{zzz}{name=zzz}{TBD}
-%\longnewglossaryentry{zzz}{name=zzz}{TBD}
+\longnewglossaryentry{cheque}{name=cheque}{TBD}
+\longnewglossaryentry{uploader}{name=uploader}{TBD}
+\longnewglossaryentry{witness}{name=witness}{TBD}
+\longnewglossaryentry{upload and disappear}{name=upload and disappear}{A way to deploy your interactive dynamic content to be stored in the cloud.}
+\longnewglossaryentry{world computer}{name=world computer}{Global infrastructure that supports data storage, transfer and processing.}
+\longnewglossaryentry{neighbourhood depth}{name=neighbourhood depth, parent=neighbourhood}{TBD}
+\longnewglossaryentry{thin Kademlia table}{name=thin Kademlia table, parent={Kademlia table}}{TBD}
+\longnewglossaryentry{aligned incentives}{name=aligned incentives}{TBD}
+\longnewglossaryentry{forwarding lag}{name=forwarding lag}{TBD}
+\longnewglossaryentry{sender anonymity}{name=sender anonymity}{TBD}
+\longnewglossaryentry{bootstrapping protocol}{name=bootstrapping protocol}{TBD}
+\longnewglossaryentry{decentralised network}{name=decentralised network}{TBD}
+\longnewglossaryentry{load balancing}{name=load balancing}{TBD}
+\longnewglossaryentry{redundancy}{name=redundancy}{TBD}
+\longnewglossaryentry{inclusion proofs}{name=inclusion proofs}{TBD}
+\longnewglossaryentry{EVM}{name=EVM}{Ethereum virtual machine}
+\longnewglossaryentry{span value}{name=span value}{TBD}
+\longnewglossaryentry{price arbitrage}{name=price arbitrage}{TBD}
+\longnewglossaryentry{neighbourhood size}{name=neighbourhood size}{TBD}
+\longnewglossaryentry{NHS}{name=NHS, parent={neighbourhood size}}{neighbourhood size}
 %\longnewglossaryentry{zzz}{name=zzz}{TBD}
 
 
@@ -152,14 +167,94 @@ group of chunks referenced under an intermediate node.}
 \longnewglossaryentry{statement of custody receipt}{name=statement of custody receipt}{A receipt from the storer node to the uploader after successful \gloss{push syncing} of a chunk.}
 \longnewglossaryentry{anonymous uploads}{name=anonymous uploads}{Uploading leveraging the forwarding Kademlia and keeping the identity of the uploader hidden.}
 \longnewglossaryentry{pull syncing}{name=pull syncing}{TBD}
-\longnewglossaryentry{downstream peer}{name=downstream peer}{TBD}
 \longnewglossaryentry{upstream peer}{name=upstream peer}{TBD}
-\longnewglossaryentry{forwarding node}{name=forwarding node, plural=forwarding nodes}{TBD}
+
+\longnewglossaryentry{forwarding node}{name={forwarding node},plural={forwarding nodes},parent={node}}{TBD}
+
 \longnewglossaryentry{net user}{name=net user, plural=net users}{A node that is using more resources of the Swarm network than it is providing.}
 \longnewglossaryentry{net provider}{name=net provider, plural=net providers}{A node that is providing more resources to the Swarm network than it is using.}
 \longnewglossaryentry{repeated dealings}{name=repeated dealings}{TBD}
 \longnewglossaryentry{honey token}{name=honey token}{TBD}
 \longnewglossaryentry{spurious hop}{name=spurious hop}{Relaying traffic to a node without increasing proximity to the target address.}
+\longnewglossaryentry{payment threshold}{name=payment threshold}{TBD}
+\longnewglossaryentry{effective settlement threshold}{name=effective settlement threshold}{TBD}
+\longnewglossaryentry{peer}{name=peer, plural=peers}{Nodes that are in relation with a particular node $x$ are called peers of $x$.}
+\longnewglossaryentry{downstream peer}{name=downstream peer, parent={peer}}{TBD}
+%\longnewglossaryentry{non-peer}{name=non-peer}{TBD}
+\longnewglossaryentry{disconnect threshold}{name=disconnect threshold}{TBD}
+\longnewglossaryentry{uniformity requirement}{name=uniformity requirement}{TBD}
+\longnewglossaryentry{prefix collision}{name=prefix collision}{TBD}
+\longnewglossaryentry{collision slot}{name=collision slot, plural= collision }{TBD}
+\longnewglossaryentry{tragedy of the commons}{name=tragedy of the commons}{Disappearing content will have no negative consequence to any one storer node if no negative incentives are used.}
+\longnewglossaryentry{swear}{name=swear}{Nodes registered on the Swarm network are accountable and stand to lose their deposit if they are found to violate the rules of the Swarm in an on-chain litigation process.}
+% \longnewglossaryentry{swindle}{name=swindle}{Nodes monitor other nodes to check if they comply with their promise by submitting challenges according to a process of litigation.}
+\longnewglossaryentry{SWEAR}{name=SWEAR}{TBD See \gloss{Secure Ways of Ensuring ARchival or Swarm Enforcement And Registration}}
+\longnewglossaryentry{Secure Ways of Ensuring ARchival or Swarm Enforcement And Registration}{name=Secure Ways of Ensuring ARchival or Swarm Enforcement And Registration}{TBD}
+\longnewglossaryentry{chunk-epoch}{name=chunk-epoch}{TBD}
+\longnewglossaryentry{collect-and-run attack}{name=collect-and-run attack}{TBD}
+\longnewglossaryentry{addressed envelope}{name=addressed envelope}{TBD}
+\longnewglossaryentry{entanglement code}{name=entanglement code, plural=entanglement codes}{TBD}
+\longnewglossaryentry{Cauchy-Reed-Solomon erasure code}{name=Cauchy-Reed-Solomon erasure code}{TBD}
+\longnewglossaryentry{recovery chunk}{name=recovery chunk}{TBD}
+\longnewglossaryentry{recovery address}{name=recovery address}{TBD}
+\longnewglossaryentry{duplicate chunk}{name=duplicate chunk, plural=duplicate chunks}{We define a chunk as a duplicate (or seen) if and only if it is already found in the localstore.}
+\longnewglossaryentry{World Wide Web}{name=World Wide Web}{TBD}
+\longnewglossaryentry{Web 1.0}{name=Web 1.0, parent={World Wide Web}}{TBD}
+\longnewglossaryentry{internet service provider}{name=internet service provider, plural={internet service providers}}{TBD}
+\longnewglossaryentry{Web 2.0}{name=Web 2.0, parent={World Wide Web}}{TBD}
+\longnewglossaryentry{peer-to-peer}{name=peer-to-peer}{TBD}
+\longnewglossaryentry{Web 3.0}{name=Web 3.0, parent={World Wide Web}}{TBD}
+\longnewglossaryentry{BitTorrent}{name=BitTorrent}{A communication protocol for peer-to-peer file sharing used to distribute data and electronic files over the Internet.}
+\longnewglossaryentry{seeder}{name=seeder}{User hosting the content in BitTorrent peer-to-peer file exchange protocol.}
+\longnewglossaryentry{Hypertext Transfer Protocol}{name=Hypertext Transfer Protocol}{An application protocol for distributed, collaborative, hypermedia information systems.}
+\longnewglossaryentry{ZeroNet}{name=ZeroNet}{TBD}
+\longnewglossaryentry{distributed web application}{name=distributed web application, plural={distributed web applications}}{TBD}
+\longnewglossaryentry{InterPlanetary File System}{name=InterPlanetary File System}{A protocol and peer-to-peer network for storing and sharing data in a distributed file system.}
+\longnewglossaryentry{freeriding}{name=freeriding}{The uncompensated depletion of limited resources.}
+\longnewglossaryentry{incentive strategy}{name=incentive strategy}{TBD}
+\longnewglossaryentry{data slavery}{name=data slavery}{A situation where an individual has no control over their personal data used for commercial purposes by companies.}
+\longnewglossaryentry{collective information}{name=collective information}{TBD}
+\longnewglossaryentry{data silo}{name=data silo, plural={data silos}}{TBD}
+\longnewglossaryentry{distributed storage}{name=distributed storage}{TBD}
+\longnewglossaryentry{overlay network}{name=overlay network}{TBD}
+\longnewglossaryentry{overlay address space}{name=overlay address space}{TBD}
+\longnewglossaryentry{underlay address}{name=underlay address}{TBD}
+\longnewglossaryentry{protocol multiplexing}{name=protocol multiplexing}{The underlay network service can accommodate several protocols running on the same connection.}
+\longnewglossaryentry{devp2p}{name=devp2p}{TBD}
+\longnewglossaryentry{libp2p}{name=libp2p}{TBD}
+\longnewglossaryentry{overlay address}{name=overlay address}{TBD}
+\longnewglossaryentry{nearest neighbours}{name=nearest neighbours}{TBD}
+
+\longnewglossaryentry{PO bin}{name=PO bin, parent={proximity order bin}}{TBD}
+
+\longnewglossaryentry{bin}{name=bin, plural={bins}, parent={proximity order bin}}{TBD}
+
+\longnewglossaryentry{routing}{name=routing}{Relaying messages via a chain of peers ever closer to the destination}
+\longnewglossaryentry{balanced binary tree}{name=balanced binary tree}{TBD}
+\longnewglossaryentry{PO boundary}{name=PO boundary}{TBD}
+\longnewglossaryentry{empty bin}{name=empty bin}{TBD}
+\longnewglossaryentry{bottom-up  depth-first strategy}{name={bottom-up, depth-first strategy}, parent={Kademlia}}{TBD}
+
+\longnewglossaryentry{identifier}{name=identifier, parent={single owner chunk}}{TBD}
+\longnewglossaryentry{owner}{name=owner, parent={single owner chunk}}{TBD}
+\longnewglossaryentry{payload}{name=payload, parent={single owner chunk}}{TBD}
+\longnewglossaryentry{topic}{name=topic}{TBD}
+\longnewglossaryentry{redundant Kademlia connectivity}{name=redundant Kademlia connectivity}{TBD}
+\longnewglossaryentry{stable node}{name=stable node, plural={stable nodes}, parent={node}}{TBD}
+\longnewglossaryentry{stream provider}{name=stream provider}{TBD}
+\longnewglossaryentry{bin ID}{name=bin ID}{TBD}
+\longnewglossaryentry{value-consistent garbage collection strategy}{name=value-consistent garbage collection strategy}{TBD}
+\longnewglossaryentry{batch proof of custody}{name=batch proof of custody}{TBD}
+\longnewglossaryentry{feed topic}{name=feed topic}{TBD}
+\longnewglossaryentry{time-based feeds}{name=time-based feeds}{TBD}
+\longnewglossaryentry{epoch}{name=epoch}{TBD}
+\longnewglossaryentry{epoch base time}{name=epoch base time}{TBD}
+\longnewglossaryentry{epoch grid}{name=epoch grid}{TBD}
+\longnewglossaryentry{lookahead area}{name=lookahead area}{TBD}
+\longnewglossaryentry{lookback area}{name=lookback area}{TBD}
+\longnewglossaryentry{head start}{name=head start}{TBD}
+\longnewglossaryentry{hint}{name=hint}{TBD}
+\longnewglossaryentry{epoch reference}{name=epoch reference}{TBD}
 %\longnewglossaryentry{zzz}{name=zzz}{TBD}
 %\longnewglossaryentry{zzz}{name=zzz}{TBD}
 %\longnewglossaryentry{zzz}{name=zzz}{TBD}
@@ -167,10 +262,46 @@ group of chunks referenced under an intermediate node.}
 %\longnewglossaryentry{zzz}{name=zzz}{TBD}
 
 
-\newacronym{TTL}{TTL}{time to live}
+\longnewglossaryentry{time to live}{name=time to live}{TBD}
+
+%%%%%%%%%%%%%%% Acronyms / Abbreviations
+% note, with the glossaries-extra package, it seems best to use 
+% abbreviations command, not the acronyms command
+% might need to change this, read:
+% https://tex.stackexchange.com/questions/287080/best-solution-for-acronyms-abbreviations-glossary-and-index
+\newacronym[parent=time to live]{TTL}{TTL}{time to live}
+\newacronym{BMT}{BMT}{binary Merkle tree}
+\newacronym[parent=Distributed Immutable Store for Chunks]{DISC}{DISC}{distributed immutable store for chunks}
+\newabbreviation[parent=distributed hash table, plural={DHTs}]{DHT}{DHT}{distributed hash table}
+\newacronym[parent=Secured With INsurance Deposit Litigation and Escrow]{SWINDLE}{SWINDLE}{Secured With INsurance Deposit Litigation and Escrow}
+\newabbreviation[parent=Secured With INsurance Deposit Litigation and Escrow]{swindle}{swindle}{Secured With INsurance Deposit Litigation and Escrow}
+% \newacronym[parent=Secured With INsurance Deposit Litigation and Escrow]{swindle}{swindle}{Secured With INsurance Deposit Litigation and Escrow}
+% \newabbreviation[parent={World Wide Web}]{WWW}{WWW}{World Wide Web}
+%\newacronym{WWW}{WWW}{World Wide Web}
+
+\longnewglossaryentry{WWW}{name=WWW, parent={World Wide Web}, category={abb}}{TBD}
+
+\newabbreviation[parent={internet service provider}]{ISP}{ISP}{internet service provider}
+\newabbreviation[parent={peer-to-peer}]{P2P}{P2P}{peer-to-peer}
+\newabbreviation[parent={Hypertext Transfer Protocol}]{HTTP}{HTTP}{Hypertext Transfer Protocol}
+\newabbreviation[parent={distributed web application}, plural={dapps}]{dapp}{dapp}{distributed web applications}
+\newabbreviation[parent={InterPlanetary File System}]{IPFS}{IPFS}{InterPlanetary File System}
+\newabbreviation[parent={proximity order}]{PO}{PO}{proximity order}
+\newabbreviation{TEST}{TEST}{T E S T not used in text}
+%\newabbreviation[]{}{}{}
+%\newabbreviation[]{}{}{}
+%\newabbreviation[]{}{}{}
+%\newabbreviation[]{}{}{}
+%\newabbreviation[]{}{}{}
+%\newabbreviation[]{}{}{}
+
+
+%%%%%%%%%%%%%%%  END OF FILE 
 
 % \begin{figure}[htbp]
 %   \centering
 %   \caption{}
 %   \label{fig:}
 % \end{figure}
+
+% nodes: insurer, storer (commited to storing chunks), relayer, registered node, guardian, forwarder, custodian, requestor, staked node, (non-staked node)?, pinner node, stable node

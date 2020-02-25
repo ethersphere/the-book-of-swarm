@@ -1,0 +1,55 @@
+% set documentclass - this will make the file compile if open in editor
+\documentclass[a4paper,12pt,fullpage,openany,hyperfootnotes,hidelinks]{scrbook}
+
+% load Tikz & related packages
+\usepackage{tikz}
+\usetikzlibrary{matrix,arrows.meta,fit,positioning,shapes,automata}
+\usepackage{forest}
+
+% document must begin
+\begin{document}
+
+% notes on graphics goal / textual description of what is to be conveyed
+% INSERT
+
+% existing sketch of the graphics
+% INSERT
+%\begin{figure}[htp]
+%    \centering
+%    \includegraphics[width=10cm]{fig-drafts/swarm-layered-design.jpg}
+%\end{figure}
+
+% simple example Tikz "picture"
+% \begin{figure}[htbp]
+% \centering
+% \resizebox{1\textwidth}{!}{
+%     \input{fig/swarm-hash.tex}
+% }
+% \caption[Swarm hash]{Swarm hash}
+% \label{fig:Swarm-hash}
+% \end{figure}
+
+% \begin{figure}[htbp]
+%     \centering
+%     \input{fig/kademlia-1.tex}
+%     \caption[Forwarding Kademlia routing]{TBD Forwarding Kademlia routing}
+%     \label{fig:forwarding-kademlia}
+% \end{figure}
+
+% \begin{figure}[htbp]
+%     \centering
+%     \input{fig/kademlia-2.tex}
+%     \caption[Forwarding Kademlia routing]{TBD Forwarding Kademlia routing}
+%     \label{fig:forwarding-kademlia}
+% \end{figure}
+
+\begin{figure}[htbp]
+   \centering
+   \caption[Kademlia table (recursive flavour)]{\gloss{Kademlia table} (recursive flavour):  peers of node $x$ partitioned into proximity order bins. Saturated Kademlia connectivity is 
+   characterised by a live Kademlia table of directly connected TCP peers such that (1) there is at least $k$ peers in each bin up to but excluding saturation depth $d_x$ and (2) all the nodes in the entire network that would fall in a bin higher or equal to $d_x$ are actually peers of $x$. }
+   \caption[Forwarding Kademlia routing]{TBD Forwarding Kademlia routing}
+   \label{fig:kademlia-table}
+\end{figure}
+
+% document must end
+\end{document}

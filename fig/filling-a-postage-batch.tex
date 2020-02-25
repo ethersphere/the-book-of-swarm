@@ -1,0 +1,59 @@
+\scalebox{0.8}{
+\begin{forest}
+slot/.style={rectangle,minimum width=9mm, minimum height=9mm},
+filled/.style={fill=lightgray},
+mid/.style={circle, radius=1mm},
+[{},mid,for tree={draw, grow=south}
+  [{},mid,edge label={node[midway,left] {0}}
+    [{},mid,edge label={node[midway,left] {0}}
+      [{},mid,edge label={node[midway,left] {0}}
+        [{$0$},slot,edge label={node[midway,left] {0}}]
+        [{$1$},slot,edge label={node[midway,right] {1}}]
+      ]
+      [{},mid,edge label={node[midway,right] {1}}
+        [{$2$},slot,edge label={node[midway,left] {0}}]
+        [{$3$},slot,edge label={node[midway,right] {1}}]
+      ]
+    ]
+    [{},mid,edge label={node[midway,right] {1}} 
+      [{},mid,edge label={node[midway,left] {0}}
+        [{$4$},slot,edge label={node[midway,left] {0}}]
+        [{$5$},slot,rectangle,filled,edge label={node[midway,right] {1}}
+            [{\footnotesize $1010...$},  l=2mm, rectangle, draw=none, edge=dotted]
+        ]
+      ]
+      [{},mid,edge label={node[midway,right] {1}}
+        [{$6$},slot,edge label={node[midway,left] {0}}]
+        [{$7$},slot,edge label={node[midway,right] {1}}]
+      ]
+    ] 
+  ]
+  [{},mid,edge label={node[midway,right] {1}}
+    [{},mid, edge label={node[midway,left] {0}}
+      [{},mid,edge label={node[midway,left] {0}}
+        [{$8$},slot,filled, edge label={node[midway,left] {0}}
+            [{\footnotesize $1000...$}, l=2mm, rectangle, draw=none, edge=dotted]
+        ]
+        [{$9$},slot,edge label={node[midway,right] {1}}]
+      ]
+      [{},mid,edge label={node[midway,right] {1}}
+        [{$10$},slot,edge label={node[midway,left] {0}}]
+        [{$11$},slot,edge label={node[midway,right] {1}}]
+      ]
+    ]
+    [{},mid,edge label={node[midway,right] {1}} 
+      [{},mid,edge label={node[midway,left] {0}}
+        [{$12$},slot,edge label={node[midway,left] {0}}]
+        [{$13$},slot,filled,edge label={node[midway,right] {1}}
+            [{\footnotesize $1011...$},  l=2mm, rectangle, draw=none, edge=dotted]
+        ]
+      ]
+      [{},mid,edge label={node[midway,right] {1}}
+        [{$14$},slot,edge label={node[midway,left] {0}}]
+        [{$15$},slot,edge label={node[midway,right] {1}}]
+      ]
+    ]
+  ] 
+]
+\end{forest}
+}

@@ -1,37 +1,67 @@
+The \gloss{hive protocol} enables nodes to exchange information about other peers that are relevant to them in order to bootstrap their connectivity  (see \ref{sec:bootstrapping}) . The information communicated are both overlay and underlay addresses of the known remote peers (see  \ref{spec:format:bzzaddress}). The overlay address serves to select peers to achieve the connectivity pattern needed for the desired network topology. Underlay address is needed to establish the peer connections by dialing selected peers.
 
-Nodes get information about other peers relevant to them through the hive protocol.
+\subsection{Streams and messages}
 
-The protocol is based on the idea that nodes advertise their \emph{saturation  depth} (\ref{sec:bootstrapping}) to their peers, which is considered as a subscription by their peers. Peers respond to the subscription by sending information about their own peers to the subscriber.
+The protocol specifies two streams with two messages:
 
-\subsection{Messages}
+\begin{lstlisting}[basicstyle=\ttfamily]
+// /swarm/hive/1.0.0/peers
+// /swarm/hive/1.0.0/peers\_notification
+syntax = "proto3";
+
+message GetPeers {
+    uint32 bin = 1;       
+    uint32 limit = 2;
+}
+
+message Peers {
+    repeated BzzAddress peers = 1;
+}
+
+message BzzAddress {
+    bytes Overlay = 1;
+    bytes Underlay = 2;
+}
+\end{lstlisting}
+
+Connected nodes can request information about peers belonging to a proximity order in order to achieve optimal saturation. This can be done any time during the lifetime of the connection by sending \texttt{GetPeers} message over the \texttt{/swarm/hive/1.0.0/peers} stream, and receiving the list of known peers encoded in the \texttt{Peers} message as a response.
+
+During the lifetime of connection, nodes can broadcast newly received peers to their peers. This is done by sending the \texttt{Peers} message over the \texttt{/swarm/hive/1.0.0/peers\_notification} stream.
+
+All new (previously not known) peers found in the \texttt{Peers} message received from either of the two streams as well as newly connected peers that dialled in should be automatically broadcast to all connected peers that are closer  to them than the node's base overlay address. Formally, 
+node $s$ (sender) notifies an existing peer $r$ (recipient) about peer $p$ if $\mathit{PO}(s, r) = \mathit{PO}(s, p)$. 
+
+Upon receiving a peers message, nodes are meant to store the peer information in their \gloss{address book}, i.e., a data structure containing info about peers known to the node. The address book is meant to be used to suggest peers  to a connectivity manager according to a connection strategy (\ref{spec:strategy:connection}) in order to bootstrap kademlia topology (\ref{sec:kademlia-connectivity}). The address book is meant to be persisted across sessions.
+
+\subsection{Fetching peers}
+
+This is a request/response communication that is happening over the \texttt{/swarm/hive/1.0.0/peers} stream. On each request, a new stream is created with the appropriate id, and after the response is received, the stream should be closed by both sides.
+
+\subsubsection{Requesting side}
+
+The requesting side creates a stream and sends \texttt{GetPeers} message and waits for the \texttt{Peers} message as a response. The \texttt{bin} field in the message specifies the proximity order bin that the sender is interested in finding peers for. The \texttt{limit} field can be used to limit the maximum number of peers in the response. A size of 0 means that there is no limit. 
+
+After the response is received, requesting node should close its side of the stream to let the other side know that response is read, and move on to processing the response. Each new peer (that is not previously known) received should be broadcast to all peers that are closer to them than the node itself.
+
+\subsubsection{Responding side}
+
+When the stream is created, responding side should wait for a \texttt{GetPeers} request with bin $b$ and limit $l$ and acts on the request appropriately: information about at most $l$ connected peers that have proximity order $p$ with the requesting peer are found and is wrapped in a \texttt{Peers} message that is sent as a response.
+
+Nodes should keep track of peer info they already sent to other peers, or received it from, in order to avoid  duplicate or even circular peers notifications.
+
+After the response is sent, this node should wait for requesting node to close its side of the stream before closing the stream themselves and moving on.
+
+\subsection{Sending peers notifications}
+
+This is a notification style communication that is happening over the \texttt{/swarm/hive/1.0.0/peers\_notification} stream. Nodes should send info about each newly found or connected peer to all connected peers that are closer. Nodes should keep track of peer info they already sent to other peers, or received it from, in order to avoid  duplicate or even circular peers notifications.
+
+\subsubsection{Sending side}
+
+A stream with the appropriate id is created and a \texttt{Peers} message is sent over the stream. There is no response to this message. The sending node should wait for the receiving side to close its side of the stream, before closing the stream themselves and moving on.
+
+\subsubsection{Receiving side}
+
+When the stream is created, receiving node should wait for a \texttt{Peers} message. After receiving the message, node should close its side of the stream to let the sender node know that the message was received, and move on with processing. If the new node was not known, it should also be forwarded to all connected peers closer to peer address then the node themselves.
 
 
-\begin{definition}{Subscribe message}\label{def:hive-subscribe-msg}
 
-| id | def |
-| :--- | :---- |
-| DEPTH | LIST(UINT8) |
-\end{definition}
-
-
-
-\begin{definition}{Peers message}\label{def:hive-peers-msg}
-
-| id | def |
-| :--- | :---- |
-| PEERS | LIST(LIST(*BZZADDRESS)) |
-\end{definition}
-
-\subsection{Protocol}
-
-When two peers connect and the hive protocol is started on the peer connection a subscribe message is sent.
-\subsection{Push Syncing}\label{sec:push-syncing}
-
-On receiving this subscribe message from the peer, nodes respond with a peers message right away. This peers message is meant to contain bzz addresses of a maximum of \texttt{MAX\_HIVE\_PEERS\_COUNT}=50 peers.
-
-At later stages, a subscribe message is sent (only) if the node's saturation depth changes. There is not meant to be a direct response to a subscribe message.
-
-If a node establishes a new peer connection with a full node, it notifies some of its existing peers about the new peer. Those existing peers get notified that, based on their advertised saturation depth, are interested in the new peer. 
-Formally, when a node $s$ (sender) connects with another node $p$, $s$ notifies an existing peer $r$ (recipient) if $\mathit{PO}(s, r) = \mathit{PO}(s, p)$ or $\mathit{depth}(r)\leq \mathit{PO}(r, p)$. The notification is a peers message containing $r$'s bzz address.
-
-Upon receiving a peers message, nodes are meant to store the peer information in their \gloss{address book}, i.e., a data structure containing info about peers known to the node. The address book is meant to be used to suggest peers  to a connectivity manager according to a connection strategy (\ref{spec:strategy:connection}) in order to bootstrap kademlia topology (\ref{sec:kademlia-connectivity}). 

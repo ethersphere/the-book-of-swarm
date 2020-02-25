@@ -1,7 +1,33 @@
-\subsection{Messages}
-The bzz protocol consists of a single message type: handshake.
+The bzz handshake protocol is the protocol that is always run after two peers are connected and before any other protocols are established. It communicates information about the  peer's address, network ID and light node capability.
 
-The bzz handshake is the first message to be exchanged between peers after the p2p transport protocol has been successfully negotiated. The handshake message consists of four data fields:
+The handshake protocol defines only one stream and three messages:
+
+\begin{lstlisting}[basicstyle=\ttfamily]
+// ID: /swarm/handshake/1.0.0/handshake
+// Serialization: Varint delimited Protobuf
+syntax = "proto3";
+
+message Syn {
+    bytes Address = 1;
+    int32 NetworkID = 2;
+    bool Light = 3;
+}
+
+message SynAck {
+    Syn Syn = 1;
+    Ack Ack = 2;
+}
+
+message Ack {
+    bytes Address = 1;
+}
+\end{lstlisting}
+
+This message sequence is inspired by the TCP three way handshake to ensure message deliverability.
+
+Upon connection a requesting peer constructs a new handshake stream and sends a \texttt{Syn} message with its Overlay address, Network ID and Lightnode capability flag, and waits for \texttt{SynAck} response message from the responding peer. In  the  \texttt{SynAck} message responder sends it own \texttt{Syn} message as well as an acknowledgement with the received Overlay address. After the requesting peer receives the \texttt{SynAck} message from the responding peer and validates that the received \texttt{Ack} information in it is correct, it sends an \texttt{Ack} message itself as a confirmation to the responding peer. The stream is closed by the responding peer after it receives the \texttt{Ack} message.
+
+The connection must be terminated if network IDs are do not match or if the  exact  order of messages is not followed.
 
 \begin{definition}{Bzz handshake message}\label{def:bzz-handshake}
 
@@ -17,11 +43,6 @@ pos & name  & len & type & description \\\hline
 \end{tabular}
 \end{definition}
 
-\subsection{Protocol}
-
-Upon connection, the peer who initiated the connection sends a handshake message to the other. If more than one handshake is received from the same peer, the peer is disconnected.
-Connecting peers must have the same network ID; mismatch entails disconnection.
-Connecting peers must have compatible versions, incompatibility entails disconnection.
 The bzz address is verified and overlay, underlay and signature are extracted.
 light is a boolean field indicating whether the node is operating as a light (as opposed to full) node.
 
