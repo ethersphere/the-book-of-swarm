@@ -83,13 +83,21 @@ Let $R$ be an arbitrary binary relation over nodes in a network. Nodes that are 
 The equivalence classes of peers are called \glossplural{proximity order bin}, or just \glossplural{bin} for short. When arranged in bins, peers of $x$ are grouped in the \gloss{Kademlia table} of the node $x$ (see figure \ref{fig:kademlia-table}). 
 
 
+\begin{figure}[htbp]
+   \centering
+   \caption[Kademlia table (recursive flavour)]{\gloss{Kademlia table} (recursive flavour):  peers of node $x$ partitioned into proximity order bins. Saturated Kademlia connectivity is 
+   characterised by a live Kademlia table of directly connected TCP peers such that (1) there is at least $k$ peers in each bin up to but excluding saturation depth $d_x$ and (2) all the nodes in the entire network that would fall in a bin higher or equal to $d_x$ are actually peers of $x$. }
+   \label{fig:kademlia-table}
+\end{figure}
+
+
 
 \begin{figure}[htbp]
    \centering
-    \input{fig/kademlia-1.tex}
-    \input{fig/kademlia-2.tex}
    \caption[Kademlia table (recursive flavour)]{\gloss{Kademlia table} (recursive flavour):  peers of node $x$ partitioned into proximity order bins. Saturated Kademlia connectivity is 
    characterised by a live Kademlia table of directly connected TCP peers such that (1) there is at least $k$ peers in each bin up to but excluding saturation depth $d_x$ and (2) all the nodes in the entire network that would fall in a bin higher or equal to $d_x$ are actually peers of $x$. }
+    \input{fig/kademlia-2.tex}
+   \caption[Forwarding Kademlia routing]{TBD Forwarding Kademlia routing}
    \label{fig:kademlia-table}
 \end{figure}
 
@@ -261,7 +269,7 @@ The \gloss{BMT hash} address is the root hash of a \gloss{binary Merkle tree} bu
    \label{fig:BMT}
 \end{figure}
 
-This structure  allows for compact \gloss{inclusion proofs} with a 32-byte resolution. Inclusion proof means a proof that a string is a substring of another string, for instance that a string is included in a chunk. Together with the Swarm file hash (\ref{sec:files} and \ref{spec:format:files}), it allows for logarithmic inclusion proofs for files, i.e., proof that a string is found part of a file.
+This structure  allows for compact \gloss{inclusion proofs} with a 32-byte resolution. Inclusion proof means a proof that a string is a substring of another string, for instance that a string is included in a chunk. Together with the Swarm file hash (\ref{sec:files} and \ref{spec:format:files}), it allows for logarithmic inclusion proofs for files. 
 
 \subsubsection{Chunk encryption}\label{sec:chunk-encryption}
 
@@ -287,10 +295,10 @@ With \glossplural{single owner chunk} a user can assign arbitrary data to an add
     \item \emph{content}: 
 \begin{itemize}
     \item \emph{identifier} - 32 bytes arbitrary identifier, 
-    \item \emph{signature} - 65 bytes $\langle r,s,v \rangle$ representation of an EC signature
-    \item \emph{filling} - 23 idle bytes to filled deterministically,, e.g. a 23 byte segment of the payload's BMT hash staring on offset 1.
+    \item \emph{signature} - 65 bytes \emph{r,s,v}, representation of an EC signature,
+    \item \emph{padding} - 23 idle bytes,
     \item \emph{span} - 8 byte chunk span,
-    \item \emph{payload} - max 4096 bytes of regular chunk data.
+    \item \emph{payload} - max 4096 bytes of data.
 \end{itemize}
     \item \emph{address} - 256-bit keccak sha3 hash of identifier + owner public key.
 \end{itemize}
@@ -320,7 +328,7 @@ Assoc chunks offer a virtual partitioning of part of the address space into subs
    \label{fig:assoc-integrity}
 \end{figure}
 
-The notion of integrity for single-owner chunks is weaker than in the case of content addressing: After all, it is, in principle, possible to assign and sign any payload to an identifier. Nonetheless, the fact that the chunk can only be created by a single owner (of the private key that the signature requires), it is reasonable to expect uniqueness guarantees. If the owner of the private key signs two different payloads with the same identifier and uploads both chunks to Swarm, the behaviour of the network is unpredictable (see \ref{sec:feed-integrity} for a  more detailed discussion).
+The notion of integrity for single-owner chunks is weaker than in the case of content addressing: After all, it is, in principle, possible to assign and sign any payload to an identifier. Nonetheless, the fact that the chunk can only be created by a single owner (of the private key that the signature requires), it is reasonable to expect uniqueness guarantees. If the owner of the private key signs two different payloads with the same identifier and uploads both chunks to Swarm, the behaviour of the network is unpredictable (see \ref{sec:feeds} for a  more detailed discussion).
 
 
 \subsection{Redundancy by replication}\label{sec:redundancy-by-local-replication}
@@ -338,17 +346,7 @@ Take the highest depth $d'$ such that (1) and (2) are satisfied. Such a $d$ alwa
 
 
 
-For a particular redundancy, the area of the fully connected neighbourhood defines an \gloss{area of responsibility}. The PO boundary of the area of responsibility defines a \gloss{radius of responsibility} for the node. A storer node is said to be \emph{responsible} for (storing) a chunk if the chunk address falls within the node's radius of responsibility.
-
-It is already at this point instructive to show neighbourhoods and how they are structured, see figure \ref{fig:assoc-integrity}). 
-
-\begin{figure}[htbp]
-   \centering
-%   \includegraphics{}
-   \caption[Nearest neighbours]{Nearest neighbours}
-   \label{fig:nearest-neighbours}
-\end{figure}
-
+For a particular redundancy, the area of the fully connected neighbourhood defines an \gloss{area of responsibility}. The PO boundary of the area of responsibility defines a \gloss{radius of responsibility} for the node. A storer node is said to be \emph{responsible} for (storing) a chunk if the chunk address falls within the node's radius of responsibility. 
 
 \subsubsection{Redundant retrievability}
 
@@ -370,7 +368,7 @@ In this section, we demonstrate how chunks actually move around in the network: 
 
 \subsection{Retrieval}\label{sec:retrieval}
 
-In a distributed chunk store, we say that a chunk is \emph{accessible} if a message is routable between the requester and the node that is closest to the chunk. Sending a retrieve request message to the chunk address will reach this node.  Assuming that the node closest to the chunk address actually stores the chunk. In a distributed chunk store with healthy Kademlia topology all chunks are accessible for every node.
+In a distributed chunk store, we say that a chunk is \emph{accessible} if a message is routable between the requester and the node who stores the chunk. Assuming that the node closest to the chunk address actually stores the chunk, sending a retrieve request message to the chunk address will reach the storer node. In a distributed chunk store with healthy Kademlia topology all chunks are accessible for every node.
 
 \subsubsection{Chunk delivery}
 
@@ -420,7 +418,7 @@ Potentially, a large proportion of Swarm nodes are not stably online. Such a hig
 
 \subsubsection{Timeout vs not found}
 
-Note that in Swarm there is no explicit negative response for chunks not found. In principle, the node that is closest to the retrieved address can tell that there is no chunk at this address and could issue a "not found" response, however this is not desirable for the following. While the closest node to a chunk can verify that a chunk is indeed not at the place in the network where it is supposed to be, all nodes further away from the chunk cannot credibly conclude this as they cannot verify it first-hand and all positive evidence about the chunk's retrievability obtained later is retrospectively plausibly deniable. 
+Note that in Swarm there is no explicit negative response for chunks not found. In principle, the node that is closest to the retrieved address can tell that there is no chunk at this address and could issue a "not found" response, however this is not desirable for the following reasoning: While the closest node to a chunk can verify that a chunk is indeed not at the place in the network where it is supposed to be, all nodes further away from the chunk cannot credibly conclude this as they cannot verify it first-hand and all positive evidence about the chunk's retrievability obtained later is retrospectively plausibly deniable. 
 
 All in all, as long as delivery earns more for the storer, the strategy is to keep a request open until it times out and be prepared for the chunk to appear. There are several ways the chunk can arrive after the request: (1) syncing from peers (2) appearance of a new node or (3) if a request precedes upload, e.g., requestor "subscribes" to a single-owner address (see \ref{sec:messaging}) to  decrease latency of lookup. This is conceptually different from server-based architectures where it makes sense to expect a resource to be either on the host server or not. 
  
@@ -429,7 +427,7 @@ All in all, as long as delivery earns more for the storer, the strategy is to ke
 
 Using the pass-back mechanism for request-delivery also enables \gloss{opportunistic caching}, i.e., when a forwarding node receives a chunk, then the chunk is saved in case it will be requested again. This mechanism is crucial in making Swarm scale storage of popular content automatically (see \ref{sec:caching}).
 
-\subsubsection{Incentives}
+\subsubsection{Conclusion}
 
 So far, we have shown that using the retrieval protocol and maintaining Kademlia connectivity, nodes in the network are capable of retrieving chunks. However, since forwarding is using a scarce resource (bandwidth), without accounting, network reliability will be contingent on the proportion of freeriding and altruism. Instead, in section \ref{sec:incentivisation}, we provide a system of economic incentives that align with desired behaviour. In other words, profit maximising strategies by node operators adhering to the protocol give rise to emergent behaviour that is beneficial for users of the network as a whole.
  
@@ -456,7 +454,7 @@ Similarly to downloaders in the retrieval protocol, the identity of uploaders ca
 
 Another similarity is that in order to allow the pass-back mechanism for responses, nodes should remember which peer sent a particular chunk. This record should persist for a short period while the statement of custody responses are expected. When this period ends, the record is removed. A statement of custody not matching a record is considered unsolicited and is allowed only up to a small percentage of all push-sync traffic with a peer. Going above this tolerance threshold is sanctioned with disconnection and blacklisting (see \ref{sec:sanctions}).
 
-In this section we described how the logistics of chunk uploads can be organised with a network protocol using forwarding Kademlia routing with response back-passing. This solution is only complete once it is secured with aligned incentives: The strategy to follow this protocol should be incentivised and DDOS abuse should be disincentivised. These are discussed in detail in \ref{sec:postage-stamps} and \ref{sec:push-sync-incentives}).
+In this section we described how the logistics of chunk uploads can be organised with a network protocol using forwarding Kademlia routing with response back-passing. This solution is only complete once it is secured with aligned incentives: The strategy to follow this protocol should be incentivised and DDOS abuse should be disincentivised. These are discussed in detail in \ref{sec:postage-stamps} and TODO<>REFERENCE to new Push sync incentives chapter.
 
 \subsection{Pull syncing}\label{sec:pull-syncing}
 
@@ -629,6 +627,7 @@ Nodes receive a reward every time they serve a chunk, therefore the profitabilit
 %
 \footnote{Better metrics for predicting chunk profitability than the age of last request are expected to be identified and developed by a storer nodes (see \ref{spec:strategy:garbage-collection})}.
 
+% Typically a chunk will be worth storing in bin $i$ needs to be twice as popular as a chunk that is worth having in bin $i+1$.
 
 \subsubsection{Non-caching nodes}
 
@@ -807,7 +806,7 @@ If the insider has a chequebook they can pay the newcomer with a cheque. This ha
 \centering
 \input{fig/zero-cash-entry.tex}
 \caption[Zero cash entry]{Bootstrapping or how to launch as a swap capable node consuming and providing a
-service and earn money.}
+service and earn money}
 \label{fig:zero-cash-entry}
 \end{figure}
 
@@ -1020,8 +1019,8 @@ If the batch was filled completely at the time of upload and the batch is not re
 
 \begin{figure}[htbp]
   \centering
-  \input{fig/filling-a-postage-batch}
-  \caption[Filling a postage batch]{Filling a postage batch.}
+  \input{fig/hash-collision}
+  \caption{Filling a postage batch}
   \label{fig:filling-a-postage-batch}
 \end{figure}
 
@@ -1988,6 +1987,16 @@ After iterating through all the chunk of the content to be globally pinned, the 
 %
 \footnote{Given $n$ chunks in the original published content, $p$ pinners and redundancy factor $r$, a pinner will need to host on average $\frac{rn}{p}$ chunks.}
 
+To  recap the recovery, we enlist  the information pinners need in order to construct and serve recovery chunks and indicate their source:
+
+\begin{itemize}
+\item \emph{original chunk address} - from publisher 
+\item \emph{recovery identifier} - from publisher
+\item \emph{signature} - from publisher
+\item \emph{signer} - from the signature knowing original chunk address and  recovery identifier
+\item \emph{original chunk data} - download from Swarm knowing the original address
+\item \emph{recovery address} - calculated from signer and recovery identifier
+\end{itemize}
 
 \subsection{Missing chunk notification}\label{sec:missing-chunk-notifications}
 
@@ -1997,7 +2006,7 @@ Pinners store the recovery chunks in their local store (see figure \ref{fig:reco
 
 \begin{figure}[htbp]
   \centering
-  \caption[Recovery chunk storage]{Recovery chunk storage}
+  \caption[Recovery chunk]{Recovery chunk}
   \label{fig:recovery-chunk-storage}
 \end{figure}
 
@@ -2011,7 +2020,7 @@ By construction, the recovery address matches one of the pinners address on a pr
   \label{fig:missing-chunk-notification}
 \end{figure}
 
-The missing notification protocol including procedures followed by publisher, pinners and downloader are spelled out in  \ref{spec:protocol:missing-chunk-notification}.
+The missing notification protocol including procedures followed by publisher, pinners and downloader are spelled out in \ref{spec:protocol:missing-chunk-notification}.
 
 
 
@@ -2172,37 +2181,7 @@ When pinning a file or collection, it is supposed to be retrieved and stored. Pi
 
 \yellow{still working out}
 
-The \texttt{recovery} API supports the creation of recovery chunks (see \ref{sec:reupload}). For this a POST request needs to be sent with a JSON structure in the request body. The request URL specifies a hash referencing a pinned file or collection while the recovery JSON in the body supports the following attributes:
-
-\begin{itemize}
-\item \texttt{publisher} - The publisher's public key used as the single  owner of the recovery chunk address.
-\item \texttt{hosts} - The root hash of the manifest that collects the recovery hosts (aka pinners) overlay addresses to match recovery addresses against. The addresses are partial, i.e., the prefix of the host overlay with byte length corresponding to $\mathtt{depth} / 8+1$.  
-\item \texttt{depth} - The minimum length in bits of the prefix shared by the recovery address and a recovery host overlay. It expresses the required proximity needed to land the address in a host's neighbourhood. 
-\item \texttt{count} - The number of recovery chunks created for each original chunk. 
-\end{itemize}
-
-As the file/collection is traversed, for each chunk, recovery chunks are generated using the publisher's public key and an incremented index. The \texttt{hosts} attribute is set to a hash that references the manifest which represents the recovery hosts (aka pinners) addresses. The first few recovery addresses that fall within the proximity of any pinner in the manifest are calculated; the number of recovery chunks is given by the \texttt{count} attribute, and the minimal length of prefix shared by the recovery address and a pinner overlay is given by the \texttt{depth} attribute.
-
-For each recovery address found, the uploader produces the signature that the host will need to assemble the recovery chunk. The recovery identifier hashed together with the original chunk  address needs to be signed by the publisher private key. The original chunk address, the index and the signature together constitute the \gloss{recovery chunk info} needed by the host to reconstruct the recovery chunk. 
-
-Since the original chunk address is stored by the host, they find the matching original if it matches the address  only partially. We can therefore store the index on the last 4  bytes of the chunk address and convey all info needed to get the recovery identifier. Overall, the 32 bytes of chunk address + index and 65 bytes of signature take 97 bytes to store.
-A chunk therefore can hold 42 of these recovery infos, which are packaged per pinner and published as a feed. The feed is owned by the publisher and uses the root pin as the topic and the pinner address hashed with a serial index as identifier, see figure \ref{fig:recovery-info-chunk}.
-This scheme incurs 1/42 storage and bandwidth overhead (2.38\%)
-
-To recap the recovery preparation from the point of view of pinners, we enlist  the information pinners need to construct the recovery chunks for pinned content $p$ and indicate their source:
-
-\begin{itemize}
-\item \emph{original chunk address} - as pinners pin the content, they have the original chunk, the partial chunk address as part of the recovery info can be used to match the full address.
-\item \emph{original chunk data} - download from Swarm knowing the root of the pinned content.
-\item \emph{recovery info} - downloaded in packages of 42 from Swarm knowing the recovery info serial feed. 
-\item \emph{recovery info serial feed addresses} - constructed as the hash of the publisher public key as owner and the hash of the root pin and the host public key as topic and using incrementing integers as index.
-\item \emph{recovery index} - knowing the other pinners this could be calculated but it is extracted from the last 4 bytes of the original chunk address field in the recovery info. 
-\item \emph{recovery identifier} - the hash of the chunk address and the recovery index.
-\item \emph{signature} - extracted from the recovery info. Can be validated knowing both the publisher public key as well as the plaintext, i.e., the hash of the intended payload hash (original chunk address) and the recovery identifier.
-\item \emph{recovery address} - calculated as the hash of the signer and recovery identifier.
-\end{itemize}
-
-
+Pinning (both at upload and through the pin endpoint) supports the creation of recovery chunks (see \ref{sec:reupload}) if the \texttt{X-SWARM-CHUNK-RECOVERY-KEY} header is set to a public key. As the file/collection is traversed, for each chunk, recovery chunks are generated using the public key and an incremented index. If \texttt{X-SWARM-CHUNK-RECOVERY-PINNERS} is set to a manifest, it is assumed to represent the pinners addresses. The first $n$ recovery addresses that fall within the proximity of any pinner in the manifest are calculated. 
 
 \subsubsection{Erasure coding}
 

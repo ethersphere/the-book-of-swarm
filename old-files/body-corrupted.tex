@@ -261,7 +261,7 @@ The \gloss{BMT hash} address is the root hash of a \gloss{binary Merkle tree} bu
    \label{fig:BMT}
 \end{figure}
 
-This structure  allows for compact \gloss{inclusion proofs} with a 32-byte resolution. Inclusion proof means a proof that a string is a substring of another string, for instance that a string is included in a chunk. Together with the Swarm file hash (\ref{sec:files} and \ref{spec:format:files}), it allows for logarithmic inclusion proofs for files, i.e., proof that a string is found part of a file.
+This structure  allows for compact \gloss{inclusion proofs} with a 32-byte resolution. Inclusion proof means a proof that a string is a substring of another string, for instance that a string is included in a chunk. Together with the Swarm file hash (\ref{sec:files} and \ref{spec:format:files}), it allows for logarithmic inclusion proofs for files. 
 
 \subsubsection{Chunk encryption}\label{sec:chunk-encryption}
 
@@ -287,10 +287,10 @@ With \glossplural{single owner chunk} a user can assign arbitrary data to an add
     \item \emph{content}: 
 \begin{itemize}
     \item \emph{identifier} - 32 bytes arbitrary identifier, 
-    \item \emph{signature} - 65 bytes $\langle r,s,v \rangle$ representation of an EC signature
-    \item \emph{filling} - 23 idle bytes to filled deterministically,, e.g. a 23 byte segment of the payload's BMT hash staring on offset 1.
+    \item \emph{signature} - 65 bytes \emph{r,s,v}, representation of an EC signature,
+    \item \emph{padding} - 23 idle bytes,
     \item \emph{span} - 8 byte chunk span,
-    \item \emph{payload} - max 4096 bytes of regular chunk data.
+    \item \emph{payload} - max 4096 bytes of data.
 \end{itemize}
     \item \emph{address} - 256-bit keccak sha3 hash of identifier + owner public key.
 \end{itemize}
@@ -320,7 +320,7 @@ Assoc chunks offer a virtual partitioning of part of the address space into subs
    \label{fig:assoc-integrity}
 \end{figure}
 
-The notion of integrity for single-owner chunks is weaker than in the case of content addressing: After all, it is, in principle, possible to assign and sign any payload to an identifier. Nonetheless, the fact that the chunk can only be created by a single owner (of the private key that the signature requires), it is reasonable to expect uniqueness guarantees. If the owner of the private key signs two different payloads with the same identifier and uploads both chunks to Swarm, the behaviour of the network is unpredictable (see \ref{sec:feed-integrity} for a  more detailed discussion).
+The notion of integrity for single-owner chunks is weaker than in the case of content addressing: After all, it is, in principle, possible to assign and sign any payload to an identifier. Nonetheless, the fact that the chunk can only be created by a single owner (of the private key that the signature requires), it is reasonable to expect uniqueness guarantees. If the owner of the private key signs two different payloads with the same identifier and uploads both chunks to Swarm, the behaviour of the network is unpredictable (see \ref{sec:feeds} for a  more detailed discussion).
 
 
 \subsection{Redundancy by replication}\label{sec:redundancy-by-local-replication}
@@ -338,17 +338,7 @@ Take the highest depth $d'$ such that (1) and (2) are satisfied. Such a $d$ alwa
 
 
 
-For a particular redundancy, the area of the fully connected neighbourhood defines an \gloss{area of responsibility}. The PO boundary of the area of responsibility defines a \gloss{radius of responsibility} for the node. A storer node is said to be \emph{responsible} for (storing) a chunk if the chunk address falls within the node's radius of responsibility.
-
-It is already at this point instructive to show neighbourhoods and how they are structured, see figure \ref{fig:assoc-integrity}). 
-
-\begin{figure}[htbp]
-   \centering
-%   \includegraphics{}
-   \caption[Nearest neighbours]{Nearest neighbours}
-   \label{fig:nearest-neighbours}
-\end{figure}
-
+For a particular redundancy, the area of the fully connected neighbourhood defines an \gloss{area of responsibility}. The PO boundary of the area of responsibility defines a \gloss{radius of responsibility} for the node. A storer node is said to be \emph{responsible} for (storing) a chunk if the chunk address falls within the node's radius of responsibility. 
 
 \subsubsection{Redundant retrievability}
 
@@ -370,7 +360,7 @@ In this section, we demonstrate how chunks actually move around in the network: 
 
 \subsection{Retrieval}\label{sec:retrieval}
 
-In a distributed chunk store, we say that a chunk is \emph{accessible} if a message is routable between the requester and the node that is closest to the chunk. Sending a retrieve request message to the chunk address will reach this node.  Assuming that the node closest to the chunk address actually stores the chunk. In a distributed chunk store with healthy Kademlia topology all chunks are accessible for every node.
+In a distributed chunk store, we say that a chunk is \emph{accessible} if a message is routable between the requester and the node who stores the chunk. Assuming that the node closest to the chunk address actually stores the chunk, sending a retrieve request message to the chunk address will reach the storer node. In a distributed chunk store with healthy Kademlia topology all chunks are accessible for every node.
 
 \subsubsection{Chunk delivery}
 
@@ -420,7 +410,7 @@ Potentially, a large proportion of Swarm nodes are not stably online. Such a hig
 
 \subsubsection{Timeout vs not found}
 
-Note that in Swarm there is no explicit negative response for chunks not found. In principle, the node that is closest to the retrieved address can tell that there is no chunk at this address and could issue a "not found" response, however this is not desirable for the following. While the closest node to a chunk can verify that a chunk is indeed not at the place in the network where it is supposed to be, all nodes further away from the chunk cannot credibly conclude this as they cannot verify it first-hand and all positive evidence about the chunk's retrievability obtained later is retrospectively plausibly deniable. 
+Note that in Swarm there is no explicit negative response for chunks not found. In principle, the node that is closest to the retrieved address can tell that there is no chunk at this address and could issue a "not found" response, however this is not desirable for the following reasoning: While the closest node to a chunk can verify that a chunk is indeed not at the place in the network where it is supposed to be, all nodes further away from the chunk cannot credibly conclude this as they cannot verify it first-hand and all positive evidence about the chunk's retrievability obtained later is retrospectively plausibly deniable. 
 
 All in all, as long as delivery earns more for the storer, the strategy is to keep a request open until it times out and be prepared for the chunk to appear. There are several ways the chunk can arrive after the request: (1) syncing from peers (2) appearance of a new node or (3) if a request precedes upload, e.g., requestor "subscribes" to a single-owner address (see \ref{sec:messaging}) to  decrease latency of lookup. This is conceptually different from server-based architectures where it makes sense to expect a resource to be either on the host server or not. 
  
@@ -429,7 +419,7 @@ All in all, as long as delivery earns more for the storer, the strategy is to ke
 
 Using the pass-back mechanism for request-delivery also enables \gloss{opportunistic caching}, i.e., when a forwarding node receives a chunk, then the chunk is saved in case it will be requested again. This mechanism is crucial in making Swarm scale storage of popular content automatically (see \ref{sec:caching}).
 
-\subsubsection{Incentives}
+\subsubsection{Conclusion}
 
 So far, we have shown that using the retrieval protocol and maintaining Kademlia connectivity, nodes in the network are capable of retrieving chunks. However, since forwarding is using a scarce resource (bandwidth), without accounting, network reliability will be contingent on the proportion of freeriding and altruism. Instead, in section \ref{sec:incentivisation}, we provide a system of economic incentives that align with desired behaviour. In other words, profit maximising strategies by node operators adhering to the protocol give rise to emergent behaviour that is beneficial for users of the network as a whole.
  
@@ -456,7 +446,7 @@ Similarly to downloaders in the retrieval protocol, the identity of uploaders ca
 
 Another similarity is that in order to allow the pass-back mechanism for responses, nodes should remember which peer sent a particular chunk. This record should persist for a short period while the statement of custody responses are expected. When this period ends, the record is removed. A statement of custody not matching a record is considered unsolicited and is allowed only up to a small percentage of all push-sync traffic with a peer. Going above this tolerance threshold is sanctioned with disconnection and blacklisting (see \ref{sec:sanctions}).
 
-In this section we described how the logistics of chunk uploads can be organised with a network protocol using forwarding Kademlia routing with response back-passing. This solution is only complete once it is secured with aligned incentives: The strategy to follow this protocol should be incentivised and DDOS abuse should be disincentivised. These are discussed in detail in \ref{sec:postage-stamps} and \ref{sec:push-sync-incentives}).
+In this section we described how the logistics of chunk uploads can be organised with a network protocol using forwarding Kademlia routing with response back-passing. This solution is only complete once it is secured with aligned incentives: The strategy to follow this protocol should be incentivised and DDOS abuse should be disincentivised. These are discussed in detail in \ref{sec:postage-stamps} and TODO<>REFERENCE to new Push sync incentives chapter.
 
 \subsection{Pull syncing}\label{sec:pull-syncing}
 
@@ -629,6 +619,7 @@ Nodes receive a reward every time they serve a chunk, therefore the profitabilit
 %
 \footnote{Better metrics for predicting chunk profitability than the age of last request are expected to be identified and developed by a storer nodes (see \ref{spec:strategy:garbage-collection})}.
 
+% Typically a chunk will be worth storing in bin $i$ needs to be twice as popular as a chunk that is worth having in bin $i+1$.
 
 \subsubsection{Non-caching nodes}
 
@@ -657,6 +648,7 @@ However,  making only the statement of custody receipt a paid message, roles swi
 \end{figure}
 
 This scheme makes it clear why the incentivisation of the two  protocols relies on the same premises: there are many sellers (forwarders) and only one buyer (uploader) for a homogeneous good (the statement of custody receipt). This drives the price of the service (delivering the chunk to the storer) to the sum of all marginal cost of forwarding for each node along the route, while simultaneously allowing the storer node to capture all profits from the storage compensation scheme.
+
 
 This way we can make sure that (1) storers actually respond with receipts, and (2) have a way to detect timed out or unsolicited receipt responses to protect against DoS, see figure \ref{fig:syncing-swap}.
 
@@ -1320,7 +1312,7 @@ Suppose we were to prove the inclusion of a substring in a file at a particular 
 
 \begin{figure}[htbp]
 \centering
-\caption[??? Compact inclusion proofs for files]{??? Compact inclusion proofs for files}
+\caption[Compact inclusion proofs for files]{Compact inclusion proofs for files}
 \label{fig:file-inclusion}
 \end{figure}
 
