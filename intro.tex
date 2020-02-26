@@ -1,93 +1,93 @@
 \chapter{The vision}\label{chap:vision}
 
-Swarm is infrastructure for a self-sovereign society.  
+Swarm is an infrastructure for a self-sovereign society.  
 
 The rest of this chapter gives background information to this vision. \ref{sec:historical_context} lays out a historical analysis of the World Wide Web, focusing on how it became the place it is today.
-\ref{sec:fair-data} explains the importance of data sovereignty, collective  information and fair data economy. It discusses why a self-sovereign society needs infrastructure to collectively host, move and process data.
-Finally, \ref{sec:values} recaps the values behind the vision, spells out the requirements of the  technology and lays down the design principles that guide us in manifesting Swarm.
+\ref{sec:fair-data} explains the importance of data sovereignty, collective information, and fair data economy. It discusses why a self-sovereign society needs infrastructure to host, move, and process data collectively.
+Finally, \ref{sec:values} recaps the values behind the vision, spells out the requirements of the technology, and lays down the design principles that guide us in manifesting Swarm.
 
 \section{Historical context}\label{sec:historical_context}
 \green{}
-While the Internet in general and the \gloss{World Wide Web} (\gloss{WWW}) in particular dramatically reduced the costs of disseminating information, putting (almost) a publisher's power at (almost) every user's fingertips, these costs are still not zero and their allocation heavily influences who gets to publish what content and who gets to enjoy it.
+The internet dramatically reduced the costs of disseminating information, which dramatically empowered users. However, the costs are still not zero, and the allocation of costs heavily influences who gets to publish what content and who may enjoy it. 
 
-In order to appreciate the problems we are trying to solve, a little history of \gloss{World Wide Web} evolution is useful.
+To appreciate the problems we are trying to solve, a little history of \gloss{World Wide Web} evolution is useful.
 
 \subsection{Web 1.0}\label{sec:web_1}
 
-In the times of \gloss{Web 1.0}, in order to have your content accessible to the whole world, you would typically fire up a web server or use some web hosting (free or cheap) and upload your content that could be navigated through a set of html pages. If your content was unpopular, you still had to either maintain the server or pay the hosting to keep it accessible, but true disaster struck when, for one reason or another, it became popular (e.g. you got "slashdotted"). At this point, your traffic bill skyrocketed just before either your server crashed under the load or your hosting provider throttled your bandwidth to the point of making your content essentially unavailable for the majority of your audience. If you wanted to stay popular, you had to invest in high availability clusters connected with fat pipes; your costs grew together with your popularity, without any obvious way to cover them. There were very few practical ways to allow (let alone require) your audience to share the ensuing financial burden directly.
+In the times of \gloss{Web 1.0}, to have your content accessible to the whole world, you would typically fire up a web server or use some web hosting (free or cheap) and upload your content, navigatable through a set of HTML pages. If your content was unpopular, you still had to either maintain the server or pay the hosting to keep it accessible, but real disaster struck when, for one reason or another, it became popular (e.g., you got "slashdotted"). At this point, the traffic bill skyrocketed just before your server crashed under the load or your hosting provider throttled your bandwidth up until your content is unavailable for the majority of your audience. If you wanted to stay relevant, you had to invest in high availability clusters connected with fat pipes; your costs grew together with your popularity, without any obvious way to cover them. There were very few practical ways to allow (let alone require) your audience to share the ensuing financial burden directly.
 
-The common wisdom at the time was that it would be the \glossplural{internet service provider} (\gloss{ISP}) that would come to the rescue, since in the early days of the Web revolution bargaining about peering arrangements between ISP's involved arguments about where providers and consumers are located, and which ISP is making money from the other's network. Indeed, when there was a sharp disbalance between originators of TCP connection requests (aka SYN packets), it was customary for the originator ISP to pay the recipient ISP, which made the latter somewhat incentivised to help those hosting popular content. In practice, however, this incentive structure usually resulted in putting a free \emph{pr0n} or \emph{warez} server in the server room to tilt back the scales of SYN packet counters. Blogs catering to a niche audience had no way of competing and were generally left out in the cold. Note, however, that back then, creator-publishers typically owned their content.
+The conventional wisdom at the time was that it would be that the \glossplural{internet service provider} (\gloss{ISP}) would come to the rescue. At that time, it was typical for ISP's to bargain about peering arrangements with each other, debating about where providers and consumers are located and which ISP is making money from which network. Indeed, it was customary for the originator ISP to pay the recipient ISP when there was a sharp disbalance between originators of TCP connection requests (SYN packets). This practice made the latter somewhat incentivised to host accessible content. In practice, however, this incentive structure usually resulted in putting a free \emph{pr0n} or \emph{warez} server in the server room to tilt back the scales of SYN packet counters. As sites (e.g., blogs) who cater to a niche audience had no way of competing, they were generally left out in the cold. Note, however, that back then, creator-publishers typically owned their content.
 
 \subsection{Web 2.0}\label{sec:web_2}
 
-The transition to \gloss{Web 2.0} changed much of that. Context-sensitive targeted advertising offered a Faustian bargain to content producers. As in "We give you scalable hosting that would cope with any traffic your audience throws at it, but in return you give us substantial control over your content: we are going to track each member of your audience and collect -- and own -- as much of their personal data as we can, we are going to pick who can and who cannot see it, we are going to proactively censor it, and we may even report on you, for the same reason". As a consequence, millions of small content producers created immense value for very few corporations, getting only peanuts (typically, free hosting) in exchange.
+The transition to \gloss{Web 2.0} changed much of that. Context-sensitive targeted advertising offered a Faustian bargain to content producers. They offered the following:
+"We give you scalable hosting that copes with any traffic, and in return, you give us substantial control over your content. To specify: we are going to track each member of your audience; we collect -- and own -- as much of their data as we can; we choose who views your site; we proactively censor your site and may not report this to you.". As a consequence, millions of small content producers created immense value for very few corporations, getting only peanuts (typically, free hosting) in exchange.
 
 \subsection{Peer-to-peer networks}\label{sec:peer_to_peer}
 
-At the same time, however, the \gloss{peer-to-peer} (\gloss{P2P}) revolution was gathering pace. Actually, P2P traffic very soon took over the majority of packets flowing through the pipes, quickly overtaking the above mentioned SYN-bait servers. If anything, it proved beyond doubt that using the hitherto massively underutilized upstream bandwidth of regular end-users, they could achieve the same kind of availability and bandwidth for their content as previously provided by big corporations with data centers attached to the fattest pipes of the Internet's backbone. What's more, this could be achieved at a fraction of the cost. In particular, users retained a lot more control and freedom over their data. Finally, this mode of data distribution proved to be remarkably resilient even in the face of powerful and well-funded entities exerting great efforts to shut it down.
+At the same time, however, the \gloss{peer-to-peer} (\gloss{P2P}) revolution was gathering pace. P2P traffic very soon took over the majority of packets flowing through the pipes, quickly overtaking the above mentioned SYN-bait servers. This revolution proved that an availability, equal to that what was hitherto provided by big corporations with data centres attached to the fattest pipes of the internet, could be achieved by utilising the previously underutilised upstream bandwidth of regular end-users. Besides, it was more cost-efficient; end-users retained control and freedom over their data, and this mode of data distribution proved to be remarkably resilient even in the face of powerful and well-funded entities exerting great efforts to shut it down.
 
-
-On the other hand, even the most evolved mode of P2P file sharing, which is trackerless Bittorrent, is just that: file sharing. It is not suitable for providing the kind of interactive, responsive experience that people came to expect from web applications on \gloss{Web 2.0}. One can only get so far by simply sharing upstream bandwidth, hard-drive space, and a tiny amount of computing power, without proper accounting and indexing. However, if you add to the mix a few more emergent technologies, most importantly, the blockchain, you get what we believe deserves the \gloss{Web 3.0} moniker: a decentralised, censorship-resistant way of sharing and even collectively creating interactive content, while retaining full control over it. The price is surprisingly low and mostly consists of the resources supplied by the super-computer (by yesteryear's standards) that you already own or can rent for cheap.
+On the other hand, even the most evolved model of P2P file sharing, which is trackerless BitTorrent, is just that: file sharing. It is not suitable for providing the kind of interactive, responsive experience that people came to expect from web applications on \gloss{Web 2.0}. One can only get so far by merely sharing upstream bandwidth, hard-drive space, and a tiny amount of computing power, without proper accounting and indexing. By adding a few more emergent technologies, most importantly, the blockchain, you get what we believe deserves the \gloss{Web 3.0} moniker: a decentralised, censorship-resistant way of sharing and even collectively creating interactive content, while retaining full control over it. The price is surprisingly low and mostly consists of the resources supplied by the super-computer (by yesteryear's standards) that you already own or can rent for cheap.
 
 \subsection{The economics of BitTorrent and its limits}
 
-The genius of \gloss{BitTorrent} lies in its clever resource optimisation: if many clients want to download the same content from you, give them different parts of it and let them swap the missing parts between one another in a tit-for-tat fashion. This way, the upstream bandwidth use of a user hosting the content (\gloss{seeder} in BitTorrent parlance) is roughly the same, no matter how many clients want to download it simultaneously. This solves the most painful issue of the ancient \gloss{Hypertext Transfer Protocol} (\gloss{HTTP}) underpinning the World Wide Web.
+The genius of \gloss{BitTorrent} lies in its intelligent resource optimisation: if many clients want to download the same content from you, give them different parts of it and let them swap the missing pieces between one another in a tit-for-tat fashion. This way, the upstream bandwidth use of a user hosting the content (\gloss{seeder} in BitTorrent parlance) is roughly the same, no matter how many clients want to download it simultaneously. This approach solves the most painful issue of the ancient \gloss{Hypertext Transfer Protocol} (\gloss{HTTP}) underpinning the World Wide Web.
 
-Cheating (i.e. feeding your peers with garbage) is discouraged by the use of hierarchical piecewise hashing, whereby a package offered for download is identified by a single short hash, and any part can be cryptographically proven to be a specific part of the package without all the other parts, with a very small overhead. This beautifully simple approach has three main shortcomings, all somewhat related:
+Cheating (i.e. feeding your peers with garbage) is discouraged by the use of hierarchical piecewise hashing. With this, we can identify a package by a single short hash and cryptographically proof, with little overhead, that it belongs to a specific part. This beautifully simple approach has three main shortcomings, all somewhat related:
 
 \begin{itemize}
 \item \emph{lack of economic incentives} -- 
 There are no built-in incentives to seed downloaded content. In particular, one cannot exchange his upstream bandwidth provided by seeding one content, for the downstream bandwidth required for downloading some other content. Effectively, the upstream bandwidth provided by seeding somebody else's content is not directly rewarded in any way.
 \item \emph{initial latency} -- 
- Typically, downloads start slowly and with delay. Clients that are further ahead in downloading have much more to offer to and much less to demand from newcomers. This results in Bittorrent downloads starting as a trickle before turning into a full-blown torrent of bits. This severely limits the use of BitTorrent in interactive applications that require both responsiveness and high bandwidth.
-\item \emph{lack of content addressing} -- Small \glossplural{chunk} of data can only be shared in the context of the larger file that they are part of. We find peers sharing the content that we seek by querying the \gloss{distributed hash table} (\gloss{DHT}) for said file. In other words, the advertising of the available content happens on the level of files, as opposed to chunks, which leads to inefficiencies when the same chunks of data appear verbatim in multiple files. Also, nodes are not rewarded for their sharing efforts anymore (storage and bandwidth) once they have achieved their objective of getting the missing parts of a file from their peers.
+ Typically, downloads start slowly and with delay. Clients that are further ahead in downloading have much more to offer to and much less to demand from newcomers. This results in BitTorrent downloads starting as a trickle before turning into a full-blown torrent of bits. This severely limits the use of BitTorrent in interactive applications that require both responsiveness and high bandwidth.
+\item \emph{lack of content addressing} -- Small \glossplural{chunk} of data can only be shared in the context of the larger file to which they belong. We find peers sharing the content that we seek by querying the \gloss{distributed hash table} (\gloss{DHT}) for said file. In other words, the advertising of the available content happens on the level of files, as opposed to chunks, which leads to inefficiencies when the same chunks of data appear verbatim in multiple files. Also, nodes are not rewarded for their sharing efforts anymore (storage and bandwidth) once they have achieved their objective of getting the missing parts of a file from their peers.
 
 \end{itemize}
 
 \subsection{Towards Web 3.0}\label{sec:towards-web3}
 
-The straightforward approach of using \gloss{BitTorrent} as a distribution mechanism for web content has been successfully implemented by \gloss{ZeroNet} \cite{zeronet}. However, because of the aforementioned issues with BitTorrent, ZeroNet fails to provide the same kind of responsive experience that users of web services came to expect. Bittorrent, however is currently testing the waters with blockchain incentivization with help of their own token \cite{tron}.
+The straightforward approach of using \gloss{BitTorrent} as a distribution mechanism for web content has been successfully implemented by \gloss{ZeroNet} \cite{zeronet}. However, because of the issues mentioned above with BitTorrent, ZeroNet fails to provide the same kind of responsive experience that users of web services came to expect. BitTorrent, however, is currently testing the waters with blockchain incentivization with the help of their token \cite{tron}.
 
-In order to enable responsive \glossplural{distributed web application} (called \glossplural{dapp} in \gloss{Web 3.0} communities), \gloss{InterPlanetary File System} (\gloss{IPFS}) \cite{ipfs2014} had to introduce a few major improvements over BitTorrent. The most immediately apparent novelty is the highly web-compatible URL-based retrieval. In addition, the directory (also organized as a \gloss{DHT}) has been vastly improved, making it possible to search for any part of any file (called \gloss{chunk}). It has also been made very flexible and pluggable in order to work with any kind of storage backend, be it a laptop with intermittent WiFi, or a sophisticated high-availability cluster in a fiber-optic connected datacenter.
+In order to enable responsive \glossplural{distributed web application} (called \glossplural{dapp} in \gloss{Web 3.0} communities), \gloss{InterPlanetary File System} (\gloss{IPFS}) \cite{ipfs2014} had to introduce a few major improvements over BitTorrent. The most immediately apparent novelty is the highly web-compatible URL-based retrieval. Besides, the directory (also organised as a \gloss{DHT}) is improved, making it possible to search for any part of any file (called \gloss{chunk}). Lastly, it is very flexible and pluggable to work with any kind of storage backend, be it a laptop with intermittent WiFi, or a sophisticated high-availability cluster in a fibre-optic connected datacenter.
 
-Because of the improved directory, it is in the interest of greedy downloaders to balance the load they impose on other nodes; unlike in the case of BitTorrent, they do not need to be forced to do so. The naive default behavior of IPFS nodes is to download what they want as fast as they can from those who provide it, while automatically caching, advertising and uploading upon request everything they come across. They use their downstream bandwidth to the maximum extent they can, while they do not throttle their upstream bandwidth beyond its physical limits. This, together with a few very powerful and well-connected nodes provided by the company behind IPFS, results in a very impressive performance even without any additional incentive module.
+Because of the improved directory, it is in the interest of greedy downloaders to balance the load they impose on other nodes; unlike in the case of BitTorrent, they are not forced to do so. The naive default behaviour of IPFS nodes is to download what they want as fast as they can from those who provide it, while automatically caching, advertising and uploading upon request everything they come across. They use their downstream bandwidth to the maximum extent they can, while they do not throttle their upstream bandwidth beyond its physical limits. This, together with a few very powerful and well-connected nodes provided by the company behind IPFS, results in a remarkable performance even without any additional incentive module.
 
 
-One measure by which IPFS aims to shield its users from legal liability is that, just like in the case of BitTorrent, there is no such thing as "pushing" anything onto an IPFS node. Sharing anything on IPFS simply means making it available on one's own node and known in the directory. However, naive consumers immediately replicate all the content they download and also make it available. Public \gloss{HTTP} gateways (most of which are run by the company behind IPFS) provide automatic replication for whatever content is being accessed through them.
+One measure by which IPFS aims to shield its users from legal liability is that, just like in the case of BitTorrent, there is no such thing as "pushing" anything onto an IPFS node. Sharing anything on IPFS simply means making it available on one's node and known in the directory. However, naive consumers immediately replicate all the content they download and also make it available. Public \gloss{HTTP} gateways (most of which are run by the company behind IPFS) provide automatic replication for whatever material accessed through them.
 
-The same problem with lack of incentives is apparent in various other projects such as ZeroNet or MAIDSAFE. Incentivization for distributed document storage is still a relatively new research field, especially in the context of the brand new blockchain technology. The Tor network has seen suggestions \cite{jansen2014onions,hoshetal2014tor} but these schemes are largely academic, they are not built-in at the heart of the underlying system. Bitcoin has also been repurposed to drive other systems like Permacoin \cite{miller2014permacoin}, some use their own blockchain, such as Sia \cite{vorick2014sia} or Filecoin \cite{filecoin2014} for IPFS.
+The same problem with lack of incentives is apparent in various other projects such as ZeroNet or MAIDSAFE. Incentivization for distributed document storage is still a relatively new research field, especially in the context of the brand new blockchain technology. The Tor network has seen suggestions \cite{jansen2014onions,hoshetal2014tor} but these schemes are primarily academic, they are not built-in at the heart of the underlying system. Bitcoin repurposes as a driver to other systems like Permacoin \cite{miller2014permacoin}, some use their blockchain, such as Sia \cite{vorick2014sia} or Filecoin \cite{filecoin2014} for IPFS.
 
-What is still missing from the above incentive systems, is the possibility to rent out large amounts of disk space to those willing to pay for it, irrespective of the popularity of their content; and conversely there is also a way to deploy your interactive dynamic content to be stored in the cloud, a feature we call \gloss{upload and disappear}.
+What is still missing from the above incentive systems, is the possibility to rent out large amounts of disk space to those willing to pay for it, irrespective of the popularity of their content. Conversely, there is also a way to deploy your dynamic interactive content to be stored in the cloud, a feature we call \gloss{upload and disappear}.
 
-The objective of any incentive system for \gloss{P2P} content distribution is to encourage cooperative behavior and discourage \gloss{freeriding}: the uncompensated depletion of limited resources. The \gloss{incentive strategy} outlined here aspires to satisfy the following constraints:
+The objective of any incentive system for \gloss{P2P} content distribution is to encourage cooperative behaviour and discourage \gloss{freeriding}: the uncompensated depletion of limited resources. The \gloss{incentive strategy} outlined here aspires to satisfy the following constraints:
 
 \begin{itemize}
-    \item It is in the node's own interest, regardless of whether other nodes follow it.
+    \item It is in the node's interest, regardless of whether other nodes follow it.
     \item It makes it expensive to hog other nodes' resources.
     \item It does not impose unreasonable overhead.
     \item It plays nice with "naive" nodes.
     \item It rewards those that play nice, including those following this strategy.
 \end{itemize}
 
-In the context of Swarm, storage and bandwidth are the two most important limited resources and this is reflected in our incentives scheme. The incentives for bandwidth use are designed to achieve speedy and reliable data provision, while the storage incentives are designed to ensure long term data preservation, ideally solving the "\gloss{upload and disappear}" problem.
+In the context of Swarm, storage and bandwidth are the two most critical limited resources, which our incentive scheme reflects. The incentives for bandwidth use are designed to achieve speedy and reliable data provision, while the storage incentives are designed to ensure long term data preservation, ideally solving the "\gloss{upload and disappear}" problem.
 
 \section{Fair data economy}\label{sec:fair-data}
 
 \yellow{Gregor and Crt}
 
-In the era of \gloss{Web 3.0}, the internet is no longer just a niche where geeks play, but becomes the main conduit for most value creation. 
+In the era of \gloss{Web 3.0}, the internet is no longer just a niche where geeks play, but it became the main conduit for most value creation. 
 
 \subsection{Data sovereignty}\label{sec:data-sovereignty}
 
-As a consequence of the aforementioned Faustian bargain, the current model of the \gloss{World Wide Web} is flawed in more than one way. As a largely unforeseen consequence of economies of scale in infrastructure provision as well as network effects in social media, platforms became massive data silos, where vast amounts of user data goes through servers that belong to single organisations. This opened the possibility to collect, aggregate and analyse user data. 
+As a consequence of the aforementioned Faustian bargain, the current model of the \gloss{World Wide Web} is flawed in more than one way. As a mostly unforeseen consequence of economies of scale in infrastructure provision as well as network effects in social media, platforms became massive data silos. Vast of vast amounts of data go through the centrally controlled servers, opening the possibility to collect, aggregate and analyse user data. 
 
-The continued trend of replacing human-mediated economic interactions with computer-mediated interactions, as well as the rise of social media, have resulted in more and more information about our personal and social lives accessible to the companies behind these platforms. These have unraveled lucrative data markets where user demographics are linked with their underlying behavior, a treasure trove for marketing.
+The continued trend of replacing human-mediated economic interactions with computer-mediated interactions, as well as the rise of social media, have resulted in more and more information about our personal and social lives accessible to the companies behind these platforms. These have unravelled lucrative data markets where user demographics are linked with their underlying behaviour, a treasure trove for marketing.
 
-Data companies' business models gradually shifted towards capitalising on this asset to the point that nowadays their primary source of revenue is coming from selling the results of user profiling to advertisers and marketers. The circle is closed by showing advertisements to users on the same platforms, thus creating a feedback loop. A whole new industry grew out of this flow of information, and as a result, sophisticated systems emerged that predict and influence ways users allocate their attention and money, often knowingly exploiting human weaknesses in responding to stimuli. The situation is not far from what we could call mass manipulation, where only the most aware can truly exercise their freedom of choice and preserve their intrinsic preference regarding consumption of content or purchasing habits.
+Data companies' business models gradually shifted towards capitalising on this asset to the point that nowadays, their primary source of revenue is coming from selling the results of user profiling to advertisers and marketers. The circle is closed by showing advertisements to users on the same platforms, thus creating a feedback loop. A whole new industry grew out of this flow of information. As a result, sophisticated systems emerged that predict and influence ways users allocate their attention and money, often knowingly exploiting human weaknesses in responding to stimuli. The situation is not far from what we could call mass manipulation, where only the most aware can genuinely exercise their freedom of choice and preserve their intrinsic preference regarding consumption of content or purchasing habits.
 
-The fact that business revenue is coming from the demand for user data is also reflected in quality of service. The end users' needs became secondary to the needs of the "real" customers often leading to ever poorer user experience and quality of service. This is especially painful in the case of social platforms where the inertia due to the network effect essentially constitutes user lock-in. It is imperative to correct these misaligned incentives. In other words, provide the same services to users, but without such unfortunate incentives resulting from centralised data access.
+The quality of service also reflects the fact that business revenue is coming from the demand for user data. The end-users' needs became secondary to the needs of the "real" customers, often leading to ever a more mediocre user experience and quality of service. This is especially painful in the case of social platforms where the inertia due to the network effect essentially constitutes user lock-in. It is imperative to correct these misaligned incentives. In other words, provide the same services to users, but without such unfortunate incentives resulting from centralised data access.
 
-Not having control over their data has serious consequences on the  economic potential of the users. Some refer to this situation, somewhat dramatically, as \gloss{data slavery}. 
+Not having control over their data has severe consequences for the economic potential of the users. Some refer to this situation, somewhat dramatically, as \gloss{data slavery}. 
 The current situation of data silos have various drawbacks: 
 
 \begin{itemize}
@@ -95,28 +95,28 @@ The current situation of data silos have various drawbacks:
     \item \emph{lack of fault tolerance} - They are a single point of failure in terms of technical infrastructure.
     \item \emph{corruption} - The concentration of the decision making power constitutes an easier target for social engineering, political pressure, or corruption.
     \item \emph{attack target} - The concentration of large amounts of data under the same security system increases the potential reward for hackers. 
-    \item \emph{lack of service continuity guarantees} - Service continuity is in the hands of the organisation, and is only indirectly incentivised by reputation. This introduces the risk of inadvertent termination of the service due to bankruptcy, or regulatory or legal action.
+    \item \emph{lack of service continuity guarantees} - Service continuity is in the hands of the organisation, and is only indirectly incentivised by reputation. This introduces the risk of an inadvertent termination of the service due to bankruptcy, or regulatory or legal action.
     \item \emph{censorship} - Centralised control of data access allows for, and in most cases eventually leads to, decreased freedom of expression.
     \item \emph{surveillance} - Data flowing through centrally owned infrastructure offers easier access to traffic analysis and other methods of unsolicited monitoring, even if anonymity and confidentiality are technologically warranted.
     \item \emph{manipulation} - Data harvesters have the power to manipulate opinions, calling into question the sovereignty of individual decision making.
 \end{itemize}
 
-We believe that decentralisation is a major game-changer, which by itself solves most of the problems listed above.
+We believe that decentralisation is a significant game-changer, which by itself solves most of the problems listed above.
 
-We argue that blockchain technology is the final missing piece in the puzzle to realise the cypherpunk ideal of a truly self-sovereign internet. One of our goals with this book is to show how decentralised consensus and peer-to-peer network technologies can be combined to form a rock solid base-layer infrastructure. This foundation is not only resilient, fault tolerant, permissionless, and scalable, but also economically sustainable due to a well designed system of incentives. Due to a low barrier of entry for participants, the adaptivity of the incentives ensures that prices automatically converge to the marginal cost.
-Swarm is a \gloss{Web 3.0} stack that is decentralised, incentivised, and secured. In particular, the platform offers participants solutions to data storage, transfer, access, and authentication. These data services are more and more essential for economic interactions. By providing permissionless access to these services, with strong privacy guarantees and without borders or external restrictions, Swarm fosters the spirit of global voluntarism and builds the \emph{infrastructure for a self-sovereign digital society}.
+We argue that blockchain technology is the final missing piece in the puzzle to realise the cypherpunk ideal of a genuinely self-sovereign internet. One of our goals with this book is to show how decentralised consensus and peer-to-peer network technologies can be combined to form a rock-solid baselayer infrastructure. This foundation is not only resilient, fault-tolerant, permissionless, and scalable, but also economically sustainable due to a well-designed system of incentives. Due to a low barrier of entry for participants, the adaptivity of the incentives ensures that prices automatically converge to the marginal cost.
+Swarm is a \gloss{Web 3.0} stack that is decentralised, incentivised, and secured. In particular, the platform offers participants solutions to data storage, transfer, access, and authentication. These data services are more and more essential for economic interactions. Swarm fosters the spirit of global voluntarism and builds the \emph{infrastructure for a self-sovereign digital society}. It does so, by providing permissionless access to these services, with strong privacy guarantees and without borders or external restrictions.
 
 \subsection{Collective information}\label{sec:collective_information}
 
-\glossupper{collective information} started to accumulate with the emergence of the Internet, yet the concept has just recently become recognized and discussed under a variety of headings like \emph{fair data} or \emph{information commons}.
+\glossupper{collective information} started to accumulate with the emergence of the internet, yet the concept has just recently become recognised and discussed under a variety of headings like \emph{fair data} or \emph{information commons}.
 
 A collective, as defined by Wikipedia (itself an example of "collective information") is:
 \begin{displayquote}
-"A group of entities that share or are motivated by at least one common issue or interest, or work together to achieve a common objective." 
+"A group of entities that share or are motivated by at least one common issue or interest or work together to achieve a common objective." 
 \end{displayquote}
-The internet allows collectives to be formed on a previously unthinkable scale, despite differences in geographic location, age, social status, and other demographics. Data,  produced by these collectives, through joint interaction on public forums, reviews, votes, and polls or metadata is a form of collective information. Since most of these are facilitated by for-profit entities, running centralized servers, the collective information ends up being stored in data silos owned by a single entity, the majority held by a few big technology companies.
+The internet allows collectives to be formed on a previously unimaginable scale, despite differences in geographic location, age, social status, and other demographics. Data,  produced by these collectives, through mutual interaction on public forums, reviews, votes, and polls or metadata is a form of collective information. Since most of these are facilitated by for-profit entities, running centralised servers, the collective information ends up being stored in data silos owned by a single entity, the majority held by a few big technology companies.
 
-These "platform economies" are becoming increasingly more important in a digitizing society. We are, however, seeing that the information they acquire over their users is increasingly being used against their interests. This calls into question whether these corporations are capable of bearing the ethical responsibility that comes with the power of holding \gloss{collective information} in mass.
+These "platform economies" are becoming increasingly more critical in a digitising society. We are, however, seeing that the information they acquire over their users is increasingly used against their interests. This calls into question whether these corporations are capable of bearing the ethical responsibility that comes with the power of holding \gloss{collective information} in mass.
 
 Yet, even if corporations would be capable of bearing such responsibility, the mere existence of \glossplural{data silo} stifles innovation. The client-server architecture is nascent to this problem, that made centralised data storage unavoidable (see \ref{sec:web_1} and \ref{sec:web_2}). Peer-to-peer networks (\ref{sec:peer_to_peer}) make it possible to change this architecture, hence, enabling collective ownership of collective information. 
 
@@ -126,15 +126,14 @@ Yet, even if corporations would be capable of bearing such responsibility, the m
 \wip{still working on text}
 \subsection{Design principles}\label{sec:design-principles}
 
-Information society  and data economy bring an age where online transactions and big data are crucial to everyday life and thus the supporting technology counts as critical infrastructure. It is imperative that this base layer infrastructure be provided with strong guarantees for continuity. 
+Information society and data economy bring an age where online transactions and big data are crucial to everyday life and thus, the supporting technology counts as critical infrastructure. This baselayer infrastructure must be provided with strong guarantees for continuity. 
 
-Continuity is achieved by the following \emph{systemic} requirements:
-
+The following \emp{systemic} requirements achieve continuity:
 \begin{itemize}
 \item \emph{stable} - The specifications and software implementations are stable and resilient to changes in participation, or politics (political pressure, censorship).
 \item \emph{scalable} - The solution can accommodate many orders of magnitude more users and data than initially starting without a prohibitive hit on performance or reliability (mass adoption).
 \item \emph{self-sustaining} - The solution runs by itself as an autonomous system, not depending on social coordination of collective action or any legal entity's business, exclusive know-how or infrastructure.   
-\item \emph{secure} - The solution is resistant to deliberate attacks, immune to  social pressure  and politics and resilient in terms of tolerating errors in technologies it relies on. 
+\item \emph{secure} - The solution is resistant to deliberate attacks, immune to social pressure and politics and resilient in terms of tolerating errors in technologies it relies on. 
 \end{itemize}
 
 
@@ -150,21 +149,21 @@ Self-sovereignty implies freedom. If we break it down, this implicates the follo
 \item \emph{impartiality} -  content and value neutrality  
 \end{itemize}
 
-These metavalues can be thought of as systemic qualities which contribute to empowering individuals and collectives in the direction of self-sovereignty.
+These meta values are systemic qualities which contribute to empowering individuals and collectives in the direction of self-sovereignty.
 
-Inclusivity entails we aspire to include the underprivileged in data economy; lower barrier of entry to define complex data flow and build decentralised applications. Swarm is a network with open participation for providing service and permissionless access to publishing, sharing, and investing your data.
+Swarm is a network with open participation for providing service and permissionless access to publishing, sharing, and investing your data.
 
-Users are free to express their intention as action and have the authority to decide if they remain anonymous or share their interaction and preferences. The integrity of online persona is required. 
+Users are free to express their intention as action and have the authority to decide if they remain anonymous or share their interaction and preferences. The integrity of the online persona is required. 
 
 Economic incentives serve to make sure participants' behaviour align with the desired emergent behaviour of the network (see \ref{sec:incentivisation}) 
 
-Impartiality basically says that catering for the other three values are not only necessary but sufficient: it rules out values that would treat any particular group as privileged or express preference for data with a particular content or from a particular source.
+Impartiality says that catering for the other three values is not only necessary but sufficient: it rules out values that would treat any particular group as privileged or express preference for data with particular content or from a specific source.
 
 \subsection{Objectives}\label{sec:objectives}
 
 %\subsubsection{Scope}
 
-When we informally talk about the flow of data, we mean how information has  integrity across modalities, see figure \ref{tab:scope}. This corresponds to the original Ethereum vision.
+When we informally talk about the flow of data, we mean how information has integrity across modalities, see figure \ref{tab:scope}. This corresponds to the original Ethereum vision.
 
 \begin{table}[]
 \centering
@@ -179,19 +178,18 @@ symbolic & manipulation & processing \\
 \label{tab:scope}
 \end{table}
 
-Global infrastructure that supports data storage, transfer and processing 
-can be thought of as the \gloss{world computer}. The Ethereum blockchain is the CPU of the world computer, then Swarm is the "hard disk".
+The global infrastructure that supports data storage, transfer and processing can be thought of as the \gloss{world computer}. The Ethereum blockchain is the CPU of the world computer; then Swarm is the "hard disk".
 
-The Swarm project is set out to bring this vision to completion and build the remaining parts covering storage and communication. 
+The Swarm project brings this vision to completion and builds the remaining parts covering storage and communication. 
 
 \subsection{Impact areas}
 
 In what follows, we try to identify feature areas of the product that best express or facilitate the values discussed above. 
 
-Inclusivity in terms of permissionless participation is best guaranteed in a decentralised peer to peer network.  
-Allowing nodes to provide service and get paid doing so could offer a zero-cash entry to the ecosystem: new users without money can serve other nodes until they accumulate enough to use services themselves. A decentralised network providing distributed storage without gatekeepers is also inclusive and impartial in that it allows content creators currently deplatformed to publish without being censored. 
+Inclusivity is best guaranteed in a decentralised peer to peer network.  
+Allowing nodes to provide service and get paid doing so could offer a zero-cash entry to the ecosystem: new users without money can serve other nodes until they accumulate enough to use services themselves. A decentralised network providing distributed storage without gatekeepers is also inclusive and impartial in that it allows content creators currently de-platformed to publish without being censored. 
 
-Economic incentives built in the protocols is working best if it tracks the actions that incur costs in the context of peer to peer interaction: bandwidth sharing evidenced in message relaying is such an action where immediate accounting is possible if a node receives message valuable to them. On the other hand, promissory services such as commitment to preserve data over time, need to be rewarded only upon verifying. In order to avoid the tragedy of commons problem, such promissory commitments should be guarded by individual accountability through the threat of punitive measures, i.e., allow staked insurers.
+Economic incentives work best if they track the actions that incur costs in the context of peer to peer interaction: bandwidth sharing evidenced in message relaying is such an action where immediate accounting is possible when a node receives message valuable to them. On the other hand, promissory services such as commitment to preserving data over time, need to be rewarded only upon verifying. Such promissory obligations should be guarded by individual accountability through the threat of punitive measures, i.e., allow staked insurers to avoid the tragedy of the commons problem.
 
 Integrity is served by easy provability of authenticity, while potentially maintaining anonymity.
 Provable inclusion and uniqueness are important to allow trustless data transformations.
@@ -201,4 +199,3 @@ Provable inclusion and uniqueness are important to allow trustless data transfor
 
 
 % \chapter{Related work}
-
