@@ -1,22 +1,22 @@
 
-\subsection{Underlay network}
+\subsection{Underlay network \statusgreen}
 
-The \texttt{libp2p} networking stack provides all required properties for the swarm underlay network laid out in \ref{sec:underlay-transport}.
+The \lstinline{libp2p} networking stack provides all required properties for the swarm underlay network laid out in \ref{sec:underlay-transport}.
 
 \begin{enumerate}
 \item Addressing is provided in the form of so called \emph{multi address} for every node, which is referred here as the underlay address. Every node can have multiple underlay addresses depending on transports and network listening addresses that are configured.
-\item Dialing is provided over \texttt{libp2p} supported network transports.
-\item Listening is provided by \texttt{libp2p} supported network transports.
+\item Dialing is provided over \lstinline{libp2p} supported network transports.
+\item Listening is provided by \lstinline{libp2p} supported network transports.
 \item Live connections are established between two peers and kept open for accepting or sending messages.
-\item Channel security is provided with \texttt{TLS} and \texttt{libp2p secio} stream security transport.
-\item Protocol multiplexing is provided by \texttt{libp2p mplex} stream multiplexer protocol.
-\item Delivery guarantees are provided by using \texttt{libp2p} bidirectional streams to validate the response from the peer on sent message.
-\item Serialization is not enforced by \texttt{libp2p}, as it provides byte streams allowing flexibility for every protocol to choose the most appropriate serialization. The recommended serialization is \texttt{Protobuf} with \texttt{varint} delimited messages in streams.
+\item Channel security is provided with \lstinline{TLS} and \lstinline{libp2p secio} stream security transport.
+\item Protocol multiplexing is provided by \lstinline{libp2p mplex} stream multiplexer protocol.
+\item Delivery guarantees are provided by using \lstinline{libp2p} bidirectional streams to validate the response from the peer on sent message.
+\item Serialization is not enforced by \lstinline{libp2p}, as it provides byte streams allowing flexibility for every protocol to choose the most appropriate serialization. The recommended serialization is \lstinline{Protobuf} with \lstinline{varint} delimited messages in streams.
 \end{enumerate}
 
-\subsection{Protocols and streams}
+\subsection{Protocols and streams \statusgreen}
 
-Communication between peers is organised in protocols as logical units under a unique name that may define one or more \emph{streams}. \texttt{libp2p} provides streams as the basic channel for communication. Streams are full-duplex channels of bytes, multiplexed over a singe connection between two peers.
+Communication between peers is organised in protocols as logical units under a unique name that may define one or more \emph{streams}. \lstinline{libp2p} provides streams as the basic channel for communication. Streams are full-duplex channels of bytes, multiplexed over a singe connection between two peers.
 
 Every stream defines:
 
@@ -26,20 +26,20 @@ Every stream defines:
 \item sequence of data passing between peers over a full-duplex stream
 \end{itemize}
 
-Streams are identified by \texttt{libp2p} case-sensitive protocol IDs. The following convention is used construct stream identifiers:
+Streams are identified by \lstinline{libp2p} case-sensitive protocol IDs. The following convention is used construct stream identifiers:
 
-\begin{lstlisting}[basicstyle=\ttfamily]
+\begin{lstlisting}
 /swarm/ProtocolName/ProtocolVersion/StreamName
 \end{lstlisting}
 
 \begin{itemize}
-\item All stream IDs are prefixed with \texttt{/swarm}.
-\item \texttt{ProtocolName} is an arbitrary string that identifies the protocol.
-\item \texttt{ProtocolVersion} is a string in semver form that is used to specify compatibility between protocol implementations over time.
-\item \texttt{StreamName} is an arbitrary string that identifies a stream defined as part of the protocol.
+\item All stream IDs are prefixed with \lstinline{/swarm}.
+\item \lstinline{ProtocolName} is an arbitrary string that identifies the protocol.
+\item \lstinline{ProtocolVersion} is a string in semver form that is used to specify compatibility between protocol implementations over time.
+\item \lstinline{StreamName} is an arbitrary string that identifies a stream defined as part of the protocol.
 \end{itemize}
 
-\subsection{Data exchange sequences}
+\subsection{Data exchange sequences \statusgreen}
 
 A data passing sequence must be synchronous under one opened stream. Multiple streams can be opened at the same time that are multiplexed over the same connection exchanging data independently and asynchronously. Streams may use different data exchange sequences such as:
 
@@ -54,3 +54,33 @@ A data passing sequence must be synchronous under one opened stream. Multiple st
 Streams have predefined sequences that are kept as simple as possible for a single purpose. For complex message exchanges, multiple streams should be used.
 
 Streams may be short lived for immediate data exchange or communication, or long lived for notifications if needed.
+
+\subsection{Stream headers}
+
+A Swarm specific requirement for all libp2p streams is to exchange Header protobuf messages on every stream initialization between two peers. This message encapsulates a stream scoped information that needs to be exchanged before any stream specific data or messages are exchanged. Headers are sequences of key value pairs, where keys are arbitrary strings and values are byte arrays that do not impose any specific encoding. Every key may use appropriate encoding for the data that it relates to.
+
+\begin{definition}{Header message}\label{def:headers-message}
+
+\begin{lstlisting}[language=protobuf3]
+syntax = "proto3";
+
+package pb;
+
+message Headers {
+    repeated Header headers = 1;
+}
+
+message Header {
+  string key = 1;
+  bytes value = 2;
+}
+\end{lstlisting}
+\end{definition}
+
+On every stream initialization, the peer that creates it, is sending Headers message regardless if it contains header values or not. The receiving node must read this message and respond with response header using the same message type. This makes the header exchange sequence finished and any other stream data can be transmitted depending on the protocol.
+
+Standard header key names are defined here:
+
+\begin{enumerate}
+\item tracing-span-context
+\end{enumerate}

@@ -1,53 +1,115 @@
 
 This table gives an overview of data sizes a chunk span represents, depending on the level of recursion.
 
-\begin{table}[h]
-\begin{tabular}{|l|l|l|l|}
+\begin{table}[ht]
+\begin{tabular}{|r||r|r|r||r|r|r|}
 \hline
-Level & Span in chunks & Span in bytes & $--human$ \\
-\hline
-0 (data) & 1 & 4,096 & (4KB) \\
-1 & 128 & 524,288 & (500KB) \\
-2 & 16,384 & 67,108,864 & (67MB) \\
-3 & 2,097,152 & 8,589,934,592 & (8.5GB) \\
-4 & 268,435,456 & 1,099,511,627,776 & (1.1TB) \\
-5 & 34,359,738,368 & 140,737,488,355,328 & (140TB) \\
-6 & 4,398,046,511,104 & 18,014,398,509,481,984 & (18PB) \\
-7 & 562,949,953,421,312 & 2,305,843,009,213,693,952 & (2.3EB) \\
-\hline
+&\multicolumn{6}{|c|}{span}\\\hline
+&\multicolumn{3}{|c|}{unencrypted}
+&\multicolumn{3}{|c|}{encrypted}\\\hline
+level & chunks & $\mathit{log}_2$ of bytes & standard & chunks & $\mathit{log}_2$ of bytes & standard \\
+\hline\hline
+0 & 1 & 12 & 4KB & 1 & 12 & 4KB \\\hline
+1 & 128 & 19 & 512KB & 64 & 18 & 256KB \\\hline
+2 & 16,384 & 26 & 67MB & 4,096 & 24 & 16MB \\\hline
+3 & 2,097,152 &33 & 8.5GB & 262,144 &  30 & 1.07GB\\\hline
+4 & 268.44M & 40  & 1.1TB & 16.78M & 36 & 68.7GB\\\hline
+5 & 34,359.74M & 47 & 140TB & 1,073.74M & 42  & 4.4TB\\\hline
 \end{tabular}
-\caption{Chunk Span data size boundaries}
+\caption{Size of chunk spans}
 \end{table}
+
+
+
 
 \subsubsection{Calculating the Swarm Hash}
 
-To calculate the Swarm Hash the following method is used:
+Client-side custom redundancy is achieved by CRS erasure coding (see \ref{sec:erasure} and \ref{sec:features}); using it neccessitates 
+\begin{definition}{CRS erasure coding parameters}\label{def:crs-params}
+\begin{lstlisting}[language=buzz1]
+// /swarm/file
 
-\begin{enumerate}
-	\item Determine the \texttt{Chunk Reference} of each \texttt{Chunk} into an \emph{intermediate result} \footnote{Remember, use the actual size of represented data}
-	\item If the $log_{128}$ of the number of \texttt{Chunks} minus one is an even number, the last \texttt{Chunk Reference} should be stored and not included in the following step
-	\item Otherwise, if the $log_{128}$ of the number of \texttt{Chunks} is an even number, remove the stored \texttt{Chunk Reference} and concatenate it to the \emph{intermediate result}
-	\item If the data size of the \texttt{Chunk References} of the \texttt{Chunks} (including the stored \texttt{Chunk Reference} is greater than \texttt{Segment Size}, group all the \texttt{Chunk References} in the \emph{intermediate result} and repeat from step 1 with this as the data
-\end{enumerate}
+define type crs/params 
+    parities uint
+    strategy _race|_fallback|_disabled
+     
+\end{lstlisting}
+\end{definition}
+      
+\begin{definition}{the swarm hash tree for files}\label{def:swarm-hash}
+\begin{lstlisting}[language=buzz1]
+// /swarm/file
 
-Note that the \texttt{Swarm Hash} of data up to a single chunk in total size is identical to its \texttt{BMT Hash}.
+define function encode []chunk stream as @levels
+    for @level uint
+as
+    @chunks = @levels at @level     // read chunk stream 
+    @crs = context crs              // 
+    @m = branches (- @crs parities if @crs) 
+    
+    @parent = @chunks up to @m      // read up to m chunks from stream
+        (append crs/extend with @crs parities if @crs)
+            each chunk/store        // package children references
+                join as chunk
+                
+    if @levels length == @level+1 then
+        @levels append= stream{}
+        go self @levels for @level+1
+    
+    @levels at @level+1 append= @parent
+    if no @chunks then
+        close @levels at @level + 1
+    else
+        self @chunks for @level
+            
+define function split byte stream as @data
+as
+    @data each chunk size as chunk
 
-\subsection{Chunk Reference}
+define function  upload byte stream as @data
+as
+    @data split each branches     // 
+        go as chunk 
+            encode for 0  // 
+    @top = @levels each wait for  // wait for all levels to close
+    return @top at 0              // return root hash as address        
+\end{lstlisting}
+\end{definition}
+                   
 
-The Chunk storage in Swarm is \emph{content addressed}. This means that the identifier of each individual \texttt{Chunk} in the store is a function of the content itself.
+\begin{definition}{files and file retrieval}\label{def:file-retrieval}
+\begin{lstlisting}[language=buzz1]
+// /swarm/file
 
-This identifier always contains the address of the \texttt{Chunk}. This address is a \texttt{Swarm Overlay Address}, which means that \emph{nodes} and \emph{content} have comparable identifiers. \ref{sec:distance-and-proximity}.
+define function download reference
+as
+    chunk/retrieve @reference       // root chunk retrieval
+        decode each as chunk data   // recursion
 
-Retrieval and interpretation of a \texttt{Chunk} from the store \emph{may} require more information than merely its identifier in the store. The entity encaspulating this information is called the \texttt{Chunk Reference}.
 
-In its simplest form, the \texttt{Chunk Reference} is the same as the address of the \texttt{Chunk}. 
+define function decode chunk
+  with @limit uint8
+as
+    @leaf = @chunk span payload.length <= chunk size
+    return @chunk if @leaf or branches @limit 
+    
+    @crs = context crs
+    @all = @m = branches 
+    if @crs then
+        @m -= @crs parities
+        if @crs strategy is not {race} then 
+        @all = @m 
+        
+    @chunks = @chunk segments up to @all 
+        each go as reference retrieve 
+    wait for @m in @chunks and cancel 
 
-\subsection{Encrypted Chunk References}
+    if @crs then 
+        @chunks = @chunks crs/repair with @crs parities 
 
-Currently, the only other defined \texttt{Chunk Reference} is used with an intra-node convenience crypto scheme.
+    return @chunks if @level == @limit 
+    @chunks each go self @limit + 1  
 
-Here all references are double the \texttt{Segment Size}. The first \texttt{Segment Size} bytes is a key to decrypt the latter \texttt{Segment Size} bytes into an actual valid address that can be retrieved from the store.
+\end{lstlisting}
+\end{definition}
 
-The symmetric key provided by the caller when adding the content is used as the seed to derive all decryption keys for the \texttt{Intermediate Chunks} \ref{intermediate-chunks}. It is also used as the encryption key for the \texttt{Swarm Hash} \ref{swarm-hash}.
-
-\todo{Describe the crypto algo}

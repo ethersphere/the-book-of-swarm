@@ -1,6 +1,7 @@
 
-\chapter{Kademlia graph theory}
-\section{Logarithmic distance and proximity order}\label{sec:proximity}
+\chapter{Formalisations and proofs}\label{sec:formalisation}
+
+\section{Logarithmic distance and proximity order \statusgreen}\label{sec:proximity}
 Consider the set of bit sequences with fixed length $d$ as points in a space. We can define a distance metric $\chi$ such that
 the distance between two such sequences is defined as the bigendian numerical value of their bitwise XOR ($\xor$).
 
@@ -42,7 +43,7 @@ d & \text{ if } x=y\\
 \end{definition}
 
 
-In practice, $\PO(x,y)$ is the length of the longest common prefix in the bigendian binary representation of $x$ and $y$. So in practice it is calculated by counting the matching bits from the left. The maximum value of proximity is the number of bits $d$.
+In practice, $\PO(x,y)$ is the length of the longest common prefix in the bigendian binary representation of $x$ and $y$. So in practice it is calculated by counting the matching bits from the left. The maximum value of proximity is the number of bits $d$. Kademlia falls in the prefix matching class of DHT-s \cite{rowstron2001pastry,zhao2004tapestry}.
 
 Taking the proximity order relative to a fixed point $x_0$ partitions the points in
 the space (of bit sequences of length $d$) into equivalence classes. Points in each class are at
@@ -66,14 +67,15 @@ most half as distant from $x_0$ as items in the previous class. Furthermore, any
 
 Given a set of points uniformly distributed in the space (e.g., the results of a hash function), proximity orders map onto a series of subsets with cardinalities on a negative exponential scale, i.e., PO bin 0 has half of the points of any random sample, PO bin 1 has one fourth, PO bin 2 one eighth, etc.
 
-\section{Proximity orders in graph topology}
+\section{Proximity orders in graph topology \statusgreen}
 
+This section gives a graph theoretical  approach to Kademlia topology \cite{aspnes2007skip}.
 Consider a set of points $V$ in the space with a logarithmic distance and 
 a binary relation $R$. Define a directed graph where every point in the set is a vertex and any two vertices $x$ and $y$ are  connected with an edge if they are in relation $R$. 
 
 
 Points that are in relation $R$ with a particular point $x_0$ can be indexed by their proximity order relative to $x_0$. This index is called \gloss{Kademlia table}.
-The kademlia table can serve as the basis for local decisions in graph traversal where the task is to find a path between two points. 
+The Kademlia table can serve as the basis for local decisions in graph traversal where the task is to find a path between two points. 
 
 
 \begin{definition}{Kademlia table}\label{def:kademlia-table}
@@ -113,9 +115,9 @@ $\mathit{PO}(x_{d}, y)\geq d_y$, which together with kademlia connectivity crite
 \end{proof}
 \end{theorem}
 
-\section{Constructing kademlia topology}
+\section{Constructing kademlia topology \statusred}
 
-\section{Complexity of filling up a postage stamp batch}\label{sec:complexity-filling}
+\section{Complexity of filling up a postage stamp batch \statusgreen}\label{sec:complexity-filling}
 
 A postage batch is utilised optimally if each of its collision slots are filled. Although hashes are uniform, due to variance one cannot guarantee that $2^d$ independent hashes map to the collision slots of a batch of depth $d$.
 We presented various ways of mining chunks: by (1) choosing the nonce of a trojan chunk (see \ref{sec:trojan}), (2) choosing the encryption key (see \ref{sec:postage-stamps}), or choosing the index of a single owner chunk (see \ref{sec:addressed-envelopes}). Whichever way we are mining the chunks, the chance of finding an address that takes the $i$-th collision slot of the stamp, i.e., 
@@ -171,10 +173,83 @@ Averaging for the whole batch ($n=2^D$) gives%
 &=D*0.6931+1
 \end{align} \end{subequations}
 
+\section{Average hop count for chunk retrieval  \statusred}
 
-\section{Latest update lookup algorithm for time based feeds}\label{sec:feeds-lookup-algo}
+This section gives a formal estimation of the expected hop count for a random non-cached chunk.  
+Hop-count in traditional kademlia has already been  analysed \cite{roos2013comprehending, roos2015determining}.
 
-This section gives a walkthrough about the steps of the algorithm that finds the latest update of a time-based feed  (see \ref{sec:time-based-feeds}).
+\section{Distribution of requests \statusred}
+
+In this section we derive the distribution of requests per PO bin that an average node experiences.
+
+\section{epoch-based feeds \statusgreen}\label{sec:epoch-based-feeds-appendix}
+\subsection{Update example \statusgreen}
+ 
+Let's say that we want to update our resource 5 minutes later. The Unix Time is now $1534093015$.
+We calculate $\mathit{epochBaseTime}(1534093015, 25) = 1509949440$.
+This results in the same epoch as before $\langle  1534093015, 25\rangle$. Therefore, we decrease the level and calculate again:
+$\mathit{epochBaseTime}(1534093015, 24) = 1526726656$. Thus, the next update will be located at $\langle  1526726656, 24\rangle$
+
+If the publisher keeps updating the resource exactly every 5 minutes, the epoch grid will look like this:
+
+{\small
+\begin{tabular}{c|c}
+\begin{tabular}{r|l|l}
+update & timestamp & epoch representation\\
+1 & 1534092715 & $\langle  1509949440, 25\rangle$\\
+2 & 1534093015 & $\langle  1526726656, 24\rangle$\\
+3 & 1534093315 & $\langle  1526726656, 23\rangle$\\
+4 & 1534093615 & $\langle  1530920960, 22\rangle$\\
+5 & 1534093915 & $\langle  1533018112, 21\rangle$\\
+6 & 1534094215 & $\langle  1534066688, 20\rangle$\\
+7 & 1534094515 & $\langle  1534066688, 19\rangle$\\
+8 & 1534094815 & $\langle  1534066688, 18\rangle$\\
+9 & 1534095115 & $\langle  1534066688, 17\rangle$\\
+10 & 1534095415 & $\langle 1534066688, 16\rangle$\\
+11 & 1534095715 & $\langle 1534066688, 15\rangle$\\
+12 & 1534096015 & $\langle 1534083072, 14\rangle$\\
+13 & 1534096315 & $\langle 1534091264, 13\rangle$\\
+14 & 1534096615 & $\langle 1534095360, 12\rangle$\\
+15 & 1534096915 & $\langle 1534095360, 11\rangle$
+\end{tabular}
+&
+\begin{tabular}{r|l|l}
+update & timestamp & epoch representation\\
+16 & 1534097215 & $\langle 1534096384, 10\rangle$\\
+17 & 1534097515 & $\langle 1534096896, 9\rangle$\\
+18 & 1534097815 & $\langle 1534097408, 11\rangle$\\
+19 & 1534098115 & $\langle 1534097408, 10\rangle$\\
+20 & 1534098415 & $\langle 1534097920, 9\rangle$\\
+21 & 1534098715 & $\langle 1534098176, 8\rangle$\\
+22 & 1534099015 & $\langle 1534098432, 10\rangle$\\
+23 & 1534099315 & $\langle 1534098944, 9\rangle$\\
+24 & 1534099615 & $\langle 1534099200, 8\rangle$\\
+25 & 1534099915 & $\langle 1534099456, 15\rangle$\\
+26 & 1534100215 & $\langle 1534099456, 14\rangle$\\
+27 & 1534100515 & $\langle 1534099456, 13\rangle$\\
+28 & 1534100815 & $\langle 1534099456, 12\rangle$\\
+29 & 1534101115 & $\langle 1534099456, 11\rangle$\\
+30 & 1534101415 & $\langle 1534100480, 10\rangle$
+\end{tabular}
+\end{tabular}
+}
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{fig/feeds/00.png}\\
+\includegraphics[width=\textwidth]{fig/feeds/01.png}\\
+\includegraphics[width=\textwidth]{fig/feeds/02.png}\\
+\includegraphics[width=\textwidth]{fig/feeds/03.png}
+\caption[Updates of epoch-based feed in the epoch grid]{Updates of epoch-based feed in the epoch grid. Epochs occupied are marked in yellow. }
+\label{fig:feeds-update}
+\end{figure}
+
+If the publisher keeps updating every 5 minutes ($300s$), we can expect the updates to stay around level 8-9 ($2^8 = 256s$, $2^9 = 512s$). The publisher can however, at any time vary this update frequency or just update randomly. This does not affect the algorithm.
+
+\subsection{Parallel algorithm to look up the latest update \statusorange}\label{sec:feeds-lookup-algo}
+
+This section gives a walkthrough about the steps of the algorithm that finds the latest update of a epoch-based feed  (see \ref{sec:epoch-based-feeds}).
 
 \begin{figure}[htbp]
 \centering
@@ -188,8 +263,8 @@ This section gives a walkthrough about the steps of the algorithm that finds the
 \label{fig:feeds-lookup-1}
 \end{figure}
 
-The \gloss{lookahead area} indicates the area that will continue to be explored if R1 succeeds, while the \gloss{lookback area} highlights what will be continued to be explored if R1 fails to find an update in at their location. After a short interval (configurable parameter \gloss{head start}) waiting for R1 to resolve, the algorithm sets out to explore both lookahead and lookback areas, headed by  $\langle  12, 2 \rangle$ and $\langle  4, 2 \rangle$ respectively. These two simultaneous lookups are labeled R2 in the figure below, and are active together with R1. Also, recursively, 4 more lookup areas (labeled LA2 and LB2) are defined that depend on the result of each instance of R2:
-Once R1 resolves we can prune one area or the other. This is implemented by recursively cancelling a context, which aborts all chunk retrievals associated with it. the found update U9 can then be used as a hint for future lookups
+The \gloss{lookahead area} indicates the area that will continue to be explored if R1 succeeds, while the \gloss{lookback area} highlights what will be continued to be explored if R1 fails to find an update at their location. After a short interval (configurable parameter \gloss{head start}) waiting for R1 to resolve, the algorithm sets out to explore both lookahead and lookback areas, headed by  $\langle  12, 2 \rangle$ and $\langle  4, 2 \rangle$ respectively. These two simultaneous lookups are labeled R2 in the figure below, and are active together with R1. Also, recursively, 4 more lookup areas (labeled LA2 and LB2) are defined that depend on the result of each instance of R2:
+Once R1 resolves we can prune one area or the other. This is implemented by recursively cancelling a context, which aborts all chunk retrievals associated with it. The found update U9 can then be used as a hint for future lookups
 
 In our example, R1 returns update U6, therefore our status is as below. Note that U6 is now marked as "known" in yellow, thus we're certain that the area in dark red, while it could contain other updates, **does not contain the latest one**, which is the one we care about:
 
@@ -202,7 +277,7 @@ In our example, R2 finally resolves, finding update U8. This means we can cancel
 To shorten up the example, if R3 resolved immediately with no update found ($\langle  14, 1 \rangle$ did not contain an update), that would cancel LA3 family of lookups, while LB3 continues (now marked as R4):
 
 
-Altough not drawn above, it is easy to see the pattern: LA4 and LB5 would then be scanned as R5 and R6 respectively, and in this case, fail, thus leaving $\langle  12, 1 \rangle$ (U9), as the found update:
+Although not drawn above, it is easy to see the pattern: LA4 and LB5 would then be scanned as R5 and R6 respectively, and in this case, fail, thus leaving $\langle  12, 1 \rangle$ (U9), as the found update:
 
 
 .
@@ -212,12 +287,12 @@ This example is simplified -- with the current algorithm parameters, there can p
 If the algorithm failed to find an update (i.e., if U3-U9 did not actually exist), then the hint in $\langle  0, 3 \rangle$ (U2) would be challenged for validity: In this situation if the hint actually contains an update, that is then returned the last update and we're done. If the hint, however, is proven false then the algorithm restarts without hint at that point.
 
 
-\chapter{Implementers' guide}
+\chapter{Implementers' guide}\label{sec:implementor-guide}
 \input{implementers-guide.tex}
 
 
-\chapter{About the project}\label{sec:about}
-\section{History}
-\section{Organisation}
-\section{Community}
-\section{Ecosystem}
+\chapter{About the project \statusred}\label{sec:about}
+\section{History \statusred}
+\section{Organisation \statusred}
+\section{Community \statusred}
+\section{Ecosystem \statusred}

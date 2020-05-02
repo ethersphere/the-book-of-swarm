@@ -1,0 +1,25 @@
+\lstdefinelanguage[1]{buzz}{%
+    sensitive=true,%
+    morecomment=[l]{//},%
+    morecomment=[s]{/*}{*/},%
+    morestring=[b]{"},%
+    % For the keywords of buzz
+    morekeywords={%a
+        about,with,for,of,in,on,by,at,from,to,off,between,within,into,upon,over,above,behind,towards,down,up,  
+        ,as,
+        if,then,else,switch,case,any,each,such,that,go
+        },%
+    % Basic types
+    morekeywords=[2]{%
+    double,float,uint8,uin16,int32,int64,uint32,uint64,bool,string,byte,nil,stream,no,not,type,function,size%
+    ,xor,and,=,-,+,>,<,==
+       },%
+    % Options
+    morekeywords=[3]{%
+        define,fail,return,self,pragma,context,%
+        cancel,wait,while,range,
+        hash,read,write,match,head,prefix,append,pad,is,has,
+        split,join
+        }%
+}
+\lstalias[]{buzz1}[1]{buzz}

@@ -1,0 +1,34 @@
+
+\subsection{Update notification requests\statusgreen}\label{sec:update-notification-requests} 
+
+Now consider the use case when a publisher does not want to receive direct messages or send out notifications. Is there a way for consumers to "plant" a notification request at the address of the update directly? The challenge is that (prepaid) addressed envelopes so far required that the sender's public key is known, so that they can produce a valid single-owner chunk for the response. In this section, we show another technique which allows for the case when sender has not revealed their overlay or refuse to handle notifications.                                                                                                                                                                                                                               
+\subsubsection{Requesting update} 
+
+If $I$  wants to subscribe $R$ to a  particular update at address $H_U$ derived from $I_U$ and $P_U$, it takes $I_U$ as a private key $K_U$ and corresponding public key $P_U$. It also chooses a random salt $S_U$ and hashes it with $I_U$ to result in a private key $K_{SU}$ and corresponding public key $P_{SU}$. Then mine a single-owner address $H_{SU}$ for $P_{SU}$ with nonce $N_{SU}$ that is close to the recipient address $A_R$ and prepare it as a prepaid addressed envelope. Package the envelope together with the salt $S_U$, encrypt it with $P_U$ as a trojan message and
+package it as a trojan chunk with nonce $N_U$ so that the resulting content hash $H_N$ falls in the neighbourhood of $H_U$ or in fact arbitrarily close to $H_U$. This chunk is called \gloss{update notification request} and issuer sends it with a postage stamp so that nodes in the proximity of $H_U$ can store it.
+
+
+\subsubsection{Sending the update notification}
+
+When a node in the proximity of $H_U$ receives the desired update chunk, a single-owner chunk with address $H_U$, it tries to find matching update notification requests for it. In order not to need to try with every chunk, issuer mines the request chunk to be arbitrarily close to $H_U$ so that notifiers only need to iterate over a small number of nearest chunks in their local storage. To find the corresponding requests, matching chunks are taken as trojans with payload to be decrypted with the index $I_U$ extracted from the incoming update chunk used as a private key. The resulting trojan is verified, its payload is deserialised and postage stamp $PS_R$ and salt $S_U$ are extracted from it. Then the salt is used to derive private key $K_{SU}$ with which the actual notification (the content of the incoming update chunk with index and publisher signature) is signed, then create the valid single-owner chunk with nonce $N_{SU}$ as index, the signature and the actual notification as payload at address $H_{SU}$. The node then sends this chunk, called \gloss{update notification} alongside the corresponding postage stamp not knowing anything of the recipient's identity or anything about the channel the update was on.
+
+
+\subsubsection{Receiving the notification}
+
+When $R$ receives the notification chunk at address $H_{SU}$, it validates as a single-owner chunk and the update chunk content is extracted. If valid, save the update chunk and call the handler for channel index $I_U$.
+If $I=R$, issuer and recipient are the same, then this is a notification request to issuer as recipient.
+Typically, the issuer has requested update at $H_U$, then after time-out, the notification request is created and sent but the database has an open request for $H_U$. When it receives the notification from the node that is in the proximity of $H_U$, the chunk is validated, saved and triggers the handler(s).
+
+
+\subsubsection{Features}
+
+\begin{itemize}
+    \item originator does not need to know public key of any particular node in the neighbourhood of the update
+    \item originator does not need to rely on any node to be online
+    \item notifier needs to have both the update chunk as well as the notification to write the notification chunk
+    \item mining the notification request address in close proximity of the update chunk's address allows notifiers to look up the notification request more efficiently
+    \item notification request is not distinguishable from a random single-owner chunk
+    \item forwarding nodes cannot change or interpret the notification 
+    \item notifier knows nothing about originator or notified peers
+\end{itemize}
+

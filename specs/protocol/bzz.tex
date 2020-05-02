@@ -1,8 +1,12 @@
+\subsection{Bzz handshake protocol \statusgreen}\label{spec:protocol:bzz}
+
 The bzz handshake protocol is the protocol that is always run after two peers are connected and before any other protocols are established. It communicates information about the  peer's address, network ID and light node capability.
 
 The handshake protocol defines only one stream and three messages:
 
-\begin{lstlisting}[basicstyle=\ttfamily]
+\begin{definition}{Bzz handshake protocol  messages}\label{def:bzz-messages}
+
+\begin{lstlisting}
 // ID: /swarm/handshake/1.0.0/handshake
 // Serialization: Varint delimited Protobuf
 syntax = "proto3";
@@ -22,10 +26,11 @@ message Ack {
     bytes Address = 1;
 }
 \end{lstlisting}
+\end{definition}
 
 This message sequence is inspired by the TCP three way handshake to ensure message deliverability.
 
-Upon connection a requesting peer constructs a new handshake stream and sends a \texttt{Syn} message with its Overlay address, Network ID and Lightnode capability flag, and waits for \texttt{SynAck} response message from the responding peer. In  the  \texttt{SynAck} message responder sends it own \texttt{Syn} message as well as an acknowledgement with the received Overlay address. After the requesting peer receives the \texttt{SynAck} message from the responding peer and validates that the received \texttt{Ack} information in it is correct, it sends an \texttt{Ack} message itself as a confirmation to the responding peer. The stream is closed by the responding peer after it receives the \texttt{Ack} message.
+Upon connection a requesting peer constructs a new handshake stream and sends a \lstinline{Syn} message with its Overlay address, Network ID and Lightnode capability flag, and waits for \lstinline{SynAck} response message from the responding peer. In  the  \lstinline{SynAck} message responder sends it own \lstinline{Syn} message as well as an acknowledgement with the received Overlay address. After the requesting peer receives the \lstinline{SynAck} message from the responding peer and validates that the received \lstinline{Ack} information in it is correct, it sends an \lstinline{Ack} message itself as a confirmation to the responding peer. The stream is closed by the responding peer after it receives the \lstinline{Ack} message.
 
 The connection must be terminated if network IDs are do not match or if the  exact  order of messages is not followed.
 
@@ -54,4 +59,10 @@ After the handshake,  each peer should remember the following data about the oth
     \item the bzz address signature - needed by the hive protocol to pass information about the node to other peers (see \ref{spec:protocol:hive})
     \item whether the peer is a light node
 \end{itemize}
+
+\subsection{Encapsulation of context for tracing \statusgreen}
+
+P2P Stream scoped tracing span context is exchanged by using stream headers. Header key "tracing-span-context" is reserved for binary encoded tracing span context data. This context should be used in tracing messages. The stream initiator node should provide tracing span context to the responding node. This context is optional and all nodes must function the same as span context is provided by other nodes or not regardless if the node has tracing configured or not.
+
+% \subsection{Encapsulation of price information \statusred}
 

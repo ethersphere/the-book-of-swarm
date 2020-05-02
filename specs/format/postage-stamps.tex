@@ -1,13 +1,22 @@
 
-There can be different implementations of postage stamps that differ in the structure and semantics of the . To allow for new cryptographic mechanisms to be used as they are developed, the \emph{witnessType} argument indicates the type of the witness used. 
+\subsection{D}
+\subsubsection{Witness type}
 
-Witness type 0 stands for ECDSA witness, which is an ECDSA signature on the 128 bytes resulting from the concatenation of `payloadHash`, `postagePaid`, `beginValidity` and `endValidity`. The binary encoding of the ECDSA signature is 65 bytes resulting from the concatenation of the `r` (32 bytes), `s` (32 bytes) and `v` (1 byte) parameters of the signature, in this order. The signature is calculated on the SECP256K1 elliptic curve, just like the signatures of Ethereum transactions. This is the bare minimum that postage stamp contracts and clients must implement.
+There can be different implementations of postage stamps that differ in the structure and semantics of the \emph{proof of payment}. To allow for new cryptographic mechanisms to be used as they are developed, the \lstinline{witnessType} argument indicates the type of the witness used. 
 
-The ECDSA witness is the simplest and cheapest solution both in terms of gas consumed by the stamp verification contract and in terms of computational resources used off chain. Also, it does not rely on cryptographic assumptions in addition to those on which Ethereum critically relies, therefore as long as Ethereum is considered cryptographically secure, no advance in cryptorgraphy can render this witness type insecure. This is the justification for this witness type to be the only mandatory witness type to be implemented.
+Witness type $0$ stands for ECDSA witness, which is an ECDSA signature on the byte slice resulting from the concatenation of   1) preamble constant 2) chunk hash 3) batch reference 4) valid until date.% 
+%
+\footnote{The binary encoding of the ECDSA signature is 65 bytes resulting from the concatenation of the $r$ (32 bytes), $s$ (32 bytes) and $v$ (1 byte) parameters of the signature, in this order. The signature is calculated on the secp256k1 elliptic curve, just like the signatures of Ethereum transactions.}
+%
+This is the bare minimum that postage stamp contracts and clients must implement.%
+%
+\footnote{The ECDSA witness is the simplest and cheapest solution both in terms of gas consumed by the stamp verification contract and in terms of computational resources used off chain. Also, it does not rely on cryptographic assumptions in addition to those on which Ethereum critically relies, therefore as long as Ethereum is considered cryptographically secure, no advance in cryptorgraphy can render this witness type insecure. This is the justification for this witness type to be the only mandatory witness type to be implemented.}
 
-Witness type `1` refers to the RSA witness, which is an RSA signature on the same 128 bytes as above. The binary encoding of the RSA signature is of variable length, and is an Solidity ABI encoded array of the RSA signature `s` (as defined in [PKCS \#1](https://tools.ietf.org/html/rfc8017)) and the RSA public key parameters `n` (RSA modulus) and `e` (public exponent).
+Witness type $1$ refers to the RSA witness, which is an RSA signature on the same 128 bytes as above. The binary encoding of the RSA signature is of variable length, and is an Solidity ABI encoded array of the RSA signature $s$.%
+%
+\footnote{as defined in \emph{PKCS \#1}, \url{https://tools.ietf.org/html/rfc8017} and the RSA public key parameters $n$ (RSA modulus) and $e$ (public exponent).}
 
-The RSA witness is specified so that blind stamping services can be implemented in a simple fashion, in order to mitigate the privacy issues arising from the ability to link chunks signed with the same private key. Even though blind ECDSA signatures also exist, their protocol requires more rounds of communication, making the implementation of such a service more complex, more error-prone and less performant. The specification of such blind stamping services is outside of the scope of this SWIP, requiring a separate one.
+The RSA witness is specified so that blind stamping services can be implemented in a simple fashion, in order to mitigate the privacy issues arising from the ability to link chunks signed with the same private key. Even though blind ECDSA signatures also exist, their protocol requires more rounds of communication, making the implementation of such a service more complex, more error-prone and less performant. 
 
 The inclusion of the entire public key in each RSA witness rather than storing the public key in contract state and just referencing it from the witness is justified by reducing the gas costs of interactions with the contract as well as future-proofing the design in case contract state rent is introduced in Ethereum. These considerations are more important than the brevity of postage stamps, marginally reducing the bandwith costs of uploading and forwarding stamped content.
 
@@ -66,12 +75,33 @@ Nodes participating in the same postage system are configured to reference the s
 
 \end{lstlisting}
 
-This accessor method returns `true` if the proof embodied by `witness` checks out for all other arguments within the claimed 
-validity period, i.e. when `block.timestamp` (the output of `TIMESTAMP` EVM opcode) is between `beginValidity` (inclusive) and 
-`endValidity`, (exclusive). Outside of the validity period, the return value is undefined.
+This accessor method returns \lstinline{true} if the proof embodied by \lstinline{witness} checks out for all other arguments within the claimed 
+validity period, i.e. when \lstinline{block.timestamp} (the output of \lstinline{TIMESTAMP EVM} opcode) is between \lstinline{beginValidity} (inclusive) and 
+\lstinline{endValidity} (exclusive). Outside of the validity period, the return value is \lstinline{undefined}.
 
-The binary serialization of the postage stamp consists of a single 5-element array containing the arguments in the same order, all [RLP-encoded](https://github.com/ethereum/wiki/wiki/RLP). 
+The binary serialization of the postage stamp consists of a single 5-element array containing the arguments in the same order. 
 
 
-Assume the blockhash at block height $t$ is $H_t$. For each postage stamp $p$ with payment id $\mathit{id}(p)$, calculate the reference $\mathit{ref}(t, p)\defeq \mathit{Hash}(H_t|id_p)$. A registered node with address $a$ is selected to win the lottery if for all registered addresses $a'$,  $\mathit{PO}(\mathit{ref}(t, p), \mathit{addr}(n))
->\mathit{PO}(\mathit{ref}(t, p), \mathit{addr}(n'))$.
+\begin{definition}{postage stamp}\label{def:postage-stamp}
+\begin{lstlisting}[language=buzz1]
+// /swarm/postage
+
+define type batchid as [32]byte  
+define type address as bzz/address
+define type witness as crypo/signature
+
+// postage stamp
+define type stamp  
+    batchid
+    address
+    witness
+
+define function valid stamp
+as 
+    // check validity on blockchain
+    ethereum call context contracts postage
+        is @stamp valid
+        
+\end{lstlisting}
+\end{definition}
+

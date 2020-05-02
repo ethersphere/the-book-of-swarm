@@ -1,0 +1,103 @@
+
+
+\begin{definition}{constants}\label{def:chunk-constants}
+\begin{lstlisting}[language=buzz1]
+// /swarm/chunk
+
+define type segment as [32]byte
+define type payload as [:4096]byte 
+define type span as uint64 
+
+define function branches 
+    as payload size / segment size
+
+\end{lstlisting}
+\end{definition}
+
+\begin{definition}{chunk reference}\label{def:chunk-reference}
+\begin{lstlisting}[language=buzz1]
+// /swarm/chunk
+
+define type address = [segment size]byte
+
+define type key = [segment size]byte 
+
+define type reference 
+    address                   // result of keccak256 hash
+    key if context.encryption // decryption key optional (context dependent)
+
+\end{lstlisting}
+\end{definition}
+
+
+\begin{definition}{chunk}\label{def:chunks}
+\begin{lstlisting}[language=buzz1]
+// /swarm/chunk
+
+define type chunk
+    span      // length of data span subsumed under node
+    payload   // max 4096 bytes of a larger structure
+
+define function address of chunk
+as
+    @chunk payload bmt/hash with @chunk span 
+
+// deserialise 
+define function chunk of bytes as @bytes
+    at address
+    with key
+as  
+    @chunk = @bytes chunk 
+    assert @chunk address == @address
+    @chunk (decrypt with @key if @key)
+
+\end{lstlisting}
+\end{definition}
+
+\begin{definition}{span to payload length}\label{def:span}
+\begin{lstlisting}[language=buzz1]
+// /swarm/chunk
+
+define function payload.length of uint64 as @span
+as
+    while @span >= 4096 
+        @span = @span + 4095
+           / 4096
+           * reference size
+    return @span
+\end{lstlisting}
+\end{definition}
+
+Where length is the content of the length field and reference  size is the sum of size of the referencing hash value and that of the decryption key, which is currently 64, as we use 256-bit hashes and 256-bit keys.
+
+This procedure can be used to remove the padding after decryption before returning the plaintext chunk. 
+
+\begin{definition}{chunk retrieval}\label{def:retrieve}
+\begin{lstlisting}[language=buzz1]
+// /swarm/chunk
+
+define function retrieve reference 
+as 
+    retrieve @reference address 
+        (decrypt with @reference key if @reference key)
+
+\end{lstlisting}
+\end{definition}
+
+
+\begin{definition}{chunk storage}\label{def:store}
+\begin{lstlisting}[language=buzz1]
+// /swarm/chunk
+
+
+define function store payload
+    over span 
+    with key 
+as 
+    @span = @payload length if no @span  
+    chunk{@span,@payload} (encrypt with @key if @key) 
+        store 
+            in reference (with @key if @key)
+\end{lstlisting}
+\end{definition}
+

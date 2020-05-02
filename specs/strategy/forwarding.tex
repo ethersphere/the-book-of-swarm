@@ -1,36 +1,27 @@
+Forwarding strategy refers to the process a node follows pertaining to relayed messages and responses in Forwarding Kademlia as relevant for chunk retrieval and upload.
 
+Note that for retrieval as well as push-syncing, the protocol does not specify just allows forwarding of retrieve requests and chunk deliveries, respectively.
+Whether a node forwards an incoming message and where it forwards them, should be guided by the incentives in order to attain stability.
 
+As described in \ref{sec:pricing}, nodes  formulate and  advertise their prices for each PO bin separately. 
+The optimal pricing strategy will reflect the PO bins in that the prices for closer bins will monotonically decrease. 
 
-
-
-1. Get rid of `hopcount` and make sure we have forwarding of chunk requests without loops in a DAG
-2. Add somehow retry mechanism for chunks in the syncer, possibly through the `FetcherItem` and the `NetStore` retry mechanism used for RetrieveRequests
-3. Pass information on who has offered a given chunk from the syncer to the fetchers.
-4. Extract all logic that selects the `next` peer at one place - this decision is based on:
-    - Kademlia
-    - historic information of the Fetcher (such as PeerToSkip ; who has been tried already)
-    - syncer information - who has offered a given chunk
-    - path info - minimally, who requested the chunk
-
-In particular, 4 is achieved by finding the closest peer to the chunk address such that
+With sufficiently 
     
-    
-- NEW: 
-    - it has not yet been selected earlier by the fetcher
-    
-- KNOWN SOURCE:
-    - peer that offered the chunk via syncing, such a peer is a reat candidate as it guarantees the chunk in one hop
-    
-- ON ROUTE: 
-    - if the chunk falls outside of the area of responsibility, it strictly increases proximity to the chunk (in other words, we choose from the same PO bin the chunk falls into). 
-    - if the chunk falls within our area of responsibility, then choose a nearest neighbour - ideally all the nearest neighbours at once - note that there are gonna be nearest neighbours further from the chunk than us
+ 
+\subsubsection{Retries}
+%disconnection
 
-- REVERSE: if the request comes from a node not strictly further from the chunk, then
-  - do not select any peer and forward to noone
-      this can happen 
-      - if we are the requesting peer's nearest neighbours:
-        we don't have the chunk and all other neighbours are asked, so makes no sense to forward
-      - we offered the hash via syncing to the requesting node. If we get here, it means we deleted a chunk we offered or the  requesor 
-      
-      This algotithm is strict in that the forwarding path created by nodes following these rules have the properties explicitly used in the paper's claim to logN steps to get the chunk from anywhere. 
-      In particular it is guaranteed to be without loops. It is guaranteed to succeed with the sole assumption of kademlia health. However, modifications will need to be made to take care of the situations with unhealthy kademlia.
+Both push-sync and retrieval messages are using backwarding (i.e., pass-back responses), and the compensation for forwarding only gets accounted for once the response is sent. This incentivises nodes to watch on peer connections where the downstream message was sent. In particular, if downstream peer disconnects  before the response in received, the forwarding should be repeated and tried on another peer.
+
+
+%price-driven strategy
+
+% acyclicity
+
+
+ %\subsubsection{}
+
+% multiple requests
+
+

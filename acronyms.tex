@@ -1,0 +1,205 @@
+% definitions of acronyms
+% (some) are linking to main terms following the example described here:
+% https://tex.stackexchange.com/questions/8946/how-to-combine-acronym-and-glossary
+% this is so they are listed in index under main terms
+
+\newglossaryentry{WWW}{
+    type=\acronymtype,                   % put it into acronyms glossary (not main)
+    name={WWW\glsadd{World Wide Web}},   % the short / non-first label
+    description={\gls{World Wide Web}},  % what appears as description in glossary
+    first={WWW\glsadd{World Wide Web}}   % what is shown on first appearance
+    }
+% NOTE: above is example of acronym also described in main glossary, hence all the links
+
+\newglossaryentry{TLD}{
+    type=\acronymtype,
+    name={TLD},
+    description={top level domain},
+    first={top level domain (TLD)}
+    }
+% NOTE: above is example of acronym not described in main glossary, just in acronyms list
+    
+\newglossaryentry{TTL}{
+    type=\acronymtype,
+    name={TTL\glsadd{time to live}},
+    description={\gls{time to live}},
+    first={TTL\glsadd{time to live}}
+    }
+
+\newglossaryentry{AC}{
+    type=\acronymtype,
+    name={AC\glsadd{access control}},
+    description={\gls{access control}},
+    first={access control (AC)\glsadd{access control}}
+    }
+    
+\newglossaryentry{ENS}{
+    type=\acronymtype,
+    name={ENS\glsadd{Ethereum Name Service}},
+    % short={ENS\glsadd{Ethereum name service}},
+    description={\gls{Ethereum Name Service}},
+    first={ENS\glsadd{Ethereum Name Service}}
+    }
+    
+
+\newglossaryentry{URL}{
+    type=\acronymtype,
+    name={URL},
+    description={Uniform Resource Locator},
+    first={Uniform Resource Locator (URL)}
+    }
+
+\newglossaryentry{BMT}{
+    type=\acronymtype,
+    name={BMT\glsadd{binary Merkle tree}},
+    description={\gls{binary Merkle tree}},
+    first={BMT\glsadd{binary Merkle tree}}
+    }
+
+\newglossaryentry{DISC}{
+    type=\acronymtype,
+    name={DISC\glsadd{distributed immutable store for chunks}},
+    description={\gls{distributed immutable store for chunks}},
+    first={DISC\glsadd{distributed immutable store for chunks}}
+    }
+
+\newglossaryentry{DHT}{
+    type=\acronymtype,
+    name={DHT\glsadd{distributed hash table}},
+    description={\gls{distributed hash table}},
+    first={DHT\glsadd{distributed hash table}},
+    plural={DHTs\glsadd{distributed hash table}}
+    }
+
+\newglossaryentry{SWINDLE}{
+    type=\acronymtype,
+    name={SWINDLE},
+    description={Secured With INsurance Deposit Litigation and Escrow, see \gls{swindle}},
+    first={SWINDLE\glsadd{swindle} (Secured With INsurance Deposit Litigation and Escrow)},
+    plural={SWINDLE\glsadd{swindle}}
+    }
+
+\newglossaryentry{SWEAR}{
+    type=\acronymtype,
+    name={SWEAR},
+    description={Secure Ways of Ensuring ARchival or Swarm Enforcement And Registration, see \gls{swear}},
+    first={SWEAR\glsadd{swear} (Secure Ways of Ensuring ARchival or Swarm Enforcement And Registration)},
+    plural={SWEAR\glsadd{swear}}
+    }
+
+\newglossaryentry{SWAP}{
+    type=\acronymtype,
+    name={SWAP},
+    description={service wanted and provided ALSO settle with automated payments ALSO send waiver as payment ALSO start without a penny, see \gls{swap}},
+    first={SWAP\glsadd{swap}},
+    plural={SWAP\glsadd{swap}}
+    }
+
+\newglossaryentry{ISP}{
+    type=\acronymtype,
+    name={ISP},
+    description={internet service provider },
+    first={internet service provider (ISP)}
+    }
+
+\newglossaryentry{P2P}{
+    type=\acronymtype,
+    name={P2P\glsadd{peer-to-peer}},
+    description={\gls{peer-to-peer}},
+    first={P2P\glsadd{peer-to-peer}}
+    }
+
+\newglossaryentry{HTTP}{
+    type=\acronymtype,
+    name={HTTP},
+    description={Hypertext Transfer Protocol},
+    first={Hypertext Transfer Protocol (HTTP)}
+    }
+
+\newglossaryentry{dapp}{
+    type=\acronymtype,
+    name={dapp},
+    description={\gls{distributed web application}},
+    first={dapp\glsadd{distributed web application}},
+    plural={dapps\glsadd{distributed web application}}
+    }
+
+\newglossaryentry{IPFS}{
+    type=\acronymtype,
+    name={IPFS\glsadd{InterPlanetary File System}},
+    description={\gls{InterPlanetary File System}},
+    first={IPFS\glsadd{InterPlanetary File System}}
+    }
+
+\newglossaryentry{PO}{
+    type=\acronymtype,
+    name={PO\glsadd{proximity order}},
+    description={\gls{proximity order}},
+    first={PO\glsadd{proximity order}}
+    }
+
+\newglossaryentry{EVM}{
+    type=\acronymtype,
+    name={EVM},
+    description={Ethereum virtual machine},
+    first={Ethereum virtual machine (EVM)}
+    }
+
+\newglossaryentry{BMT chunk}{
+    type=\acronymtype,
+    name={BMT chunk\glsadd{binary Merkle tree chunk}},
+    description={\gls{binary Merkle tree chunk}},
+    first={BMT chunk\glsadd{binary Merkle tree chunk}}
+    }
+
+\newglossaryentry{BMT hash}{
+    type=\acronymtype,
+    name={BMT hash\glsadd{binary Merkle tree hash}},
+    description={\gls{binary Merkle tree hash}},
+    first={BMT hash\glsadd{binary Merkle tree hash}}
+    }
+
+\newglossaryentry{ACT}{
+    type=\acronymtype,
+    name={ACT\glsadd{access control trie}},
+    description={\gls{access control trie}},
+    first={ACT\glsadd{access control trie}}
+    }
+
+
+\newglossaryentry{PSS}{
+    type=\acronymtype,
+    name={PSS\glsadd{postal service on Swarm}},
+    description={\gls{postal service on Swarm}},
+    first={PSS\glsadd{postal service on Swarm}}
+    }
+    
+\newglossaryentry{prod}{
+    type=\acronymtype,
+    name={prod\glsadd{prompt recovery of data}},
+    description={\gls{prompt recovery of data}},
+    first={prod\glsadd{prompt recovery of data}}
+    }
+ 
+\newglossaryentry{X3DH}{
+    type=\acronymtype,
+    name={X3DH\glsadd{extended triple Diffie--Hellmann key exchange}},
+    description={\gls{extended triple Diffie--Hellmann key exchange}},
+    first={X3DH\glsadd{extended triple Diffie--Hellmann key exchange}}
+    }
+
+\newglossaryentry{CRS}{
+    type=\acronymtype,
+    name={CRS\glsadd{Cauchy-Reed-Solomon erasure code}},
+    description={\gls{Cauchy-Reed-Solomon erasure code}},
+    first={CRS\glsadd{Cauchy-Reed-Solomon erasure code}}
+    }
+
+\newglossaryentry{race}{
+    type=\acronymtype,
+    name={race\glsadd{raffle--apply--claim--earn}},
+    description={\gls{raffle--apply--claim--earn}},
+    first={race\glsadd{raffle--apply--claim--earn}}
+    }
+    
+

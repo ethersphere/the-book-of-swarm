@@ -1,0 +1,160 @@
+\begin{tikzpicture}[
+level/.style={sibling distance=15mm, line width=0.6pt, level distance=18mm},
+hash/.style={fill=white, rounded corners=2pt,draw,minimum size=1.2cm},
+chunk/.style={fill=lightgray, rounded corners=2pt,draw,minimum size=1.2cm},
+midchunk/.style={draw=none,minimum size=0.2cm}
+]
+
+% root node
+\node [hash] (root) {$R$}
+  % vertical arrow
+  child[grow=down,draw=none] { node {} edge from parent[<-,shorten >=12pt]}
+  % annotation
+  child[grow=right,draw=none,level distance=5cm] { node (swh) {Swarm root hash} edge from parent[draw=none] }
+  % level n-1
+  child {node [hash] (n-10) {$R_{0}$} edge from parent[draw=none]
+    % arrow
+    child[grow=down,draw=none] { node {} edge from parent[<-, shorten >=12pt]}
+    % annotation
+    child[grow=left,draw=none,level distance=4cm] { node[align=center] (bnl) {intermediate\\branching nodes\\composed of 64 references }  edge from parent[draw=none] }
+    % level n-2
+    child {node [hash] (n-2l0) {$R_{0}$} edge from parent[draw=none]
+      % level 2
+      child[thick] {node [midchunk] (2l0) {} edge from parent[draw=none]
+        % level 1
+        % child[grow=down,draw=none] { node {} edge from parent[<-, shorten >=18pt, ultra thick]}
+        child {node [hash] at (0,1.2) (1l0) {$R_{0}$} edge from parent[draw=none]
+          % level 0
+          child[grow=down,draw=none] { node {} edge from parent[<-, shorten >=12pt]}
+          child {node [hash] (0l0) {$R_{0}$} edge from parent[<-, draw=none]
+            child {node [chunk] {$C_{0}$}}
+          }
+          child {node [hash] (0l1) {$R_{1}$} edge from parent[<-, draw=none]
+            child {node [chunk] (cl1) {$C_{1}$}}
+          }
+          child[missing]
+          child {node [hash] (0ll) {$R_{63}$} edge from parent[<-, draw=none]
+            child {node [chunk] (cll) {}}
+          }
+        }
+        % level 1 siblings
+        child {node [hash] at (0,1.2) (1l1) {$R_{1}$} edge from parent[draw=none]
+          child[thick,loosely dotted, shorten >=6mm, thick,<-] {node {}}
+        }
+        child[missing]
+        child {node [hash] at (0,1.2) (1ll) {$R_{63}$} edge from parent[draw=none]
+          child[thick,loosely dotted, shorten >=6mm, thick,<-] {node {}}
+        }
+      }
+    }
+    % level n-2 siblings lhs
+    child {node [hash] (n-2l1) {$R_{1}$} edge from parent[draw=none]
+      child[thick,loosely dotted, shorten >=6mm, thick,<-] {node {}}
+    }
+    child[missing]
+    child {node [hash] (n-2ll) {$R_{63}$} edge from parent[draw=none]
+      child[thick,loosely dotted, shorten >=6mm, thick,<-] {node {}}
+    }
+  }
+  % level n-1 siblings
+  child {node [hash] (n-11) {$R_{1}$} edge from parent[draw=none]
+    child[thick,loosely dotted, shorten >=6mm, thick,<-] {node {}}
+  }
+  child[missing]
+  child[missing]
+  child[missing]
+  child {node [hash] (n-1l) {$R_{63}$} edge from parent[draw=none]
+    % level n-2 siblings rhs vertical arrow
+    child[grow=down,draw=none] { node {} edge from parent[<-, shorten >=12pt]}
+    child[grow=right,level distance=9cm] { node[align=center] (bnr)  {intermediate\\branching nodes\\composed of 64 references} edge from parent[draw=none]}
+    child[missing]
+    child {node [hash] (n-2r0) {$R_{0}$} edge from parent[draw=none]
+      child[thick,loosely dotted, shorten >=6mm, thick,<-] {node {}}
+    }
+    % child[missing]
+    child {node [hash] (n-2r1) {$R_{1}$} edge from parent[draw=none]
+      child[thick,loosely dotted, shorten >=6mm, thick,<-] {node {}}
+    }
+    child[missing]
+    child {node [hash] (n-2rl) {$R_{63}$} edge from parent[draw=none]
+      % level 2 siblings
+      child[grow=down] {node [midchunk] (2rl) {} edge from parent[draw=none]
+        % child[grow=down,draw=none] { node {} edge from parent[<-, shorten >=18pt, ultra thick]}
+        child {node [hash] at (0,1.2) (1r0) {$R_{0}$} edge from parent[draw=none]
+          child[thick,loosely dotted, shorten >=6mm, thick,<-] {node {}}
+        }
+        child {node [hash] at (0,1.2) (1r1) {$R_{1}$} edge from parent[draw=none]
+          child[thick,loosely dotted, shorten >=6mm, thick,<-] {node {}}
+        }
+        child[missing]
+        child {node [hash] at (0,1.2) (1rl) {$R_{63}$} edge from parent[draw=none]
+          child[grow=down,draw=none] { node {} edge from parent[<-, shorten >=12pt]}
+          child {node [hash] (0r0) {$R_{0}$} edge from parent[<-, draw=none]
+            child {node [chunk] (cr0) {}}
+          }
+          child {node [hash] (0r1) {$R_{1}$} edge from parent[<-, draw=none]
+            child {node [chunk] (cr1) {}}
+          }
+          child[missing]
+          child {node [hash] (0rl) {$R_{63}$} edge from parent[<-, draw=none]
+            child {node [chunk] (crl) {$C_{m}$}
+              child [grow=right] { edge from parent[draw=none]
+                child [grow=right] {node[align=center] {leaf chunks\\data level} edge from parent[draw=none]
+                  child [grow=up] {node {level $0$} edge from parent[draw=none]
+                    child [grow=up] {node {level $1$} edge from parent[draw=none]
+                        child [grow=up] {node at (0,0.8) {level $n-1$} edge from parent[draw=none]
+                          child [grow=up] {node {root = level $n$} edge from parent[draw=none]}
+                        }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  };
+
+% elipsis
+\path (n-11) -- (n-1l) node [midway,font=\large] {$\ldots$};
+\path (n-2l0) -- (2l0) node [midway,font=\large,sloped] {$\ldots$};
+\path (n-2rl) -- (2rl) node [midway,font=\large,sloped] {$\ldots$};
+\path (1l1) -- (1ll) node [midway,font=\large] {$\ldots$};
+\path (1r1) -- (1rl) node [midway,font=\large] {$\ldots$};
+\path (1ll) -- (1r0) node [midway,font=\large] {$\ldots$};
+\path (n-2l1) -- (n-2ll) node [midway,font=\large] {$\ldots$};
+\path (n-2r1) -- (n-2rl) node [midway,font=\large] {$\ldots$};
+\path (n-2ll) -- (n-2r0) node [midway,font=\large,sloped] {$\ldots$};
+\path (0l1) -- (0ll) node [midway,font=\large] {$\ldots$};
+\path (0r1) -- (0rl) node [midway,font=\large] {$\ldots$};
+\path (0ll) -- (0r0) node [midway,font=\large] {$\ldots$};
+\path (cl1) -- (cll) node [midway,font=\large] {$\ldots$};
+\path (cr1) -- (crl) node [midway,font=\large] {$\ldots$};
+\path (cll) -- (cr0) node [midway,font=\large] {$\ldots$};
+
+
+% arrows from annotations
+\begin{scope}[shorten >=.5cm,thin]
+\draw [->] (swh) -> (root);
+\draw [->] (bnl) -> (n-10);
+\draw [->] (bnl) -> (n-2l0);
+\draw [->] (bnl) -> (1l0);
+\draw [->] (bnl) -> (0l0);
+\draw [->] (bnr) -> (n-1l);
+\draw [->] (bnr) -> (n-2rl);
+\draw [->] (bnr) -> (1rl);
+\draw [->] (bnr) -> (0rl);
+\end{scope}
+
+% boxes to group nodes
+\node[rounded corners=2pt, draw=white, minimum height=1.1cm, fit=(root)] {};
+\node[rounded corners=2pt, draw=black, minimum height=1.1cm, fit=(0l0) (0ll)] {};
+\node[rounded corners=2pt, draw=black, minimum height=1.1cm, fit=(n-2l0) (n-2ll)] {};
+\node[rounded corners=2pt, draw=black, minimum height=1.1cm, fit=(n-2r0) (n-2rl)] {};
+\node[rounded corners=2pt, draw=black, minimum height=1.1cm, fit=(1l0) (1ll)] {};
+\node[rounded corners=2pt, draw=black, minimum height=1.1cm, fit=(1r0) (1rl)] {};
+\node[rounded corners=2pt, draw=black, minimum height=1.1cm, fit=(n-10) (n-1l)] {};
+\node[rounded corners=2pt, draw=black, minimum height=1.1cm, fit=(0r0) (0rl)] {};
+
+\end{tikzpicture}

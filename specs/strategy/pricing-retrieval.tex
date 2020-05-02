@@ -8,7 +8,7 @@ reactive - respond to downstream price increase with exploring alternative peers
 proactive: respond to 
 
 
-\subsection{Passive strategy}\label{sec:pricing-retrieval}
+\subsection{Passive strategy \statusorange}\label{sec:pricing-retrieval}
 The following strategy is a basic way on how nodes *can* use the protocol described above. The strategy intends to be as easy as possible to implement, while balbalbala
 
 \subsubsection{Margin}
@@ -56,11 +56,11 @@ The following configuration options will be added.
 
 See below for how these variables are used.
 
-\subsection{Behavior of a node}
-1) Given a particular \texttt{`chunkReference`}, a node chooses to send the $`ChunkRequestMessage`$, usually, to the peer with the lowest price of all peers in that bin.
+\subsection{Behavior of a node \statusred}
+1) Given a particular \lstinline{`chunkReference`}, a node chooses to send the $`ChunkRequestMessage`$, usually, to the peer with the lowest price of all peers in that bin.
 2) If a `newPrice` message is returned from a `chunkRequestMessage`, the node updates the `priceInformationRegistry` and sends the `chunkRequestMessage` again, choosing a peer on the basis of the updated `priceInformationRegistry`. 
 4) When a peer requests a certain `ChunkRequestMessage` and does not have the `chunkContent` in its local storage, it forwards the `chunkRequestMessage` (see 1) with a price equal to the `chunkRequestMessage` it received minus his `margin`.
-5) A node keeps track of his `bandWidth\_usage` (\texttt{(upstream bandwidth used / `period`) / (`maximum\_upstream\_bandwidth`)})
+5) A node keeps track of his `bandWidth\_usage` (\lstinline{(upstream bandwidth used / `period`) / (`maximum\_upstream\_bandwidth`)})
 6) Whenever `bandWidth\_usage` > `high\_water\_mark`, the `margin` will be (1+`margin\_change`) * `margin`
 7) Whenever `bandWidth\_usage` < `low\_water\_mark`, the `margin` will be (1-`margin\_change`) * `margin`. `margin\_change` indicates the 
 8) Whenever a node can get a `chunk` for a cheaper price than requested by a `ChunkRequestMessage` (upstream peers changed prices, amount of hops are less than the average request for the same distance), he answers with a `ChunkDeliveryMessage`, which will be priced based on the `ChunkRequestMessage`. 

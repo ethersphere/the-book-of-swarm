@@ -1,68 +1,87 @@
-\subsection{Simple Summary}
-Standardisation of the bzz-retrieve protocol which allows for nodes to issue requests for content addressed data and for their counterparts to deliver that content
+\begin{definition}{Retrieval protocol messages}\label{def:retrieval-messages}
 
-\subsection{Abstract}
-Every node that fully participates in the Swarm is expected to request, deliver or forward requests for chunk retrievals. This is to be done using a simple p2p protocol that negotiates the delivery of those data chunks.
+\begin{lstlisting}[]
+// /swarm/retrieval/1.0.0/
+syntax = "proto3";
 
-\subsection{Motivation}
-Different Swarm implementations must standardise the way chunk delivery is made. In order for the devp2p protocols on these nodes to correctly negotiate and establish normal operations, the underlying protocol messages and exchange rules must be thoroughly defined. Doing so should pave the way for a simplified reimplementation of Swarm in other clients and languages.
-
-\subsection{Specification}
-<!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for the current Swarm platform and future client implementations.-->
-The Swarm retrieval protocol is defined as a `devp2p` protocol with the following parameters:
-Protocol name:    bzz-retrieve
-Current version:  2
-Max Msg Size:     10 * 1024 * 1024
-
-Types of nodes and their participation in the retrieval protocol:
-1. Bootnode - does not participate in the `bzz-retrieve` protocol
-2. Light node - participates but does not handle retrieve requests (handles ChunkDelivery message and issues RetrieveRequest messages)
-3. Full node - participates fully (issues and handles both RetrieveRequest and ChunkDelivery messages)
-
-Protocol Messages:
-1. ChunkDelivery
-2. RetrieveRequest
-
-The protocol messages are defined in the following manner:
-
-1. RetrieveRequest is the message used to issue a request for a single chunk over the Swarm. When a chunk is not found locally on the node handling the message from the requester, that node is expected to send another
-RetrieveRequest to the node it sees fit in order to get the chunk. In turn, if that node does not find the chunk, another RetrieveRequest is expected to happen and so forth until the chunk is found.
-Once a chunk is found, it is sent back to the requesting node which in turn forwards the chunk back to the node which requested it etc, until the whole cascade of requests is resolved with the delivery of the
-wanted chunk to the original requester of the chunk.
-
-The definition of the RetrieveRequest message:
-```go
-type RetrieveRequest struct {
-	Ruid uint
-	Addr storage.Address
+message Request {
+    bytes Addr = 1;
 }
-```
 
-The RetrieveRequest defines two fields:
-a. Ruid - a unique, random `uint32` generated on the requesting node to associate a certain requested chunk with a node
-b. Addr - a 32-byte chunk hash to retrieve
-
-2. ChunkDelivery is used in order to deliver chunks over the Swarm. It is the cornerstone of every bit that should be delivered over Swarm. Each ChunkDelivery message represents a delivery of one discrete chunk.
-A ChunkDelivery must always be preceded by a RetrieveRequest message. This mitigates the risk of misbehaving nodes spamming other nodes with unwanted content, causing their local storage to be
-filled with unsolicited content.
-
-The definition of the ChunkDelivery message:
-```go
-type ChunkDelivery struct {
-	Ruid  uint
-	Addr  storage.Address
-	SData []byte
+message Delivery {
+    bytes Data = 1;
 }
-```
 
-The ChunkDelivery message defines 3 fields:
-a. Ruid - a unique, random `uint32` that corresponds to the Ruid of the incoming RetrieveRequest message for which the ChunkDelivery was sent.
-b. Addr - the 32-byte chunk address of the delivered chunk
-c. SData - an arbitrary byte array containing the chunk data
+\end{lstlisting}
+\end{definition}
 
 
-Notes:
-1. The requester node \textit{MUST} check that a Ruid on an incoming ChunkDelivery message exists for the specific peer from which the chunk was delivered. If the given Ruid cannot be found - that peer should be treated as a misbehaving node and should be dropped
-2. The requester node \textit{MUST} check that the address on an incoming ChunkDelivery is identical to the requested chunk address that is associated with the request's unique identifier (Ruid). If the chunk addresses do not match - that node should be treated as a misbehaving node and should be dropped
-3. The requester node \textit{MUST} verify that the content of the delivered chunk, after hashing, corresponds to the requested chunk address. If the hashes do not match - the node from which the chunk delivery was received should be treated as a misbehaving node and should be dropped.
+
+% \subsection{Simple Summary \statusorange}
+% Standardisation of the bzz-retrieve protocol which allows for nodes to issue requests for content addressed data and for their counterparts to deliver that content
+
+% \subsection{Abstract \statusorange}
+% Every node that fully participates in the Swarm is expected to request, deliver or forward requests for chunk retrievals. This is to be done using a simple p2p protocol that negotiates the delivery of those data chunks.
+
+% \subsection{Motivation \statusorange}
+% Different Swarm implementations must standardise the way chunk delivery is made. In order for the devp2p protocols on these nodes to correctly negotiate and establish normal operations, the underlying protocol messages and exchange rules must be thoroughly defined. Doing so should pave the way for a simplified reimplementation of Swarm in other clients and languages.
+
+% \subsection{Specification \statusorange}
+% <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for the current Swarm platform and future client implementations.-->
+% The Swarm retrieval protocol is defined as a `devp2p` protocol with the following parameters:
+% Protocol name:    bzz-retrieve
+% Current version:  2
+% Max Msg Size:     10 * 1024 * 1024
+
+% Types of nodes and their participation in the retrieval protocol:
+% 1. Bootnode - does not participate in the `bzz-retrieve` protocol
+% 2. Light node - participates but does not handle retrieve requests (handles ChunkDelivery message and issues RetrieveRequest messages)
+% 3. Full node - participates fully (issues and handles both RetrieveRequest and ChunkDelivery messages)
+
+% Protocol Messages:
+% 1. ChunkDelivery
+% 2. RetrieveRequest
+
+% The protocol messages are defined in the following manner:
+
+% 1. RetrieveRequest is the message used to issue a request for a single chunk over the Swarm. When a chunk is not found locally on the node handling the message from the requester, that node is expected to send another
+% RetrieveRequest to the node it sees fit in order to get the chunk. In turn, if that node does not find the chunk, another RetrieveRequest is expected to happen and so forth until the chunk is found.
+% Once a chunk is found, it is sent back to the requesting node which in turn forwards the chunk back to the node which requested it etc, until the whole cascade of requests is resolved with the delivery of the
+% wanted chunk to the original requester of the chunk.
+
+% The definition of the RetrieveRequest message:
+% ```go
+% type RetrieveRequest struct {
+% 	Ruid uint
+% 	Addr storage.Address
+% }
+% ```
+
+% The RetrieveRequest defines two fields:
+% a. Ruid - a unique, random `uint32` generated on the requesting node to associate a certain requested chunk with a node
+% b. Addr - a 32-byte chunk hash to retrieve
+
+% 2. ChunkDelivery is used in order to deliver chunks over the Swarm. It is the cornerstone of every bit that should be delivered over Swarm. Each ChunkDelivery message represents a delivery of one discrete chunk.
+% A ChunkDelivery must always be preceded by a RetrieveRequest message. This mitigates the risk of misbehaving nodes spamming other nodes with unwanted content, causing their local storage to be
+% filled with unsolicited content.
+
+% The definition of the ChunkDelivery message:
+% ```go
+% type ChunkDelivery struct {
+% 	Ruid  uint
+% 	Addr  storage.Address
+% 	SData []byte
+% }
+% ```
+
+% The ChunkDelivery message defines 3 fields:
+% a. Ruid - a unique, random `uint32` that corresponds to the Ruid of the incoming RetrieveRequest message for which the ChunkDelivery was sent.
+% b. Addr - the 32-byte chunk address of the delivered chunk
+% c. SData - an arbitrary byte array containing the chunk data
+
+
+% Notes:
+% 1. The requester node \textit{MUST} check that a Ruid on an incoming ChunkDelivery message exists for the specific peer from which the chunk was delivered. If the given Ruid cannot be found - that peer should be treated as a misbehaving node and should be dropped
+% 2. The requester node \textit{MUST} check that the address on an incoming ChunkDelivery is identical to the requested chunk address that is associated with the request's unique identifier (Ruid). If the chunk addresses do not match - that node should be treated as a misbehaving node and should be dropped
+% 3. The requester node \textit{MUST} verify that the content of the delivered chunk, after hashing, corresponds to the requested chunk address. If the hashes do not match - the node from which the chunk delivery was received should be treated as a misbehaving node and should be dropped.
 

@@ -1,12 +1,14 @@
 The \gloss{hive protocol} enables nodes to exchange information about other peers that are relevant to them in order to bootstrap their connectivity  (see \ref{sec:bootstrapping}) . The information communicated are both overlay and underlay addresses of the known remote peers (see  \ref{spec:format:bzzaddress}). The overlay address serves to select peers to achieve the connectivity pattern needed for the desired network topology. Underlay address is needed to establish the peer connections by dialing selected peers.
 
-\subsection{Streams and messages}
+\subsection{Streams and messages \statusgreen}
 
 The protocol specifies two streams with two messages:
 
-\begin{lstlisting}[basicstyle=\ttfamily]
+\begin{definition}{Hive protocol messages}\label{def:hive-messages}
+
+\begin{lstlisting}
 // /swarm/hive/1.0.0/peers
-// /swarm/hive/1.0.0/peers\_notification
+// /swarm/hive/1.0.0/peers_notification
 syntax = "proto3";
 
 message GetPeers {
@@ -23,45 +25,44 @@ message BzzAddress {
     bytes Underlay = 2;
 }
 \end{lstlisting}
+\end{definition}
 
-Connected nodes can request information about peers belonging to a proximity order in order to achieve optimal saturation. This can be done any time during the lifetime of the connection by sending \texttt{GetPeers} message over the \texttt{/swarm/hive/1.0.0/peers} stream, and receiving the list of known peers encoded in the \texttt{Peers} message as a response.
+Connected nodes can request information about peers belonging to a proximity order in order to achieve optimal saturation. This can be done any time during the lifetime of the connection by sending \lstinline{GetPeers} message over the \lstinline{/swarm/hive/1.0.0/peers} stream, and receiving the list of known peers encoded in the \lstinline{Peers} message as a response.
 
-During the lifetime of connection, nodes can broadcast newly received peers to their peers. This is done by sending the \texttt{Peers} message over the \texttt{/swarm/hive/1.0.0/peers\_notification} stream.
+During the lifetime of connection, nodes can broadcast newly received peers to their peers. This is done by sending the \lstinline{Peers} message over the \\\lstinline{/swarm/hive/1.0.0/peers_notification} stream.
 
-All new (previously not known) peers found in the \texttt{Peers} message received from either of the two streams as well as newly connected peers that dialled in should be automatically broadcast to all connected peers that are closer  to them than the node's base overlay address. Formally, 
-node $s$ (sender) notifies an existing peer $r$ (recipient) about peer $p$ if $\mathit{PO}(s, r) = \mathit{PO}(s, p)$. 
 
 Upon receiving a peers message, nodes are meant to store the peer information in their \gloss{address book}, i.e., a data structure containing info about peers known to the node. The address book is meant to be used to suggest peers  to a connectivity manager according to a connection strategy (\ref{spec:strategy:connection}) in order to bootstrap kademlia topology (\ref{sec:kademlia-connectivity}). The address book is meant to be persisted across sessions.
 
-\subsection{Fetching peers}
+\subsection{Fetching peers \statusgreen}
 
-This is a request/response communication that is happening over the \texttt{/swarm/hive/1.0.0/peers} stream. On each request, a new stream is created with the appropriate id, and after the response is received, the stream should be closed by both sides.
+This is a request/response communication that is happening over the \lstinline{/swarm/hive/1.0.0/peers} stream. On each request, a new stream is created with the appropriate id, and after the response is received, the stream should be closed by both sides.
 
 \subsubsection{Requesting side}
 
-The requesting side creates a stream and sends \texttt{GetPeers} message and waits for the \texttt{Peers} message as a response. The \texttt{bin} field in the message specifies the proximity order bin that the sender is interested in finding peers for. The \texttt{limit} field can be used to limit the maximum number of peers in the response. A size of 0 means that there is no limit. 
+The requesting side creates a stream and sends \lstinline{GetPeers} message and waits for the \lstinline{Peers} message as a response. The \lstinline{bin} field in the message specifies the proximity order bin that the sender is interested in finding peers for. The \lstinline{limit} field can be used to limit the maximum number of peers in the response. A size of 0 means that there is no limit. 
 
 After the response is received, requesting node should close its side of the stream to let the other side know that response is read, and move on to processing the response. Each new peer (that is not previously known) received should be broadcast to all peers that are closer to them than the node itself.
 
 \subsubsection{Responding side}
 
-When the stream is created, responding side should wait for a \texttt{GetPeers} request with bin $b$ and limit $l$ and acts on the request appropriately: information about at most $l$ connected peers that have proximity order $p$ with the requesting peer are found and is wrapped in a \texttt{Peers} message that is sent as a response.
+When the stream is created, responding side should wait for a \lstinline{GetPeers} request with bin $b$ and limit $l$ and acts on the request appropriately: information about at most $l$ connected peers that have proximity order $p$ with the requesting peer are found and is wrapped in a \lstinline{Peers} message that is sent as a response.
 
 Nodes should keep track of peer info they already sent to other peers, or received it from, in order to avoid  duplicate or even circular peers notifications.
 
 After the response is sent, this node should wait for requesting node to close its side of the stream before closing the stream themselves and moving on.
 
-\subsection{Sending peers notifications}
+\subsection{Sending peers notifications \statusgreen}
 
-This is a notification style communication that is happening over the \texttt{/swarm/hive/1.0.0/peers\_notification} stream. Nodes should send info about each newly found or connected peer to all connected peers that are closer. Nodes should keep track of peer info they already sent to other peers, or received it from, in order to avoid  duplicate or even circular peers notifications.
+This is a notification style communication that is happening over the\\ \lstinline{/swarm/hive/1.0.0/peers_notification} stream. Nodes should send info about each newly found or connected peer to all connected peers that are closer. Nodes should keep track of peer info they already sent to other peers, or received it from, in order to avoid  duplicate or even circular peers notifications.
 
 \subsubsection{Sending side}
 
-A stream with the appropriate id is created and a \texttt{Peers} message is sent over the stream. There is no response to this message. The sending node should wait for the receiving side to close its side of the stream, before closing the stream themselves and moving on.
+A stream with the appropriate id is created and a \lstinline{Peers} message is sent over the stream. There is no response to this message. The sending node should wait for the receiving side to close its side of the stream, before closing the stream themselves and moving on.
 
 \subsubsection{Receiving side}
 
-When the stream is created, receiving node should wait for a \texttt{Peers} message. After receiving the message, node should close its side of the stream to let the sender node know that the message was received, and move on with processing. If the new node was not known, it should also be forwarded to all connected peers closer to peer address then the node themselves.
+When the stream is created, receiving node should wait for a \lstinline{Peers} message. After receiving the message, node should close its side of the stream to let the sender node know that the message was received, and move on with processing. If the new node was not known, it should also be forwarded to all connected peers closer to peer address then the node themselves.
 
 
 

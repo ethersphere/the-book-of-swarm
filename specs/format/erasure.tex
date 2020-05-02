@@ -1,0 +1,25 @@
+
+Erasure coding interface provides wrappers \lstinline{extend/repair} for the encoder/decoder that work directly on a list of chunks.%
+%
+\footnote{Cauchy-Reed-Solomon erasure codes based on \url{https://github.com/klauspost/reedsolomon}.
+}
+
+Assuming $n$ out of $m$ coding.
+\lstinline{extend} takes a list of $n$ data chunks and an argument for the number of required parities. It returns the parity chunks only.
+\lstinline{repair} takes a list of $m$ chunks (extended with \emph{all} parities) and an argument for the number of parities $p=m-n$, that designate the last $p$ chunks as parity chunks. It returns the list of $n$ repaired data chunks only.
+The encoder does not know which parts are invalid, so missing or invalid chunks should be set to \lstinline{nil} in the argument to repair.
+If parity chunks are needed to be repaired, you call \lstinline{repair @chunks with @parities; extend with @parities}
+
+\begin{definition}{CRS erasure code interface definition}\label{def:crs}
+\begin{lstlisting}[language=buzz1]
+
+define function extend []chunk as @chunks
+    with @parities uint
+    return [@parities]chunk
+
+define function repair []chunk as @chunks  
+    with @parities uint
+   return [@chunks length - @parities]chunk
+
+\end{lstlisting}
+\end{definition}

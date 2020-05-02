@@ -1,0 +1,106 @@
+Manifests represent a mapping of strings to references (see \ref{sec:collections}). The primary purpose is to implement document collections (websites) on swarm and enable URL-based addressing of content. This section defines the data structures relevant for manifests as well as the algorithms for lookup and update which implement the manifest API (see \ref{sec:manifests-ux} and \ref{spec:api:manifest}).
+
+A manifest entry can be conceived of as metadata about a file pointed to and retrievable by its reference (see \ref{spec:format:files}). The metadata is quite diverse, ranging from information needed for access control, file information similar to one given on file systems, information needed for erasure coding (see \ref{sec:erasure}, \ref{sec:headers} and \ref{spec:format:erasure}), information for browser, i.e.,  response headers such as content type (MIME info) and most importantly the reference to the file. Using manifests as simple key-value store is exemplified by access control (see \ref{sec:access-control}, \ref{sec:access-control-ux} for discussion as well as \ref{spec:format:access-control} and \ref{spec:api:access-control} for the specification).
+
+\begin{definition}{manifest entry}\label{def:manifest-entry}
+\begin{lstlisting}[language=buzz1]
+// /swarm/manifest
+
+// manifest entry encodes attributes 
+define type entry 
+    info                 // FS file/dir info
+    access.control/info  // access conrrol info
+    crs/info             // erasure coding - CRS params
+    reference            // reference
+
+define type info
+    content.type  [32]byte
+
+\end{lstlisting}
+\end{definition}
+
+\begin{definition}{manifest data structure}\label{def:manifests}
+\begin{lstlisting}[language=buzz1]
+// /swarm/manifest
+
+define type node 
+    entry  *entry          // reference to chunk serialised as entry
+    forks  [<<256]fork     // sparse array of max 256 fork
+
+// fork encodes a branch
+define type fork 
+    prefix segment   // compaction 
+    node   *node     // reference to chunk serialised as node
+
+// manifest entry encodes attributes 
+define type entry 
+    info                 // FS file/dir info
+    access.control/info  // access conrrol info
+    crs/info             // erasure coding - CRS params
+    reference            // reference
+
+define type info
+    content.type  segment
+
+\end{lstlisting}
+\end{definition}
+
+\begin{definition}{manifest path lookup}\label{def:manifests-lookup}
+\begin{lstlisting}[language=buzz1]
+// /swarm/manifest
+
+define function lookup *node
+    on @path []byte
+as 
+    @context access.control = @node entry access.control 
+    // manifest is  a compacted trie
+    @fork = @node forks at head @path 
+    // if @path empty, the  paths matched return the entry
+    if no @path then 
+        return @node entry
+
+    if @fork prefix is prefix of @path then // including == 
+      return self @fork node 
+        on @path from @fork prefix length
+
+   fail with "not found"
+
+\end{lstlisting}
+\end{definition}
+
+
+\begin{definition}{manifest update}\label{def:manifest-update}
+\begin{lstlisting}[language=buzz1]
+define function add reference  
+    to *node 
+    on @path []byte 
+as
+    // if called on nil call on zero value
+    if no @node then 
+        self @reference to node{} on @path
+        return
+
+    // if empty path then change entry field of node
+    if no @path then
+        @node entry = @reference
+        @node store 
+            return
+
+    // lookup the fork based on the first byte of path
+    @fork = @node forks at head @path
+    // if no fork yet, add the singleton node 
+    if no @fork then
+        @node forks at head @path =
+            fork{@path, store node{@reference as entry}}
+        @node store 
+            return
+
+    @common = prefix of @path and @fork prefix // common cannot be empty
+    @rest = @fork prefix from @common length
+    @newnode = node{}
+    @newnode forks at head @rest = fork{@rest, @fork node}
+    @midnode = self @reference to @newnode on @path from @common length 
+    @node forks at head @path = fork{ @midnode, @common } 
+    @node store
+\end{lstlisting}
+\end{definition}

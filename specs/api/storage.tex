@@ -1,0 +1,61 @@
+
+All URIs are relative to \emph{http://localhost:8500/bzz/}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+Method & HTTP request & Description\tabularnewline
+\midrule
+\endhead
+\href{DefaultApi.md\#bzzUploadFile}{\textbf{bzzUploadFile}} &
+\textbf{POST} /upload & Swarm Upload API\tabularnewline
+\bottomrule
+\end{longtable}
+
+\# \textbf{bzzUploadFile} \textgreater{} Object
+bzzUploadFile(SWARMPOSTAGESUBSCRIPTION, SWARMTAG, SWARMENCRYPTED,
+SWARMPIN, SWARMCRSPARITY, file)
+
+Swarm Upload API
+
+\hypertarget{parameters}{%
+\subsubsection{Parameters}\label{parameters}}
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+Name & Type & Description & Notes\tabularnewline
+\midrule
+\endhead
+\textbf{SWARMPOSTAGESUBSCRIPTION} & \textbf{String} & & {[}default to
+null{]}\tabularnewline
+\textbf{SWARMTAG} & \textbf{String} & & {[}optional{]} {[}default to
+null{]}\tabularnewline
+\textbf{SWARMENCRYPTED} & \textbf{String} & & {[}optional{]} {[}default
+to null{]}\tabularnewline
+\textbf{SWARMPIN} & \textbf{Boolean} & & {[}optional{]} {[}default to
+null{]}\tabularnewline
+\textbf{SWARMCRSPARITY} & \textbf{String} & & {[}optional{]} {[}default
+to null{]}\tabularnewline
+\textbf{file} & \textbf{List} & & {[}optional{]} {[}default to
+null{]}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{return-type}{%
+\subsubsection{Return type}\label{return-type}}
+
+\href{..//Models/object.md}{\textbf{Object}}
+
+\hypertarget{authorization}{%
+\subsubsection{Authorization}\label{authorization}}
+
+No authorization required
+
+\hypertarget{http-request-headers}{%
+\subsubsection{HTTP request headers}\label{http-request-headers}}
+
+\begin{itemize}
+\item
+  \textbf{Content-Type}: multipart/form-data, file, application/x-tar
+\item
+  \textbf{Accept}: application/json, application/problem+json
+\end{itemize}%

@@ -1,0 +1,145 @@
+
+\subsection{Recovery chunks \statusyellow}\label{sec:recovery-chunks}
+
+
+In what follows we describe a simple protocol for notifying pinners about the loss of a chunk which they can react to by (1) reuploading said chunk to the network and at the same time (2) responding to notifier by delivering to them the missing chunk. For this, we first introduce the concept of \gloss{recovery chunk} (the recovery chunk scheme is formalised in \ref{spec:format:recovery}).
+
+A recovery chunk is essentially a hijacked version of a content addressed chunk relocated to the pinner's area of responsibility. This hijacking is made possible by wrapping the chunk in a single owner chunk with a specially mined address. This address can be constructed by anyone uploader, recovery hosts and downloaders based on some information shared.
+If recovery chunks are distributed among willing hosts (pinners), then downloaders not finding a chunk can  fall back to requesting it through a recovery address.
+This procedure is called \gloss{missing chunk notification protocol}.
+
+\subsubsection{Recovery address}
+ 
+A recovery chunk is single owner chunk (see \ref{sec:single-owner-chunks}) that has a  
+
+\begin{itemize}
+\item \emph{payload} -- the original content addressed chunk.
+\item \emph{owner} -- the uploader/publisher
+\item \emph{identifier} -- constructed by hashing together a topic and an index.
+\item \emph{topic} -- the original chunk address.
+\item \emph{index} -- arbitrary nonce. \end{itemize}
+
+
+
+A recovery chunk is meant to be stored by a willing pinner, called \gloss{host} in a way that the chunk is retrievable by its address from them in the usual way. Therefore, the index must be chosen so that the chunk's address falls in the area of responsibility of its host. 
+On the other hand, selecting the index should follow a procedure that is both deterministic and consensual, so that the recovery addresses are available to third parties who wish to retrieve the chunk, see figure \ref{fig:recovery-chunk}.
+
+\begin{figure}[htbp]
+  \centering
+  \caption[Recovery chunk \statusred]{Recovery chunk}
+  \label{fig:recovery-chunk}
+\end{figure}
+
+\subsubsection{Mining the recovery chunks}
+
+
+The uploader is assumed to have the following:
+
+\begin{itemize}
+\item \lstinline{publisher key-pair} -- used as the owner of the recovery chunk.
+\item \lstinline{hosts} -- the hosts (aka pinners) overlay addresses to match recovery addresses against. The addresses can be partial, i.e., the prefix of the host overlay. 
+\item \lstinline{host proximity} -- The minimum number of initial bits shared by the recovery address and a recovery host overlay.%
+%
+\footnote{It makes sense to use the postage lottery batch depth for what is the correct depth. This can be looked up at the time of publishing using an accessor of the postage stamp smart contract.}
+%
+It expresses the required proximity needed to land the address in a host's neighbourhood. 
+\item \lstinline{redundancy level} -- The number of recovery chunks created for each original chunk. This count must not be greater than the number of hosts.
+\end{itemize}
+
+The uploader iteratively increments an integer starting from 0 to find an index which, alongside their public key as  owner, the original address as topic, is used to generate candidate recovery chunk addresses. 
+The first address that fall within the proximity of any pinner is recorded.
+
+The uploader can create multiple recovery addresses for a chunk stored and pinned by different hosts. This redundancy serves to protect against pinners going offline, being attacked or not responding for any other reason.
+
+Depending on the redundancy level, uploader can continue the iteration until sufficient number of recovery addresses are found. Each recovery address must be in the proximity of a distinct host.
+
+
+This signature signs off on the recovery identifier and the original chunk address. This signature makes it possible to put the original chunk content as the payload of the recovery chunk, the wrapped proxy to the original chunk hijacked to the neighbourhood of the pinner. Since the single owner of the recovery chunk is the publisher, pinners are unable to construct an invalid recovery chunk.
+But it also means that in order for pinners to construct and deliver recovery chunks, they need the signature from the publisher. 
+ 
+
+
+For each recovery address found, the uploader produces the signature that the host will need to assemble the recovery chunk. The recovery identifier hashed together with the original chunk  address needs to be signed by the owner. The original chunk address, the index and the signature together constitute the \gloss{recovery chunk info} needed by the host to reconstruct the recovery chunk, see figure \ref{fig:recovery-chunk-info}.
+
+\begin{figure}[htbp]
+  \centering
+  \caption[Recovery chunk info \statusred]{Recovery chunk info}
+  \label{fig:recovery-chunk-info}
+\end{figure}
+
+\subsubsection{Creating recovery chunks}
+
+When providing recoverability for content, the uploader is assumed to have the list of willing pinners wanting to serve recovery chunks of the content. 
+
+As the file/collection is traversed, for each chunk, the recovery chunk info is created and recorded per pinner. Once there is sufficient number of recovery chunk info, the publisher packages them sends them to the pinner.%
+%
+\footnote{Given $n$ chunks in the original published content, $p$ pinners and redundancy factor $r$, a pinner will need to host on average $\frac{rn}{p}$ chunks.}
+%
+
+Since the original chunk address is stored by the host, they find the matching original if it matches the address  only partially. The index can thus be stored on the last 4 bytes of the chunk address and convey all info needed to get the recovery identifier. 
+
+Overall, the 32 bytes of chunk address + index and 65 bytes of signature take 97 bytes to store. A chunk therefore can hold 42 of these recovery infos, which are packaged per pinner and published as a simple feed. The feed is owned by the publisher and uses the root pin hashed with the pinner address as the topic, see figure \ref{fig:recovery-info-chunk}.
+This scheme incurs 1/42 storage and bandwidth overhead (2.38\%).%
+%
+\footnote{Surely, this only refers to the overhead of the recovery chunk distribution.
+}
+
+
+\begin{figure}[htbp]
+  \centering
+  \caption[Recovery info chunk \statusred]{Recovery info chunk packages 42 recovery infos}
+  \label{fig:recovery-info-chunk}
+\end{figure}
+
+ 
+\subsubsection{The pinners}
+
+Pinners that are willing to serve recovery chunks for a piece of content are supposed to have indicated this to the  publisher and have downloaded all the chunks and have them pinned. They then construct the recovery chunk info feed addresses constructed as the hash of the publisher public key as owner and the hash of the root pin and the host public key as topic and using incrementing integers as index. Retrieving feed chunks with these addresses, the pinner downloads the recovery chunk infos.
+In order to create a recovery chunk, the pinner needs:
+
+\begin{itemize}
+\item \emph{original chunk address} -- as pinners pin the content, they have the original chunk, the partial chunk address as part of the recovery info can be used to match the full address.
+\item \emph{original chunk data} -- download from Swarm knowing the root of the pinned content.
+\item \emph{recovery index} -- knowing the other pinners this could be calculated but it is extracted from the last 4 bytes of the original chunk address field in the recovery info. 
+\item \emph{recovery identifier} -- the hash of the chunk address and the recovery index.
+\item \emph{signature} -- extracted from the recovery info. Can be validated knowing both the publisher public key as well as the plaintext, i.e., the hash of the intended payload hash (original chunk address) and the recovery identifier.
+\item \emph{recovery address} -- calculated as the hash of the owner and recovery identifier.
+\end{itemize}
+
+Pinners store the recovery chunks in their local store (see figure \ref{fig:recovery-chunk-storage}), %
+%.
+\footnote{In order not to store the chunk data twice, pinner could just reference the original chunk in the recovery chunk entry in their localstore.}  so they can respond to retrieve requests with the recovery address.
+
+\begin{figure}[htbp]
+  \centering
+  \caption[Missing chunk notification process \statusred]{Missing chunk notification process}
+  \label{fig:missing-chunk-notification}
+\end{figure}
+
+The missing chunk notification protocol including procedures followed by publisher, pinners and downloader is specified in detail in  \ref{spec:protocol:missing-chunk-notification}.
+
+
+\subsubsection{Missing chunks}
+
+If the manifest entry for the file has the \lstinline{recovery} attribute set, it means that in case a chunk is found missing, we can fall back on the missing chunk notification protocol (see \ref{sec:reupload}). The value of the \lstinline{recory} attribute is a structure specifying parameters required by the missing chunk notification protocol:
+
+\begin{itemize}
+\item \emph{pinners} -- Reference to the root of the data structure representing the set of pinner addresses. 
+\item \emph{publisher} -- Public key of the publisher needed to create the recovery chunk addresses.
+\item \emph{depth} -- The minimum length of the prefix common to the recovery address and a pinner.  
+\end{itemize}
+
+When a chunk request times out, the client can start finding  the recovery address using the set of pinners (see \ref{spec:format:recovery}), the publisher's public key and the depth. Once a recovery address is found, it is sent as a retrieve request to Swarm. If this times out, the next recovery address is tried using a different pinner node. This is repeated until the recovery chunk arrives or all the pinners and insurers are exhausted.
+
+\begin{figure}[htbp]
+  \centering
+  \caption[Recovery chunk storage \statusred]{Recovery chunk storage}
+  \label{fig:recovery-chunk-storage}
+\end{figure}
+
+
+\subsection{Missing chunk notification \statusyellow}\label{sec:missing-chunk-notifications}
+
+Since the recovery chunk addresses are deterministically and consensually derived, any downloader can regenerate them following the same procedure as the publisher originally as long as the necessary information is available to them. This includes the chunk address, the publisher's public key and (the prefix of) the pinners' addresses as well as the host proximity and redundancy level used. As a fallback strategy after retrieval of the original chunk timed out, downloaders can simply send the first recovery address as retrieve request to Swarm (see \ref{sec:download}).
+
+By construction, the recovery address matches one of the pinners' address on a prefix comfortably longer than the pinner's neighbourhood depth. Therefore the pinner will end up receiving the retrieve request. When the pinner looks up the request, they find the recovery chunk and (1) they immediately deliver it to the peer the request came from, and (2) they repair the network, i.e., restore universal retrievability by reuploading the missing original chunk to Swarm (see figure \ref{fig:missing-chunk-notification}).  If the downloader's recovery request times out, they can still try with the second recovery address until all recovery addresses as specified by the redundancy level have been exhausted. Unless all the $r$ pinners serving the recovery chunks fail to respond, recovery will be successful. This process is called the \gloss{missing chunk notification protocol}.

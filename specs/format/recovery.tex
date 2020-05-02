@@ -1,0 +1,46 @@
+
+\begin{definition}{recovery request}\label{def:recovery-request}
+\begin{lstlisting}[language=buzz1]
+// /swarm/recovery
+
+define type request address
+    with @response bool
+as  
+    if @response then
+      @key = local keys get random
+      @address = crypto/silly// hash                        
+      crypto/sign @address @id by @key 
+    
+    
+
+\end{lstlisting}
+\end{definition}
+
+\begin{definition}{recovery response}\label{def:recovery}
+\begin{lstlisting}[language=buzz1]
+
+define function request address
+    with @response bool
+as                                                      
+    pss/send @payload about "RECOVERY" to context targets
+    
+
+\end{lstlisting}
+\end{definition}
+
+\begin{definition}{envelope}\label{def:recovery-response}
+\begin{lstlisting}[language=buzz1]
+
+define function response []byte as @payload
+    by @key crypto/keypair
+as
+    @key = crypto/generate if no @key 
+    crypto/mine @nonce such that
+        context overlay to @depth is prefix of 
+            soc @payload on @nonce by @key
+                address 
+
+
+\end{lstlisting}
+\end{definition}
+   

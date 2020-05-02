@@ -1,0 +1,165 @@
+\lstdefinelanguage[2]{protobuf}{%
+    sensitive=true,%
+    morecomment=[l]{//},%
+    morecomment=[s]{/*}{*/},%
+    morestring=[b]{"},%
+    % For the keywords of Protocol Buffers
+    % see https://developers.google.com/protocol-buffers/docs/proto
+    morekeywords={enum,oneof,map,syntax,public,import,option,package,message,%
+        group,optional,required,repeated,default,reserved,extend,extensions,%
+        to,max,service,rpc,returns,true,false},%
+    % Basic types
+    % see https://developers.google.com/protocol-buffers/docs/proto#scalar
+    morekeywords=[2]{%
+        double,float,int32,int64,uint32,uint64,sint32,sint64,%
+        fixed32,fixed64,sfixed32,sfixed64,bool,string,bytes},%
+    % Options
+    % taken from 'google/protobuf/descriptor.proto'
+    morekeywords=[3]{%
+        % Generic Options
+        deprecated, uninterpreted_option,%
+        % File Options
+        java_package,java_outer_classname,java_multiple_files,%
+        java_generate_equals_and_hash,java_string_check_utf8,optimize_for,%
+        go_package,cc_generic_services,java_generic_services,%
+        py_generic_services,cc_enable_arenas,obj_class_prefix,%
+        csharp_namespace,%
+        % Message Options
+        message_set_wire_format,no_standard_descriptor_accessor,map_entry,%
+        % Field Options
+        ctype, packed,jstype,lazy,weak,%
+        % Enum Options
+        allow_alias}%
+}
+\lstalias[]{protobuf2}[2]{protobuf}
+
+\lstdefinelanguage[3]{protobuf}[2]{protobuf}{%
+    % Language keywords
+    % see https://developers.google.com/protocol-buffers/docs/proto3
+    deletekeywords={
+        % 'group' was marked as deprecated in protobuf2; now it's disallowed
+        group,%
+        % in protobuf3 the Any type replaces extensions (from protobuf2)
+        extensions, to, extend, max,%
+        % 'required' is no longer allowed
+        required,%
+        % 'optional' is default; stating it explicitly is disallowed
+        optional,%
+        % explicit default values are no longer allowed
+        default}%
+}
+\lstalias[]{protobuf3}[3]{protobuf}
+
+
+\usepackage{xcolor}
+\usepackage{xcolor-solarized}
+\usepackage{textcomp}
+
+\newcommand{\SetProtoColorsSolarized}{
+  % Colors taken from the 'solarized' color scheme of Ethan Schoonover
+  % (with light background)
+  % http://ethanschoonover.com/solarized
+  \colorlet{proto_basic}{solarized-base00}
+  \colorlet{proto_keyword}{solarized-cyan}
+  \colorlet{proto_type}{solarized-cyan}
+  \colorlet{proto_options}{solarized-cyan}
+  \colorlet{proto_comment}{solarized-base1}
+  \colorlet{proto_string}{solarized-blue}
+  \colorlet{proto_number}{solarized-violet}
+  \colorlet{proto_ident}{solarized-base00}
+  \colorlet{proto_digits}{solarized-violet}
+  \colorlet{proto_background}{solarized-base3}
+}
+
+\newcommand{\SetProtoColorsBlueish}{
+  % Colors inspired by the NASM style of Robin Eklind
+  % https://github.com/mewspring/latex
+  \definecolor{proto_basic}{RGB}{0,0,0}             % black
+  \definecolor{proto_keyword}{RGB}{0,0,255}         % blue
+  \definecolor{proto_type}{RGB}{128,0,0}            % dark red
+  \definecolor{proto_options}{RGB}{128,0,128}       % purple
+  \definecolor{proto_comment}{RGB}{0,128,0}         % dark green
+  \definecolor{proto_string}{RGB}{255,0,0}          % red
+  \definecolor{proto_number}{RGB}{108,113,196}      % violet
+  \definecolor{proto_ident}{RGB}{0,0,0}             % black
+  \definecolor{proto_digits}{RGB}{0,0,128}          % dark blue
+  \definecolor{proto_background}{RGB}{255,255,255}  % white
+}
+
+\newcommand{\SetProtoColorsTomorrow}{
+  % Colors taken from the 'Tomorrow' color scheme of Chris Kempson
+  % https://github.com/chriskempson/tomorrow-theme/blob/master/vim/colors/Tomorrow.vim
+  \definecolor{proto_basic}{RGB}{77, 77, 76}          % dark grey
+  \definecolor{proto_keyword}{RGB}{245, 135, 31}      % orange
+  \definecolor{proto_type}{RGB}{66, 113, 174}         % purple
+  \definecolor{proto_options}{RGB}{137, 89, 168}
+  \definecolor{proto_comment}{RGB}{142, 144, 140}
+  \definecolor{proto_string}{RGB}{113, 140, 0}        % green
+  \definecolor{proto_number}{RGB}{137, 89, 168}
+  \definecolor{proto_ident}{RGB}{200, 40, 41}         % red
+  \definecolor{proto_digits}{RGB}{245, 135, 31}       % orange
+  \definecolor{proto_background}{RGB}{255, 255, 255}  % white
+}
+
+% \SetProtoColorsSolarized{}
+% \SetProtoColorsTomorrow{}
+\SetProtoColorsBlueish{}
+
+\lstdefinestyle{protobuf}{
+  frame=lines,
+  xleftmargin=\parindent,
+  belowcaptionskip=1\baselineskip,
+  backgroundcolor=\color{proto_background},
+  basicstyle=\color{proto_basic}\footnotesize\ttfamily,
+	keywordstyle=[1]\color{proto_keyword},
+	keywordstyle=[2]\color{proto_type},
+	keywordstyle=[3]\color{proto_options},
+	commentstyle=\color{proto_comment},
+	stringstyle=\color{proto_string},
+  numberstyle=\color{proto_number}\tiny,
+  identifierstyle=\color{proto_ident},
+	numbers=left,
+	numbersep=5pt,
+	breaklines=true,
+	showstringspaces=false,
+	tabsize=2,
+  % This 'literate' block is responsible for colouring numbers
+  % appearing in the code
+  literate={0}{{\textcolor{proto_digits}{0}}}{1}%
+           {1}{{\textcolor{proto_digits}{1}}}{1}%
+           {2}{{\textcolor{proto_digits}{2}}}{1}%
+           {3}{{\textcolor{proto_digits}{3}}}{1}%
+           {4}{{\textcolor{proto_digits}{4}}}{1}%
+           {5}{{\textcolor{proto_digits}{5}}}{1}%
+           {6}{{\textcolor{proto_digits}{6}}}{1}%
+           {7}{{\textcolor{proto_digits}{7}}}{1}%
+           {8}{{\textcolor{proto_digits}{8}}}{1}%
+           {9}{{\textcolor{proto_digits}{9}}}{1}%
+           {.0}{{\textcolor{proto_digits}{.0}}}{2}%
+           {.1}{{\textcolor{proto_digits}{.1}}}{2}%
+           {.2}{{\textcolor{proto_digits}{.2}}}{2}%
+           {.3}{{\textcolor{proto_digits}{.3}}}{2}%
+           {.4}{{\textcolor{proto_digits}{.4}}}{2}%
+           {.5}{{\textcolor{proto_digits}{.5}}}{2}%
+           {.6}{{\textcolor{proto_digits}{.6}}}{2}%
+           {.7}{{\textcolor{proto_digits}{.7}}}{2}%
+           {.8}{{\textcolor{proto_digits}{.8}}}{2}%
+           {.9}{{\textcolor{proto_digits}{.9}}}{2}%
+           % We need to add some hacks - otherwise 'listings' would
+           % colour (only) the digits in the types instead of the type
+           {int32}{{\textcolor{proto_type}{int32}}}{5}%
+           {int64}{{\textcolor{proto_type}{int64}}}{5}%
+           {uint32}{{\textcolor{proto_type}{uint32}}}{6}%
+           {uint64}{{\textcolor{proto_type}{uint64}}}{6}%
+           {sint32}{{\textcolor{proto_type}{sint32}}}{6}%
+           {sint64}{{\textcolor{proto_type}{sint64}}}{6}%
+           {fixed32}{{\textcolor{proto_type}{fixed32}}}{7}%
+           {fixed64}{{\textcolor{proto_type}{fixed64}}}{7}%
+           {sfixed32}{{\textcolor{proto_type}{sfixed32}}}{8}%
+           {sfixed64}{{\textcolor{proto_type}{sfixed64}}}{8}%
+           {java_string_check_utf8}{{%
+             \textcolor{proto_options}{java_string_check_utf8}}}{2}%
+           {\ }{{ }}{1},
+	prebreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+	upquote=true,
+}

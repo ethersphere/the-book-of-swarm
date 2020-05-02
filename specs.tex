@@ -1,115 +1,168 @@
 
-The Swarm specification is presented in four chapters. \ref{spec:convention} enlists all the conventions relating data types, formats and processes. Protocols 
-(\ref{spec:protocol}) specify wire protocols: message formats and serialisation and encapsulation are hard requirements that are crucial for  cross client compatibility.
+The Swarm specification is presented in four chapters. \ref{spec:convention} enlists all the conventions relating data types, formats and algorithms. Protocols 
+(\ref{spec:protocol}) specify wire protocols: message formats and serialisation and encapsulation are hard requirements that are crucial for  cross client compatibility. This chapter benefits from \lstinline{protobuf},%
+%
+\footnote{\url{https://developers.google.com/protocol-buffers}}
+%
+which is a generic language-neutral, platform-neutral, extensible mechanism for serializing structured data.
 Strategies (\ref{spec:strategy}) are meant to be recommended  behaviour that is supposed to be aligned with economic incentives.
 Strategies may not be optimal, in some cases, the directions focused on simplicity and ease of reasoning.
-APIs (\ref{spec:api}) gives a formal specification of the high level interfaces of Swarm. Different client implementations are going to be tested against a standard suite of API tests.
+APIs (\ref{spec:api}) gives a formal specification of the high level interfaces of Swarm. Different client implementations are  to be tested against a standard suite of API tests. The API specifications benefit from \lstinline{OpenAPI},%
+%
+\footnote{\url{https://swagger.io/}}
+%
+which is an API description format for REST APIs.
 
 
-\chapter{Convention}\label{spec:convention}
+\chapter{Data types and algorithms}\label{spec:convention}
 
-\red{}
+\orange{}
 \section{Bzz address}\label{spec:format:bzzaddress}
 \input{specs/format/bzzaddress.tex}
-\section{Chunk and Binary Merkle Tree Hash}\label{spec:format:bmt}
+
+\section{Chunks, encryption, BMT hash}
+\subsection{Chunks \statusyellow}\label{spec:format:chunks}
+\input{specs/format/chunks.tex}
+\subsection{Binary Merkle Tree Hash \statusyellow}\label{spec:format:bmt}
 \input{specs/format/bmt.tex}
-\section{Files and the Swarm hash}\label{spec:format:files}
-\input{specs/format/files.tex}
-\section{Manifests}\label{spec:format:manifests}
-\input{specs/format/manifests.tex}
-\section{Erasure coding}\label{spec:format:erasure}
-\input{specs/format/erasure.tex}
-\section{Entanglement coding}\label{spec:format:entanglements}
-%\input{specs/format/entanglement.tex}
-\section{Encryption}\label{spec:format:encryption}
+\subsection{Encryption \statusyellow}\label{spec:format:encryption}
 \input{specs/format/encryption.tex}
-\section{Access Control}\label{spec:format:access-control}
+
+\section{Files, manifests and data structures}\label{spec:format:data-structures}
+\subsection{Files and the Swarm hash \statusyellow}\label{spec:format:files}
+\input{specs/format/files.tex}
+\subsection{Manifests \statusyellow}\label{spec:format:manifests}
+\input{specs/format/manifests.tex}
+\subsection{Erasure coding \statusred}\label{spec:format:erasure}
+\input{specs/format/erasure.tex}
+% \section{Entanglement coding \statusred}\label{spec:format:entanglements}
+%\input{specs/format/entanglement.tex}
+
+\section{Access Control \statusred}\label{spec:format:access-control}
 \input{specs/format/access-control.tex}
-\section{PSS message}\label{spec:format:pss-messsage}
-\input{specs/format/pss-message.tex}
-\section{Resource updates}\label{spec:format:resource-updates}
-%\input{specs/format/resource-updates.tex}
-\section{Zero-leak channels}\label{spec:format:zero-leak-channels}
-%\input{specs/format/zero-leak-channels.tex}
-\section{Time-based feeds}\label{spec:format:time-based-feeds}
-%\input{specs/format/time-based-feeds.tex}
+
+\section{PSS message \statusyellow}\label{spec:format:pss-messsage}
+\input{specs/format/pss.tex}
 \section{Update notifications}\label{spec:format:update-notifications}
 %\input{specs/format/update-notifications.tex}
-\section{Postage stamps}\label{spec:format:postage-stamps}
+
+\section{Chunk recovery  \statusred}\label{spec:format:recovery}
+\input{specs/format/recovery.tex}
+
+\section{Postage stamps \statusorange}\label{spec:format:postage-stamps}
 \input{specs/format/postage-stamps.tex}
-\section{Honey token and multi-chain support}\label{spec:format:honey}
+% \section{Honey token and multi-chain support}\label{spec:format:honey}
 %\input{specs/format/honey.tex}
 
 
-\chapter{Protocol}\label{spec:protocol}
+\chapter{Protocols}\label{spec:protocol}
 
-\section{Introduction}\label{spec:protocol:intro}
-\green{}
+\section{Introduction \statusorange}\label{spec:protocol:intro}
 \input{specs/protocol/protocols.tex}
-\section{Bzz  handshake protocol}\label{spec:protocol:bzz}
-\green{}
+
+\section{Swarm protocol basics\statusgreen}\label{spec:protocol:basics}
 \input{specs/protocol/bzz.tex}
-\section{Hive discovery protocol}\label{spec:protocol:hive}
-\green{}
+
+\section{Hive discovery  \statusgreen}\label{spec:protocol:hive}
 \input{specs/protocol/hive.tex}
-\section{Retrieval protocol}\label{spec:protocol:retrieval}
-\red{}
+
+\section{Retrieval  \statusorange  \statuspriority}\label{spec:protocol:retrieval}
 \input{specs/protocol/retrieval.tex}
-\section{Push-syncing protocol}\label{spec:protocol:push-sync}
-\ref{}
+
+\section{Push-syncing  \statusorange  \statuspriority}\label{spec:protocol:push-sync}
 \input{specs/protocol/push-sync.tex}
-\section{Stream protocol}\label{spec:protocol:stream}
-\input{specs/protocol/stream.tex}
-\section{Pull-syncing as a stream provider}\label{spec:protocol:pull-sync}
-\red{}
+
+\section{Pull-syncing \statusorange  \statuspriority}\label{spec:protocol:pull-sync}
 \input{specs/protocol/pull-sync.tex}
-\section{SWAP settlement protocol}\label{spec:protocol:swap}
-\red{}
-\input{specs/protocol/swap.tex}
+
+\section{SWAP settlement protocol \statusorange}\label{spec:protocol:swap}
 
 
-\chapter{Strategy}\label{spec:strategy}
+\chapter{Strategies \statusorange}\label{spec:strategy}
 
-\red{}
-\section{Connection strategy}\label{spec:strategy:connection}
+\section{Connection  \statusorange}\label{spec:strategy:connection}
 %\input{specs/strategy/connection.tex}
-\section{Forwarding strategy}\label{spec:strategy:forwarding}
+
+\section{Forwarding  \statusorange}\label{spec:strategy:forwarding}
 \input{specs/strategy/forwarding.tex}
+
 %peer selection and pricing
-\section{Pricing strategy}\label{spec:strategy:pricing}
+\section{Pricing  \statusorange}\label{spec:strategy:pricing}
 \input{specs/strategy/pricing-retrieval.tex}
-\section{Accounting and settlement strategy}\label{spec:strategy:swap}
+
+\section{Accounting and settlement  \statusorange}\label{spec:strategy:swap}
 \input{specs/strategy/swap.tex}
-\section{Push-syncing strategy}\label{spec:strategy:push-sync}
+
+\section{Push-syncing  \statusorange}\label{spec:strategy:push-sync}
 \input{specs/strategy/push-sync.tex}
-\section{Pull-syncing strategy}\label{spec:strategy:pull-sync}
+
+\section{Pull-syncing  \statusorange}\label{spec:strategy:pull-sync}
 \input{specs/strategy/pull-sync.tex}
-\section{Garbage collection strategy}\label{spec:strategy:garbage-collection}
+
+\section{Garbage collection \statusorange}\label{spec:strategy:garbage-collection}
 \input{specs/strategy/garbage-collection.tex}
-% \section{Upload strategy}\label{spec:strategy:upload}
-% \input{specs/strategy/upload.tex}
-% \section{Download strategy}\label{spec:strategy:download}
-% \input{specs/strategy/download.tex}
 
-\chapter{API}\label{spec:api}
+\chapter{API-s}\label{spec:api}
 
-\red{}
+\section{External API requirements\statusorange}\label{spec:api:external}
+\subsection{Signer}\label{spec:api:signer}
+% \input{specs/api/signer.tex}
 
-\section{Storage API URL schemes}\label{spec:api:storage}
-\input{specs/api/storage.tex}
-\section{Communications API}\label{spec:api:communications}
-\input{specs/api/comms.tex}
-\section{Access Control API}\label{spec:api:access-control}
-\input{specs/api/access-control.tex}
-\section{Local APIs}
-\subsection{Tags API}\label{spec:api:tags}
+\subsection{Blockchain \statusred}\label{spec:api:blockchain}
+% \input{specs/api/blockchain.tex}
+
+\subsection{Local \statusred}\label{spec:api:local}
+% \input{specs/api/local.tex}
+
+\subsection{State store \statusred}\label{spec:api:statestore}
+% \input{specs/api/statestore.tex}
+
+
+
+\section{API primitives}\label{spec:api:primitives}
+
+\subsection{Chunk \statusred}\label{spec:api:chunkx}
+% \input{specs/api/chunks.tex}
+
+\subsection{Tags \statusred}\label{spec:api:tags}
 \input{specs/api/tags.tex}
-\subsection{Pinning API}\label{spec:api:pinning}
+
+\subsection{Pinning
+\statusorange}\label{spec:api:pinning}
 \input{specs/api/pinning.tex}
-\subsection{Swap API}\label{spec:api:swap}
+
+\subsection{Swap and chequebook\statusorange}\label{spec:api:swap}
 \input{specs/api/swap.tex}
-\subsection{Postage API}\label{spec:api:postage}
+
+\subsection{Postage stamps \statusorange}\label{spec:api:postage}
 \input{specs/api/postage.tex}
-\subsection{Node admin API}\label{spec:api:admin}
-\input{specs/api/node-admin.tex}
+
+\subsection{PSS \statusorange}\label{spec:api:trojan}
+\input{specs/api/pss.tex}
+
+\section{Composite builtin API \statusorange}\label{spec:api:builtin}
+
+\subsection{File \statusorange}\label{spec:api:file}
+
+\subsection{Manifest \statusorange}\label{spec:api:manifest}
+
+\subsection{Recovery\statusorange}\label{spec:api:recovery}
+
+\subsection{PSS \statusorange}\label{spec:api:pss}
+
+\subsection{Feeds \statusorange}\label{spec:api:feeds}
+
+\subsection{Access Control  \statusorange}\label{spec:api:access-control}
+\input{specs/api/access-control.tex}
+
+
+
+\section{Storage API \statusred}\label{spec:api:storage}
+\input{specs/api/storage.tex}
+
+
+\section{Communications  \statusred}\label{spec:api:communications}
+\input{specs/api/comms.tex}
+
+% \subsection{The pss URL scheme}
 
