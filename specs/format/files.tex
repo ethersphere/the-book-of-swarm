@@ -24,53 +24,46 @@ level & chunks & $\mathit{log}_2$ of bytes & standard & chunks & $\mathit{log}_2
 
 \subsubsection{Calculating the Swarm Hash}
 
-Client-side custom redundancy is achieved by CRS erasure coding (see \ref{sec:erasure} and \ref{sec:features}); using it neccessitates 
-\begin{definition}{CRS erasure coding parameters}\label{def:crs-params}
-\begin{lstlisting}[language=buzz1]
-// /swarm/file
-
-define type crs/params 
-    parities uint
-    strategy _race|_fallback|_disabled
-     
-\end{lstlisting}
-\end{definition}
+Client-side custom redundancy is achieved by CRS erasure coding (see \ref{sec:erasure} and \ref{sec:features}); using it neccessitates some CRS parameters.
       
 \begin{definition}{the swarm hash tree for files}\label{def:swarm-hash}
 \begin{lstlisting}[language=buzz1]
-// /swarm/file
+// /file
 
-define function encode []chunk stream as @levels
+define function encode @levels []chunk stream 
     for @level uint
 as
     @chunks = @levels at @level     // read chunk stream 
     @crs = context crs              // 
     @m = branches (- @crs parities if @crs) 
     
-    @parent = @chunks up to @m      // read up to m chunks from stream
+    @parent = read @m from @chunks  // read up to m chunks from stream blocking
         (append crs/extend with @crs parities if @crs)
-            each chunk/store        // package children references
+            each chunk/store        // package children reference
                 join as chunk
                 
     if @levels length == @level+1 then
         @levels append= stream{}
         go self @levels for @level+1
     
-    @levels at @level+1 append= @parent
+    write @parent to @levels at @level+1 
     if no @chunks then
         close @levels at @level + 1
     else
         self @chunks for @level
             
-define function split byte stream as @data
+define function split @data byte stream 
 as
-    @data each chunk size as chunk
+    @level = chunk stream{}
+    go @data each chunk size as chunk 
+        write to @chunks
+    @level
 
-define function  upload byte stream as @data
+define function upload byte stream as @data
+has api POST  on "file/" from @data as body
 as
-    @data split each branches     // 
-        go as chunk 
-            encode for 0  // 
+    @levels append= @data split     // 
+    go encode @levels for 0
     @top = @levels each wait for  // wait for all levels to close
     return @top at 0              // return root hash as address        
 \end{lstlisting}
@@ -79,37 +72,67 @@ as
 
 \begin{definition}{files and file retrieval}\label{def:file-retrieval}
 \begin{lstlisting}[language=buzz1]
-// /swarm/file
+// /file
+
+define function copy to @reader stream of byte{}
+    from @chunks stream of []chunk
+    using @buffers stream of [@buffer.size]stream of [branches]chunk
+as
+    @chunks = read @buffers if no @chunks
+    @chunk = read @chunks
+    if no @chunk
+        write @chunks to @buffer
+        self @reader using @buffers
+    write @chunk data to @reader
 
 define function download reference
+    ?using @buffer.size uint64
+has api GET  on "file/<reference>" 
 as
-    chunk/retrieve @reference       // root chunk retrieval
-        decode each as chunk data   // recursion
+    @reader = stream of byte{} 
+    @buffers = stream of [@buffer.size]stream of [branches]chunk
+    chunk/retrieve @reference            // root chunk retrieval
+        go decode into @buffer down to 1 // traverse          
+    copy into @reader from @buffers 
 
-
-define function decode chunk
-  with @limit uint8
+define function decode chunk 
+    into @response chunk stream
+    ?down to @limit uint8
 as
-    @leaf = @chunk span payload.length <= chunk size
-    return @chunk if @leaf or branches @limit 
-    
+     
     @crs = context crs
     @all = @m = branches 
     if @crs then
         @m -= @crs parities
-        if @crs strategy is not {race} then 
-        @all = @m 
+        if @crs strategy is not "race" then 
+            @all = @m 
         
     @chunks = @chunk segments up to @all 
         each go as reference retrieve 
-    wait for @m in @chunks and cancel 
-
+    wait for @m in @chunks 
+    
     if @crs then 
+        cancel @chunks
         @chunks = @chunks crs/repair with @crs parities 
-
-    return @chunks if @level == @limit 
-    @chunks each go self @limit + 1  
+    
+    if @chunk span < chunk size exp @limit + 1 then
+        @chunks each  into @reader
+        
+       
+    @chunks each go self down to @limit  
 
 \end{lstlisting}
 \end{definition}
 
+
+\begin{definition}{the swarm hash tree for files}\label{def:file-info}
+\begin{lstlisting}[language=buzz1]
+// /file
+
+define type info
+    mode        int64 
+    size        int64
+    modified    time        
+
+\end{lstlisting}
+\end{definition}

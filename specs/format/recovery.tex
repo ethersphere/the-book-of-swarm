@@ -1,15 +1,44 @@
 
+\begin{definition}{targeted delivery request}\label{def:targeted-delivery}
+\begin{lstlisting}[language=buzz1]
+// /targeted.delivery
+
+define type envelope
+    id        segment
+    signature crypto/signature
+
+
+define function wrap address
+    ?by @key
+    to @targets []target
+as
+    @key = crypto/random  if no @key
+    @n = crypto/mine @n such that
+        @targets any is prefix of
+            hash @n and @key account
+    @sig = crypto/sign hash @n and @address 
+        by @key 
+    envelope{ @n, @sig  }            
+
+\end{lstlisting}
+\end{definition}
+
 \begin{definition}{recovery request}\label{def:recovery-request}
 \begin{lstlisting}[language=buzz1]
-// /swarm/recovery
-
-define type request address
+// /recovery
+define type request
+    address
+    envelope
+    
+define function request address
     with @response bool
+    to @targets []target
 as  
+    @request = request{ @address }
     if @response then
-      @key = local keys get random
-      @address = crypto/silly// hash                        
-      crypto/sign @address @id by @key 
+        @request envelope =
+            targeted.delivery/wrap @address by @key to @targets
+    pss/send @request bytes about "RECOVERY" to @targets
     
     
 
@@ -19,28 +48,8 @@ as
 \begin{definition}{recovery response}\label{def:recovery}
 \begin{lstlisting}[language=buzz1]
 
-define function request address
-    with @response bool
-as                                                      
-    pss/send @payload about "RECOVERY" to context targets
+
     
 
 \end{lstlisting}
 \end{definition}
-
-\begin{definition}{envelope}\label{def:recovery-response}
-\begin{lstlisting}[language=buzz1]
-
-define function response []byte as @payload
-    by @key crypto/keypair
-as
-    @key = crypto/generate if no @key 
-    crypto/mine @nonce such that
-        context overlay to @depth is prefix of 
-            soc @payload on @nonce by @key
-                address 
-
-
-\end{lstlisting}
-\end{definition}
-   

@@ -50,7 +50,7 @@
 \longnewglossaryentry{address book}{name=address book}{Kademlia table of known peer addresses.}
 \longnewglossaryentry{immutable}{name=immutable chunk store, text=immutable}{No replace/update operation is available on chunks.}
 \longnewglossaryentry{reference}{name=chunk reference, text=reference}{information needed to retrieve and read a chunk; it is the address with an optional decryption key appended used for encrypted chunks.}
-\longnewglossaryentry{content addressed chunk}{name=content addressed chunk, plural=content addressed chunks}{A chunk is Content addressing means that the chunk content determines the chunk address, usually the address being the fingerpringt of the data using some hash function. The default content addressed chunk in Swarm is at most 4 kilobytes and uses Binary Merkle Tree hash with Keccak256 base hash as its address function.}
+\longnewglossaryentry{content addressed chunk}{name=content addressed chunk, plural=content addressed chunks}{A chunk is Content addressing means that the chunk content determines the chunk address, usually the address being the fingerprint of the data using some hash function. The default content addressed chunk in Swarm is at most 4 kilobytes and uses Binary Merkle Tree hash with Keccak256 base hash as its address function.}
 \longnewglossaryentry{single owner chunk}{name=single owner chunk, plural=single owner chunks}{A special type of chunk in Swarm, the integrity of which is given by the association of its payload to an identifier attested by the signature of its owner while the identifier and the owner's account determines the chunk address.}
 \longnewglossaryentry{garbage collection}{name=garbage collection}{The process that purges chunks from their local storage.}
 \longnewglossaryentry{garbage collection strategy}{name=garbage collection strategy}{The process that dictates which chunks are chosen for garbage collection.}
@@ -58,17 +58,17 @@
 \longnewglossaryentry{pass-back delivery}{name=pass-back delivery}{A method of chunk delivery where the chunk delivery response simply follows the request route back to the originator.}
 \longnewglossaryentry{routed delivery}{name=routed delivery}{Hypothetical way of chunk delivery using kademlia routing but independently of the request.}
 \longnewglossaryentry{opportunistic caching}{name=opportunistic caching}{When a forwarding node receives a chunk, then the chunk is saved in case it will be requested again.}
-\longnewglossaryentry{light node}{name=light node, plural={light nodes}}{Concept of light node refer to a special mode of operation necessitated by poor bandwidth environments, e.g., mobile devices on low throughput networks or devices allowing only transient or low-volume storage.}
+\longnewglossaryentry{light node}{name=light node, plural={light nodes}}{Concept of light node refer to a special mode of operation necessitated by poor bandwidth environments, e.g., mobile devices on low throughput networks or devices allowing only transient or low-volume storage. Such nodes do not accept incoming connections.}
 \longnewglossaryentry{chequebook contract}{name=chequebook contract}{Smart contract that allows the beneficiary to choose when payments are to be processed.}
 \longnewglossaryentry{global balance}{name=global balance}{The amount deposited in the chequebook to serve as collateral for the cheques.}
 \longnewglossaryentry{newcomer}{name=newcomer}{A party entering the Swarm system with zero liquid funds.}
 \longnewglossaryentry{raffle draw}{name=raffle draw}{Instance of the postage lottery draw repeated every $N$ blocks conducted by the postage lottery contract on the blockchain.}
 \longnewglossaryentry{insider}{name=insider}{A peer inside the Swarm that already has some funds.}
 
-\longnewglossaryentry{postage stamp}{name=postage stamp}{Proof of payment for pre-paid delivery and storage.}
+\longnewglossaryentry{postage stamp}{name={postage stamp}, plural={postage stamps} }{Proof of payment for pre-paid delivery and storage.}
 \longnewglossaryentry{batch}{name=batch}{A group of chunks referenced under an intermediate node.}
 \longnewglossaryentry{chunk span}{name=chunk span}{The length of data subsumed under an intermediate chunk.}
-\longnewglossaryentry{Swarm manifest}{name=Swarm manifest}{A structure that defines a mapping between arbitrary paths and files to handle collections.}
+\longnewglossaryentry{Swarm manifest}{name={Swarm manifest}, plural={Swarm manifests} }{A structure that defines a mapping between arbitrary paths and files to handle collections.}
 \longnewglossaryentry{manifest entry}{name=manifest entry}{Contains a reference to the Swarm root chunk of the representation of a file and also specifies the media mime type of file.}
 \longnewglossaryentry{root access}{name=root access}{Non-privileged access to encrypted content based on meta-information encoded in root manifest entry for a document.}
 \longnewglossaryentry{granted access}{name=granted access}{A type of selective access to encrypted content requiring \gloss{root access} as well as access credentials: authorized private key or passphrase.}
@@ -77,7 +77,7 @@
 \longnewglossaryentry{session key}{name=session key}{One of the keys involved in the process of allowing selective access to content to multiple parties. }
 \longnewglossaryentry{lookup key}{name=lookup key}{One of the keys involved in the process of allowing selective access to content to multiple parties. }
 \longnewglossaryentry{access key decryption key}{name=access key decryption key}{The key the publisher grants to party in multi party selective access scenario, to decrypt the global access key.}
-\longnewglossaryentry{Trojan chunk}{name=Trojan chunk}{A chunk containing a disguised message while appearing no different to other chunks. }
+\longnewglossaryentry{Trojan chunk}{name={Trojan chunk}, plural={Trojan chunks} }{A chunk containing a disguised message while appearing no different to other chunks. }
 \longnewglossaryentry{neighbourhood notification}{name=neighbourhood notification}{Notification about feed update which works without the issuer of the notification knowing the identity of prospective posters.}
 \longnewglossaryentry{targeted chunk delivery}{name=targeted chunk delivery}{Mechanism to request a chunk from an arbitrary neighbourhood where it is known to be stored to an arbitrary neighbourhood where it is known to be needed.}
 \longnewglossaryentry{direct notification from publisher}{name=direct notification from publisher}{The process where a recipient is notified of a feed update by the publisher or other parties known to have it.}
@@ -92,7 +92,7 @@
 \longnewglossaryentry{bzz account}{name=bzz account}{The account in Swarm, also see \gloss{Swarm base account}.}
 \longnewglossaryentry{enode URL scheme}{name=enode URL scheme}{An URL scheme under which an Ethereum node can be described.}
 \longnewglossaryentry{mining chunks}{name=mining chunks}{An example of chunk mining is generating an encrypted variant of chunk content so that the resulting chunk address satisfies certain constraints, e.g., is close to or farther away from a particular address.}
-\longnewglossaryentry{chunk value}{name=chunk value}{The chunk value is determined  by the price of the postage batch it is stamped with. It serves to order chunks when a node prioritises for garbbage collection.}
+\longnewglossaryentry{chunk value}{name=chunk value}{The chunk value is determined  by the price of the postage batch it is stamped with. It serves to order chunks when a node prioritises for garbage collection.}
 \longnewglossaryentry{postage lottery}{name=postage lottery}{A scheme for compensation through redistributing the revenue coming from postage stamps among the registered storers in a fair way.}
 \longnewglossaryentry{security deposit}{name=security deposit}{The stake a node must put up when registering to be able to sell promissory storage receipts.}
 \longnewglossaryentry{litigation}{name=litigation}{An on-chain process where nodes violating the rules of Swarm stand to lose their deposit.}
@@ -122,7 +122,7 @@
 \longnewglossaryentry{load balancing}{name=load balancing}{The process of distributing a set of tasks over a set of nodes to make the process more efficient.}
 \longnewglossaryentry{redundancy}{name=redundancy}{In the context of distributed chunk store, redundancy is a surplus replicas or so called parities that contribute to resilience of chunk storage in the face of churn and garbage collection.}
 \longnewglossaryentry{inclusion proofs}{name=inclusion proofs}{A proof that a string is a substring of another string, for instance that a string is included in a chunk.}
-\longnewglossaryentry{span value}{name=span value}{TBD Viktor?: An 8 byte of data inside a single owner chunk that determines the length of the payload.}
+\longnewglossaryentry{span value}{name=span value}{An 8 byte encoding of the length of the data span subsumed under an intermediate chunk.}
 \longnewglossaryentry{neighbourhood size}{name=neighbourhood size}{The number of nearest neighbours of a node. }
 \longnewglossaryentry{NHS}{name=NHS, parent={neighbourhood size}}{neighbourhood size}
 \longnewglossaryentry{postage batch}{name=postage batch, plural={postage batches}}{A postage batch is an id associated with a verifiable payment on chain which can be attached to (multiple) chunks as a postage stamp.}
@@ -154,7 +154,7 @@ resource updates}{Feeds that represent revisions of the same semantic entity.}
 \longnewglossaryentry{outbox index key chains}{name=outbox index key chains}{Additional key chains added to the double ratchet key management (beside the ones for encryption) that make the feed update locations resilient to compromise.}
 \longnewglossaryentry{real-time integrity check}{name=real-time integrity check}{For any deterministically indexed feed. Integrity translates to non-forking or unique chain commitment.}
 \longnewglossaryentry{indexing scheme}{name=indexing scheme, plural={indexing schemes}}{Defines the way  the addresses of subsequent updates of a feed  are calculated. The choice of indexing scheme depends on the type and usage characteristics (update frequency) of the feed.}
-\longnewglossaryentry{prekey bundle}{name=prekey bundle}{Consists of all information the initiator needs about responder to initiate a handshake.}
+\longnewglossaryentry{pre-key bundle}{name=pre-key bundle}{Consists of all information the initiator needs about responder to initiate a handshake.}
 \longnewglossaryentry{destination target}{name=destination target}{A bit sequence that represents a neighbourhood in the address space. In the context of chunk mining, it refers to the prefix that the mined address should match.}
 \longnewglossaryentry{requestor node}{name=requestor node}{A node requesting some information from the network.}
 \longnewglossaryentry{anonymous retrieval}{name=anonymous retrieval}{Not disclosing the identity of requestor node while retrieving a chunk.}
@@ -185,6 +185,7 @@ resource updates}{Feeds that represent revisions of the same semantic entity.}
 \longnewglossaryentry{chunk-epoch}{name=chunk-epoch}{TBD}
 \longnewglossaryentry{collect-and-run attack}{name=collect-and-run attack}{Situation where a party would collect the funds for some promised work, but not actually do the work.}
 \longnewglossaryentry{addressed envelope}{name=addressed envelope}{A construct where the address of the single owner chunk is created before the chunk content is associated with it.}
+\longnewglossaryentry{stamped addressed envelope}{name=stamped     addressed envelope}{Addressed envelope with an attached stamp.}
 \longnewglossaryentry{entanglement code}{name=entanglement code, plural=entanglement codes}{An error correction code optimized for bandwidth of repair.}
 \longnewglossaryentry{Cauchy-Reed-Solomon erasure code}{name=Cauchy-Reed-Solomon erasure code}{A systemic erasure code which when applied to a data (of $n$ chunks)  produces $k$ extra 'parity' chunks  in such a way that any $n$ chunks out of the total $n + k$ are enough to reconstruct the original blob.}
 \longnewglossaryentry{missing chunk notification protocol}{name=missing chunk notification protocol}{A protocol upon which downloader not finding a chunk, can fall back to a recovery process and request the chunk from a pinner.}
@@ -247,7 +248,7 @@ used in single owner chunks: the payload is signed against it by the owner and h
 \longnewglossaryentry{head start}{name=head start}{A configurable time interval that defines waiting time before an exploration of an area for updates of epoch-based feeds. }
 \longnewglossaryentry{hint}{name=hint}{TBD}
 \longnewglossaryentry{epoch reference}{name=epoch reference}{A pair of epoch base time and level that identify a specific epoch.}
-\longnewglossaryentry{fair data economy}{name=fair data economy}{Economy of processing data with fair compensation of all parties involved in its creation of enrichment.}
+\longnewglossaryentry{fair data economy}{name=fair data economy}{Economy of processing data with fair compensation of all parties involved in its creation or enrichment.}
 \longnewglossaryentry{pinner}{name=pinner, plural={pinners}}{A node keeping a persistent copy of a chunk.}
 \longnewglossaryentry{accessible chunk}{name=accessible chunk}{A chunk is accessible if a message is routable between the requester and the node that is closest to the chunk.}
 \longnewglossaryentry{Swarm base account}{name=Swarm base account}{The Ethereum account the Swarm node is associated with. See also \gloss{bzz account}.}
@@ -255,6 +256,21 @@ used in single owner chunks: the payload is signed against it by the owner and h
 \longnewglossaryentry{time to live}{name=time to live}{The lifespan or lifetime of a request or other message in a computer or network.}
 \longnewglossaryentry{denial of service (DoS)}{name=denial of service (DoS)}{Denying of access to services by flooding those services with illegitemate requests.}
 \longnewglossaryentry{raffle--apply--claim--earn}{name=raffle--apply--claim--earn (race)}{The postage lottery protocol for  incentivising non-promissory storage by redistributing postage stamp revenue to simple non-staked storers applying with proof of custody.}
+\longnewglossaryentry{tar stream}{name=tar stream}{In computing, tar is a computer software utility for collecting many files into one archive file, often referred to as a tarball.}
+\longnewglossaryentry{shallow bin}{name={shallow bin}, plural={shallow bins} }{TBD Dan}
+\longnewglossaryentry{deep bin}{name={deep bin}, plural={deep bins}}{TBD Dan}
+\longnewglossaryentry{on-chain payment}{name={on-chain payment}, plural= {on-chain payments}}{Payment via the blockchain network. Each transaction must be processed by each and every node in the network leading to relatively high transaction costs.}
+\longnewglossaryentry{second-layer payment}{name={second-layer payment}, plural={second-layer payments} }{TBD}
+\longnewglossaryentry{tragedy of commons}{name={tragedy of commons} }{A situation where, in a shared-resource system, individual users act in their own interest contrary to common good and deplete or spoil the shared resource through collective action.}
+\longnewglossaryentry{blockhash}{name=blockhash}{The top hash of a block of data, e.g. a Merkle tree.}
+
+
+\longnewglossaryentry{recover security}{name=recover security}{TBD}
+\longnewglossaryentry{recovery targets}{name=recovery targets}{TBD Dan}
+\longnewglossaryentry{elliptic curve Diffie-Hellman}{name=elliptic curve Diffie-Hellman}{A key agreement protocol that allows two parties, each in possession of an elliptic-curve public–private key pair, to establish a shared secret over an insecure channel.}
+\longnewglossaryentry{key derivation  function}{name=key derivation  function}{TBD}
+
+%\longnewglossaryentry{zzz}{name=zzz}{TBD}
 %\longnewglossaryentry{zzz}{name=zzz}{TBD}
 %\longnewglossaryentry{zzz}{name=zzz}{TBD}
 %\longnewglossaryentry{zzz}{name=zzz}{TBD}

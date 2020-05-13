@@ -25,14 +25,13 @@ define function hash payload
 as
     @padded = @payload as [:chunk size]byte    // use zero padding 
     // for BMT hashing only
-    @span append subhash @padded 
-        over chunk size 
+    hash @span and root of @padded over chunk size 
     
-define function subhash []byte @section
-    over uint as @len
+define function root of @section []byte
+    over @len uint
 as
     return hash @section        // data level
-        if @len is 2 * segment size
+        if @len == 2 * segment size
     @len /= 2                  // recursive call
     @children = @section each @len go self over @len
     wait for @children 

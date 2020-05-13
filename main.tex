@@ -13,7 +13,7 @@
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{amssymb}
-
+\usepackage{rest-api}
 \usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
 \usepackage{listings}
 \usepackage{listings-buzz} % import this package after listings
@@ -172,11 +172,29 @@
 \providecommand{\xor}{\veebar}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % new math environments
-\theoremstyle{definition}
-\newtheorem{definition}{Definition}[section]
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{lemma}{Lemma}[section]
-\newtheorem{corollary}{Corollary}[section]
+\usepackage{thmtools}
+\declaretheoremstyle[
+spaceabove=6pt, spacebelow=6pt,headfont=\normalfont\bfseries,notefont=\mdseries, notebraces={}{},bodyfont=\normalfont,postheadspace=1em,qed={}]{theorem}
+\declaretheorem[style=theorem]{definition}
+\declaretheorem[style=theorem]{theorem}
+%\theoremstyle{definition}
+%\newtheorem{definition}{Definition}%[section]
+
+\makeatletter
+\def\ll@definition{%
+  \protect\numberline{\csname the\thmt@envname\endcsname}%
+  \ifx\@empty\thmt@shortoptarg
+    \thmt@thmname
+  \else
+    \thmt@shortoptarg
+  \fi}
+\def\l@thmt@definition{} 
+\makeatother
+
+% \newtheorem{theorem}{Theorem}[section]
+% \newtheorem{lemma}{Lemma}[section]
+% \newtheorem{corollary}{Corollary}[section]
+\renewcommand{\listtheoremname}{List of definitions}
 
 \makeatletter % legacy /sc command support
 %\DeclareOldFontCommand{\rm}{\normalfont\rmfamily}{\mathrm}
@@ -214,7 +232,9 @@ backend stack for the decentralised web}
 \input{intro.tex}
 \part{Design and architecture} \label{part:designarchitecture}
 \input{body.tex}
-\part{Specifications} \label{part:specifications}
+\part{Specifications}
+\label{part:specifications}
+\listoftheorems[ignoreall,show={definition}]
 \input{specs.tex}
 %%%%%%%%%%%%%%%%%%%%%%
 \phantomsection 

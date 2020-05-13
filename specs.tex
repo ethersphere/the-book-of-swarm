@@ -17,12 +17,18 @@ which is an API description format for REST APIs.
 \chapter{Data types and algorithms}\label{spec:convention}
 
 \orange{}
+
+\section{Built-in primitives \statusyellow}\label{spec:format:builtin}
+\input{specs/format/builtin.tex}
+
 \section{Bzz address}\label{spec:format:bzzaddress}
 \input{specs/format/bzzaddress.tex}
 
-\section{Chunks, encryption, BMT hash}
-\subsection{Chunks \statusyellow}\label{spec:format:chunks}
+\section{Chunks, encryption and addressing}
+\subsection{Content addressed chunks \statusyellow}\label{spec:format:chunks}
 \input{specs/format/chunks.tex}
+\subsection{Single owner chunk \statusyellow}\label{spec:format:soc}
+\input{specs/format/soc.tex}
 \subsection{Binary Merkle Tree Hash \statusyellow}\label{spec:format:bmt}
 \input{specs/format/bmt.tex}
 \subsection{Encryption \statusyellow}\label{spec:format:encryption}
@@ -33,20 +39,18 @@ which is an API description format for REST APIs.
 \input{specs/format/files.tex}
 \subsection{Manifests \statusyellow}\label{spec:format:manifests}
 \input{specs/format/manifests.tex}
-\subsection{Erasure coding \statusred}\label{spec:format:erasure}
-\input{specs/format/erasure.tex}
 % \section{Entanglement coding \statusred}\label{spec:format:entanglements}
 %\input{specs/format/entanglement.tex}
 
-\section{Access Control \statusred}\label{spec:format:access-control}
+\section{Access Control \statusorange}\label{spec:format:access-control}
 \input{specs/format/access-control.tex}
 
 \section{PSS message \statusyellow}\label{spec:format:pss-messsage}
 \input{specs/format/pss.tex}
-\section{Update notifications}\label{spec:format:update-notifications}
+\section{Update notifications \statusred}\label{spec:format:update-notifications}
 %\input{specs/format/update-notifications.tex}
 
-\section{Chunk recovery  \statusred}\label{spec:format:recovery}
+\section{Chunk recovery  \statusyellow}\label{spec:format:recovery}
 \input{specs/format/recovery.tex}
 
 \section{Postage stamps \statusorange}\label{spec:format:postage-stamps}

@@ -9,7 +9,8 @@ Pss has two fundamental types, a message and a trojan chunk structure which wrap
 
 
 define type topic        as [32]byte       // obfuscated topic matcher
-define type targets      as [][]byte       // overlay prefixes        
+define type targets      as [][]byte       // overlay prefixes 
+define type recipient    as crypto/keypair
 
 // pss message
 define type message 
@@ -36,7 +37,7 @@ define function seal []byte as @payload
 as
     @seal = hash @payload and @topic // obfuscate topic
         xor @topic          
-    return message{ @esal, @payload }
+    return message{ @seal, @payload }
 
 define function unseal message
     with topic 
@@ -44,7 +45,7 @@ as
     @seal = hash @message payload and @topic 
     if @topic == @seal xor @message seal then // check 
         return @payload 
-    return nill
+    return nil
     
 \end{lstlisting}
 \end{definition}
@@ -54,16 +55,16 @@ The targets are a list of overlay address prefixes derived from overlay addresse
 
 \begin{definition}{pss message wrapping and mining trojan chunk}\label{def:wrap}
 \begin{lstlisting}[language=buzz1]
-// /swarm/pss
+// /pss
 
 // wraps the message in a trojan chunk
 define function wrap message 
     for recipient
     to  targets
 as 
-    @msg =  if @recipient then
-        crypto/encrypt @msg for @recipient 
-        else @message bytes
+    @msg = @message 
+        (crypto/encrypt for @recipient if @recipient) 
+
     @nonce = crypto/mine @n such that
         @targets any is prefix of
             trojan{@n, @msg} as chunk address 
@@ -77,11 +78,11 @@ First the message is unwrapped using the recipient private key and unsealed with
 
 \begin{definition}{pss message unwrapping and local trojan delivery}\label{def:unwrap}
 \begin{lstlisting}[language=buzz1]
-// /swarm/pss
+// /pss
 
 // unwrap trojan chunk 
 define function unwrap chunk
-    for @recipient crypto/keypair 
+    for recipient
 as
     @chunk bytes 
         (crypto/decrypt  for @recipient if @recipient)
@@ -93,12 +94,13 @@ define type mailbox
     topic
     deliveries stream of []byte 
     
-define registry mailboxes of mailbox
+define context mailboxes as []mailbox
 
 define function deliver chunk
     @msg = @chunk unwrap for context recipient
     mailboxes each @mailbox 
-        if @msg unseal with @mailbox topic then
+        @payload = unseal @msg  with @mailbox topic
+        if @payload then 
             write @msg payload 
                 to @mailbox deliveries 
     
@@ -109,11 +111,12 @@ define function deliver chunk
 
 \begin{definition}{pss/send API endpoints}\label{def:send}
 \begin{lstlisting}[language=buzz1]
-// /swarm/pss
+// /pss
 // send API endpoint
 define function send payload
     about topic
     to    targets
+has api POST on "/pss/<topic>"
 as 
     context tag = tag/tag{}
     seal @payload with @topic        // seal with topic
@@ -127,13 +130,15 @@ as
 
 \begin{definition}{pss/receive API endpoint}\label{def:receive}
 \begin{lstlisting}[language=buzz1]
-// /swarm/pss
+// /pss
 // send API endpoint
 define function receive about topic 
     on uint64 @channel
 as 
     @stream = open @channel
-    registry append 
+    context mailboxes append= mailbox{ @topic, @stream }
+    
+define function cancel topic 
 \end{lstlisting}
 \end{definition}
 
@@ -141,6 +146,7 @@ as
 
 \begin{definition}{envelope}\label{def:pss-envelope}
 \begin{lstlisting}[language=buzz1]
+// /pss
 
 define type envelope
     id  [32]byte

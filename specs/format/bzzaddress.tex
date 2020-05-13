@@ -1,8 +1,7 @@
 \subsection{Overlay address \statusyellow}
 
 Swarm's overlay network uses 32-byte addresses. In order to help  uniform utilisation of the address space,  these addresses must be derived using a hash function. A Swarm node must be associated with an Ethereum account called the \gloss{Swarm base account} or \gloss{bzz account}.
-The node's overlay address is derived as hash of the corresponding  public key.
- of the 
+The node's overlay address is derived the public key of the account.
 
 \begin{definition}{Swarm overlay address of node A}\label{def:overlay}
 \begin{equation}
@@ -24,10 +23,9 @@ where
 
 To enable peers to locate the a node on the network, the overlay address is paired with an underlay address. The underlay address is a string representation of the node's network location on the underlying transport layer. 
 
-\begin{definition}{underlay}\label{def:underlay}
+\begin{definition}{Swarm underlay multiaddress}\label{def:underlay}
 \begin{lstlisting}[]
 // ID: /swarm/handshake/1.0.0/
-}
 \end{lstlisting}
 \end{definition}
 
@@ -48,7 +46,7 @@ Bzz address is functionally the pairing of overlay and underlay addresses. In or
 \begin{definition}{Swarm bzz address transfer format} \label{def:bzz-address}
 \begin{lstlisting}[]
 // ID: /swarm/handshake/1.0.0/bzzaddress
-// Serialization: Varint delimited Protobuf
+
 syntax = "proto3";
 
 message BzzAddress {
@@ -61,7 +59,7 @@ message BzzAddress {
 
 Here the signature is attesting to an underlay address for a network:
 
-\begin{definition}{signed underlay address of node A}\label{def:signed-underlay}
+\begin{definition}{Signed underlay address of node A}\label{def:signed-underlay}
 \begin{equation}
 \mathit{signedUnderlay}(A) \defeq \mathit{Sign}(\mathit{underlay}|\mathit{bzzNetworkID})         
 \end{equation}
@@ -71,28 +69,35 @@ of the underlay with bzz network ID appended as plaintext and hashes the resulti
 
 \begin{definition}{bzz types}\label{def:bzz-types}
 \begin{lstlisting}[language=buzz1]
-// /swarm/bzz
+// /bzz
 
-define type overlay as [segment.size]byte
+define type overlay as [segment size]byte
+define type underlay []byte
 
-define type account as crypto/keypair
-
-define type eth.address of account 
+define function overlay.address of pubkey 
+    within @network uint64 
 as
-    hash @account public key from 12
-
-define function address of account 
-    for uint64 as @network
-as
-    hash @account eth.address
+    hash @pubkey address
         and @network 
             as overlay
+
+define function valid bzz.address 
+    within @network uint64
+as
+    assert @bzz.address overlay == overlay.address of crypto/recover from @bzz.address signature with @bzz.address @underlay
+        within @network
+        
+define function bzz.address of overlay
+    from underlay 
+    by @account ethereum/address
+as
+    @sig = crypto/sign @underlay by @account
+    bzz.address{ @overlay, @underlay, @sig }
 
 \end{lstlisting}
 \end{definition}
 
-Note that the overlay address is not explicitly part of the construct. It is not needed since it can be calculated from signature, underlay and the network ID.
 
 
 
-In order to get the overlay address from the transfer format peer info, one recovers from signature the peer's base account public key using the plaintext that is constructed as per \ref{def:signed-underlay}. From the public key, the overlay can be calculated as in \ref{def:overlay}.
+In order to get the overlay address from the transfer format peer info, one recovers from signature the peer's base account public key using the plaintext that is constructed as per \ref{def:signed-underlay}. From the public key, the overlay can be calculated as in \ref{def:overlay}. The overlay address thus obtained needs to be checked against the one provided in the handshake.

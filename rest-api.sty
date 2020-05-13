@@ -1,0 +1,449 @@
+%%
+%% This is file `rest-api.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% rest-api.dtx  (with options: `package')
+%% 
+%% This is a generated file.
+%% 
+%% Copyright (C) 2020 by Dennis Klein <dennis94.kl@gmail.com>
+%% 
+%% This file may be distributed and/or modified under the conditions of
+%% the LaTeX Project Public License, either version 1.3c of this license
+%% or (at your option) any later version. The latest version of this
+%% license is in:
+%% 
+%% http://www.latex-project.org/lppl.txt
+%% 
+%% and version 1.3c or later is part of all distributions of LaTeX
+%% version 2008/05/04 or later.
+%% 
+\NeedsTeXFormat{LaTeX2e}[1999/12/01]
+\ProvidesPackage{rest-api}
+    [2020/03/22 v1.2 rest-api package]
+
+
+
+
+
+
+
+%% This program can be redistributed and/or modified under the terms
+%% of the LaTeX Project Public License Distributed from CTAN archives
+%% in directory macros/latex/base/lppl.txt.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{restapi}[2020/02/18 REST API package]
+\RequirePackage[T1]{fontenc}
+\RequirePackage{tabularx,colortbl}
+\RequirePackage{transparent}
+\RequirePackage{xcolor}
+\RequirePackage{color}
+\RequirePackage{xifthen, xstring}
+\RequirePackage{tikz}
+\RequirePackage[framemethod=tikz]{mdframed}
+\RequirePackage{array}
+\RequirePackage{verbatim}
+\RequirePackage{listings}
+\definecolor{getBlue}{HTML}{1391FF}
+\definecolor{getBlueBorder}{HTML}{61affe}
+\definecolor{getLightBlue}{HTML}{ECF6FF}
+\newcommand{\getGetColor}{getBlue}
+\newcommand{\getGetBorderColor}{getBlueBorder}
+% \newcommand{\getGetLightColor}{getLightBlue}
+\newcommand{\getGetLightColor}{white}
+\definecolor{postGreen}{HTML}{009D77}
+\definecolor{postGreenBorder}{HTML}{49CC97}
+\definecolor{postLightGreen}{HTML}{EBF7F4}
+\newcommand{\getPostColor}{postGreen}
+\newcommand{\getPostBorderColor}{postGreenBorder}
+\newcommand{\getPostLightColor}{white}
+% \newcommand{\getPostLightColor}{postLightGreen}
+\definecolor{putOrange}{HTML}{E97500}
+\definecolor{putOrangeBorder}{HTML}{fca130}
+\definecolor{putLightOrange}{HTML}{FEF4EB}
+\newcommand{\getPutColor}{putOrange}
+\newcommand{\getPutBorderColor}{putOrangeBorder}
+\newcommand{\getPutLightColor}{white}
+% \newcommand{\getPutLightColor}{putLightOrange}
+\definecolor{deleteRed}{HTML}{CF3030}
+\definecolor{deleteRedBorder}{HTML}{f93e3e}
+\definecolor{deleteLightRed}{HTML}{FBEEEE}
+\newcommand{\getDeleteColor}{deleteRed}
+\newcommand{\getDeleteBorderColor}{deleteRedBorder}
+\newcommand{\getDeleteLightColor}{white}
+% \newcommand{\getDeleteLightColor}{deleteLightRed}
+\colorlet{punct}{black}
+\definecolor{background}{HTML}{EEEEEE}
+\colorlet{delimGet}{\getGetColor}
+\colorlet{numbGet}{delimGet}
+\colorlet{delimPost}{\getPostColor}
+\colorlet{numbPost}{delimPost}
+\colorlet{delimPut}{\getPutColor}
+\colorlet{numbPut}{delimPut}
+\colorlet{delimDelete}{\getDeleteColor}
+\colorlet{numbDelete}{delimDelete}
+\lstdefinelanguage{jsonGet}{
+basicstyle=\small\ttfamily\color{black},
+numberstyle=\small\color{black},
+keywordstyle=\color{black},
+commentstyle=\color{black},
+stringstyle=\color{black},
+frame=L,
+framesep=8pt,
+framerule=2pt,
+xleftmargin=50pt,
+xrightmargin=0pt,
+rulesep=0pt,
+backgroundcolor=\color{white},
+numbersep=8pt,
+tabsize=4,
+showstringspaces=false,
+breaklines=true
+% literate=
+% *{0}{{{\color{numbGet}0}}}{1}
+% {1}{{{\color{numbGet}1}}}{1}
+% {2}{{{\color{numbGet}2}}}{1}
+% {3}{{{\color{numbGet}3}}}{1}
+% {4}{{{\color{numbGet}4}}}{1}
+% {5}{{{\color{numbGet}5}}}{1}
+% {6}{{{\color{numbGet}6}}}{1}
+% {7}{{{\color{numbGet}7}}}{1}
+% {8}{{{\color{numbGet}8}}}{1}
+% {9}{{{\color{numbGet}9}}}{1}
+% {:}{{{\color{punct}{:}}}}{1}
+% {,}{{{\color{punct}{,}}}}{1}
+% {\{}{{{\color{delimGet}{\{}}}}{1}
+% {\}}{{{\color{delimGet}{\}}}}}{1}
+% {[}{{{\color{delimGet}{[}}}}{1}
+% {]}{{{\color{delimGet}{]}}}}{1},
+}
+\lstdefinelanguage{jsonPost}{
+basicstyle=\small\ttfamily\color{black},
+numberstyle=\small\color{black},
+keywordstyle=\color{black},
+commentstyle=\color{black},
+stringstyle=\color{black},
+frame=L,
+framesep=8pt,
+framerule=2pt,
+xleftmargin=50pt,
+xrightmargin=0pt,
+rulesep=0pt,
+backgroundcolor=\color{white},
+numbersep=8pt,
+tabsize=4,
+showstringspaces=false,
+breaklines=true
+% literate=
+% *{0}{{{\color{numbPost}0}}}{1}
+% {1}{{{\color{numbPost}1}}}{1}
+% {2}{{{\color{numbPost}2}}}{1}
+% {3}{{{\color{numbPost}3}}}{1}
+% {4}{{{\color{numbPost}4}}}{1}
+% {5}{{{\color{numbPost}5}}}{1}
+% {6}{{{\color{numbPost}6}}}{1}
+% {7}{{{\color{numbPost}7}}}{1}
+% {8}{{{\color{numbPost}8}}}{1}
+% {9}{{{\color{numbPost}9}}}{1}
+% {:}{{{\color{punct}{:}}}}{1}
+% {,}{{{\color{punct}{,}}}}{1}
+% {\{}{{{\color{delimPost}{\{}}}}{1}
+% {\}}{{{\color{delimPost}{\}}}}}{1}
+% {[}{{{\color{delimPost}{[}}}}{1}
+% {]}{{{\color{delimPost}{]}}}}{1},
+}
+\lstdefinelanguage{jsonPut}{
+basicstyle=\small\ttfamily\color{black},
+numberstyle=\small\color{black},
+keywordstyle=\color{black},
+commentstyle=\color{black},
+stringstyle=\color{black},
+frame=L,
+framesep=8pt,
+framerule=2pt,
+xleftmargin=50pt,
+xrightmargin=0pt,
+rulesep=0pt,
+backgroundcolor=\color{white},
+numbersep=8pt,
+tabsize=4,
+showstringspaces=false,
+breaklines=true
+% literate=
+% *{0}{{{\color{numbPut}0}}}{1}
+% {1}{{{\color{numbPut}1}}}{1}
+% {2}{{{\color{numbPut}2}}}{1}
+% {3}{{{\color{numbPut}3}}}{1}
+% {4}{{{\color{numbPut}4}}}{1}
+% {5}{{{\color{numbPut}5}}}{1}
+% {6}{{{\color{numbPut}6}}}{1}
+% {7}{{{\color{numbPut}7}}}{1}
+% {8}{{{\color{numbPut}8}}}{1}
+% {9}{{{\color{numbPut}9}}}{1}
+% {:}{{{\color{punct}{:}}}}{1}
+% {,}{{{\color{punct}{,}}}}{1}
+% {\{}{{{\color{delimPut}{\{}}}}{1}
+% {\}}{{{\color{delimPut}{\}}}}}{1}
+% {[}{{{\color{delimPut}{[}}}}{1}
+% {]}{{{\color{delimPut}{]}}}}{1},
+}
+\lstdefinelanguage{jsonDelete}{
+basicstyle=\small\ttfamily\color{black},
+numberstyle=\small\color{black},
+keywordstyle=\color{black},
+commentstyle=\color{black},
+stringstyle=\color{black},
+frame=L,
+framesep=8pt,
+framerule=2pt,
+xleftmargin=50pt,
+xrightmargin=0pt,
+rulesep=0pt,
+backgroundcolor=\color{white},
+numbersep=8pt,
+tabsize=4,
+showstringspaces=false,
+breaklines=true
+% literate=
+% *{0}{{{\color{numbDelete}0}}}{1}
+% {1}{{{\color{numbDelete}1}}}{1}
+% {2}{{{\color{numbDelete}2}}}{1}
+% {3}{{{\color{numbDelete}3}}}{1}
+% {4}{{{\color{numbDelete}4}}}{1}
+% {5}{{{\color{numbDelete}5}}}{1}
+% {6}{{{\color{numbDelete}6}}}{1}
+% {7}{{{\color{numbDelete}7}}}{1}
+% {8}{{{\color{numbDelete}8}}}{1}
+% {9}{{{\color{numbDelete}9}}}{1}
+% {:}{{{\color{punct}{:}}}}{1}
+% {,}{{{\color{punct}{,}}}}{1}
+% {\{}{{{\color{delimDelete}{\{}}}}{1}
+% {\}}{{{\color{delimDelete}{\}}}}}{1}
+% {[}{{{\color{delimDelete}{[}}}}{1}
+% {]}{{{\color{delimDelete}{]}}}}{1},
+}
+\mdfdefinestyle{mystyle}{
+linecolor=white,
+% linecolor=\methodBorderColor,
+% backgroundcolor=\methodLightColor,
+skipabove=0pt,
+linewidth=1.5pt,
+skipbelow=0pt,
+innertopmargin=0pt,
+innerbottommargin=-3pt,
+innerrightmargin=0pt,
+innerleftmargin=0pt,
+leftmargin=0pt,
+rightmargin=0pt,
+nobreak=true
+}
+\newcommand{\routeBreakValue}{true}
+\newcommand{\noBreakRoute}
+{
+\renewcommand{\routeBreakValue}{true}
+}
+\newcommand{\breakRoute}
+{
+\renewcommand{\routeBreakValue}{false}
+}
+\newcommand{\methodColor}{getBlue}
+\newcommand{\methodLightColor}{white}
+% \newcommand{\methodLightColor}{getLightBlue}
+\newcommand{\methodBorderColor}{getBlueBorder}
+\newcommand{\methodJson}
+{
+\lstset{language=jsonGet,rulecolor=\color{\methodColor}}
+}
+\begin{comment}
+\newcommand{\apiCorner}{notround}
+
+\newcommand{\apiCornerRound}
+{
+\renewcommand{\apiCorner}{round}
+}
+
+\newcommand{\apiCornerNotRound}
+{
+\renewcommand{\apiCorner}{notround}
+}
+\end{comment}
+\newenvironment{apiRoute}[3]
+{
+\newcommand{\method}{#1}
+\newcommand{\urlPath}{#2}
+\newcommand{\routeDescription}{#3}
+
+\ifthenelse{\equal{\method}{get}}
+{
+\renewcommand{\methodColor}{\getGetColor}
+\renewcommand{\methodLightColor}{\getGetLightColor}
+\renewcommand{\methodBorderColor}{\getGetBorderColor}
+\renewcommand{\methodJson}
+{
+% \colorlet{delimGet}{\methodColor}
+% \colorlet{numbGet}{delimGet}
+\lstset{language=jsonGet,rulecolor=\color{gray!20}}
+% =\color{\methodColor}}
+}
+}
+{}
+
+\ifthenelse{\equal{\method}{post}}
+{
+\renewcommand{\methodColor}{\getPostColor}
+\renewcommand{\methodLightColor}{\getPostLightColor}
+\renewcommand{\methodBorderColor}{\getPostBorderColor}
+\renewcommand{\methodJson}
+{
+% \colorlet{delimPost}{\methodColor}
+% \colorlet{numbPost}{delimPost}
+\lstset{language=jsonPost,rulecolor=\color{\methodColor}}
+}
+}
+{}
+
+\ifthenelse{\equal{\method}{put}}
+{
+\renewcommand{\methodColor}{\getPutColor}
+\renewcommand{\methodLightColor}{\getPutLightColor}
+\renewcommand{\methodBorderColor}{\getPutBorderColor}
+\renewcommand{\methodJson}
+{
+% \colorlet{delimPut}{\methodColor}
+% \colorlet{numbPut}{delimPut}
+\lstset{language=jsonPut,rulecolor=\color{\methodColor}}
+}
+}
+{}
+\ifthenelse{\equal{\method}{delete}}
+{
+\renewcommand{\methodColor}{\getDeleteColor}
+\renewcommand{\methodLightColor}{\getDeleteLightColor}
+\renewcommand{\methodBorderColor}{\getDeleteBorderColor}
+\renewcommand{\methodJson}
+{
+% \colorlet{delimDelete}{\methodColor}
+% \colorlet{numbDelete}{delimDelete}
+\lstset{language=jsonDelete,rulecolor=\color{\methodColor}}
+}
+}
+{}
+
+\ifthenelse{\equal{\routeDescription}{}}
+{
+\newcommand{\printDescription}{}
+}
+{
+\newcommand{\printDescription}
+{
+% \rowcolor{\methodLightColor}
+& \textit{\routeDescription} \\
+}
+
+}
+
+\begingroup
+\setlength{\parindent}{0em}
+\begin{mdframed}[style=mystyle,nobreak=\routeBreakValue]
+\begin{tabularx}{\textwidth}{p{1.6cm} X}
+\rowcolor{white}
+% \rowcolor{\methodLightColor}
+
+\cellcolor{\methodColor}
+\centering
+\textcolor{white}{\textbf{\textsc{\method}}}
+& \textbf{\urlPath} \\
+
+\printDescription
+
+\rowcolor{white} & \\
+% \rowcolor{\methodLightColor} & \\
+\end{tabularx}
+}
+{
+\end{mdframed}
+\endgroup
+}
+\newenvironment{routeRequest}[1]
+{
+\arrayrulecolor{\methodColor}
+
+\begin{tabularx}{\textwidth}{X l}
+% \rowcolor{\methodLightColor!20}
+\rowcolor{white}
+\textbf{Body} & #1 \\ \hline
+\end{tabularx}
+\vspace{1ex}
+}
+{
+\bigskip
+}
+\lstnewenvironment{routeRequestBody}
+{
+\methodJson
+}
+{}
+\newenvironment{routeParameter}
+{
+\newcommand{\routeParamItem}[2]
+{
+% \rowcolor{\methodLightColor} ##1 & ##2 \\
+\rowcolor{white} ##1 & ##2 \\
+}
+\newcommand{\noRouteParamter}[1]
+{
+\small{\textit{##1}}
+}
+
+% \arrayrulecolor{\methodColor}
+
+\begin{tabularx}{\textwidth}{X}
+% \rowcolor{\methodLightColor!20}
+\rowcolor{white}
+\textbf{Parameter} \\ \hline
+\end{tabularx}
+
+\tabularx{\textwidth}{l X}
+}
+{
+\endtabularx
+}
+\newenvironment{routeResponse}[1]
+{
+\newcommand{\noRouteResponse}[1]
+{
+\begin{tabulfarx}{\textwidth}{X}
+\rowcolor{white}
+% \rowcolor{\methodLightColor}
+\small{\textit{##1}} \\
+\end{tabularx}
+}
+
+% \arrayrulecolor{\methodColor}
+\begin{tabularx}{\textwidth}{X l}
+% \rowcolor{\methodLightColor!20}
+% \rowcolor{gray!20}
+\textbf{Response} & #1 \\ \hline
+\end{tabularx}
+}
+{}
+\newenvironment{routeResponseItem}[2]
+{
+\begin{tabularx}{\textwidth}{l X}
+\textbf{#1} & #2 \\
+\end{tabularx}
+}
+{
+\medskip
+}
+\lstnewenvironment{routeResponseItemBody}
+{
+\vspace{-1.4em}
+\methodJson
+}
+{}
+\endinput
+%%
+%% End of file `rest-api.sty'.

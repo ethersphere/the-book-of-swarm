@@ -4,24 +4,25 @@ A manifest entry can be conceived of as metadata about a file pointed to and ret
 
 \begin{definition}{manifest entry}\label{def:manifest-entry}
 \begin{lstlisting}[language=buzz1]
-// /swarm/manifest
+// /manifest
 
 // manifest entry encodes attributes 
 define type entry 
-    info                 // FS file/dir info
-    access.control/info  // access conrrol info
-    crs/info             // erasure coding - CRS params
-    reference            // reference
+    file/info              // FS file/dir info
+    access/params          // access control params
+    crs/params             // erasure coding - CRS params
+    reference              // reference
+    headers                // http response headers 
 
-define type info
-    content.type  [32]byte
+define type headers
+    content.type  [segment size]byte
 
 \end{lstlisting}
 \end{definition}
 
 \begin{definition}{manifest data structure}\label{def:manifests}
 \begin{lstlisting}[language=buzz1]
-// /swarm/manifest
+// /manifest
 
 define type node 
     entry  *entry          // reference to chunk serialised as entry
@@ -32,27 +33,18 @@ define type fork
     prefix segment   // compaction 
     node   *node     // reference to chunk serialised as node
 
-// manifest entry encodes attributes 
-define type entry 
-    info                 // FS file/dir info
-    access.control/info  // access conrrol info
-    crs/info             // erasure coding - CRS params
-    reference            // reference
-
-define type info
-    content.type  segment
-
 \end{lstlisting}
 \end{definition}
 
 \begin{definition}{manifest path lookup}\label{def:manifests-lookup}
 \begin{lstlisting}[language=buzz1]
-// /swarm/manifest
+// /manifest
 
-define function lookup *node
-    on @path []byte
+define function lookup @path []byte
+    in *node
+ has api GET on "/manifest/<@node:reference>/<@path>"
 as 
-    @context access.control = @node entry access.control 
+    context access = @node entry access/params 
     // manifest is  a compacted trie
     @fork = @node forks at head @path 
     // if @path empty, the  paths matched return the entry
@@ -60,9 +52,8 @@ as
         return @node entry
 
     if @fork prefix is prefix of @path then // including == 
-      return self @fork node 
-        on @path from @fork prefix length
-
+      return self @path from @fork prefix length
+          in @fork node 
    fail with "not found"
 
 \end{lstlisting}
@@ -71,36 +62,125 @@ as
 
 \begin{definition}{manifest update}\label{def:manifest-update}
 \begin{lstlisting}[language=buzz1]
-define function add reference  
+// /manifest
+
+define function add *entry  
     to *node 
     on @path []byte 
+has api PUT on "/manifest/<@node>"
+    
 as
     // if called on nil call on zero value
-    if no @node then 
-        self @reference to node{} on @path
-        return
+    @node = node{} if no @node 
 
     // if empty path then change entry field of node
     if no @path then
-        @node entry = @reference
-        @node store 
-            return
+        @node entry = @entry
+        return store @node
 
     // lookup the fork based on the first byte of path
     @fork = @node forks at head @path
     // if no fork yet, add the singleton node 
     if no @fork then
         @node forks at head @path =
-            fork{@path, store node{@reference as entry}}
-        @node store 
-            return
+            fork{@path, store node{@entry}}
+        return store @node
 
     @common = prefix of @path and @fork prefix // common cannot be empty
     @rest = @fork prefix from @common length
     @newnode = node{}
     @newnode forks at head @rest = fork{@rest, @fork node}
-    @midnode = self @reference to @newnode on @path from @common length 
-    @node forks at head @path = fork{ @midnode, @common } 
+    @midnode = self @entry to @newnode on @path from @common length 
+    @node forks at head @path = fork{ @common, @midnode } 
     @node store
+    
+
+\end{lstlisting}
+\end{definition}
+
+\begin{definition}{manifest remove}\label{def:manifest-remove}
+\begin{lstlisting}[language=buzz1]
+// /manifest
+
+define function remove @path []byte 
+    from *node
+has api DELETE on "/manifest/<@node>/<@path>"
+as
+    // if called on nil call on zero value
+    return node{} if no @node 
+
+    // if empty path then change entry field of node
+    if no @path then
+        return nil if @node forks length == 0 
+        @node entry = nil //entry exists
+        return store @node
+
+    // lookup the fork based on the first byte of path
+    @fork = @node forks at head @path
+    // if no fork yet, add the singleton node 
+    return @node if no @fork
+
+    @common = prefix of @path and @fork prefix // common cannot be empty
+    return @node if @common and @fork prefix have different length          // path not found
+    
+    @rest = @fork prefix from @common length
+    @newnode =  self @rest from @fork node               
+    if no @newnode then           // deleted item was terminal node, delete fork 
+        @node forks at head @res = nil
+    else if @newnode forks length == 1 then // compact non-forking nodes 
+        @singleton = @newnode forks first
+        @newprefix = @common append @singleton prefix
+        @node forks at head @path = 
+            fork{ @newprefix, @singleton node }
+    else
+        @node fork at head @path node = @newnode
+        
+    @node store
+    
+
+\end{lstlisting}
+\end{definition}
+
+
+\begin{definition}{manifest merge}\label{def:manifest-merge}
+\begin{lstlisting}[language=buzz1]
+// /manifest
+
+define function merge @new *node  
+    to  @old *node 
+has api PUT on "/manifest/<@old>"
+    with @new as body
+as
+    // if called on nil call on zero value
+    return @new if no @old
+    return @old if no @new
+    @node = node{ @new or @old } 
+    @new forks pos or @old forks pos 
+        each bit @pos go 
+            @fork = merge.fork @new forks at @pos
+                to @old forks at @pos
+            @node forks at @fork prefix head = @fork 
+    @node store 
+
+define function merge.fork @new fork 
+    to @old fork    
+as
+    @common = prefix of @new prefix and @old prefix 
+    @restnew = @new prefix from @common length
+    @restold = @old prefix from @common length
+    if no @restnew and no @restold then  
+        return fork{@common, merge.node @new reference to @old reference}
+    @node = add @new reference to nil on @restnew 
+        add to @old reference @restold
+    fork{ @common, @node }
+         
+\end{lstlisting}
+\end{definition}
+
+\begin{definition}{manifest API}\label{def:manifest-api}
+\begin{lstlisting}[language=buzz1]
+// /manifest
+
+
 \end{lstlisting}
 \end{definition}

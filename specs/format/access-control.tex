@@ -1,0 +1,145 @@
+\begin{definition}[Access control]\label{def:ac}
+\begin{lstlisting}[language=buzz1]
+// /access
+
+define type auth as "pass"|"pk" 
+define type hint as [segment size]byte
+
+// access control parameters
+define type params
+	auth                          // serialises uint8
+	publisher crypto/pubkey       // 65 byte
+	salt                          // salt for scrypt/dh
+	hint                          // hint to link identity
+	act       *node               // reference to act manifest root
+	kdf                           // params for scrypt
+} 
+
+// root access manifest
+define type root
+    params
+    reference
+
+\end{lstlisting}
+\end{definition}
+
+
+\begin{definition}[Session key and auth with credentials]\label{def:session-key}
+\begin{lstlisting}[language=buzz1]
+// /access
+
+define function session.key.pass from hint 
+    with  salt 
+    using kdf
+as
+    crypto/scrypt from input/password using @hint
+        with @salt using @kdf
+
+define function session.key.pk from hint
+    with crypto/pubkey
+    using salt
+as
+    crypto/shared.secret between 
+        input/select key by @hint
+            and @pubkey 
+        hash with @salt
+      
+define function session.key 
+    using params
+as
+    if @params auth == "pass" then
+        return session.key.pass from  @params hint 
+            with @params salt using @params kdf
+                
+    session.key.pk from @params hint 
+        with @params publisher using @params salt
+\end{lstlisting}
+\end{definition}
+
+
+\begin{definition}[Access key]\label{def:access-key}
+\begin{lstlisting}[language=buzz1]
+// /access
+define function access.key 
+    using params
+as 
+    @key = session.key using @params 
+    return @key if no @params act
+    act.lookup @key in @params act
+   
+define function act.lookup key
+    in @act *node
+as
+        manifest/lookup hash @key and 0
+            in @act
+                xor hash @key and 1
+
+
+\end{lstlisting}
+\end{definition}
+
+
+\begin{definition}[Access control API]\label{def:ac-api}
+\begin{lstlisting}[language=buzz1]
+// /access
+
+// control 
+define function lock reference
+    using params
+has api POST on "/access/<address>"
+    with @params as body
+as
+    @key = hash @reference address and @key 
+    @encrypted = @reference as bytes 
+        crypto/crypt with @key
+    root{ @params, @encrypted } 
+        store
+        
+
+define function unlock address
+has api GET on "access/<address>"
+as
+    @root = retrieve @address 
+        try as root otherwise return @address
+    @key = access.key using @root params
+    @root encrypted crypto/crypt with @key
+        as *node
+    
+\end{lstlisting}
+\end{definition}
+
+\begin{definition}[ACT manipulation API]\label{def:act-api}
+\begin{lstlisting}[language=buzz1]
+// /access
+
+define type act as manifest/node
+
+define function add @keys []crypto/pubkey
+    to *root
+has api PUT on "/access/<root>/" 
+    with @keys as body
+as 
+    // get params from the root access structure
+    @params = retrieve @root as root params
+    @access.key = access.key using @params                      
+    @keys each @key
+        @session.key = session.key using @params
+        manifest/add @access.key xor hash @session.key with 1
+            to @act on hash @session.key with 0  
+            
+
+define function remove @keys []crypto/pubkey
+    from *root   
+has api DELETE on "/access/<root>" 
+    with @keys as body
+as 
+    // get params from the root access structure
+    @params = retrieve @root as root params
+    @keys each @key
+        @session.key = session.key using @params
+        manifest/remove hash @session.key with 0  
+            from @params act 
+             
+
+\end{lstlisting}
+\end{definition}
