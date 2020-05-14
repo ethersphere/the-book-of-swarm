@@ -26,7 +26,7 @@ level & chunks & $\mathit{log}_2$ of bytes & standard & chunks & $\mathit{log}_2
 
 Client-side custom redundancy is achieved by CRS erasure coding (see \ref{sec:erasure} and \ref{sec:features}); using it neccessitates some CRS parameters.
       
-\begin{definition}{the swarm hash tree for files}\label{def:swarm-hash}
+\begin{definition}[File API: upload/storage;  swarm hash]\label{def:swarm-hash}
 \begin{lstlisting}[language=buzz1]
 // /file
 
@@ -70,7 +70,7 @@ as
 \end{definition}
                    
 
-\begin{definition}{files and file retrieval}\label{def:file-retrieval}
+\begin{definition}[File   API: download/retrieval]\label{def:file-retrieval}
 \begin{lstlisting}[language=buzz1]
 // /file
 
@@ -125,7 +125,7 @@ as
 \end{definition}
 
 
-\begin{definition}{the swarm hash tree for files}\label{def:file-info}
+\begin{definition}[File info]\label{def:file-info}
 \begin{lstlisting}[language=buzz1]
 // /file
 

@@ -5,7 +5,7 @@ The encryption seed for the chunk is derived from the master seed if given, othe
 
 The reference to a single chunk (and the whole content) is the concatenation of the hash of encrypted data and the decryption key (see \ref{def:chunk-reference}). This means the encrypted Swarm reference (64 bytes) will be longer than the unencrypted one (32 bytes). When a node syncs encrypted chunks, it does not share the full references (or the decryption keys) with the other nodes in any way.  Therefore, other nodes will be unable to access the original data, or in fact, even to detect whether a chunk is encrypted.
 
-\begin{definition}{Chunk encryption/decryption API}\label{def:encrypt}
+\begin{definition}[Chunk encryption/decryption API]\label{def:encrypt}
 \begin{lstlisting}[language=buzz1]
 
 // generate key for a chunk

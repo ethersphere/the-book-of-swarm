@@ -143,12 +143,12 @@ If all peer connections are stably online, a \gloss{thin Kademlia table}, i.e. a
 
 
 
-With \gloss{Kademlia} saturation guaranteed, a node will always be able to forward a message and ensure \gloss{routability}. If nodes comply with the forwarding principles (and that is ensured by \gloss{aligned incentives} (see \ref{spec:strategy:forwarding}) the only case when relaying breaks could possibly break down is in the case that a node drops out of the network after having received a message but before it has had chance to forward it.%
+With \gloss{Kademlia} saturation guaranteed, a node will always be able to forward a message and ensure \gloss{routability}. If nodes comply with the forwarding principles (and that is ensured by \gloss{aligned incentives} (see \ref{spec:strategy:forwarding}) the only case when relaying could possibly break down is in the case that a node drops out of the network after having received a message but before it has had chance to forward it.%
 %
 \footnote{Healthy nodes could commit to being able to forward within a (very short) constant time we can call the \gloss{forwarding lag}. In the case that a \gloss{downstream peer} disconnects before this forwarding lag passes, then the \gloss{upstream peer} can re-forward the message to an alternative peer, thereby keeping the message passing unbroken. See \ref{sec:retrieval} for more detail.
 } 
 
-An important advantage of Forwarding Kademlia is that this method of routing requires a lot less bandwidth than the iterative algorithm. In the iterative version, known peers are not guaranteed to be online, so finding one that is, adds an additional level of unpredictability.
+An important advantage of forwarding Kademlia is that this method of routing requires a lot less bandwidth than the iterative algorithm. In the iterative version, known peers are not guaranteed to be online, so finding one that is, adds an additional level of unpredictability.
 
 \subsubsection{Sender anonymity}
 \glossupper{sender anonymity} is a crucial feature of  Swarm. It is important that since requests are relayed from peer-to-peer, those peers further down in the request cascade can never know who the originator of the request was. 
@@ -223,11 +223,11 @@ As is customary in Swarm, we provide a few resolutions of this acronym, which su
 
 
 \begin{itemize}
-\item \emph{decentralised infrastructure for storage and communication} 
-\item \emph{distributed immutable store for chunks} 
-\item \emph{data integrity by signature or content address}
+\item \emph{decentralised infrastructure for storage and communication}, 
+\item \emph{distributed immutable store for chunks}, 
+\item \emph{data integrity by signature or content address},
 % \item \emph{downloadable incentivised secure communications}
-\item \emph{driven by incentives with smart contracts} 
+\item \emph{driven by incentives with smart contracts}. 
 
 \end{itemize}
  

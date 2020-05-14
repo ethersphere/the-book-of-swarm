@@ -1,7 +1,7 @@
 Single owner chunks are the second type of chunk in swarm (see \ref{sec:single-owner-chunks}). They constitute the basis of swarm feeds.
 
 
-\begin{definition}{single owner chunks}\label{def:soc}
+\begin{definition}[Single owner chunks]\label{def:soc}
 \begin{lstlisting}[language=buzz1]
 // /soc
 
@@ -26,7 +26,7 @@ as
 \end{lstlisting}
 \end{definition}
 
-\begin{definition}{single owner chunk retrieval}\label{def:soc-retrieve}
+\begin{definition}[Single owner chunk API: retrieval]\label{def:soc-retrieve}
 \begin{lstlisting}[language=buzz1]
 // /soc
 
@@ -42,9 +42,9 @@ as
 \end{definition}
 
 
-\begin{definition}{single owner chunk storage}\label{def:soc-store}
+\begin{definition}[Single owner chunk API: storage]\label{def:soc-store}
 \begin{lstlisting}[language=buzz1]
-// /swarm/soc
+// /soc
 
 define function store payload
     on @id [segment size]byte

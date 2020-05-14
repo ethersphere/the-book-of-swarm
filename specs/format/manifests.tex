@@ -2,7 +2,7 @@ Manifests represent a mapping of strings to references (see \ref{sec:collections
 
 A manifest entry can be conceived of as metadata about a file pointed to and retrievable by its reference (see \ref{spec:format:files}). The metadata is quite diverse, ranging from information needed for access control, file information similar to one given on file systems, information needed for erasure coding (see \ref{sec:erasure}, \ref{sec:headers} and \ref{spec:format:erasure}), information for browser, i.e.,  response headers such as content type (MIME info) and most importantly the reference to the file. Using manifests as simple key-value store is exemplified by access control (see \ref{sec:access-control}, \ref{sec:access-control-ux} for discussion as well as \ref{spec:format:access-control} and \ref{spec:api:access-control} for the specification).
 
-\begin{definition}{manifest entry}\label{def:manifest-entry}
+\begin{definition}[Manifest entry]\label{def:manifest-entry}
 \begin{lstlisting}[language=buzz1]
 // /manifest
 
@@ -20,7 +20,7 @@ define type headers
 \end{lstlisting}
 \end{definition}
 
-\begin{definition}{manifest data structure}\label{def:manifests}
+\begin{definition}[Manifest data structure]\label{def:manifests}
 \begin{lstlisting}[language=buzz1]
 // /manifest
 
@@ -36,13 +36,13 @@ define type fork
 \end{lstlisting}
 \end{definition}
 
-\begin{definition}{manifest path lookup}\label{def:manifests-lookup}
+\begin{definition}[Manifest API: path lookup]\label{def:manifests-lookup}
 \begin{lstlisting}[language=buzz1]
 // /manifest
 
 define function lookup @path []byte
     in *node
- has api GET on "/manifest/<@node:reference>/<@path>"
+has api GET on "/manifest/<@node:reference>/<@path>"
 as 
     context access = @node entry access/params 
     // manifest is  a compacted trie
@@ -60,7 +60,7 @@ as
 \end{definition}
 
 
-\begin{definition}{manifest update}\label{def:manifest-update}
+\begin{definition}[Manifest API: update]\label{def:manifest-update}
 \begin{lstlisting}[language=buzz1]
 // /manifest
 
@@ -98,7 +98,7 @@ as
 \end{lstlisting}
 \end{definition}
 
-\begin{definition}{manifest remove}\label{def:manifest-remove}
+\begin{definition}[Manifest API: remove]\label{def:manifest-remove}
 \begin{lstlisting}[language=buzz1]
 // /manifest
 
@@ -142,7 +142,7 @@ as
 \end{definition}
 
 
-\begin{definition}{manifest merge}\label{def:manifest-merge}
+\begin{definition}[Manifest API:  merge]\label{def:manifest-merge}
 \begin{lstlisting}[language=buzz1]
 // /manifest
 
@@ -177,7 +177,7 @@ as
 \end{lstlisting}
 \end{definition}
 
-\begin{definition}{manifest API}\label{def:manifest-api}
+\begin{definition}[Manifest API]\label{def:manifest-api}
 \begin{lstlisting}[language=buzz1]
 // /manifest
 

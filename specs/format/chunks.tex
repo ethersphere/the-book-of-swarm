@@ -1,10 +1,10 @@
 First let us define some basic types, such as \emph{payload, span, segment}. These fixed length byte slices enables verbose expression of fundamental units like \lstinline{segment size} or \lstinline{payload size}.
 
-\begin{definition}{basic types}\label{def:chunk-constants}
+\begin{definition}[segment, payload, span, branches]\label{def:chunk-constants}
 \begin{lstlisting}[language=buzz1]
 // /chunk
 
-define type segment as [32]byte    // basic unit (used in type definitions)
+define type segment as [32]byte    // unit for type definitions
 define type payload as [:4096]byte // variable length max 4Kilobyte
 define type span as uint64         // little endian binary marshalled
 
@@ -16,7 +16,7 @@ define function branches
 
 Now  let's turn to the definition of \emph{address,  key} and \emph{reference}:                                             
 
-\begin{definition}{chunk reference}\label{def:chunk-reference}
+\begin{definition}[Chunk reference]\label{def:chunk-reference}
 \begin{lstlisting}[language=buzz1]
 // /chunk
 
@@ -31,7 +31,7 @@ define type reference
 
 Now, define chunk as a object with span  and payload.
 
-\begin{definition}{chunk}\label{def:chunks}
+\begin{definition}[Content addressed chunk]\label{def:chunks}
 \begin{lstlisting}[language=buzz1]
 // /chunk
 
@@ -58,7 +58,7 @@ Where length is the content of the length field and reference  size is the sum o
 
 In order to remove the padding after decryption before returning the plaintext chunk. 
 
-\begin{definition}{span to payload length}\label{def:span}
+\begin{definition}[Span to payload length]\label{def:span}
 \begin{lstlisting}[language=buzz1]
 // /chunk
 
@@ -74,7 +74,7 @@ as
 
 Finally, we can define the public API of chunks  for retrieval and storage.
 
-\begin{definition}{chunk retrieval}\label{def:retrieve}
+\begin{definition}[Chunk API retrieval]\label{def:retrieve}
 \begin{lstlisting}[language=buzz1]
 // /chunk
 
@@ -87,7 +87,7 @@ as
 \end{definition}
 
 
-\begin{definition}{chunk storage}\label{def:store}
+\begin{definition}[Chunk API: storage] \label{def:store}
 \begin{lstlisting}[language=buzz1]
 // /chunk
 

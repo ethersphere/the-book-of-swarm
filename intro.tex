@@ -79,11 +79,13 @@ Although it has become a spectacularly popular and very useful, BitTorrent is at
 % 3/ some short exploration of current attempts to provide this and their potential limitations, but keep this short, unemotional and unbiased
 % 4/ drum up to grand ending of how swarm will provide trustless computing save the world etc. etc.
 
-\say{The Times 03/
+\begin{displayquote}
+The Times 03/
 Jan/2009 Chancel
 lor on brink of 
 second bailout f
-or banks}
+or banks
+\end{displayquote}
 
 At 6:15 on (or after) Saturday the 3rd January 2009 the world changed forever. A mysterious cypherpunk created the first block of a chain that would come to encircle the entire world, and the genie was officially out of the bottle. This first step would put in motion a set of reactions that would result in an unprecedentedly enormous amount of money flowing from the traditional reservoirs of fiat and physical goods into a totally new way to store and transmit value -- cryptocurrency -- Satoshi Nakamato did something no-one else had been able to do, he disintermediated the banks, decentralised trustless value transfer and in that moment money became owned by everyone.
 
@@ -95,11 +97,11 @@ The straightforward approach of using \gloss{BitTorrent} as a distribution mecha
 
 In order to try to enable responsive \glossplural{distributed web application} (a \glossplural{dapp}), the \gloss{InterPlanetary File System} (\gloss{IPFS}) \cite{ipfs2014} has introduced a few major improvements over BitTorrent. The most immediately apparent one is highly web-compatible URL-based retrieval. In addition, the directory and indexing of data, (also organized as a \gloss{DHT}) had been vastly improved, making it possible to search for a small part of any file, called a \gloss{chunk}.
 
-There are also numerous other efforts to fill the gap of providing a Web 3.0 surrogate for the constellation of servers and services that have come to be expected by a Web 2.0 developer. These are not insignificant roles to supplant, even the most simple web app still subsumes a vast array of concepts and paradigms which have to be remapped into this now trustless setting. In many ways, this problem is proving to be perhaps even more nuanced that implementing trustless computation in the blockchain.
+There are also numerous other efforts to fill the gap of providing a Web 3.0 surrogate for the constellation of servers and services that have come to be expected by a Web 2.0 developer. These are not insignificant roles to supplant, even the most simple web app still subsumes a vast array of concepts and paradigms which have to be remapped into this now trustless setting. In many ways, this problem is proving to be perhaps even more nuanced that implementing trustless computation in the blockchain. Swarm responds to this with an array of carefully designed data structures, which enable the application developer to recreate concepts we have grown used to in Web 2.0 into the new setting of Web 3.0. Later we will describe how it is possible in Swarm to reimagine the current state of the web, but this time built on solid cryptographic foundations.
 
-A sliding scale can be perceived with large file size, low frequency of retrieval and a more monolithic api on the left, and smaller data packets, higher frequency of retrieval and more nuanced api on the right. In this graph, file storage and retrieval systems like a posix filesystem, S3, Storj and BitTorrent live on the left hand side, wheras key-value stores like LevelDB or databases like MongoDB or Postgres live on the right. Of this scale, all are needed to build a useful app, and furthermore there must be the ability to combine data where necessary, and to ensure only authorised parties have access to their data. In a centrist model it is easy to handle these problems initially, more difficult with scale, but every part of the scale has a solution from one piece of software or another. However, in the decentralised model, all bets are off the table. Authorisation must be handled with cryptography and the combination of data is hence limited by this. As a result, the Web 3.0 stack is nascent and evolving, and many solutions are only deal piecemeal with only part of this spectrum of requirements. In this book, you will learn how Swarm spans each area of this spectrum, as well as providing high level tools so for the new guard of budding Web 3.0 developers. And so we hope from an infrastructure perspective, working on Web 3.0 will feel like the halcyon days of Web 1.0, while delivering unprecedented levels of security and privacy.
+A sliding scale can be perceived with large file size, low frequency of retrieval and a more monolithic api on the left, and smaller data packets, higher frequency of retrieval and more nuanced api on the right. In this graph, file storage and retrieval systems like a posix filesystem, S3, Storj and BitTorrent live on the left hand side, whereas key-value stores like LevelDB or databases like MongoDB or Postgres live on the right. Across this scale, all these modalities are needed to build a useful app, and furthermore there must be the ability to combine data where necessary, and to ensure only authorised parties have access to their data. In a centrist model it is easy to handle these problems initially, more difficult with growth, but every part of the scale has a solution from one piece of software or another. However, in the decentralised model, all bets are off the table. Authorisation must be handled with cryptography and the combination of data is hence limited by this. As a result, the Web 3.0 stack is nascent and evolving, and many solutions are only deal piecemeal with only part of this spectrum of requirements. In this book, you will learn how Swarm spans each area of this spectrum, as well as providing high level tools for the new guard of budding Web 3.0 developers. And so we hope from an infrastructure perspective, working on Web 3.0 will feel like the halcyon days of Web 1.0, while delivering unprecedented levels of security and privacy.
 
-To respond to the need for a privacy to be baked in at the root level in file-sharing, as it is so effectively in Ethereum, Swarm insists on anonymity at a very fundamental and absolute level. Lessons from Web 2.0 have taught us that trust should be given away carefully and only to those that are deserving of it and will treat it with respect. Data is toxic, and we must treat it carefully, in order to be responsible to ourselves and those for whom we take responsibility. Later we will explain how Swarm provides full and fundamental user privacy.
+To respond to the need for a privacy to be baked in at the root level in file-sharing, as it is so effectively in Ethereum, Swarm insists on anonymity at a very fundamental and absolute level. Lessons from Web 2.0 have taught us that trust should be given away carefully and only to those that are deserving of it and will treat it with respect. Data is toxic, and we must treat it carefully in order to be responsible to ourselves and those for whom we take responsibility. Later we will explain how Swarm provides full and fundamental user privacy.
 
 And of course, to fully transition to a Web 3.0 decentralised world, we must also deal with the problems of incentive and trust that are traditionally solved by handing over responsibility to the (often untrustworthy) centralised gatekeeper. As we have noted, this is one problem that BitTorrent has also struggled to solve and responded to with a plethora of seed ratios and private (centralised) trackers.
 
@@ -133,7 +135,7 @@ Despite this huge amount of value, the asymmetric distribution of the wealth gen
 % move this?
 % As a solution, citizens could organise into "data co-operatives", who would then act as trade unions do in conventional economy. 
 
-Flows of data are becoming increasingly blocked and filtered by governments using reasoning based on the protection of citizens, sovereignty and national economy \cite{VirtualNationalism2020Feb}. Leaks revealed by several security experts have shown that for governments to properly give considersation to national security,  data should be kept close to home and not left to reside in other countries. GDPR is such one instance of a "digital border" that has been erected -- data may leave the EU only if appropriate safeguards are in place. Other countries, such as India, Russia and China, have implemented their own geographic limitations on data. The EU Commission has pledged to closely monitor the policies of these countries and address any limits or restrictions to data flows in trade negotiations and through the actions in the World Trade Organization \cite{EUWhitePaperAI2020Feb}.
+Flows of data are becoming increasingly blocked and filtered by governments using reasoning based on the protection of citizens, sovereignty and national economy \cite{VirtualNationalism2020Feb}. Leaks revealed by several security experts have shown that for governments to properly give consideration to national security,  data should be kept close to home and not left to reside in other countries. GDPR is such one instance of a "digital border" that has been erected -- data may leave the EU only if appropriate safeguards are in place. Other countries, such as India, Russia and China, have implemented their own geographic limitations on data. The EU Commission has pledged to closely monitor the policies of these countries and address any limits or restrictions to data flows in trade negotiations and through the actions in the World Trade Organization \cite{EUWhitePaperAI2020Feb}.
 
 Despite this growing interest in the ebb and flow of data, it is the big tech firms that firmly hold a grip on much of this, and the devil is in the details. Swarm's privacy first model requires that no personal data be divulged to any third parties, so everything is end-to-end encrypted out of the box, resisting the ability of service providers to aggregate and leverage giant datasets. The outcome of this is that instead of being concentrated at the service provider, control of the data remains decentralised and with the individual to which it pertains, and as a result, so does the power.
 
@@ -218,7 +220,7 @@ Swarm is infrastructure for a self-sovereign society.
 
 \subsection{Values \statusorange}\label{sec:values}
 
-Self-sovereignty implies freedom. If we break it down, this implicates the following metavalues: 
+Self-sovereignty implies freedom. If we break it down, this implies the following metavalues: 
 
 \begin{itemize}
 \item \emph{inclusivity} - Public and permissionless participation.  
@@ -229,7 +231,7 @@ Self-sovereignty implies freedom. If we break it down, this implicates the follo
 
 These metavalues can be thought of as systemic qualities which contribute to empowering individuals and collectives in the direction of self-sovereignty.
 
-Inclusivity entails we aspire to include the underprivileged in data economy; lower barrier of entry to define complex data flow and build decentralised applications. Swarm is a network with open participation for providing service and permissionless access to publishing, sharing, and investing your data.
+Inclusivity entails we aspire to include the underprivileged in the data economy; lower barrier of entry to define complex data flow and build decentralised applications. Swarm is a network with open participation for providing service and permissionless access to publishing, sharing, and investing your data.
 
 Users are free to express their intention as action and have the authority to decide if they remain anonymous or share their interaction and preferences. The integrity of online persona is required. 
 
@@ -240,18 +242,17 @@ Impartiality basically says that catering for the other three values are not onl
 \subsection{Design principles \statusorange}\label{sec:design-principles}
  
 
-Information society  and data economy bring an age where online transactions and big data are crucial to everyday life and thus the supporting technology counts as critical infrastructure. It is imperative that this base layer infrastructure be provided with strong guarantees for continuity. 
+Information society and the data economy bring an age where online transactions and big data are crucial to everyday life and thus the supporting technology is critical infrastructure. It is imperative that this base layer infrastructure be provided with strong guarantees for continuity. 
 
 Continuity is achieved by the following \emph{systemic} requirements:
 
 \begin{itemize}
 \item \emph{stable} - The specifications and software implementations are stable and resilient to changes in participation, or politics (political pressure, censorship).
-\item \emph{scalable} - The solution can accommodate many orders of magnitude more users and data than initially starting without a prohibitive hit on performance or reliability (mass adoption).
+\item \emph{scalable} - The solution can accommodate many orders of magnitude more users and data than initially starting with, without experiencing prohibitively high reductions in performance or reliability during mass adoption.
 \item \emph{self-sustaining} - The solution runs by itself as an autonomous system, not depending on social coordination of collective action or any legal entity's business, exclusive know-how or infrastructure.   
-\item \emph{secure} - The solution is resistant to deliberate attacks, immune to  social pressure  and politics and resilient in terms of tolerating errors in technologies it relies on. 
+\item \emph{secure} - The solution is resistant to deliberate attacks, immune to  social pressure and politics and resilient in tolerating faults in its technological dependencies (e.g. blockchain, programming languages). 
 \end{itemize}
-
-
+)
 
 
 
@@ -274,8 +275,8 @@ symbolic & manipulation & processing \\
 \label{tab:scope}
 \end{table}
 
-Global infrastructure that supports data storage, transfer and processing 
-can be thought of as the \gloss{world computer}. If the Ethereum blockchain is the CPU of the world computer, then Swarm is the "hard disk".
+A global infrastructure that supports data storage, transfer and processing 
+can be thought of using a loose analogy as the \gloss{world computer}. Then, if the Ethereum blockchain is the CPU of the world computer, then Swarm is best thought of as the "hard disk". Of course, as is inherent, this model belies the complex nature of Swarm, and Swarm is capable of much more than simple storage, as we will discuss later in the book.
 
 The Swarm project is set out to bring this vision to completion and build the remaining parts covering storage and communication. 
 
@@ -283,23 +284,23 @@ The Swarm project is set out to bring this vision to completion and build the re
 
 In what follows, we try to identify feature areas of the product that best express or facilitate the values discussed above. 
 
-Inclusivity in terms of permissionless participation is best guaranteed in a decentralised peer-to-peer network.  
-Allowing nodes to provide service and get paid doing so could offer a zero-cash entry to the ecosystem: new users without money can serve other nodes until they accumulate enough to use services themselves. A decentralised network providing distributed storage without gatekeepers is also inclusive and impartial in that it allows content creators currently deplatformed to publish without being censored. 
+Inclusivity in terms of permissionless participation is best guaranteed by a decentralised peer-to-peer network.  
+Allowing nodes to provide service and get paid for doing so will offer a zero-cash entry to the ecosystem: new users without currency can serve other nodes until they accumulate enough currency to use services themselves. A decentralised network providing distributed storage without gatekeepers is also inclusive and impartial in that it allows content creators who risk being deplatformed by repressive and unjust authorities to publish without their right to free speech being censored. 
 
-Economic incentives built in the protocols is working best if it tracks the actions that incur costs in the context of peer to peer interaction: bandwidth sharing evidenced in message relaying is such an action where immediate accounting is possible if a node receives message valuable to them. On the other hand, promissory services such as commitment to preserve data over time, need to be rewarded only upon verifying. In order to avoid the tragedy of commons problem, such promissory commitments should be guarded by individual accountability through the threat of punitive measures, i.e., allow staked insurers.
+Economic incentives built in the protocols works best if it tracks the actions that incur costs in the context of peer-to-peer interactions: bandwidth sharing as evidenced in message relaying is one such action where immediate accounting is possible as a node receives a message that is valuable to them. On the other hand, promissory services such the commitment to preserve data over time, must be rewarded only upon verifying. In order to avoid the \gloss{tragedy of commons} problem, such promissory commitments should be guarded against by enforcing individual accountability through the threat of punitive measures, i.e. by allowing staked insurers.
 
-Integrity is served by easy provability of authenticity, while potentially maintaining anonymity.
-Provable inclusion and uniqueness are important to allow trustless data transformations.
+Integrity is served by easy provability of authenticity, while maintaining anonymity.
+Provable inclusion and uniqueness are fundamental to allowing trustless data transformations.
 
 % \subsection{Requirements \statusred}\label{sec:requirements}
 
 \subsection{The future} \label{sec:future}
 
-The future is unknown and many challenges lie ahead for humanity. What is certain in today's digital society is that to be sovereign and in control of our destinies, nations and individuals alike need to keep access and control over their data and communication.
+The future is unknown and many challenges lie ahead for humanity. What is certain in today's digital society is that to be sovereign and in control of our destinies, nations and individuals alike must retain access and control over their data and communication.
 
-Swarm's vision and objectives stem from the decentralized tech community and it's values, as it was originally designed to be the "hard drive" for the world computer that is Ethereum.
+Swarm's vision and objectives stem from the decentralized tech community and its values, as it was originally designed to be the "hard drive" component in the trinity which would form the world computer: Ethereum, Whisper, and Swarm.
 
-It will offer responsiveness suitable for dapps running real-time on the devices of users and properly incentivizing storage on any kind of storage backend - from laptop to high-availability clusters. This will be done with incentivization for storage and bandwidth done in a way guaranteeing service continuity guarantees.
+It offers the responsiveness required by dapps running on the devices of users and well incentivised storage using any kind of storage infrastructure - from smartphone to high-availability clusters. Continuity will be guaranteed with well designed incentives for bandwidth and storage.
 
 Content creators will get fair compensation for the content they will offer and content consumers will be paying for it, removing the middlemen providers that currently benefit from the network effects. The benefits of the network effects will be spread throughout the network.
 

@@ -19,6 +19,8 @@
 \usepackage{listings-buzz} % import this package after listings
 \usepackage{listings-protobuf} % import this package after listings
 % \usepackage{listings-golang} % import this package after listings
+% \usepackage[labelfont=bf]{caption} % bold captions for images
+\interfootnotelinepenalty=10000 %% Completely prevent breaking of footnotes
 
 \lstdefinestyle{bos}{
 %   frame=lines,
@@ -234,7 +236,6 @@ backend stack for the decentralised web}
 \input{body.tex}
 \part{Specifications}
 \label{part:specifications}
-\listoftheorems[ignoreall,show={definition}]
 \input{specs.tex}
 %%%%%%%%%%%%%%%%%%%%%%
 \phantomsection 

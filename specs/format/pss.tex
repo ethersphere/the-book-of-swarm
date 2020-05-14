@@ -1,21 +1,21 @@
-\subsection{Pss message and trojan chunk}
+\subsection{Direct pss message with trojan chunk}
 
 Pss has two fundamental types, a message and a trojan chunk structure which wraps the encrypted serialised message and contains a nonce that is mined to make the resulting chunk's content address (BMT hash) to match the targets.
 
 
-\begin{definition}{pss message and trojan chunk}\label{def:pss-message}
+\begin{definition}[Basic types: topic, targets, recipient, message and trojan]\label{def:pss-message}
 \begin{lstlisting}[language=buzz1]
-// /swarm/pss
+// /pss
 
 
-define type topic        as [32]byte       // obfuscated topic matcher
+define type topic        as [segment size]byte       // obfuscated topic matcher
 define type targets      as [][]byte       // overlay prefixes 
-define type recipient    as crypto/keypair
+define type recipient    as crypto/pubkey
 
 // pss message
 define type message 
     seal    segment            
-    payload [!4030]byte    // varlength padded to 4030B
+    payload [!:4030]byte    // varlength padded to 4030B
     
 // trojan chunk
 define type trojan 
@@ -28,11 +28,11 @@ define type trojan
 The message is encoded in a way that allows integrity checking and at the same time obfuscates the topic. The operation to package the payload with a topic is called \emph{sealing}
 
 
-\begin{definition}{sealing the message}\label{def:pss-sealing}
+\begin{definition}[Sealing/unsealing the message]\label{def:pss-sealing}
 \begin{lstlisting}[language=buzz1]
-// /swarm/pss
+// /pss
 
-define function seal []byte as @payload
+define function seal @payload []byte
     with topic
 as
     @seal = hash @payload and @topic // obfuscate topic
@@ -53,11 +53,10 @@ as
 Functions \lstinline{wrap/unwrap} transform between message and trojan chunk. \lstinline{wrap} takes an optional recipient public key to asymmetrically encrypt the message.
 The targets are a list of overlay address prefixes derived from overlay addresses of recipients, with length specified to guarantee that a chunk matching it will end up with the recipient solely as a result if  push-syncing.   
 
-\begin{definition}{pss message wrapping and mining trojan chunk}\label{def:wrap}
+\begin{definition}[Wrapping/unwrapping]\label{def:wrap}
 \begin{lstlisting}[language=buzz1]
 // /pss
 
-// wraps the message in a trojan chunk
 define function wrap message 
     for recipient
     to  targets
@@ -70,23 +69,22 @@ as
             trojan{@n, @msg} as chunk address 
     trojan{@nonce, @msg} as chunk 
 
-\end{lstlisting}
-\end{definition}
-
-As a chunk arrives at the node,  \lstinline{pss/deliver} is called as a hook by the storage component.
-First the message is unwrapped using the recipient private key and unsealed with all the topics subscribed to by API clients. If the unsealing is successful, message integrity as well as topic matching is proven so the payload is written into the stream registered for the topic in question.
-
-\begin{definition}{pss message unwrapping and local trojan delivery}\label{def:unwrap}
-\begin{lstlisting}[language=buzz1]
-// /pss
-
-// unwrap trojan chunk 
 define function unwrap chunk
     for recipient
 as
     @chunk bytes 
         (crypto/decrypt  for @recipient if @recipient)
             as message
+
+\end{lstlisting}
+\end{definition}
+
+When a chunk arrives at the node,  \lstinline{pss/deliver} is called as a hook by the storage component.
+First the message is unwrapped using the recipient private key and unsealed with all the topics API clients subscribed to. If the unsealing is successful, message integrity as well as topic matching is proven so the payload is written into the stream registered for the topic in question.
+
+\begin{definition}[Incoming message handling]\label{def:delivery}
+\begin{lstlisting}[language=buzz1]
+// /pss
 
 // mailbox is a handler type, expects payload
 // sent sealed with the topic to be delivered via the stream 
@@ -109,15 +107,18 @@ define function deliver chunk
 \end{definition}
 
 
-\begin{definition}{pss/send API endpoints}\label{def:send}
+\begin{definition}[pss API: send]\label{def:send}
 \begin{lstlisting}[language=buzz1]
 // /pss
-// send API endpoint
-define function send payload
+
+define function send @payload []byte
     about topic
-    to    targets
-has api POST on "/pss/<topic>"
+    for recipient
+    ?to    targets
+has api POST on "/pss/<recipient>/<topic>(?targets=<targets>)"
+    with @payload as body
 as 
+    targets = lookup.targets for @recipient if no @targets
     context tag = tag/tag{}
     seal @payload with @topic        // seal with topic
         wrap for @recipient          // encrypt if given recipient
@@ -128,12 +129,13 @@ as
 \end{lstlisting}
 \end{definition}
 
-\begin{definition}{pss/receive API endpoint}\label{def:receive}
+\begin{definition}[pss API: receive]\label{def:receive}
 \begin{lstlisting}[language=buzz1]
 // /pss
-// send API endpoint
+
 define function receive about topic 
     on uint64 @channel
+has api GET on "/pss/<topic>/<channel>"
 as 
     @stream = open @channel
     context mailboxes append= mailbox{ @topic, @stream }
@@ -144,7 +146,7 @@ define function cancel topic
 
 \subsection{Envelopes}
 
-\begin{definition}{envelope}\label{def:pss-envelope}
+\begin{definition}[Envelope]\label{def:pss-envelope}
 \begin{lstlisting}[language=buzz1]
 // /pss
 

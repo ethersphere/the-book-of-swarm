@@ -1,9 +1,8 @@
 \subsection{Overlay address \statusyellow}
 
-Swarm's overlay network uses 32-byte addresses. In order to help  uniform utilisation of the address space,  these addresses must be derived using a hash function. A Swarm node must be associated with an Ethereum account called the \gloss{Swarm base account} or \gloss{bzz account}.
-The node's overlay address is derived the public key of the account.
+Swarm's overlay network uses 32-byte addresses. In order to help  uniform utilisation of the address space,  these addresses must be derived using a hash function. A Swarm node must be associated a \gloss{Swarm base account} or \gloss{bzz account}, which is an Ethereum account that the node (operator) must possess the private key for. The node's overlay address is derived the public key of this account. 
 
-\begin{definition}{Swarm overlay address of node A}\label{def:overlay}
+\begin{definition}[Swarm overlay address of node A]\label{def:overlay}
 \begin{equation}
 \mathit{overlayAddress}(A) \defeq \mathit{Hash}(\mathit{ethAddress}|\mathit{bzzNetworkID})         
 \end{equation}
@@ -19,31 +18,24 @@ where
 \end{itemize}
 \end{definition}
 
+In a way, deriving the node address from a public key means the overlay address space is not freely available: to occupy an address you must possess the private key of the address which other nodes need to verify. Such authentication is easy using a digital signature of a shared consensual piece of text, see \ref{spec:format:bzzaddress}.
+
 \subsection{Underlay address \statusyellow}
 
-To enable peers to locate the a node on the network, the overlay address is paired with an underlay address. The underlay address is a string representation of the node's network location on the underlying transport layer. 
+To enable peers to locate the a node on the network, the overlay address is paired with an underlay address. The underlay address is a string representation of the node's network location on the underlying transport layer. It is used by nodes to dial other nodes to establish keep-alive peer to peer connections. 
 
-\begin{definition}{Swarm underlay multiaddress}\label{def:underlay}
+\begin{definition}[Swarm underlay multiaddress]\label{def:underlay}
 \begin{lstlisting}[]
-// ID: /swarm/handshake/1.0.0/
+
 \end{lstlisting}
 \end{definition}
-
-% As long as swarm runs of devp2p, we use the \gloss{enode URL scheme} representation:
-
-% \begin{definition}{devp2p underlay address of a node}\label{def:underlay}
-% $\mathit{underlay}(n) \defeq $
-% \begin{verbatim}
-%     "enode://"<NODEID>"@"<HOST>(":"<TCPPORT>("?udp="<UDPPORT>))
-% \end{verbatim}
-% \end{definition}
 
 
 \subsection{BZZ address \statusyellow}
 
-Bzz address is functionally the pairing of overlay and underlay addresses. In order to ensure that an address is derived from an account the node possesses as well as verifiably attest to an underlay address a node can be called on, bzz addresses are communicated in the following transfer format:
+Bzz address is functionally the pairing of overlay and underlay addresses. In order to ensure that an overlay address is derived from an account the node possesses as well as verifiably attest to an underlay address a node can be called on, bzz addresses are communicated in the following transfer format:
 
-\begin{definition}{Swarm bzz address transfer format} \label{def:bzz-address}
+\begin{definition}[Swarm bzz address transfer format]\label{def:bzz-address}
 \begin{lstlisting}[]
 // ID: /swarm/handshake/1.0.0/bzzaddress
 
@@ -57,9 +49,9 @@ message BzzAddress {
 \end{lstlisting}
 \end{definition}
 
-Here the signature is attesting to an underlay address for a network:
+Here the signature is attesting to the association of an overlay and an underlay address for a network. 
 
-\begin{definition}{Signed underlay address of node A}\label{def:signed-underlay}
+\begin{definition}[Signed underlay address of node A]\label{def:signed-underlay}
 \begin{equation}
 \mathit{signedUnderlay}(A) \defeq \mathit{Sign}(\mathit{underlay}|\mathit{bzzNetworkID})         
 \end{equation}
@@ -67,7 +59,7 @@ Here the signature is attesting to an underlay address for a network:
 
 of the underlay with bzz network ID appended as plaintext and hashes the resulting public key together with the bzz network ID. 
 
-\begin{definition}{bzz types}\label{def:bzz-types}
+\begin{definition}[Node addresses: overlay, underlay,  bzz address]\label{def:bzz-types}
 \begin{lstlisting}[language=buzz1]
 // /bzz
 
@@ -77,9 +69,8 @@ define type underlay []byte
 define function overlay.address of pubkey 
     within @network uint64 
 as
-    hash @pubkey address
-        and @network 
-            as overlay
+    hash @pubkey address and @network 
+        as overlay
 
 define function valid bzz.address 
     within @network uint64
@@ -101,3 +92,9 @@ as
 
 
 In order to get the overlay address from the transfer format peer info, one recovers from signature the peer's base account public key using the plaintext that is constructed as per \ref{def:signed-underlay}. From the public key, the overlay can be calculated as in \ref{def:overlay}. The overlay address thus obtained needs to be checked against the one provided in the handshake.
+
+Signing of the underlay enables preflight authentication of the underlay of a trusted but not connected node. 
+
+Since underlays are meant to be volatile, we can assume and in fact expect multiple underlays signed by the same node. However, these are meant to be temporally ordered. So one with a newer timestamp invalidates the older one. 
+
+In order to make sure that the node connected through that underlay does indeed operate the overlay address, its authentication must be obtained through the peer connection that was initiated by dialing the underlay. The This protects against malicious impersonation of a trusted overlay potentially. 

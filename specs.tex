@@ -14,6 +14,8 @@ APIs (\ref{spec:api}) gives a formal specification of the high level interfaces 
 which is an API description format for REST APIs.
 
 
+\listoftheorems[ignoreall,show={definition}]
+
 \chapter{Data types and algorithms}\label{spec:convention}
 
 \orange{}
@@ -41,16 +43,21 @@ which is an API description format for REST APIs.
 \input{specs/format/manifests.tex}
 % \section{Entanglement coding \statusred}\label{spec:format:entanglements}
 %\input{specs/format/entanglement.tex}
+% composite api, resolver, tags
+\input{specs/format/storage.tex}
 
 \section{Access Control \statusorange}\label{spec:format:access-control}
 \input{specs/format/access-control.tex}
 
-\section{PSS message \statusyellow}\label{spec:format:pss-messsage}
+\section{PSS \statusyellow}
+
+\subsection{PSS message}
+\label{spec:format:pss-messsage}
 \input{specs/format/pss.tex}
-\section{Update notifications \statusred}\label{spec:format:update-notifications}
+\subsection{Update notifications \statusred}\label{spec:format:update-notifications}
 %\input{specs/format/update-notifications.tex}
 
-\section{Chunk recovery  \statusyellow}\label{spec:format:recovery}
+\subsection{Chunk recovery  \statusyellow}\label{spec:format:recovery}
 \input{specs/format/recovery.tex}
 
 \section{Postage stamps \statusorange}\label{spec:format:postage-stamps}
@@ -109,18 +116,7 @@ which is an API description format for REST APIs.
 \chapter{API-s}\label{spec:api}
 
 \section{External API requirements\statusorange}\label{spec:api:external}
-\subsection{Signer}\label{spec:api:signer}
-% \input{specs/api/signer.tex}
-
-\subsection{Blockchain \statusred}\label{spec:api:blockchain}
-% \input{specs/api/blockchain.tex}
-
-\subsection{Local \statusred}\label{spec:api:local}
-% \input{specs/api/local.tex}
-
-\subsection{State store \statusred}\label{spec:api:statestore}
-% \input{specs/api/statestore.tex}
-
+\input{specs/api/external.tex}
 
 
 \section{API primitives}\label{spec:api:primitives}

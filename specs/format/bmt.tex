@@ -16,9 +16,9 @@ Obtaining the BMT hash of a sequence involves the following steps:
 \item \emph{integrity protection} - Prepend the span to the root hash of the binary tree and calculate the \emph{base hash} of the data
 \end{enumerate}
 
-\begin{definition}{bmt hash}\label{def:bmt-hash}
+\begin{definition}[BMT hash]\label{def:bmt-hash}
 \begin{lstlisting}[language=buzz1]
-// /swarm/chunk/bmt
+// /bmt
 
 define function hash payload 
     with span

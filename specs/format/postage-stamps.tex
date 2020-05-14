@@ -1,5 +1,5 @@
 
-\subsection{D}
+\subsection{Stamps for upload}
 \subsubsection{Witness type}
 
 There can be different implementations of postage stamps that differ in the structure and semantics of the \emph{proof of payment}. To allow for new cryptographic mechanisms to be used as they are developed, the \lstinline{witnessType} argument indicates the type of the witness used. 
@@ -82,11 +82,12 @@ validity period, i.e. when \lstinline{block.timestamp} (the output of \lstinline
 The binary serialization of the postage stamp consists of a single 5-element array containing the arguments in the same order. 
 
 
-\begin{definition}{postage stamp}\label{def:postage-stamp}
+
+\begin{definition}[Postage stamp basic types: batchID, address, witness, stamp, validity]\label{def:postage-stamp}
 \begin{lstlisting}[language=buzz1]
 // /postage
 
-define type batchid as [32]byte  
+define type batchid as [segment size]byte  
 define type address as bzz/address
 define type witness as crypo/signature
 
@@ -99,9 +100,12 @@ define type stamp
 define function valid stamp
 as 
     // check validity on blockchain
-    ethereum call context contracts postage
-        is @stamp valid
+    ethereum call "valid" using context contracts "postage"
+        with @stamp
         
 \end{lstlisting}
 \end{definition}
 
+\subsection{Postage subscriptions}\label{spec:format:subscriptions}
+
+\subsection{Postage lottery race}\label{spec:format:race}
