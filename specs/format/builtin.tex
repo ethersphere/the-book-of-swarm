@@ -273,3 +273,45 @@ define type params
      
 \end{lstlisting}
 \end{definition}
+
+
+\subsection{State store \statusgreen}\label{spec:format:statestore}
+% \input{specs/api/statestore.tex}
+
+\begin{definition}[State store]\label{def:state-store}
+\begin{lstlisting}[language=buzz1]
+// /statestore
+
+define type key []byte
+define type db  []byte
+define type value []byte
+
+define function create db
+
+define function destroy db
+
+define function put value
+    to db
+    on key
+    
+define function get key 
+    from db
+    return value
+\end{lstlisting}
+\end{definition}
+
+
+\subsection{Local context and configuration \statusgreen}\label{spec:format:local}
+% \input{specs/api/local.tex}
+
+
+\begin{definition}[Context]\label{def:scontext}
+\begin{lstlisting}[language=buzz1]
+// /context
+
+define type contract as "buzz"|"chequebook"|"postage"|""
+
+define type context
+    contracts [contract]ethereum/address 
+\end{lstlisting}
+\end{definition}

@@ -29,59 +29,17 @@ In order to facilitate the upgrade of the contract either in case of a discovere
 In order to avoid centralized control, it is also recommended that it is the witness-verifying contract that is referenced in client configuration so that client operators can independently decide for themselves when and whether to switch to a new contract, as they become available.
 
 
-Nodes participating in the same postage system are configured to reference the same contract on the same blockchain. This contract
-*must* have an accessor call with the following ABI signature:
+Nodes participating in the same postage system are configured to reference the same contract on the same blockchain. This contract must conform to the following interface:
 
-\begin{lstlisting}
+\begin{definition}[Postage contract]\label{def:postage}
 
-```json
-{
-  "name": "postage",
-  "type": "function",
-  "inputs": [
-    {
-      "name": "payloadHash",
-      "type": "bytes32"
-    },
-    {
-      "name": "postagePaid",
-      "type": "uint256"
-    },
-    {
-      "name": "beginValidity",
-      "type": "uint256"
-    },
-    {
-      "name": "endValidity",
-      "type": "uint256"
-    },
-    {
-      "name": "witnessType",
-      "type": "uint8"
-    },
-    {
-      "name": "witness",
-      "type": "bytes"
-    }
-  ],
-  "outputs": [
-    {
-      "name": "",
-      "type": "bool"
-    }
-  ]
-}
-```
+\end{definition}
 
-\end{lstlisting}
 
 This accessor method returns \lstinline{true} if the proof embodied by \lstinline{witness} checks out for all other arguments within the claimed 
 validity period, i.e. when \lstinline{block.timestamp} (the output of \lstinline{TIMESTAMP EVM} opcode) is between \lstinline{beginValidity} (inclusive) and 
 \lstinline{endValidity} (exclusive). Outside of the validity period, the return value is \lstinline{undefined}.
-
-The binary serialization of the postage stamp consists of a single 5-element array containing the arguments in the same order. 
-
-
+ 
 
 \begin{definition}[Postage stamp basic types: batchID, address, witness, stamp, validity]\label{def:postage-stamp}
 \begin{lstlisting}[language=buzz1]

@@ -1,12 +1,11 @@
 
-The Swarm specification is presented in four chapters. \ref{spec:convention} enlists all the conventions relating data types, formats and algorithms. Protocols 
-(\ref{spec:protocol}) specify wire protocols: message formats and serialisation and encapsulation are hard requirements that are crucial for  cross client compatibility. This chapter benefits from \lstinline{protobuf},%
+The Swarm specification is presented in four chapters. Chapter \ref{spec:convention} enlists all the conventions relating data types, formats and algorithms using the \lstinline{buzz} language as pseudo-code.
+Chapter \ref{spec:protocol} ( Protocols) specifies the wire protocols: message formats, serialisation and encapsulation are hard requirements that are crucial for  cross client compatibility. This chapter benefits from \lstinline{protobuf},%
 %
 \footnote{\url{https://developers.google.com/protocol-buffers}}
 %
 which is a generic language-neutral, platform-neutral, extensible mechanism for serializing structured data.
-Strategies (\ref{spec:strategy}) are meant to be recommended  behaviour that is supposed to be aligned with economic incentives.
-Strategies may not be optimal, in some cases, the directions focused on simplicity and ease of reasoning.
+The chapter on Strategies (\ref{spec:strategy}) is meant to present recommended incentive-aligned behaviour.
 APIs (\ref{spec:api}) gives a formal specification of the high level interfaces of Swarm. Different client implementations are  to be tested against a standard suite of API tests. The API specifications benefit from \lstinline{OpenAPI},%
 %
 \footnote{\url{https://swagger.io/}}
@@ -23,20 +22,20 @@ which is an API description format for REST APIs.
 \section{Built-in primitives \statusyellow}\label{spec:format:builtin}
 \input{specs/format/builtin.tex}
 
-\section{Bzz address}\label{spec:format:bzzaddress}
+\section{Bzz address\statusgreen}\label{spec:format:bzzaddress}
 \input{specs/format/bzzaddress.tex}
 
-\section{Chunks, encryption and addressing}
-\subsection{Content addressed chunks \statusyellow}\label{spec:format:chunks}
+\section{Chunks, encryption and addressing\statusyellow}
+\subsection{Content addressed chunks \statusgreen}\label{spec:format:chunks}
 \input{specs/format/chunks.tex}
-\subsection{Single owner chunk \statusyellow}\label{spec:format:soc}
+\subsection{Single owner chunk \statusgreen}\label{spec:format:soc}
 \input{specs/format/soc.tex}
 \subsection{Binary Merkle Tree Hash \statusyellow}\label{spec:format:bmt}
 \input{specs/format/bmt.tex}
 \subsection{Encryption \statusyellow}\label{spec:format:encryption}
 \input{specs/format/encryption.tex}
 
-\section{Files, manifests and data structures}\label{spec:format:data-structures}
+\section{Files, manifests and data structures\statusyellow}\label{spec:format:data-structures}
 \subsection{Files and the Swarm hash \statusyellow}\label{spec:format:files}
 \input{specs/format/files.tex}
 \subsection{Manifests \statusyellow}\label{spec:format:manifests}
@@ -46,12 +45,12 @@ which is an API description format for REST APIs.
 % composite api, resolver, tags
 \input{specs/format/storage.tex}
 
-\section{Access Control \statusorange}\label{spec:format:access-control}
+\section{Access Control \statusgreen}\label{spec:format:access-control}
 \input{specs/format/access-control.tex}
 
 \section{PSS \statusyellow}
 
-\subsection{PSS message}
+\subsection{PSS message\statusgreen}
 \label{spec:format:pss-messsage}
 \input{specs/format/pss.tex}
 \subsection{Update notifications \statusred}\label{spec:format:update-notifications}
@@ -77,19 +76,29 @@ which is an API description format for REST APIs.
 \section{Hive discovery  \statusgreen}\label{spec:protocol:hive}
 \input{specs/protocol/hive.tex}
 
-\section{Retrieval  \statusorange  \statuspriority}\label{spec:protocol:retrieval}
+\section{Retrieval  \statusorange}\label{spec:protocol:retrieval}
 \input{specs/protocol/retrieval.tex}
 
-\section{Push-syncing  \statusorange  \statuspriority}\label{spec:protocol:push-sync}
+\section{Push-syncing  \statusorange}\label{spec:protocol:push-sync}
 \input{specs/protocol/push-sync.tex}
 
-\section{Pull-syncing \statusorange  \statuspriority}\label{spec:protocol:pull-sync}
+\section{Pull-syncing \statusorange}\label{spec:protocol:pull-sync}
 \input{specs/protocol/pull-sync.tex}
 
 \section{SWAP settlement protocol \statusorange}\label{spec:protocol:swap}
 
 
 \chapter{Strategies \statusorange}\label{spec:strategy}
+
+
+The strategies clients follow will have a fundamental effect on the behaviour of the network and if they end up going against the preconceived design, the project may very well fail to suit user expectations. Such scenarios can easily turn fatal to the project, which is why it is instructive to err on the side of caution when change (or initially suggest) strategies for node behaviour.
+The scope of strategies are defined as those aspects of the intended 'protocol' which cannot be directly observed or easily verified. As an example contrast the very act of forwarding an incoming retrieve request (strategy) with the act of using correctly formatted and serialised messages when doing so (protocol constraint). The latter can be immediately detected and be responded to by disconnecting and blacklisting offenders. In contrast, whether a node does forwarding in a way conducive to the desired network outcome is subtle to detect. 
+
+Since we choose to work with the narrowest possible assumption of profit-maximising node operators, the choice of strategies ought to be course grained enough to evaluate the consequences of the options. In particular we must not allow for scenarios when even vaguely rational deviations from the recommended strategy have catastrophic effects.
+
+In general incentives should be in place to guarantee that behaviour that is detrimental to the service incurs a risk of subsequent loss, deterrent upfront cost or opens up reciprocal  vulnerability. 
+
+The constraints put on strategic choice are crucial in terms of rendering the game theory feasible to simulations and experiments or express them with simple enough analytical models to aid reasoning. 
 
 \section{Connection  \statusorange}\label{spec:strategy:connection}
 %\input{specs/strategy/connection.tex}
@@ -115,20 +124,70 @@ which is an API description format for REST APIs.
 
 \chapter{API-s}\label{spec:api}
 
+
+\begin{definition}[HTTP status codes used in swarm]
+\begin{lstlisting}
+\end{lstlisting}
+\begin{tabular}{c|p{0.25\linewidth}|p{0.6\linewidth}}
+103 & Checkpoint & returns temporary root hash for resumable uploads
+\\\hline
+200 & ok &
+\\
+201 & Created & returned by POST requests upon successful creation of file/manifest/tag/stamp/
+\\
+206 & Partial Content &
+\\\hline
+400 & Bad request & returned if request or its parameters are not well formed or missing
+\\
+401 & Unauthorized & returned by access control if auth fails
+\\
+402 & Payment Required & returned if no swap balance or missing/invalid postage stamp
+\\
+403 & Forbidden & returned if retrieved chunk is encrypted  but reference is. missing decryption key
+\\
+404 & Not Found &
+returned if a local prerequisite is not found
+\\
+405 & Method Not Allowed & HTTP verb  not allowed for this endpoint
+\\
+406 & Not Acceptable &
+the Accept header explicit in the request.
+\\
+408 & Request Timeout & retrieve requests fallback error after TTL passed
+\\
+411 & Length Required & returned by chunk upload API if length of file uploaded is beyond limit
+% 412 & Precondition Failed (RFC 7232)
+\\
+413 & Payload Too Large  &
+length of payload to upload beyond (chunk API)
+\\
+414 & URI Too Long  & manifest path  $\leq $ 32
+\\
+416 & Range Not Satisfiable  & offset in range query out of range
+\\
+420 & Enhance your calm & returned when recovery was initiated but retrieval timed out
+\\
+422 & Unprocessable Entity & returned by the blockchain external API if eth api returns an error 
+% 417 & Expectation Failed
+% 421 & Misdirected Request (RFC 7540)
+% 451 & Unavailable For Legal Reasons (RFC 7725)
+\end{tabular}
+\end{definition}
+
+
 \section{External API requirements\statusorange}\label{spec:api:external}
 \input{specs/api/external.tex}
 
 
-\section{API primitives}\label{spec:api:primitives}
+\section{Storage API \statusyellow}\label{spec:api:storage}
+\input{specs/api/storage.tex}
 
-\subsection{Chunk \statusred}\label{spec:api:chunkx}
-% \input{specs/api/chunks.tex}
 
-\subsection{Tags \statusred}\label{spec:api:tags}
+\subsection{Tags \statusyellow}\label{spec:api:tags}
 \input{specs/api/tags.tex}
 
 \subsection{Pinning
-\statusorange}\label{spec:api:pinning}
+\statusyellow}\label{spec:api:pinning}
 \input{specs/api/pinning.tex}
 
 \subsection{Swap and chequebook\statusorange}\label{spec:api:swap}
@@ -137,32 +196,23 @@ which is an API description format for REST APIs.
 \subsection{Postage stamps \statusorange}\label{spec:api:postage}
 \input{specs/api/postage.tex}
 
-\subsection{PSS \statusorange}\label{spec:api:trojan}
-\input{specs/api/pss.tex}
 
-\section{Composite builtin API \statusorange}\label{spec:api:builtin}
-
-\subsection{File \statusorange}\label{spec:api:file}
-
-\subsection{Manifest \statusorange}\label{spec:api:manifest}
-
-\subsection{Recovery\statusorange}\label{spec:api:recovery}
-
-\subsection{PSS \statusorange}\label{spec:api:pss}
-
-\subsection{Feeds \statusorange}\label{spec:api:feeds}
-
-\subsection{Access Control  \statusorange}\label{spec:api:access-control}
+\subsection{Access Control  \statusgreen}\label{spec:api:access-control}
 \input{specs/api/access-control.tex}
 
 
+% \subsection{Recovery\statusorange}\label{spec:api:recovery}
 
-\section{Storage API \statusred}\label{spec:api:storage}
-\input{specs/api/storage.tex}
-
-
-\section{Communications  \statusred}\label{spec:api:communications}
+\section{Communications  \statusorange}\label{spec:api:communications}
 \input{specs/api/comms.tex}
+
+\subsection{PSS \statusyellow}\label{spec:api:trojan}
+\input{specs/api/pss.tex}
+
+
+\subsection{Feeds \statusorange}\label{spec:api:feeds}
+
+
 
 % \subsection{The pss URL scheme}
 

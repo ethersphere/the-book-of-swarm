@@ -1,0 +1,71 @@
+
+\begin{apiRoute}{GET}{/stamp}{View all postage stamps}
+{
+}
+{ }
+
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+
+\begin{apiRoute}{GET}{/stamp/\param{id}}{View postage stamp with id}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{id}{}
+\end{routeParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+
+\begin{apiRoute}{PUT}{/stamp/\param{id}}{Top up postage stamp with id}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{id}{}
+\end{routeParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+\begin{apiRoute}{DELETE}{/stamp/{id}}{Drain and expire stamp with id}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{id}{}
+\end{routeParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+
+
+\begin{apiRoute}{POST}{/stamp/{id}}{Create a new postage stamp}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{id}{}
+\end{routeParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}

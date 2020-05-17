@@ -1,0 +1,59 @@
+
+\begin{apiRoute}{POST}{/tags}{Create new tag}
+{
+}
+{ }
+
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+
+\begin{apiRoute}{GET}{/tags?offset=\{offset\}\&length=\{length\}}{Get all tags}
+{
+}
+{ }
+\begin{queryParameter} 
+\queryParamItem{offset}{integer}
+\queryParamItem{length}{integer}
+\end{queryParameter}
+
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+
+\begin{apiRoute}{GET}{/tags/\{id\}}{View details tag with given ID}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{id}{string}
+\end{routeParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+\begin{apiRoute}{DELETE}{/tags/\{id\}}{Path description}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{id}{string}
+\end{routeParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+

@@ -98,8 +98,8 @@ The equivalence classes of peers are called \glossplural{proximity order bin}, o
     % \includegraphics[width=0.7\textwidth]{fig/kademlia.pdf}
     % \includegraphics[width=0.7\textwidth]{fig/kademlia-2.pdf}
     % \includegraphics[width=0.8\textwidth]{fig/kademlia-3.pdf}
-    \includegraphics[width=.85\textwidth]{fig/kademlia-35.pdf}
-   \caption[From overlay address space to Kademlia table \statusgreen]{From overlay address space to Kademlia table. \textbf{Top}: the overlay address space is represented with a binary tree, colored leafs are actual nodes. The path of the pivot node (+) is shown with thicker lines. \textbf{Centre}: peers of the pivot nodes are shown keyed by the bits of their xor distance measured from the pivot. Here zeros represent a matching bit with the pivot, ones show a differing bit. The leaf nodes are ordered by their xor distance from the pivot (leftmost node). \textbf{Bottom}: the Kademlia table of the pivot: the subtrees branching off from the pivot path on the left are displayed as the rows of the table representing proximity order bins in increasing order.}
+    \includegraphics[width=.88\textwidth]{fig/kademlia-35.pdf}
+   \caption[From overlay address space to Kademlia table \statusgreen]{From overlay address space to Kademlia table. \textbf{Top}: the overlay address space is represented with a binary tree, colored leaves are actual nodes. The path of the pivot node (+) is shown with thicker lines. \textbf{Centre}: peers of the pivot nodes are shown keyed by the bits of their xor distance measured from the pivot. Here zeros represent a matching bit with the pivot, ones show a differing bit. The leaf nodes are ordered by their xor distance from the pivot (leftmost node). \textbf{Bottom}: the Kademlia table of the pivot: the subtrees branching off from the pivot path on the left are displayed as the rows of the table representing proximity order bins in increasing order.}
    \label{fig:kademlia-table}
 \end{figure}
 
@@ -303,7 +303,7 @@ The address of BMT chunks is calculated using the \gloss{binary Merkle tree hash
    \centering
    \resizebox{1\textwidth}{!}{
    \input{fig/bmthash.tex}}
-   \caption[BMT: Binary Merkle Tree hash used as chunk hash in Swarm \statusgreen]{BMT (Binary Merkle Tree) chunk hash in Swarm: the 1337 bytes of chunk data is segmented into 32 byte segments. Zero padding is used to fill up the rest up to 4 kilobytes. Pairs of segments are hashed together using Keccak256 to built up the binary tree. On level 7, the binary Merkle root is prepended with the 8 byte span and hashed to yield the BMT chunk hash.`}
+   \caption[BMT: Binary Merkle Tree hash used as chunk hash in Swarm \statusgreen]{BMT (Binary Merkle Tree) chunk hash in Swarm: the 1337 bytes of chunk data is segmented into 32 byte segments. Zero padding is used to fill up the rest up to 4 kilobytes. Pairs of segments are hashed together using Keccak256 to build up the binary tree. On level 7, the binary Merkle root is prepended with the 8 byte span and hashed to yield the BMT chunk hash.`}
    \label{fig:BMT}
 \end{figure}
 
@@ -1137,7 +1137,7 @@ To claim the raffle prize, a node must show that they have every witness chunk, 
 
 \subsubsection{Earn: challenging the applicants}
 
-If the set of chunks presented to the blockchain is incomplete (i.e. it doesn't contain all chunks for which a statement of custody receipt was issued), the applicants can be challenged on the blockchain. The challenge contains a statement of custody receipt that was signed previously by the applicant. This receipt can then be submitted by any third party and is validated right away by the smart contract. If the challenge is valid, the applicant loses their registration immediately and more punitive measures may be enacted by his peers. Challengers have till the end of the raffle round to challenge applicants.
+If the set of chunks presented to the blockchain is incomplete (i.e. it doesn't contain all chunks for which a statement of custody receipt was issued), the applicants can be challenged on the blockchain. The challenge contains a statement of custody receipt that was signed previously by the applicant (see \ref{sec:push-syncing} and \ref{sec:push-sync-incentives}). This receipt can then be submitted by any third party and is validated right away by the smart contract. If the challenge is valid, the applicant loses their registration immediately and more punitive measures may be enacted by his peers. Challengers have till the end of the raffle round to challenge applicants.
 
 \subsubsection{Choosing the winner}
 
@@ -1189,7 +1189,7 @@ This procedure incentivises nodes to adhere to the following behaviors:
 \footnote{or store indexes of deleted chunks which is inefficient}
 i.e. the minimum value accepted coincides with the maximum value ever deleted.
 %
-\item \emph{store the data} -- In order to provide BMT proofs the node must possess the data in the chunk content.\footnote{In the special case of addressed envelopes with prepaid postage, no payout can be collected before the envelope has been filled and sent (see \ref{sec:addressed-envelopes}).}
+\item \emph{store the data} -- In order to provide BMT proofs the node must possess the data in the chunk content.\footnote{In the special case of addressed envelopes with pre-paid postage, no payout can be collected before the envelope has been filled and sent (see \ref{sec:addressed-envelopes}).}
 \end{itemize}
 
 
@@ -1381,22 +1381,22 @@ Locking the entire amount eliminates the storer's distrust due to potential inso
 In the first two chapters of the architecture part of the book we introduced the core of swarm: the peer to peer network layer described in chapter \ref{sec:network} implements a distributed immutable storage for chunks which is complemented by the incentive system described in the following chapter. The resulting base layer system provides:
 
 \begin{enumerate}
-    \item permissionless participation and access
-    \item zero cash entry for node operators
-    \item maximum resource utilisation 
-    \item load-balanced distribution of data
-    \item scalability 
-    \item censorship resistance and privacy for storage and retrieval
-    \item auto-scaling popular content
-    \item basic plausible deniability and confidentiality 
-    \item churn resistance and eventual consistency in a dynamic network with node dropouts
-    \item sustainability without intervention due to built-in economic incentives
-    \item robust private peer-to-peer accounting 
-    \item incentivised bandwidth sharing
-    \item off-chain micro-commitments with on-chain settlement
-    \item DoS resistance and spam protection
-    \item positive (i.e., motivated by reward) incentives for storage
-    \item negative (i.e., discouraged through threat of punitive measures) incentives against data loss
+    \item permissionless participation and access,
+    \item zero cash entry for node operators,
+    \item maximum resource utilisation, 
+    \item load-balanced distribution of data,
+    \item scalability, 
+    \item censorship resistance and privacy for storage and retrieval,
+    \item auto-scaling popular content,
+    \item basic plausible deniability and confidentiality,
+    \item churn resistance and eventual consistency in a dynamic network with node dropouts,
+    \item sustainability without intervention due to built-in economic incentives,
+    \item robust private peer-to-peer accounting, 
+    \item incentivised bandwidth sharing,
+    \item off-chain micro-commitments with on-chain settlement,
+    \item DoS resistance and spam protection,
+    \item positive (i.e., motivated by reward) incentives for storage,
+    \item negative (i.e., discouraged through threat of punitive measures) incentives against data loss.
 \end{enumerate}
 
 
@@ -1470,7 +1470,7 @@ Note that all chunks in a file except for the right edge are completely filled. 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{fig/file-inclusion.pdf}
-\caption[Compact inclusion proofs for files \statusgreen]{Compact inclusion proofs for files. If we need to prove inclusion of segment   $i$, after division by 32 (within-segment position), we follow groups of 7bits to find the respective segment of the intermediate node.}
+\caption[Compact inclusion proofs for files \statusgreen]{Compact inclusion proofs for files. If we need to prove inclusion of segment   $i$, after division by 32 (within-segment position), we follow groups of 7 bits to find the respective segment of the intermediate node.}
 \label{fig:file-inclusion}
 \end{figure}
 
@@ -1523,12 +1523,12 @@ The high level API (see \ref{spec:api:storage}) to the manifests provides functi
 Earlier we introduced the low level network component of Swarm as a distributed immutable store of chunks (DISC, see \ref{sec:disc}). In the previous two sections we presented ways in which files (\ref{sec:files}) and collections (\ref{sec:collections}) can be represented in Swarm and referenced using chunk references. Manifests provide a way to index individual documents in a collection and this allows them to be considered a representation of web sites hosted in Swarm. The root manifests serve as the entry-point to virtually hosted sites on Swarm and are therefore analogous to hosting servers. In the current web, domain names resolve to the IP address of the host server, and the URL paths (of static sites) map to entries in the directory tree based on their path relative to the document root set for the host.
 Analogously, in Swarm, domain names resolve to a reference to the root manifest and the URL paths map to manifest entries based on their path.  
 
-When the HTTP API serves a URL, the following steps are performed
+When the HTTP API serves a URL, the following steps are performed:
 
 \begin{enumerate}
-    \item \emph{domain name resolution} -- Swarm resolves the host part to a reference to a root manifest
-    \item \emph{manifest traversal} -- recursively traverse embedded manifests along the path matching the URL path to arrive at a manifest entry
-    \item \emph{serving the file} -- the file referenced in the manifest entry is retrieved and rendered in the browser with headers (notably content type) taken from  the metadata of manifest entry
+    \item \emph{domain name resolution} -- Swarm resolves the host part to a reference to a root manifest,
+    \item \emph{manifest traversal} -- recursively traverse embedded manifests along the path matching the URL path to arrive at a manifest entry,
+    \item \emph{serving the file} -- the file referenced in the manifest entry is retrieved and rendered in the browser with headers (notably content type) taken from  the metadata of manifest entry.
 \end{enumerate}
 
 Swarm supports domain name resolution using the \gloss{Ethereum Name Service} (\gloss{ENS}). \gloss{ENS} is the system that, analogously to the DNS of the old web, translates human-readable names into system-specific identifiers, i.e. a reference in the case of Swarm.%
@@ -1594,7 +1594,7 @@ The access key can be obtained from a variety of sources, three of which we will
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{fig/access-control-single-party.pdf}
-\caption[Access key as session key for single party access  \statusyellow]{Access key as session key for single party access}
+\caption[Access key as session key for single party access  \statusyellow]{Access key as session key for single party access.}
 \label{fig:access-control-single-party}
 \end{figure}
 
@@ -1614,7 +1614,7 @@ Figure \ref{fig:credentials-to-derive-session-key} summarises the use of credent
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{fig/credentials-to-derive-session-key.pdf}
-\caption[Credentials to derive session key  \statusyellow]{Credentials to derive session key}
+\caption[Credentials to derive session key  \statusyellow]{Credentials to derive session key.}
 \label{fig:credentials-to-derive-session-key}
 \end{figure}
 
@@ -1635,7 +1635,7 @@ When accessing content, the user retrieves the root access meta data, identifies
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{fig/access-control-multiple-party.pdf}
-\caption[Access control for multiple grantees \statusyellow]{Access control for multiple grantees}
+\caption[Access control for multiple grantees \statusyellow]{Access control for multiple grantees.}
 \label{fig:access-control-multiple-party}
 \end{figure}
 
@@ -2001,10 +2001,10 @@ X3DH uses the following keys:%
 \footnote{The protocol specifies one-time pre-keys for the responder, but these can be safely ignored since they only serve as replay protection, which is solved by other means in this implementation.}
 
 \begin{itemize}
-\item responder long-term public identity key - $K^{\mathrm{ENS}}_r$
-\item responder resident key (aka signed pre-key) - $K^{\mathrm{Res}}_r$
-\item initiator long-term identity key - $K^{\mathrm{ID}}_i$
-\item initiator ephemeral key for the conversation - $K^{\mathrm{EPH}}_i$
+\item responder long-term public identity key - $K^{\mathrm{ENS}}_r$,
+\item responder resident key (aka signed pre-key) - $K^{\mathrm{Res}}_r$,
+\item initiator long-term identity key - $K^{\mathrm{ID}}_i$,
+\item initiator ephemeral key for the conversation - $K^{\mathrm{EPH}}_i$.
 \end{itemize}{}
 
 
@@ -2065,8 +2065,8 @@ The envelope can be perceived as open: since the poster is also the owner of the
 
 \begin{figure}[htbp]
    \centering
-   \includegraphics[width=\textwidth]{fig/prepaid-addressed-envelopes-events.pdf}
-   \caption[Prepaid addressed envelopes timeline of events \statusgreen]{Prepaid addressed envelopes timeline of events. Issuer $I$ creates the envelope encrypted for $P$ with an identifier such that $P$ as the single owner of the chunk, produces an address that falls in the recipient $R$'s neighbourhood. As a result (only) $P$ can fill the envelope with arbitrary content and then use simple push-syncing to post it to $R$.}
+   \includegraphics[width=0.75\textwidth]{fig/prepaid-addressed-envelopes-events.pdf}
+   \caption[Stamped addressed envelopes timeline of events \statusgreen]{Stamped addressed envelopes timeline of events. Issuer $I$ creates the envelope encrypted for $P$ with an identifier such that $P$ as the single owner of the chunk, produces an address that falls in the recipient $R$'s neighbourhood. As a result (only) $P$ can fill the envelope with arbitrary content and then use simple push-syncing to post it to $R$.}
    \label{fig:addressed-envelope-events}
 \end{figure}
 
@@ -2076,33 +2076,33 @@ All the poster needs to do when they wish to send a message to the recipient is 
 \begin{figure}[htbp]
    \centering
    \includegraphics[width=\textwidth]{fig/addressed-envelope.pdf}
-   \caption[Prepaid addressed envelopes \statusgreen]{A prepaid addressed envelope issued for $P$ and addressed to $R$ consists of an identifier which is mined so that when used to create a single owner chunk owned by $P$, it produces an address which falls within $R$'s neighbourhood. This allows $P$ to construct a message, sign it against the identifier and using the postage stamp, post it using the network's normal push-syncing to $R$ for free. }
+   \caption[Stamped addressed envelopes \statusgreen]{A stamped addressed envelope issued for $P$ and addressed to $R$ consists of an identifier which is mined so that when used to create a single owner chunk owned by $P$, it produces an address which falls within $R$'s neighbourhood. This allows $P$ to construct a message, sign it against the identifier and using the postage stamp, post it using the network's normal push-syncing to $R$ for free. }
    \label{fig:addressed-envelope}
 \end{figure}
 
-\subsubsection{Prepaid postage}
+\subsubsection{Pre-paid postage}
 
-These chunks behave in the same way as normal Trojan messages, with their privacy properties being the same if not somewhat better since the issuer/recipient can associate a random public key with which the message is encrypted, or even use symmetric encryption. If a postage stamp is prepaid for an address and given to someone to post later, they can use push-sync to send the chunk to the target without the poster needing to pay anything, the cost of this having already been covered by the \gloss{stamped addressed envelope}. Such a construct effectively implements \emph{addressed envelopes with prepaid postage} and serves as a base layer solution for various high-level communication needs: 1) push notifications about an update to subscribers without any computational or financial postage burden on the sender 2) free contact vouchers 3) zero-delay direct message response.  
+These chunks behave in the same way as normal Trojan messages, with their privacy properties being the same if not somewhat better since the issuer/recipient can associate a random public key with which the message is encrypted, or even use symmetric encryption. If a postage stamp is pre-paid for an address and given to someone to post later, they can use push-sync to send the chunk to the target without the poster needing to pay anything, the cost of this having already been covered by the \gloss{stamped addressed envelope}. Such a construct effectively implements \emph{addressed envelopes with pre-paid postage} and serves as a base layer solution for various high-level communication needs: 1) push notifications about an update to subscribers without any computational or financial postage burden on the sender 2) free contact vouchers 3) zero-delay direct message response.  
 
 
-\subsubsection{Issuing a prepaid addressed envelope}
+\subsubsection{Issuing a stamped addressed envelope}
 
-Issuing a prepaid addressed envelope involves the following process:
+Issuing a stamped addressed envelope involves the following process:
 
 \begin{enumerate}
 \item \emph{assume} issuer $I$, prospective poster $P$, and prospective recipient $R$ with public keys $K_I, K_P, K_R$ and overlay addresses $A_I, A_P, A_R$.
 \item \emph{mine} -- $I$ finds a nonce $N_R$ such that when used as an identifier to create a \gloss{single owner chunk}, the  address of the chunk hashes to $H_R$ which is in the nearest neighbourhood of $A_R$.
 \item \emph{pay postage} -- $I$ signs $H_R$ to produce a witness for an appropriate postage payment to produce stamp $PS_R$.
-\item \emph{encapsulate} -- package $N_R$ and $PS_R$ which represent the prepaid envelope pre-addressed to recipient address and encrypt it with $K_P$ then wrap it as a Trojan chunk.
+\item \emph{encapsulate} -- package $N_R$ and $PS_R$ which represent the pre-paid envelope pre-addressed to recipient address and encrypt it with $K_P$ then wrap it as a Trojan chunk.
 \item \emph{mine} -- find a nonce $N_P$ such that the Trojan chunk hashes to $H_P$ which is in the nearest neighbourhood of $A_P$. 
 \end{enumerate}
 
 
 
 
-\subsubsection{Receiving a prepaid addressed envelope}
+\subsubsection{Receiving a stamped addressed envelope}
 
-A prospective poster $P$ is assumed to receive a a Trojan message consisting of prepaid envelope $E$. In order to open it, she carries out the following steps:
+A prospective poster $P$ is assumed to receive a a Trojan message consisting of pre-paid envelope $E$. In order to open it, she carries out the following steps:
 
 \begin{enumerate}
     \item \emph{decrypt} message with the private key belonging to $K_P$
@@ -2111,7 +2111,7 @@ A prospective poster $P$ is assumed to receive a a Trojan message consisting of 
     \item \emph{store} $N_R$ and $PS_R$ 
 \end{enumerate}
 
-\subsubsection{Posting a prepaid addressed envelope}
+\subsubsection{Posting a stamped addressed envelope}
 
 When the poster wants to use the envelope to send an arbitrary message $M$ to $R$ (with recipient $R$ potentially unknown to the sender), they must follow the following steps:
 
@@ -2142,7 +2142,7 @@ This section elaborates on the concept of addressed envelopes and presents three
 
 \subsubsection{Direct notification from publisher}
 
-If an issuer wants a recipient to be notified of the next activity on a feed, she must construct a prepaid addressed envelope embedded in a regular Trojan message and send it to the publisher, see figure \ref{fig:direct-notification}. If the issuer is also the recipient, then the account that is used in the request and the one in the response envelope may be one and the same. 
+If an issuer wants a recipient to be notified of the next activity on a feed, she must construct a stamped addressed envelope embedded in a regular Trojan message and send it to the publisher, see figure \ref{fig:direct-notification}. If the issuer is also the recipient, then the account that is used in the request and the one in the response envelope may be one and the same. 
 
 
 When the feed owner publishes an update to her feed, the reference to the update chunk is put into the envelope and is sent to the recipient. More formally, the publisher creates a single owner chunk from the identifier representing the pre-addressed envelope and therefore, as the owner, signs off on the identifier associated with the feed update content as the payload of the single owner chunk. Right after this, the same publisher acting as the poster, push-syncs the chunk to the swarm. This construct is called \gloss{direct notification from publisher}. 
@@ -2150,7 +2150,7 @@ When the feed owner publishes an update to her feed, the reference to the update
 \begin{figure}[htbp]
    \centering
    \includegraphics[width=\textwidth]{fig/direct-notification.pdf}
-   \caption[Direct notification request and response \statusgreen]{A direct notification request contains a reference to a feed and wraps a prepaid envelope mined for $P$ (the publisher or a known distributor of the feed) and addressed to recipient $R$. The response is identical to the process used for generic pre-paid addressed envelopes and only differs in that the message is supposed to be the feed update or a reference to its content.}
+   \caption[Direct notification request and response \statusgreen]{A direct notification request contains a reference to a feed and wraps a pre-paid envelope mined for $P$ (the publisher or a known distributor of the feed) and addressed to recipient $R$. The response is identical to the process used for generic stamped addressed envelopes and only differs in that the message is supposed to be the feed update or a reference to its content.}
    \label{fig:direct-notification}
 \end{figure}
 
@@ -2418,19 +2418,19 @@ These solutions can already accomplish persistence, but they reintroduce a degre
 \subsection{Recovery \statusyellow}\label{sec:recovery-chunks}
 
 
-In what follows we describe a simple protocol for notifying pinners of the loss of a chunk, which they can react to by (1) re-uploading the lost chunk to the network and at the same time (2) responding to the notifier by delivering to them the missing chunk. The procedures relating to the missing chunk notification protocol are specified in detail in  \ref{spec:api:recovery} while related data structures are formalised in \ref{spec:format:recovery}.
+In what follows we describe a simple protocol for notifying pinners of the loss of a chunk, which they can react to by (1) re-uploading the lost chunk to the network and at the same time (2) responding to the notifier by delivering to them the missing chunk. The procedures relating to the missing chunk notification protocol are specified in detail in  \ref{spec:format:recovery} while related data structures are formalised in \ref{spec:format:recovery}.
 
 If replicas of a chunk are distributed among willing hosts (pinners), then downloaders not finding a chunk can fall back to a \gloss{recovery} process requesting it from one of these hosts using the \gloss{missing chunk notification protocol} called \gloss{prod}.
 As usual, the resolutions of this acronym capture the properties of the protocol:
 
 \begin{itemize}
-\item \emph{prompt recovery on deletion} - A prompt chunk recovery process is triggered by downloaders if they fail to retrieve a chunk.
+\item \emph{protocol for recovery on deletion} - A protocol between requestor and pinners to orchestrate chunk recovery after garbage collection. The process is triggered by downloaders if they fail to retrieve a chunk.
 \item \emph{process request of downloader} - Recovery hosts continuously listen for potential recovery requests from downloaders.
 \item \emph{provide repair of DISC} - 
 Prod provides a service to repair the Swarm DISC, in the event of data loss.
 \item \emph{pin and re-upload of data} -     
-Hosts pin the data and re-upload it to its designated when prompted with a recovery request. 
-\item \emph{post response on demand}  - If the requestor demands a direct response, the host will post the missing chunk using a recovery response envelope and accompanying postage stamp.
+Hosts pin the data and re-upload it to its designated area when prompted with a recovery request. 
+\item \emph{prompt response on demand}  - If the requestor demands a prompt direct response, the host will post the missing chunk using a recovery response envelope and accompanying postage stamp.
 \end{itemize}
 
 \subsubsection{Recovery hosts}

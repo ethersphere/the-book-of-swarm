@@ -1,16 +1,291 @@
-\UseRawInputEncoding
-\begin{apiRoute}{get}{/soc/\{owner\}/\{id\}}{get single owner chunk for owner on id}
- {
+\subsection{Chunks}
+
+\begin{apiRoute}{GET}{/chunk/\{reference\}}{Retrieve chunk as in \ref{def:retrieve}}
+{
 }
 { }
-\begin{routeParameter} \routeParamItem{owner}{eth address of single  owner}
+
+\begin{routeParameter} 
+\routeParamItem{reference}{hex string}
+\end{routeParameter}
+\begin{headerParameter} 
+\headerParamItem{SWARM-ENCRYPTION}{hex string}
+\end{headerParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\responseItem{403}{Forbidden}{} 
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+
+\begin{apiRoute}{POST}{/chunk/(?span=\{span\})}{Create chunk as in \ref{def:store}}
+{
+}
+{ }
+
+\begin{queryParameter} 
+\queryParamItem{span}{integer}
+\end{queryParameter}
+
+\begin{headerParameter} 
+\headerParamItem{SWARM-TAG}{hex string}
+\headerParamItem{SWARM-STAMP}{hex string}
+\headerParamItem{SWARM-ENCRYPTION}{hex string}
+\headerParamItem{SWARM-PIN}{bool}
+\headerParamItem{SWARM-PARITIES}{integer}
+\end{headerParameter}
+
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\responseItem{400}{Bad request}{} 
+
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+
+\begin{apiRoute}{GET}{/soc/\{owner\}/\{id\}}{Retrieve single owner chunk as in \ref{def:soc-retrieve} }
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{owner}{eth address of single owner}
 \routeParamItem{id}{identifier within owner namespace}
-\end{routeParameter} \begin{routeResponse}{application/json}
-\begin{routeResponseItem}{200}{ok} \begin{routeResponseItemBody}
-id: "0x456befeac6456befeac6456befeac6456befeac6456befeac6456befeac6456befeac6456befeac6456befeac6456befeac6456befea", owner : "0xA0f8FF943babafefe653A0f8FF943babafefe653", span: 3,  payload : "foo"
-\end{routeResponseItemBody} \end{routeResponseItem}
-\begin{routeResponseItem}{404}{error : chunk not found}
-\begin{routeResponseItemBody} 
-message: "single owner chunk for ’0xA0f8FF943babafefe653A0f8FF943babafefe653’ on id '0x456befeac6456befeac6456befeac6456befeac6456befeac6456befeac6456befeac6456befeac6456befeac6456befeac6456befea' not found!"
-\end{routeResponseItemBody} \end{routeResponseItem}
-\end{routeResponse} \end{apiRoute}
+\end{routeParameter}
+\begin{queryParameter} 
+\queryParamItem{key}{string}
+\end{queryParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\responseItem{400}{Bad request}{} 
+
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+
+\begin{apiRoute}{POST}{/soc/\{owner\}/\{id\}?span=\{span\}}{Create new single owner chunk as in \ref{def:soc-store} }
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{owner}{eth address of single owner}
+\routeParamItem{id}{identifier within owner namespace}
+\end{routeParameter}
+\begin{headerParameter} 
+\headerParamItem{SWARM-TAG}{hex string}
+\headerParamItem{SWARM-STAMP}{hex string}
+\headerParamItem{SWARM-ENCRYPTION}{hex string}
+\headerParamItem{SWARM-PIN}{bool}
+\headerParamItem{SWARM-PARITIES}{integer}
+\end{headerParameter}
+\begin{queryParameter} 
+\queryParamItem{span}{string}
+\end{queryParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+
+\subsection{File \statusgreen}\label{spec:api:file}
+
+\begin{apiRoute}{POST}{/file/}{Path description as in \ref{def:swarm-hash}}
+{
+}
+{ }
+
+\begin{headerParameter} 
+\headerParamItem{SWARM-TAG}{hex string}
+\headerParamItem{SWARM-STAMP}{hex string}
+\headerParamItem{SWARM-ENCRYPTION}{hex string}
+\headerParamItem{SWARM-PIN}{bool}
+\headerParamItem{SWARM-PARITIES}{integer}
+\end{headerParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+
+\begin{apiRoute}{GET}{/file/\{reference\}}{Retrieve file by reference as in \ref{def:file-retrieval}}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{reference}{string}
+\end{routeParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+
+\begin{apiRoute}{PUT}{/file/ }{Update file, returns new reference}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{file/collection}{as request body}
+\end{routeParameter}
+\begin{headerParameter} 
+\headerParamItem{SWARM-TAG}{hex string}
+\headerParamItem{SWARM-STAMP}{hex string}
+\headerParamItem{SWARM-ENCRYPTION}{hex string}
+\headerParamItem{SWARM-PIN}{bool}
+\headerParamItem{SWARM-PARITIES}{integer}
+\end{headerParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+\subsection{Manifest \statusgreen}\label{spec:api:manifest}
+
+
+
+
+\begin{apiRoute}{GET}{/manifest/\{node:reference\}/\{path\}}{Lookup manifest by path as in \ref{def:manifests-lookup}}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{node reference}{hex string}
+\routeParamItem{path}{string}
+\end{routeParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+\begin{apiRoute}{DELETE}{/manifest/\{node\}/\{path\} }{Delete manifest by path as in \ref{def:manifest-remove}}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{node}{string}
+\routeParamItem{path}{string}
+\end{routeParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+\begin{apiRoute}{PUT}{/manifest/\{old\} }{Update manifest as in \ref{def:manifest-update}}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{old}{string}
+\end{routeParameter}
+\begin{routeResponse}{application/json}
+v
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+
+\begin{apiRoute}{POST}{/manifest/\{old\}/\{new\}}{Merge manifests as in \ref{def:manifest-merge}}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{old}{string}
+\routeParamItem{new}{string}
+\end{routeParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+
+\subsection{High level storage API \statusyellow}\label{spec:api:manifest}
+
+
+\begin{apiRoute}{GET}{/bzz:/\{host\}/\{path\}}{Append to upload, returns new manifest}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{file/collection}{as request body}
+\end{routeParameter}
+\begin{headerParameter} 
+\headerParamItem{SWARM-TAG}{hex string}
+\headerParamItem{SWARM-STAMP}{hex string}
+\headerParamItem{SWARM-ENCRYPTION}{hex string}
+\headerParamItem{SWARM-PIN}{bool}
+\headerParamItem{SWARM-PARITIES}{integer}
+\end{headerParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+\begin{apiRoute}{PUT}{/bzz:/}{Append to upload, returns new manifest}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{file/collection}{as request body}
+\end{routeParameter}
+\begin{headerParameter} 
+\headerParamItem{SWARM-TAG}{hex string}
+\headerParamItem{SWARM-STAMP}{hex string}
+\headerParamItem{SWARM-ENCRYPTION}{hex string}
+\headerParamItem{SWARM-PIN}{bool}
+\headerParamItem{SWARM-PARITIES}{integer}
+\end{headerParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+
+\begin{apiRoute}{POST}{/bzz:/}{Upload file or collection, returns tag used for tracking global sync state}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{file/collection}{as request body}
+\end{routeParameter}
+\begin{headerParameter} 
+\headerParamItem{SWARM-TAG}{hex string}
+\headerParamItem{SWARM-STAMP}{hex string}
+\headerParamItem{SWARM-ENCRYPTION}{hex string}
+\headerParamItem{SWARM-PIN}{bool}
+\headerParamItem{SWARM-PARITIES}{integer}
+\end{headerParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+
+

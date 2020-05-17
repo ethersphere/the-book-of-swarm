@@ -1,0 +1,31 @@
+
+\begin{apiRoute}{POST}{/pss/\{recipient\}/\{topic\}(?targets=\{targets\})}{Send private message to recipient(s) as in \ref{def:send}}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{recipient}{string}
+\routeParamItem{topic}{string}
+\end{routeParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+
+\begin{apiRoute}{GET}{/pss/\{topic\}/\{channel\}}{Subscribe to messages with topic to delivered on given channel, see \ref{def:receive}}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{topic}{string}
+\routeParamItem{channel}{string}
+\end{routeParameter}
+\begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse}
+\end{apiRoute}

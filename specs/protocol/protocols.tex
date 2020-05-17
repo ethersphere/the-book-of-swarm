@@ -59,7 +59,7 @@ Streams may be short lived for immediate data exchange or communication, or long
 
 A Swarm specific requirement for all libp2p streams is to exchange Header protobuf messages on every stream initialization between two peers. This message encapsulates a stream scoped information that needs to be exchanged before any stream specific data or messages are exchanged. Headers are sequences of key value pairs, where keys are arbitrary strings and values are byte arrays that do not impose any specific encoding. Every key may use appropriate encoding for the data that it relates to.
 
-\begin{definition}{Header message}\label{def:headers-message}
+\begin{definition}[Header message]\label{def:headers-message}
 
 \begin{lstlisting}[language=protobuf3]
 syntax = "proto3";

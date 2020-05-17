@@ -4,7 +4,7 @@ The bzz handshake protocol is the protocol that is always run after two peers ar
 
 The handshake protocol defines only one stream and three messages:
 
-\begin{definition}{Bzz handshake protocol  messages}\label{def:bzz-messages}
+\begin{definition}[Bzz handshake protocol  messages]\label{def:bzz-messages}
 
 \begin{lstlisting}
 // ID: /swarm/handshake/1.0.0/handshake
@@ -34,9 +34,11 @@ Upon connection a requesting peer constructs a new handshake stream and sends a 
 
 The connection must be terminated if network IDs are do not match or if the  exact  order of messages is not followed.
 
-\begin{definition}{Bzz handshake message}\label{def:bzz-handshake}
+\begin{definition}[Bzz handshake message]\label{def:bzz-handshake}
 
-\begin{tabular}{r|l|r|l|l}
+\begin{table}[]
+    \centering
+    \begin{tabular}{r|l|r|l|l}
 \multicolumn{2}{c|}{field}& 
 \multicolumn{2}{c|}{format}& 
 \\
@@ -46,6 +48,10 @@ pos & name  & len & type & description \\\hline
 2 & bzz address & <1024 & BYTES & bzz address \ref{def:bzz-address}\\\hline
 3 & light & 4 & BOOL & light (as opposed to full) mode of operation
 \end{tabular}
+    \caption{Bzz handshake message}
+    \label{tab:my_label}
+\end{table}
+
 \end{definition}
 
 The bzz address is verified and overlay, underlay and signature are extracted.
@@ -54,10 +60,10 @@ light is a boolean field indicating whether the node is operating as a light (as
 After the handshake,  each peer should remember the following data about the other:
 
 \begin{itemize}
-    \item the overlay address - used in forwarding  (see  \ref{spec:strategy:forwarding})
-    \item the underlay address - used for dialing, passed to the underlay network protocol when the connectivity driver needs to connect to the peer (see \ref{spec:strategy:connection})
-    \item the bzz address signature - needed by the hive protocol to pass information about the node to other peers (see \ref{spec:protocol:hive})
-    \item whether the peer is a light node
+    \item the overlay address - used in forwarding  (see  \ref{spec:strategy:forwarding}),
+    \item the underlay address - used for dialing, passed to the underlay network protocol when the connectivity driver needs to connect to the peer (see \ref{spec:strategy:connection}),
+    \item the bzz address signature - needed by the hive protocol to pass information about the node to other peers (see \ref{spec:protocol:hive}),
+    \item whether the peer is a light node.
 \end{itemize}
 
 \subsection{Encapsulation of context for tracing \statusgreen}

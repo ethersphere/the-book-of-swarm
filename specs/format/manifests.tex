@@ -148,8 +148,7 @@ as
 
 define function merge @new *node  
     to  @old *node 
-has api PUT on "/manifest/<@old>"
-    with @new as body
+has api POST on "/manifest/<@old:reference>/<@new:reference>"
 as
     // if called on nil call on zero value
     return @new if no @old
@@ -174,13 +173,5 @@ as
         add to @old reference @restold
     fork{ @common, @node }
          
-\end{lstlisting}
-\end{definition}
-
-\begin{definition}[Manifest API]\label{def:manifest-api}
-\begin{lstlisting}[language=buzz1]
-// /manifest
-
-
 \end{lstlisting}
 \end{definition}

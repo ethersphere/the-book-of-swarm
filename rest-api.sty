@@ -96,7 +96,7 @@ nobreak=true
 \newenvironment{apiRoute}[3]
 {
 \newcommand{\method}{{#1}}
-\newcommand{\urlPath}{\large{\texttt{#2}}}
+\newcommand{\urlPath}{\texttt{#2}}
 \newcommand{\routeDescription}{#3}
 \newcommand{\printDescription}
 {
@@ -104,7 +104,11 @@ nobreak=true
 }
 \begingroup
 \setlength{\parindent}{0em}
-\begin{mdframed}[style=mystyle,nobreak=true]
+\begin{definition}[API endpoint \method\ \urlPath]
+
+\end{definition}
+
+\begin{mdframed}[style=mystyle]
 \begin{tabularx}{\textwidth}{p{2cm} X}
 \rowcolor{white}
 \cellcolor{gray!70}
@@ -141,6 +145,8 @@ nobreak=true
 % \methodJson
 }
 {}
+
+%%%%%%%%%%%%%%%%%%%%%%
 \newenvironment{routeParameter}
 {
 \newcommand{\routeParamItem}[2]
@@ -156,14 +162,66 @@ nobreak=true
 
 \begin{tabularx}{\textwidth}{X}
 \rowcolor{white}
-\textbf{Parameter} \\ \hline
+\textbf{Route Parameters} \\ \hline
 \end{tabularx}
 
 \tabularx{\textwidth}{l X}
 }
 {
 \endtabularx
+\medskip
 }
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newenvironment{queryParameter}
+{
+\newcommand{\queryParamItem}[2]
+{
+\rowcolor{white} {\textbf{\texttt{##1}}} & ##2 \\
+}
+\newcommand{\noQueryParamter}[1]
+{
+\small{\textit{##1}}
+}
+
+\arrayrulecolor{gray!50}
+
+\begin{tabularx}{\textwidth}{X}
+\rowcolor{white}
+\textbf{Query Parameters} \\ \hline
+\end{tabularx}
+
+\tabularx{\textwidth}{l X}
+}
+{
+\endtabularx
+\medskip
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newenvironment{headerParameter}
+{
+\newcommand{\headerParamItem}[2]
+{
+\rowcolor{white} {\textbf{\texttt{##1}}} & ##2 \\
+}
+\newcommand{\noHeaderParamter}[1]
+{
+\small{\textit{##1}}
+}
+
+\arrayrulecolor{gray!50}
+
+\begin{tabularx}{\textwidth}{X}
+\rowcolor{white}
+\textbf{Header Parameters} \\ \hline
+\end{tabularx}
+
+\tabularx{\textwidth}{l X}
+}
+{
+\endtabularx
+\medskip
+}
+%%%%%%%%%%%%%%%%%%%%
 \newenvironment{routeResponse}[1]
 {
 \newcommand{\noRouteResponse}[1]
@@ -178,13 +236,26 @@ nobreak=true
 \begin{tabularx}{\textwidth}{X l}
 \textbf{Response} & #1 \\ \hline
 \end{tabularx}
+\newcommand{\responseItem}[3]{
+\textbf{##1} & ##2 & ##3\\
 }
-{}
+
+\tabularx{\textwidth}{l l X}
+}
+{
+\endtabularx
+\medskip
+}
+
+% \begin{tabularx}{\textwidth}{l l X}
+% % \textbf{#1} & #2 & #3\\
+% }{\end{tabularx}}
+
 \newenvironment{routeResponseItem}[2]
 {
-\begin{tabularx}{\textwidth}{l X}
+% \begin{tabularx}{\textwidth}{l X}
 \textbf{#1} & #2 \\
-\end{tabularx}
+% \end{tabularx}
 }
 {
 \medskip
@@ -195,7 +266,7 @@ nobreak=true
 % \methodJson
 }
 {}
-\newcommand{\param}[1]{<#1>}
+\newcommand{\param}[1]{\{#1\}}
 
 \endinput
 %%

@@ -2,19 +2,19 @@
 
 \longnewglossaryentry{node}{name=node}{}
 
-\longnewglossaryentry{fingerpointing}{name=fingerpointing}{Litigation scheme allowing upstream peers to shift blame to downstream peer.}
+\longnewglossaryentry{fingerpointing}{name=fingerpointing}{Litigation scheme allowing upstream peers to shift blame to a downstream peer in the case of deferred responsibility.}
 \longnewglossaryentry{Kademlia topology}{name=Kademlia topology}{A scale free network topology that has guaranteed path between any two nodes in $O(log(n))$ hops.}
-\longnewglossaryentry{Kademlia connectivity}{name=Kademlia connectivity}{Connectivity pattern of a node $x$ in forwarding kademlia where (1) there is at least one peer in each PO bins $0<=i<d$, and (2) no peer $y$ in the network such that $\mathit{PO}(x,y) >= d$ and $y$ is not connected to $x$. }
+\longnewglossaryentry{Kademlia connectivity}{name=Kademlia connectivity}{Connectivity pattern of a node $x$ in forwarding Kademlia where (1) there is at least one peer in each PO bins $0<\leq i<d$, and (2) no peer $y$ in the network such that $\mathit{PO}(x,y) \geq d$ and $y$ is not connected to $x$. }
 % \longnewglossaryentry{mutable resource update}{name=mutable resource update}{}
 % \longnewglossaryentry{resource update chunk}{name=resource update chunk}{}
 \longnewglossaryentry{forwarding Kademlia}{name=forwarding Kademlia}{Recursive flavour of Kademlia routing involving message relay.}
 \longnewglossaryentry{Kademlia table}{name=Kademlia table}{Indexing of peers based on proximity order of peer address relative to local overlay address.}
-\longnewglossaryentry{saturated Kademlia table}{name=saturated Kademlia table}{Nodes with saturated Kademlia table realise Kademlia connectivity.}
-\longnewglossaryentry{retrieve request}{name=retrieve request, plural=retrieve requests}{Peer to peer protocol message asking for the delivery of a chunk based on the chunk address.}
+\longnewglossaryentry{saturated Kademlia table}{name=saturated Kademlia table}{Nodes with a saturated Kademlia table realise Kademlia connectivity.}
+\longnewglossaryentry{retrieve request}{name=retrieve request, plural=retrieve requests}{Peer-to-peer protocol message asking for the delivery of a chunk based on the chunk address.}
 \longnewglossaryentry{proximity order}{name=proximity order}{A measure of relatedness of two addresses on a discrete scale.}
 \longnewglossaryentry{neighbourhood}{name=neighbourhood}{An area of a certain distance around an address.}
-\longnewglossaryentry{retrievability}{name=retrievability}{}
-\longnewglossaryentry{routability}{name=routability}{The ability for a chunk to be routed to destination.}
+\longnewglossaryentry{retrievability}{name=retrievability}{The ability for a chunk to be retrieved in the network.}
+\longnewglossaryentry{routability}{name=routability}{The ability for a chunk to be routed to a destination.}
 % \longnewglossaryentry{practical routability}{name=practical routability}{TBD}
 \longnewglossaryentry{redundant retrievability}{name=redundant retrievability}{A chunk is said to be redundantly retrievable with degree $r$ if it is retrievable and would remain so after any $r$ nodes responsible for it leave the network.}
 \longnewglossaryentry{chunk synchronisation}{name=chunk synchronisation}{The process in which a peer stores locally the chunks from an upstream peer.}
@@ -24,7 +24,7 @@
 % \longnewglossaryentry{session syncing}{name=session syncing}{TBD}
 % \longnewglossaryentry{sync lag}{name=sync lag}{TBD}
 % \longnewglossaryentry{maturity}{name=maturity}{TBD}
-\longnewglossaryentry{chunk}{name=chunk, plural=chunks}{A chunk is fixed sized data blob, the basic unit stored in Swarm's DISC keyed by its address. There are content addressed chunks and single owner chunks.}
+\longnewglossaryentry{chunk}{name=chunk, plural=chunks}{A chunk is fixed sized data blob, the basic unit of storage in Swarm's DISC keyed by its address. There are both content addressed chunks and single owner chunks.}
 \longnewglossaryentry{proximity}{name=proximity}{Proximity measures the relatedness of two addresses in the overlay address space. It is the inverse of the normalised logarithmic XOR distance metric.}
 \longnewglossaryentry{saturation depth}{name=saturation depth}{The neighbourhood depth in the context of saturation (minimum cardinality) constraints on proximity bins outside the nearest neighbourhood.}
 \longnewglossaryentry{area of responsibility}{name=area of responsibility}{The area of the overlay address space in the node's neighbourhood. A storer node is responsible for chunks belonging to this area.}
@@ -33,30 +33,29 @@
 \longnewglossaryentry{eventual consistency}{name=eventual consistency}{The guarantee that all chunks are redundantly retrievable after allowing time for the neighbourhood peers to sync their content.}
 \longnewglossaryentry{erasure code}{name=erasure code, plural={erasure codes}}{An error correction coding scheme which optimally inflates data of $n$ chunks with $k$ parities to allow any $n$ out of the $n+k$ chunks to recover the original data.}
 \longnewglossaryentry{storer node}{name=storer node, plural=storer nodes, parent={node}}{A node storing the requested chunk.}
-\longnewglossaryentry{relaying node}{name=relaying node, plural=relaying nodes}{A node relaying messages in the context of forwarding kademlia.}
-\longnewglossaryentry{syncing}{name=syncing}{TBD}
+\longnewglossaryentry{relaying node}{name=relaying node, plural=relaying nodes}{A node relaying messages in the context of forwarding Kademlia.}
+\longnewglossaryentry{syncing}{name=syncing}{The process of exchanging chunks with neighbours in order to realise one's area of responsibility.}
 \longnewglossaryentry{chunking}{name=chunking}{Splitting of data into chunks, to be stored in Swarm.}
 \longnewglossaryentry{plausible deniability}{name=plausible deniability}{The ability to deny knowledge of any damnable actions committed by others.}
 \longnewglossaryentry{feeds}{name=feeds}{A data structure based on single owner chunks, suitable for representing a variety of sequential data, such as versioning updates of a mutable resource or indexing messages for real-time data exchange offering a system of persisted pull messaging.}
-\longnewglossaryentry{dapps}{name=dapps}{TBD}
-\longnewglossaryentry{underlay network}{name=underlay network}{The nodes in the network connect using a peer to peer network protocol as their transport layer on the lowest level.}
-\longnewglossaryentry{enode}{name=enode}{TBD}
-\longnewglossaryentry{network ID}{name=network ID}{TBD}
-\longnewglossaryentry{overlay topology}{name=overlay topology}{The connectivity graph realising a particular topology over the underlay network connections.}
-\longnewglossaryentry{kademlia}{name=kademlia}{TBD}
+\longnewglossaryentry{dapps}{name=dapps}{Applications benefitting from a decentralised infrastructure.}
+\longnewglossaryentry{underlay network}{name=underlay network}{The lowest level base network by which nodes connect using a peer-to-peer network protocol as their transport layer.}
+\longnewglossaryentry{enode}{name=enode}{An addressing scheme identifying a node's public key, ip and host port.}
+\longnewglossaryentry{network ID}{name=network ID}{An ID used to differentiate between swarm networks, such as mainnet, testnets etc.}
+\longnewglossaryentry{overlay topology}{name=overlay topology}{The connectivity graph realising a particular topology over the underlay network.}
 \longnewglossaryentry{proximity order bin}{name=proximity order bin, plural={proximity order bins}}{An equivalence class of peers in regard to their proximity order.}
-\longnewglossaryentry{churn}{name=network churn, text=churn}{Attrition of nodes from the network.}
-\longnewglossaryentry{hive protocol}{name=hive protocol}{The protocol nodes joining a decentralised network use to discover their peers.}
-\longnewglossaryentry{address book}{name=address book}{Kademlia table of known peer addresses.}
+\longnewglossaryentry{churn}{name=network churn, text=churn}{The cycle of accumulation and attrition of nodes by a network.}
+\longnewglossaryentry{hive protocol}{name=hive protocol}{The protocol nodes joining the network use to discover their peers.}
+\longnewglossaryentry{address book}{name=address book}{Kademlia table of a peer's known addresses.}
 \longnewglossaryentry{immutable}{name=immutable chunk store, text=immutable}{No replace/update operation is available on chunks.}
 \longnewglossaryentry{reference}{name=chunk reference, text=reference}{information needed to retrieve and read a chunk; it is the address with an optional decryption key appended used for encrypted chunks.}
-\longnewglossaryentry{content addressed chunk}{name=content addressed chunk, plural=content addressed chunks}{A chunk is Content addressing means that the chunk content determines the chunk address, usually the address being the fingerprint of the data using some hash function. The default content addressed chunk in Swarm is at most 4 kilobytes and uses Binary Merkle Tree hash with Keccak256 base hash as its address function.}
-\longnewglossaryentry{single owner chunk}{name=single owner chunk, plural=single owner chunks}{A special type of chunk in Swarm, the integrity of which is given by the association of its payload to an identifier attested by the signature of its owner while the identifier and the owner's account determines the chunk address.}
-\longnewglossaryentry{garbage collection}{name=garbage collection}{The process that purges chunks from their local storage.}
+\longnewglossaryentry{content addressed chunk}{name=content addressed chunk, plural=content addressed chunks}{A chunk is content addressed if the chunk content determines the chunk address. The address usually represents a fingerprint or digest of the data using some hash function. The default content addressed chunk in Swarm uses the Binary Merkle Tree hash algorithm with Keccak256 base hash to determine its address.}
+\longnewglossaryentry{single owner chunk}{name=single owner chunk, plural=single owner chunks}{A special type of chunk in Swarm, the integrity of which is given by the association of its payload to an identifier attested by the signature of its owner. The identifier and the owner's account determines the chunk address.}
+\longnewglossaryentry{garbage collection}{name=garbage collection}{The process that selectively purges chunks from a node's local storage.}
 \longnewglossaryentry{garbage collection strategy}{name=garbage collection strategy}{The process that dictates which chunks are chosen for garbage collection.}
 \longnewglossaryentry{direct delivery}{name=direct delivery}{Chunk delivery happens in one step via some lower level network protocol.}
 \longnewglossaryentry{pass-back delivery}{name=pass-back delivery}{A method of chunk delivery where the chunk delivery response simply follows the request route back to the originator.}
-\longnewglossaryentry{routed delivery}{name=routed delivery}{Hypothetical way of chunk delivery using kademlia routing but independently of the request.}
+\longnewglossaryentry{routed delivery}{name=routed delivery}{Hypothetical way of implementing chunk delivery using Kademlia routing independently of the initial request.}
 \longnewglossaryentry{opportunistic caching}{name=opportunistic caching}{When a forwarding node receives a chunk, then the chunk is saved in case it will be requested again.}
 \longnewglossaryentry{light node}{name=light node, plural={light nodes}}{Concept of light node refer to a special mode of operation necessitated by poor bandwidth environments, e.g., mobile devices on low throughput networks or devices allowing only transient or low-volume storage. Such nodes do not accept incoming connections.}
 \longnewglossaryentry{chequebook contract}{name=chequebook contract}{Smart contract that allows the beneficiary to choose when payments are to be processed.}
@@ -70,99 +69,99 @@
 \longnewglossaryentry{chunk span}{name=chunk span}{The length of data subsumed under an intermediate chunk.}
 \longnewglossaryentry{Swarm manifest}{name={Swarm manifest}, plural={Swarm manifests} }{A structure that defines a mapping between arbitrary paths and files to handle collections.}
 \longnewglossaryentry{manifest entry}{name=manifest entry}{Contains a reference to the Swarm root chunk of the representation of a file and also specifies the media mime type of file.}
-\longnewglossaryentry{root access}{name=root access}{Non-privileged access to encrypted content based on meta-information encoded in root manifest entry for a document.}
-\longnewglossaryentry{granted access}{name=granted access}{A type of selective access to encrypted content requiring \gloss{root access} as well as access credentials: authorized private key or passphrase.}
+\longnewglossaryentry{root access}{name=root access}{Non-privileged access to encrypted content based on meta-information encoded in the root manifest entry for a document.}
+\longnewglossaryentry{granted access}{name=granted access}{A type of selective access to encrypted content requiring \gloss{root access} as well as access credentials comprising either an authorized private key or passphrase.}
 \longnewglossaryentry{encrypted reference}{name=encrypted reference}{Symmetric encryption of a swarm reference to access controlled content.}
 \longnewglossaryentry{access key}{name=access key}{Symmetric key used for encryption of reference to encrypted data.}
 \longnewglossaryentry{session key}{name=session key}{One of the keys involved in the process of allowing selective access to content to multiple parties. }
 \longnewglossaryentry{lookup key}{name=lookup key}{One of the keys involved in the process of allowing selective access to content to multiple parties. }
-\longnewglossaryentry{access key decryption key}{name=access key decryption key}{The key the publisher grants to party in multi party selective access scenario, to decrypt the global access key.}
+\longnewglossaryentry{access key decryption key}{name=access key decryption key}{The key the publisher grants to a party in a multi-party selective access scenario, used to decrypt the global access key.}
 \longnewglossaryentry{Trojan chunk}{name={Trojan chunk}, plural={Trojan chunks} }{A chunk containing a disguised message while appearing no different to other chunks. }
-\longnewglossaryentry{neighbourhood notification}{name=neighbourhood notification}{Notification about feed update which works without the issuer of the notification knowing the identity of prospective posters.}
+\longnewglossaryentry{neighbourhood notification}{name=neighbourhood notification}{Notification of a feed update which works without the issuer of the notification needing to know the identity of prospective posters.}
 \longnewglossaryentry{targeted chunk delivery}{name=targeted chunk delivery}{Mechanism to request a chunk from an arbitrary neighbourhood where it is known to be stored to an arbitrary neighbourhood where it is known to be needed.}
 \longnewglossaryentry{direct notification from publisher}{name=direct notification from publisher}{The process where a recipient is notified of a feed update by the publisher or other parties known to have it.}
 
-\longnewglossaryentry{RLP}{name=RLP}{TBD}
+\longnewglossaryentry{RLP}{name=RLP}{An encoding scheme used to encode arbitrarily nested arrays of binary data.}
 
-\longnewglossaryentry{distributed immutable store for chunks}{name=distributed immutable store for chunks}{Swarm's version of distributed hash table for storing files, where it does not keep a list of where files are to be found, instead it actually stores pieces of the file directly on the node.}
-\longnewglossaryentry{distributed hash table}{name=distributed hash table,plural=distributed hash tables}{A distributed system that provides a lookup service where any participating node can efficiently retrieve the value associated with a given key. }
-\longnewglossaryentry{binary Merkle tree}{name={binary Merkle tree}}{A binary tree in which every leaf node is labelled with the cryptographic hash of a data block, and every non-leaf node is labelled with hash of labels of its child nodes.}
+\longnewglossaryentry{distributed immutable store for chunks}{name=distributed immutable store for chunks}{Swarm's version of a distributed hash table for storing files. Swarm does not keep a list of where files are to be found, instead it actually stores pieces of the file directly on the node.}
+\longnewglossaryentry{distributed hash table}{name=distributed hash table,plural=distributed hash tables}{A distributed system that provides a lookup service with which any participating node can efficiently retrieve the value associated with a given key. }
+\longnewglossaryentry{binary Merkle tree}{name={binary Merkle tree}}{A binary tree in which every leaf node is labelled with the cryptographic hash of a data block, and every non-leaf node is labelled with hash of the labels of its child nodes.}
 \longnewglossaryentry{binary Merkle tree chunk}{name=binary Merkle tree chunk}{The canonical content addressed chunk in Swarm.}
 \longnewglossaryentry{binary Merkle tree hash}{name=binary Merkle tree hash}{The method used for calculating the address of the binary Merkle tree chunks.}
-\longnewglossaryentry{bzz account}{name=bzz account}{The account in Swarm, also see \gloss{Swarm base account}.}
-\longnewglossaryentry{enode URL scheme}{name=enode URL scheme}{An URL scheme under which an Ethereum node can be described.}
-\longnewglossaryentry{mining chunks}{name=mining chunks}{An example of chunk mining is generating an encrypted variant of chunk content so that the resulting chunk address satisfies certain constraints, e.g., is close to or farther away from a particular address.}
-\longnewglossaryentry{chunk value}{name=chunk value}{The chunk value is determined  by the price of the postage batch it is stamped with. It serves to order chunks when a node prioritises for garbage collection.}
-\longnewglossaryentry{postage lottery}{name=postage lottery}{A scheme for compensation through redistributing the revenue coming from postage stamps among the registered storers in a fair way.}
+\longnewglossaryentry{bzz account}{name=bzz account}{An account in Swarm, also see \gloss{Swarm base account}.}
+\longnewglossaryentry{enode URL scheme}{name=enode URL scheme}{A URL scheme under which an Ethereum node can be described.}
+\longnewglossaryentry{mining chunks}{name=mining chunks}{An example of chunk mining is to generate an encrypted variant of chunk content so that the resulting chunk address satisfies certain constraints, e.g.\ is closer to or farther away from a particular address.}
+\longnewglossaryentry{chunk value}{name=chunk value}{The chunk value is determined by the price of the postage batch it is stamped with. It serves to determine the order of chunks when a node prioritises for garbage collection.}
+\longnewglossaryentry{postage lottery}{name=postage lottery}{A scheme to provide compensation to storing nodes through redistribution of the revenue resulting from postage stamps among the registered storers in a fair way.}
 \longnewglossaryentry{security deposit}{name=security deposit}{The stake a node must put up when registering to be able to sell promissory storage receipts.}
 \longnewglossaryentry{litigation}{name=litigation}{An on-chain process where nodes violating the rules of Swarm stand to lose their deposit.}
 \longnewglossaryentry{challenge}{name=challenge}{User can submit a challenge when they attempt to retrieve insured content and fail to find a chunk.}
 \longnewglossaryentry{access control trie}{name=access control trie}{A tree-like data structure containing access keys and other access information.}
 \longnewglossaryentry{pinning}{name=pinning}{The mechanism that makes content sticky and prevents it from being garbage collected.}
 % \longnewglossaryentry{SWINDLE}{name=SWINDLE}{TBD} DELETE
-\longnewglossaryentry{Secured With INsurance Deposit Litigation and Escrow}{name=Secured With INsurance Deposit Litigation and Escrow}{TBD See \gloss{SWINDLE}.}
-\longnewglossaryentry{update notification}{name=update notification}{TBD}
+\longnewglossaryentry{Secured With INsurance Deposit Litigation and Escrow}{name=Secured With INsurance Deposit Litigation and Escrow}{ See \gloss{SWINDLE}.}
+\longnewglossaryentry{update notification}{name=update notification}{A notification that a feed has been updated.}
 \longnewglossaryentry{upload tag}{name=upload tag}{An object representing an upload and tracking the progress by counting how many chunks reached a particular state.}
 \longnewglossaryentry{singleton manifest}{name=singleton manifest}{A manifest that contains a single entry to a file.}
-\longnewglossaryentry{range queries}{name=range queries}{Range queries will trigger the retrieval of all and only those chunks of the file that cover the desired range.}
+\longnewglossaryentry{range queries}{name=range queries}{Range queries will trigger the retrieval of all but only those chunks of the file that cover the desired range.}
 \longnewglossaryentry{BZZ network ID}{name=bzz network ID}{The ID of the Swarm network.}
-\longnewglossaryentry{Kademlia}{name=Kademlia}{A network connectivity or routing scheme based on bitprefix length used in distributed hash tables.}
-\longnewglossaryentry{reference count}{name=reference count}{A property of a chunk to prevent it from being garbage collected. It is increased and decreased when the chunk is pinned and unpinned, respectively.}
+\longnewglossaryentry{Kademlia}{name=Kademlia}{A network connectivity or routing scheme based on bit prefix length used in distributed hash tables.}
+\longnewglossaryentry{reference count}{name=reference count}{A property of a chunk used to prevent it from being garbage collected. It is increased and decreased when the chunk is pinned and unpinned, respectively.}
 \longnewglossaryentry{cheque}{name=cheque, plural=cheques}{An off-chain method of payment where issuer signs a cheque specifying a beneficiary, a date and an amount, gives it to the recipient as a token of promise to pay at a later date.}
-\longnewglossaryentry{uploader}{name=uploader}{The client uploading content to the Swarm network.}
+\longnewglossaryentry{uploader}{name=uploader}{An entity uploading content to the Swarm network.}
 \longnewglossaryentry{witness}{name=witness}{Digital signature issued by the entity that the payer of a postage stamp designates.}
-\longnewglossaryentry{upload and disappear}{name=upload and disappear}{A way to deploy your interactive dynamic content to be stored in the cloud.}
+\longnewglossaryentry{upload and disappear}{name=upload and disappear}{A way to deploy your interactive dynamic content to be stored in the cloud so it may be retrieved even if the uploader goes offline.}
 \longnewglossaryentry{world computer}{name=world computer}{Global infrastructure that supports data storage, transfer and processing.}
 \longnewglossaryentry{neighbourhood depth}{name=neighbourhood depth, parent=neighbourhood}{Distance from the node within which its peers are considered to be nearest neighbours. }
 \longnewglossaryentry{thin Kademlia table}{name=thin Kademlia table, parent={Kademlia table}}{A Kademlia table in which a single peer is present for each bin (up to a certain bin).}
-\longnewglossaryentry{aligned incentives}{name=aligned incentives}{Rewarding / penalization in such a way, that the actors are inclined towards desired behavior.}
+\longnewglossaryentry{aligned incentives}{name=aligned incentives}{Rewarding / penalisation in such a way, that the actors are inclined towards the desired behavior.}
 \longnewglossaryentry{forwarding lag}{name=forwarding lag}{The time in which healthy nodes could forward messages.}
-\longnewglossaryentry{sender anonymity}{name=sender anonymity}{As requests are relayed from peer-to-peer, further down on the request cascade can never know who the originator of the request is.}
-\longnewglossaryentry{decentralised network}{name=decentralised network}{A network designed with no central node upon which the other nodes would need to depend on.}
+\longnewglossaryentry{sender anonymity}{name=sender anonymity}{As requests are relayed from peer-to-peer, those further down on the request cascade can never know who the originator of the request is.}
+\longnewglossaryentry{decentralised network}{name=decentralised network}{A network designed with no central nodes upon which the other nodes would need to depend on.}
 \longnewglossaryentry{load balancing}{name=load balancing}{The process of distributing a set of tasks over a set of nodes to make the process more efficient.}
-\longnewglossaryentry{redundancy}{name=redundancy}{In the context of distributed chunk store, redundancy is a surplus replicas or so called parities that contribute to resilience of chunk storage in the face of churn and garbage collection.}
+\longnewglossaryentry{redundancy}{name=redundancy}{In the context of the distributed chunk store, redundancy is provided by surplus replicas or so called parities that contribute to resilience of chunk storage in the face of churn and garbage collection.}
 \longnewglossaryentry{inclusion proofs}{name=inclusion proofs}{A proof that a string is a substring of another string, for instance that a string is included in a chunk.}
 \longnewglossaryentry{span value}{name=span value}{An 8 byte encoding of the length of the data span subsumed under an intermediate chunk.}
 \longnewglossaryentry{neighbourhood size}{name=neighbourhood size}{The number of nearest neighbours of a node. }
 \longnewglossaryentry{NHS}{name=NHS, parent={neighbourhood size}}{neighbourhood size}
-\longnewglossaryentry{postage batch}{name=postage batch, plural={postage batches}}{A postage batch is an id associated with a verifiable payment on chain which can be attached to (multiple) chunks as a postage stamp.}
+\longnewglossaryentry{postage batch}{name=postage batch, plural={postage batches}}{A postage batch is an id associated with a verifiable payment on chain which can be attached to one or more chunks as a postage stamp.}
 \longnewglossaryentry{host}{name=host}{In the context of pinning, host is the volunteer pinner to be notified if a chunk that is part of the content they host is no longer found in the network.}
-\longnewglossaryentry{simple ordered sequence}{name=simple ordered sequence}{An indexing scheme and a feed type using this scheme, where subsequent updates indexes are incrementing integers.}
+\longnewglossaryentry{simple ordered sequence}{name=simple ordered sequence}{An indexing scheme used by a feed type, where subsequent updates indexes are incrementing integers.}
 \longnewglossaryentry{access control}{name=access control}{The selective restriction of access to a read a document or collection in Swarm.}
-\longnewglossaryentry{root access manifest}{name=root access manifest}{A special unencrypted manifest used in entry point for access control.}
-\longnewglossaryentry{witness batch}{name=witness batch}{Serves as a spot check for the applicant's claim that they store all chunks they are responsible for. The witness batch is random choice of the valid postage batches; the applicant must have all chunks in their neighbourhood.}
+\longnewglossaryentry{root access manifest}{name=root access manifest}{A special unencrypted manifest used as an entry point for access control.}
+\longnewglossaryentry{witness batch}{name=witness batch}{Serves as a spot check for the applicant's claim that they store all chunks they are responsible for. The witness batch is random choice of the valid postage batches; the applicant must have actually stored all chunks in their neighbourhood.}
 \longnewglossaryentry{mutable
 resource updates}{name=mutable
 resource updates}{Feeds that represent revisions of the same semantic entity.}
 \longnewglossaryentry{series}{name=series, parent={feeds}}{Special kind of feeds representing a series of content connected by a common thread, theme or author such as status updates on social media, a person's blog posts or blocks of a blockchain.}
-\longnewglossaryentry{partitions}{name=partitions, parent={feeds}}{Special kind of feeds, updates of which are meant to accumulated or added to earlier ones, e.g., parts of a video stream.}
-\longnewglossaryentry{sporadic feeds}{name=sporadic feeds, parent={feeds}}{Feeds with irregular asynchronicities, i.e., updates can have unpredictable gaps.}
+\longnewglossaryentry{partitions}{name=partitions, parent={feeds}}{Special kind of feeds, updates of which are meant to be accumulated or added to earlier ones, e.g.\ parts of a video stream.}
+\longnewglossaryentry{sporadic feeds}{name=sporadic feeds, parent={feeds}}{Feeds with irregular asynchronicities, i.e.\ updates can have unpredictable gaps.}
 \longnewglossaryentry{periodic feeds}{name=periodic feeds, parent={feeds}}{Feeds with updates published at regularly recurring intervals.}
 \longnewglossaryentry{real-time feeds}{name=real-time feeds, parent={feeds}}{Feeds where the update frequencies may not be regular but show variance within the temporal range of  real-time human interaction.}
-\longnewglossaryentry{pub-sub systems}{name={pub\slash sub systems}}{Publish/subscribe system is a form of asynchronous communication where any message published is immediately received by subscribers.}
-\longnewglossaryentry{Ethereum Name Service}{name=Ethereum Name Service}{The system that, analogously to the DNS of the old web, translates human-readable names into system-specific identifiers, i.e., reference in the case of Swarm.}
+\longnewglossaryentry{pub-sub systems}{name={pub\slash sub systems}}{A publish/subscribe system is a form of asynchronous communication where any message published is immediately received by subscribers.}
+\longnewglossaryentry{Ethereum Name Service}{name=Ethereum Name Service}{The system that, analogously to the DNS of the old web, translates human-readable names into system-specific identifiers, i.e.\ a reference in the case of Swarm.}
 \longnewglossaryentry{epoch-based indexing}{name=epoch-based indexing}{Indexing based on the epoch in which an action took place.}
-\longnewglossaryentry{outbox}{name=outbox}{TBD}
+\longnewglossaryentry{outbox}{name=outbox}{a feed representing information intended for one or more third parties.}
 \longnewglossaryentry{double ratchet}{name=double ratchet}{An industry standard key management solution providing forward secrecy, backward secrecy, immediate decryption and message loss resilience.}
 \longnewglossaryentry{feed index}{name=feed index}{Part of the identifier of the feed chunk.}
 \longnewglossaryentry{lookup strategy}{name=lookup strategy}{A strategy used for following updates to feeds.}
-\longnewglossaryentry{feed aggregation}{name=feed aggregation}{The process of turning a set of sporadic feeds into a periodic one.}
+\longnewglossaryentry{feed aggregation}{name=feed aggregation}{The process of combining a set of sporadic feeds into a periodic one.}
 \longnewglossaryentry{outbox feed}{name=outbox feed}{A feed representing the outgoing messages of a persona.}
-\longnewglossaryentry{extended triple Diffie--Hellmann key exchange}{name=extended triple Diffie--Hellmann key exchange}{The customary method of establishing the initial parameters of the double ratchet key chains.}
-\longnewglossaryentry{future secrecy}{name=future secrecy}{A feature of specific key agreement protocols that gives assurances that session keys will not be compromised even if the private key of the server is compromised.}
+\longnewglossaryentry{extended triple Diffie--Hellmann key exchange}{name=extended triple Diffie--Hellmann key exchange}{The customary method of establishing the initial parameters of a double ratchet key-chain.}
+\longnewglossaryentry{future secrecy}{name=future secrecy}{A feature of specific key agreement protocols that gives assurances that all other session keys will not be compromised even one or more session keys is obtained by an attacker.}
 \longnewglossaryentry{authoritative version history}{name=authoritative version history}{A secure audit trail of the revisions of a mutable resource.}
-\longnewglossaryentry{outbox index key chains}{name=outbox index key chains}{Additional key chains added to the double ratchet key management (beside the ones for encryption) that make the feed update locations resilient to compromise.}
-\longnewglossaryentry{real-time integrity check}{name=real-time integrity check}{For any deterministically indexed feed. Integrity translates to non-forking or unique chain commitment.}
-\longnewglossaryentry{indexing scheme}{name=indexing scheme, plural={indexing schemes}}{Defines the way  the addresses of subsequent updates of a feed  are calculated. The choice of indexing scheme depends on the type and usage characteristics (update frequency) of the feed.}
-\longnewglossaryentry{pre-key bundle}{name=pre-key bundle}{Consists of all information the initiator needs about responder to initiate a handshake.}
+\longnewglossaryentry{outbox index key chains}{name=outbox index key chains}{Additional key chains added to the double-ratchet key management (beside the ones for encryption) that make the feed update locations resilient to compromise.}
+\longnewglossaryentry{real-time integrity check}{name=real-time integrity check}{For any deterministically indexed feed. Integrity translates to a non-forking or unique chain commitment.}
+\longnewglossaryentry{indexing scheme}{name=indexing scheme, plural={indexing schemes}}{Defines the way the addresses of subsequent updates of a feed are calculated. The choice of indexing scheme depends on the type and usage characteristics (update frequency) of the feed.}
+\longnewglossaryentry{pre-key bundle}{name=pre-key bundle}{Consists of all information the initiator needs to know about the responder to initiate a cryptographic handshake.}
 \longnewglossaryentry{destination target}{name=destination target}{A bit sequence that represents a neighbourhood in the address space. In the context of chunk mining, it refers to the prefix that the mined address should match.}
 \longnewglossaryentry{requestor node}{name=requestor node}{A node requesting some information from the network.}
-\longnewglossaryentry{anonymous retrieval}{name=anonymous retrieval}{Not disclosing the identity of requestor node while retrieving a chunk.}
-\longnewglossaryentry{push syncing}{name=push syncing}{Network protocol responsible for delivering a chunk to its storer after it is uploaded to an arbitrary node.}
+\longnewglossaryentry{anonymous retrieval}{name=anonymous retrieval}{Not disclosing the identity of the requestor node while retrieving a chunk.}
+\longnewglossaryentry{push syncing}{name=push syncing}{Network protocol responsible for delivering a chunk to its proper storer after it is uploaded to an arbitrary node.}
 \longnewglossaryentry{statement of custody receipt}{name=statement of custody receipt}{A receipt from the storer node to the uploader after successful \gloss{push syncing} of a chunk.}
-\longnewglossaryentry{anonymous uploads}{name=anonymous uploads}{Uploading leveraging the forwarding Kademlia and keeping the identity of the uploader hidden.}
+\longnewglossaryentry{anonymous uploads}{name=anonymous uploads}{Uploading leveraging the forwarding Kademlia routing while keeping the identity of the uploader hidden.}
 \longnewglossaryentry{pull syncing}{name=pull syncing}{Network protocol responsible for eventual consistency and maximum resource utilisation by pulling chunks by a certain node.}
-\longnewglossaryentry{upstream peer}{name=upstream peer}{The peer that is preceeding some other peer in the chain of forwarding.}
+\longnewglossaryentry{upstream peer}{name=upstream peer}{The peer preceding some other peer in the chain of forwarding.}
 \longnewglossaryentry{forwarding node}{name={forwarding node},plural={forwarding nodes},parent={node}}{Nodes that engage in forwarding messages.}
 \longnewglossaryentry{net user}{name=net user, plural=net users}{A node that is using more resources of the Swarm network than it is providing.}
 \longnewglossaryentry{net provider}{name=net provider, plural=net providers}{A node that is providing more resources to the Swarm network than it is using.}
@@ -170,58 +169,58 @@ resource updates}{Feeds that represent revisions of the same semantic entity.}
 \longnewglossaryentry{spurious hop}{name=spurious hop}{Relaying traffic to a node without increasing proximity to the target address.}
 \longnewglossaryentry{payment threshold}{name=payment threshold}{The value of debt at which a cheque is issued.}
 \longnewglossaryentry{effective settlement threshold}{name=effective settlement threshold}{TBD}
-\longnewglossaryentry{peer}{name=peer, plural=peers}{Nodes that are in relation with a particular node $x$ are called peers of $x$.}
-\longnewglossaryentry{downstream peer}{name=downstream peer, parent={peer}}{The peer that is succeeding some other peer in the chain of forwarding.}
-\longnewglossaryentry{disconnect threshold}{name=disconnect threshold}{The threshold for debt between peers that determines the value of debt at which a peer in debt will be disconnected.}
+\longnewglossaryentry{peer}{name=peer, plural=peers}{Nodes that are in relation to a particular node $x$ are called peers of $x$.}
+\longnewglossaryentry{downstream peer}{name=downstream peer, parent={peer}}{A peer that succeeds some other peer in the chain of forwarding.}
+\longnewglossaryentry{disconnect threshold}{name=disconnect threshold}{The threshold for debt between peers that determines the value of the debt at which a peer in debt will be disconnected.}
 \longnewglossaryentry{uniformity requirement}{name=uniformity requirement}{A constraint on postage batches that chunks signed with same batch identifier must not have a common prefix longer than the depth.}
-\longnewglossaryentry{prefix collision}{name=prefix collision}{In the context of postage stamps, when owner of a batch attaches it to two chunks with a shared prefix longer than the depth of the batch.}
-\longnewglossaryentry{collision slot}{name=collision slot, plural= collision slots}{The collection of maximum length prefixes that any two chunk stamped with a postage batch are allowed to share. A stamped chunk occupies a collision slot. }
+\longnewglossaryentry{prefix collision}{name=prefix collision}{In the context of postage stamps, when the owner of a batch attaches a stamp to two chunks with a shared prefix longer than the depth of the batch.}
+\longnewglossaryentry{collision slot}{name=collision slot, plural= collision slots}{The collection of maximum length prefixes that any two chunks stamped with a postage batch are allowed to share. A stamped chunk occupies a collision slot. }
 \longnewglossaryentry{tragedy of the commons}{name=tragedy of the commons}{Disappearing content will have no negative consequence to any one storer node if no negative incentives are used.}
 % swap, swear and swindle
 \longnewglossaryentry{swindle}{name=swindle}{Incentive scheme where nodes monitor other nodes to check if they comply with their promise by submitting challenges according to a process of litigation.}
 \longnewglossaryentry{swear}{name=swear}{Incentive scheme where nodes registered on the Swarm network are accountable and stand to lose their deposit if they are found to violate the rules of the Swarm in an on-chain litigation process.}
 % \longnewglossaryentry{swap}{name=swap}{Incentive scheme where nodes are in quasi-permanent long term contact with their registered peers. Along these connections the peers are swapping chunks and receipts triggering swap accounting.}
-\longnewglossaryentry{swap}{name=swap}{swap is a Swarm accounting protocol with tit-for-tat accounting scheme that scales microtransactions. Includes a network protocol also called swap.}
+\longnewglossaryentry{swap}{name=swap}{swap is a Swarm accounting protocol with a tit-for-tat accounting scheme that scales microtransactions. Includes a network protocol also called Swap.}
 \longnewglossaryentry{chunk-epoch}{name=chunk-epoch}{TBD}
 \longnewglossaryentry{collect-and-run attack}{name=collect-and-run attack}{Situation where a party would collect the funds for some promised work, but not actually do the work.}
 \longnewglossaryentry{addressed envelope}{name=addressed envelope}{A construct where the address of the single owner chunk is created before the chunk content is associated with it.}
 \longnewglossaryentry{stamped addressed envelope}{name=stamped     addressed envelope}{Addressed envelope with an attached stamp.}
 \longnewglossaryentry{entanglement code}{name=entanglement code, plural=entanglement codes}{An error correction code optimized for bandwidth of repair.}
-\longnewglossaryentry{Cauchy-Reed-Solomon erasure code}{name=Cauchy-Reed-Solomon erasure code}{A systemic erasure code which when applied to a data (of $n$ chunks)  produces $k$ extra 'parity' chunks  in such a way that any $n$ chunks out of the total $n + k$ are enough to reconstruct the original blob.}
-\longnewglossaryentry{missing chunk notification protocol}{name=missing chunk notification protocol}{A protocol upon which downloader not finding a chunk, can fall back to a recovery process and request the chunk from a pinner.}
+\longnewglossaryentry{Cauchy-Reed-Solomon erasure code}{name=Cauchy-Reed-Solomon erasure code}{A systemic erasure code which when applied to data consisting of $n$ chunks produces $k$ extra 'parity' chunks in such a way that any $n$ chunks out of the total $n + k$ are enough to reconstruct the original blob.}
+\longnewglossaryentry{missing chunk notification protocol}{name=missing chunk notification protocol}{A protocol upon which downloader not finding a chunk, can fall back to a recovery process and request the chunk from a pinner of that chunk.}
 \longnewglossaryentry{recovery}{name=recovery}{A process of requesting a missing chunk from specific recovery hosts.}
-\longnewglossaryentry{recovery request}{name=recovery request}{A request to a recovery host to initiate a reupload of a missing chunk we know it has pinned.}
+\longnewglossaryentry{recovery request}{name=recovery request}{A request to a recovery host to initiate the reupload of a missing chunk we know it has pinned in its local store.}
 \longnewglossaryentry{recovery feed}{name=recovery feed}{A publisher's feed advertising recovery targets to their consumers.}
 \longnewglossaryentry{recovery host}{name=recovery host}{Pinning nodes that are willing to provide their pinned chunks in the context of recovery.}
-\longnewglossaryentry{recovery response envelope}{name=recovery response envelope}{An addressed envelope to provide a way for recovery hosts to  respond directly to the originator of the recovery request promptly and without cost or computational burden.}
+\longnewglossaryentry{recovery response envelope}{name=recovery response envelope}{An addressed envelope which provides a way for recovery hosts to  respond directly to the originator of the recovery request promptly and without cost or computational burden.}
 %\longnewglossaryentry{prod}{name=prod}{}
-\longnewglossaryentry{duplicate chunk}{name=duplicate chunk, plural=duplicate chunks}{We define a chunk as a duplicate (or seen) if and only if it is already found in the localstore.}
+\longnewglossaryentry{duplicate chunk}{name=duplicate chunk, plural=duplicate chunks}{We define a chunk as a duplicate (or seen) if and only if it is already found in the local store.}
 \longnewglossaryentry{World Wide Web}{name=World Wide Web}{A part of the Internet where documents and other web resources are identified by Uniform Resource Locators and interlinked by hypertext.}
 \longnewglossaryentry{Web 1.0}{name=Web 1.0, parent={World Wide Web}}{Websites where people were limited to viewing content in a passive manner.}
-\longnewglossaryentry{Web 2.0}{name=Web 2.0, parent={World Wide Web}}{Describes websites that emphasize user-generated content, ease of use, participatory culture and interoperability for end users.}
-\longnewglossaryentry{peer-to-peer}{name=peer-to-peer}{A network where tasks or workloads are partitioned between peers, which are equally privileged participants.}
+\longnewglossaryentry{Web 2.0}{name=Web 2.0, parent={World Wide Web}}{Describes websites that emphasise user-generated content, ease of use, participatory culture and complex user interfaces for end users.}
+\longnewglossaryentry{peer-to-peer}{name=peer-to-peer}{A network where tasks or workloads are partitioned between peers who are all equally privileged participants.}
 \longnewglossaryentry{Web 3.0}{name=Web 3.0, parent={World Wide Web}}{A decentralised, censorship-resistant way of sharing and even collectively creating interactive content, while retaining full control over it.}
 \longnewglossaryentry{BitTorrent}{name=BitTorrent}{A communication protocol for peer-to-peer file sharing used to distribute data and electronic files over the Internet.}
-\longnewglossaryentry{seeder}{name=seeder}{User hosting the content in BitTorrent peer-to-peer file exchange protocol.}
+\longnewglossaryentry{seeder}{name=seeder}{User hosting the content in the BitTorrent peer-to-peer file exchange protocol.}
 \longnewglossaryentry{Hypertext Transfer Protocol}{name=Hypertext Transfer Protocol}{An application protocol for distributed, collaborative, hypermedia information systems.}
 \longnewglossaryentry{ZeroNet}{name=ZeroNet}{Decentralized web platform using Bitcoin cryptography and BitTorrent network.}
 \longnewglossaryentry{distributed web application}{name=distributed web application, plural={distributed web applications}}{A client side web application that leverages the Web 3.0 technologies (e.g. Ethereum network) and does not rely on any central server.}
 \longnewglossaryentry{InterPlanetary File System}{name=InterPlanetary File System}{A protocol and peer-to-peer network for storing and sharing data in a distributed file system.}
 \longnewglossaryentry{freeriding}{name=freeriding}{The uncompensated depletion of limited resources.}
-\longnewglossaryentry{incentive strategy}{name=incentive strategy}{A strategy of rewarding and penalizing behavior to reach desired goals.}
-\longnewglossaryentry{data slavery}{name=data slavery}{A situation where an individual has no control over their personal data used for commercial purposes by companies.}
-\longnewglossaryentry{collective information}{name=collective information}{Data produced by collective effort, such as data on public forums, reviews, votes, polls.}
-\longnewglossaryentry{data silo}{name=data silo, plural={data silos}}{A collection of information in an organization that is isolated from and not accessible by other parts of the organization. In more general meaning also the data large companies are keeping to themselves.}
+\longnewglossaryentry{incentive strategy}{name=incentive strategy}{A strategy of rewarding and penalising behavior to encourage desired behaviour.}
+\longnewglossaryentry{data slavery}{name=data slavery}{A situation where an individual is trapped in a situation where they do not control or receive sufficient remuneration for their personal data which is used for commercial purposes by companies.}
+\longnewglossaryentry{collective information}{name=collective information}{Data produced by collective effort, such as data on public forums, reviews, votes, polls, wikis.}
+\longnewglossaryentry{data silo}{name=data silo, plural={data silos}}{A collection of information in an organization that is isolated from and not accessible by other parts of the organization. In more general terms, the large datasets organisations often keep to themselves.}
 \longnewglossaryentry{distributed storage}{name=distributed storage}{A network of storage where information is stored on more than one node, possibly in replicated fashion.}
-\longnewglossaryentry{overlay network}{name=overlay network}{Connectivity pattern of Swarm oecondary conceptual network .}
+\longnewglossaryentry{overlay network}{name=overlay network}{Connectivity pattern of Swarm secondary conceptual network, a second network scheme overlayed over the base \gloss{underlay network}.}
 \longnewglossaryentry{overlay address space}{name=overlay address space}{Address space of the overlay Swarm network consisting of 256-bit integers.}
 \longnewglossaryentry{underlay address}{name=underlay address}{The address of a Swarm node on the underlay network. It might not remain stable between sessions.}
-\longnewglossaryentry{protocol multiplexing}{name=protocol multiplexing}{The underlay network service can accommodate several protocols running on the same connection.}
-\longnewglossaryentry{devp2p}{name=devp2p}{A set of network protocols which form the Ethereum peer-to-peer network. Also implemented as set of programming libraries with the same name.}
+\longnewglossaryentry{protocol multiplexing}{name=protocol multiplexing}{The underlay network service can accommodate several separate protocols running on the same connection.}
+\longnewglossaryentry{devp2p}{name=devp2p}{A set of network protocols which form the Ethereum peer-to-peer network. Implemented as a set of programming libraries with the same name.}
 \longnewglossaryentry{libp2p}{name=libp2p}{A framework and suite of protocols for building peer-to-peer network applications. }
 \longnewglossaryentry{overlay address}{name=overlay address}{The address with which each node running Swarm is identified. It is the basis for communication in the sense that it remains stable across sessions even if underlay address changes.}
-\longnewglossaryentry{nearest neighbours}{name=nearest neighbours}{Generally, peers that are closest to the node. In particular, }
-\longnewglossaryentry{PO bin}{name=PO bin, parent={proximity order bin}}{TBD}
+\longnewglossaryentry{nearest neighbours}{name=nearest neighbours}{Generally, peers that are closest to the node. In particular, those residing within the neighbourhood depth of each other.}
+\longnewglossaryentry{PO bin}{name=PO bin, parent={proximity order bin}}{A container containing nodes with the same relative proximity order as the origin node.}
 \longnewglossaryentry{routing}{name=routing}{Relaying messages via a chain of peers ever closer to the destination.}
 \longnewglossaryentry{balanced binary tree}{name=balanced binary tree}{A binary tree in which subtrees of every node differ in height by at most 1.}
 \longnewglossaryentry{proximity order boundary}{name=proximity order boundary}{Such a boundary of the area of responsibility defines a \gloss{radius of responsibility} for the node.}
@@ -231,46 +230,48 @@ resource updates}{Feeds that represent revisions of the same semantic entity.}
 used in single owner chunks: the payload is signed against it by the owner and hashed together with the owner's account results in the address.}
 \longnewglossaryentry{owner}{name=owner, parent={single owner chunk}}{Account of the owner of single owner chunk.}
 \longnewglossaryentry{payload}{name=payload, parent={single owner chunk}}{Part of single owner chunk with size of maximum 4096 bytes of regular chunk data.}
-\longnewglossaryentry{topic}{name=topic}{TBD}
+\longnewglossaryentry{topic}{name=topic}{An arbitrary identifier chosen by the creating node and used to distinguish data structures.}
 \longnewglossaryentry{redundant Kademlia connectivity}{name=redundant Kademlia connectivity}{A Kademlia connectivity where some peers might churn, yet Kademlia connectivity would still exist.}
 \longnewglossaryentry{stable node}{name=stable node, plural={stable nodes}, parent={node}}{Node that is stably online.}
-\longnewglossaryentry{stream provider}{name=stream provider}{TBD Viktor}
-\longnewglossaryentry{bin ID}{name=bin ID}{A sequential counter  per PO bin acting as index of the chunks stored locally on a node.}
+\longnewglossaryentry{stream provider}{name=stream provider}{To provide of a stream of chunks to another node on request.}
+\longnewglossaryentry{bin ID}{name=bin ID}{A sequential counter  per PO bin acting as an index of the chunks stored locally on a node.}
 \longnewglossaryentry{value-consistent garbage collection strategy}{name=value-consistent garbage collection strategy}{Strategy of garbage collection where a minimum postage stamp value accepted on a chunk coincides with the garbage collection cutoff value. }
 \longnewglossaryentry{batch proof of custody}{name=batch proof of custody}{A canonically serialised ordered list of binary Merkle tree proofs.}
 \longnewglossaryentry{feed topic}{name=feed topic}{Part of the identifier of the feed chunk.}
 \longnewglossaryentry{epoch-based feeds}{name=epoch-based feeds}{Special kind of feeds which provide feeds with sporadic updates a way to be searched.}
 \longnewglossaryentry{epoch}{name=epoch}{A concrete time period starting at a specific point in time with specific length.}
-\longnewglossaryentry{epoch base time}{name=epoch base time}{The specific point in time, when an epoch starts.}
+\longnewglossaryentry{epoch base time}{name=epoch base time}{The specific point in time when an epoch starts.}
 \longnewglossaryentry{epoch grid}{name=epoch grid}{The arrangement of epochs where rows (referred to as levels) represent alternative partitioning of time into various disjoint epochs with the same length.}
 \longnewglossaryentry{lookahead area}{name=lookahead area}{An area that can be part of search of the algorithm that finds the latest update of a epoch-based feed.}
 \longnewglossaryentry{lookback area}{name=lookback area}{An area that can be part of search of the algorithm that finds the latest update of a epoch-based feed.}
-\longnewglossaryentry{head start}{name=head start}{A configurable time interval that defines waiting time before an exploration of an area for updates of epoch-based feeds. }
-\longnewglossaryentry{hint}{name=hint}{TBD}
+\longnewglossaryentry{head start}{name=head start}{A configurable time interval that defines the waiting time before an exploration of an area for updates of epoch-based feeds. }
+\longnewglossaryentry{hint}{name=hint}{A hint can be provided to provide a starting point for the discovery of feed updates.}
 \longnewglossaryentry{epoch reference}{name=epoch reference}{A pair of epoch base time and level that identify a specific epoch.}
-\longnewglossaryentry{fair data economy}{name=fair data economy}{Economy of processing data with fair compensation of all parties involved in its creation or enrichment.}
+\longnewglossaryentry{fair data economy}{name=fair data economy}{Economy of processing data characterised by fair compensation of all parties involved in its creation or enrichment.}
 \longnewglossaryentry{pinner}{name=pinner, plural={pinners}}{A node keeping a persistent copy of a chunk.}
 \longnewglossaryentry{accessible chunk}{name=accessible chunk}{A chunk is accessible if a message is routable between the requester and the node that is closest to the chunk.}
 \longnewglossaryentry{Swarm base account}{name=Swarm base account}{The Ethereum account the Swarm node is associated with. See also \gloss{bzz account}.}
 \longnewglossaryentry{prompt recovery of data}{name=prompt recovery of data}{The protocol of the missing chunk notification and recovery.}
 \longnewglossaryentry{time to live}{name=time to live}{The lifespan or lifetime of a request or other message in a computer or network.}
-\longnewglossaryentry{denial of service (DoS)}{name=denial of service (DoS)}{Denying of access to services by flooding those services with illegitemate requests.}
+\longnewglossaryentry{denial of service (DoS)}{name=denial of service (DoS)}{Denying of access to services by flooding those services with illegitimate requests.}
 \longnewglossaryentry{raffle--apply--claim--earn}{name=raffle--apply--claim--earn (race)}{The postage lottery protocol for  incentivising non-promissory storage by redistributing postage stamp revenue to simple non-staked storers applying with proof of custody.}
 \longnewglossaryentry{tar stream}{name=tar stream}{In computing, tar is a computer software utility for collecting many files into one archive file, often referred to as a tarball.}
 \longnewglossaryentry{shallow bin}{name={shallow bin}, plural={shallow bins} }{TBD Dan}
 \longnewglossaryentry{deep bin}{name={deep bin}, plural={deep bins}}{TBD Dan}
-\longnewglossaryentry{on-chain payment}{name={on-chain payment}, plural= {on-chain payments}}{Payment via the blockchain network. Each transaction must be processed by each and every node in the network leading to relatively high transaction costs.}
-\longnewglossaryentry{second-layer payment}{name={second-layer payment}, plural={second-layer payments} }{TBD}
+\longnewglossaryentry{on-chain payment}{name={on-chain payment}, plural= {on-chain payments}}{Payment via a blockchain network.}
+\longnewglossaryentry{second-layer payment}{name={second-layer payment}, plural={second-layer payments} }{Payments processed by an additional system superimposed on a blockchain network.}
 \longnewglossaryentry{tragedy of commons}{name={tragedy of commons} }{A situation where, in a shared-resource system, individual users act in their own interest contrary to common good and deplete or spoil the shared resource through collective action.}
-\longnewglossaryentry{blockhash}{name=blockhash}{The top hash of a block of data, e.g. a Merkle tree.}
+\longnewglossaryentry{blockhash}{name=blockhash}{The hash of a block which itself forms part of a blockchain.}
 
 
 \longnewglossaryentry{recover security}{name=recover security}{TBD}
 \longnewglossaryentry{recovery targets}{name=recovery targets}{TBD Dan}
 \longnewglossaryentry{elliptic curve Diffie-Hellman}{name=elliptic curve Diffie-Hellman}{A key agreement protocol that allows two parties, each in possession of an elliptic-curve public–private key pair, to establish a shared secret over an insecure channel.}
-\longnewglossaryentry{key derivation  function}{name=key derivation  function}{TBD}
+\longnewglossaryentry{key derivation  function}{name=key derivation  function}{A function which deterministically produces keys from an initial seed, often used concurrently by parties separately to generate secure messaging key schemes.}
 
-%\longnewglossaryentry{zzz}{name=zzz}{TBD}
+\longnewglossaryentry{FAANG}{name=FAANG}{Facebook, Apple, Amazon, Netflix and Google.}
+
+\longnewglossaryentry{blockchain}{name=blockchain}{An immutable list of blocks, where each next block contains a cryptographic hash of the previous block. }
 %\longnewglossaryentry{zzz}{name=zzz}{TBD}
 %\longnewglossaryentry{zzz}{name=zzz}{TBD}
 %\longnewglossaryentry{zzz}{name=zzz}{TBD}

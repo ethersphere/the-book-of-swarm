@@ -5,7 +5,7 @@
 Consider the set of bit sequences with fixed length $d$ as points in a space. We can define a distance metric $\chi$ such that
 the distance between two such sequences is defined as the bigendian numerical value of their bitwise XOR ($\xor$).
 
-\begin{definition}{XOR distance ($\chi$)}\label{def:xor}
+\begin{definition}[XOR distance ($\chi$)]\label{def:xor}
 \begin{equation}
 \chi(x, y) \defeq \mathit{Uint}(x  \xor y)
 \end{equation}
@@ -13,13 +13,13 @@ the distance between two such sequences is defined as the bigendian numerical va
 
 Given the fixed length $d>0$, there is a maximum distance in this space, and thus we can define the notion of \emph{normalised distance} and its inverse, \emph{proximity}:
 
-\begin{definition}{normalised XOR distance ($\overline{\chi}$)}\label{def:normalisedxor}
+\begin{definition}[normalised XOR distance ($\overline{\chi}$)]\label{def:normalisedxor}
 \begin{equation}
 \overline{\chi}(x, y) \defeq \frac{\chi(x,y)}{2^d-1}
 \end{equation}
 \end{definition}
 
-\begin{definition}{proximity}\label{def:proximity}
+\begin{definition}[proximity]\label{def:proximity}
 \begin{equation}
 \mathit{Proximity}(x, y) \defeq \frac{1}{\overline{\chi}(x,y)}
 \end{equation}{}
@@ -29,7 +29,7 @@ Given the fixed length $d>0$, there is a maximum distance in this space, and thu
 \emph{Proximity order (PO)} is a discrete logarithmic scaling of proximity.
 
 
-\begin{definition}{Proximity order ($\PO$)}\label{def:xorPO}
+\begin{definition}[Proximity order ($\PO$)]\label{def:xorPO}
 \begin{equation}
 \begin{split}
 \PO&: \Keys \times\Keys\mapsto \overline{0,d}\\
@@ -43,13 +43,14 @@ d & \text{ if } x=y\\
 \end{definition}
 
 
-In practice, $\PO(x,y)$ is the length of the longest common prefix in the bigendian binary representation of $x$ and $y$. So in practice it is calculated by counting the matching bits from the left. The maximum value of proximity is the number of bits $d$. Kademlia falls in the prefix matching class of DHT-s \cite{rowstron2001pastry,zhao2004tapestry}.
+In practice, $\PO(x,y)$ is the length of the longest common prefix in the bigendian binary representation of $x$ and $y$. It is therefore most practical to calculate by counting the matching bits of the binary form of the addresses from the left. Hence, Kademlia falls into the prefix matching class of DHT-s \cite{rowstron2001pastry,zhao2004tapestry}. The maximum possible value of proximity is the total number of bits $d$. 
 
-Taking the proximity order relative to a fixed point $x_0$ partitions the points in
-the space (of bit sequences of length $d$) into equivalence classes. Points in each class are at
-most half as distant from $x_0$ as items in the previous class. Furthermore, any two points belonging to the same class are at most half as distant from each other as they are from $x_0$. We can generalise the important properties of the proximity order function as follows:
+Taking the proximity order relative to a fixed point $x_0$ partitions all points in
+the space, consisting of all possible bit sequences of length $d$ into equivalence classes. Points in each class are at
+most half as distant from $x_0$ as items in the previous class. Furthermore, any two points belonging to the same class are at most half as distant from each other as they are from $x_0$. 
+We can generalise the important properties of the proximity order function as follows:
 
-\begin{definition}{Proximity order definitional properties}\label{def:PO}
+\begin{definition}[Proximity order definitional properties]\label{def:PO}
 \begin{equation}
 \PO: \Keys\times \Keys\mapsto \overline{0,d}
 \end{equation}
@@ -65,20 +66,20 @@ most half as distant from $x_0$ as items in the previous class. Furthermore, any
 % \end{equation}
 \end{definition}
 
-Given a set of points uniformly distributed in the space (e.g., the results of a hash function), proximity orders map onto a series of subsets with cardinalities on a negative exponential scale, i.e., PO bin 0 has half of the points of any random sample, PO bin 1 has one fourth, PO bin 2 one eighth, etc.
+Given a set of points uniformly distributed in the space (e.g. the results of a hash function), proximity orders map onto a series of subsets with cardinalities on a negative exponential scale, i.e. PO bin $0$ has half of the points of any random sample, PO bin 1 has one fourth, PO bin 2 one eighth, etc.
 
 \section{Proximity orders in graph topology \statusgreen}
 
-This section gives a graph theoretical  approach to Kademlia topology \cite{aspnes2007skip}.
+This section outlines a graph theoretical  approach to Kademlia topology \cite{aspnes2007skip}.
 Consider a set of points $V$ in the space with a logarithmic distance and 
-a binary relation $R$. Define a directed graph where every point in the set is a vertex and any two vertices $x$ and $y$ are  connected with an edge if they are in relation $R$. 
+a binary relation $R$. Define a directed graph where every point in the set is a vertex and any two vertices $x$ and $y$ are connected with an edge if they are in relation $R$. 
 
 
-Points that are in relation $R$ with a particular point $x_0$ can be indexed by their proximity order relative to $x_0$. This index is called \gloss{Kademlia table}.
-The Kademlia table can serve as the basis for local decisions in graph traversal where the task is to find a path between two points. 
+Points in relation $R$ with a particular point $x_0$ can be indexed by their proximity order relative to $x_0$. This index is called \gloss{Kademlia table}.
+The Kademlia table can then serve as the basis for local decisions in graph traversal where the task is to find a path between two points. 
 
 
-\begin{definition}{Kademlia table}\label{def:kademlia-table}
+\begin{definition}[Kademlia table]\label{def:kademlia-table}
 \begin{equation}
 \begin{split}
 &\mathit{Kad}_x: \overline{0,d} \mapsto \mathcal{P}(\mathit{V})\\
@@ -87,9 +88,9 @@ The Kademlia table can serve as the basis for local decisions in graph traversal
 \end{equation}
 \end{definition}
 
-We say that a point has \emph{kademlia connectivity} (or the point's connectivity has  the kademlia property) if (1) it is connected to at least one node for each proximity order up to (but excluding) some maximum value $d$ (called the \gloss{saturation depth}) and (2) it is connected to all nodes whose proximity order relative to the node is greater or equal to $d$.
+We say that a point has \emph{Kademlia connectivity} (or the point's connectivity has  the Kademlia property) if (1) it is connected to at least one node for each proximity order up to (but excluding) some maximum value $d$ (called the \gloss{saturation depth}) and (2) it is connected to all nodes whose proximity order relative to the node is greater or equal to $d$.
 
-\begin{definition}{Kademlia connectivity}\label{sec:kademlia-connectivity}
+\begin{definition}[Kademlia connectivity]\label{sec:kademlia-connectivity}
 \begin{equation}
 \exists d, 0\leq d \leq l, \text{such that}
 \begin{subequations}
@@ -100,12 +101,12 @@ We say that a point has \emph{kademlia connectivity} (or the point's connectivit
 \end{definition}
 
 
-If each point of a connected subgraph has kademlia connectivity, then we say the subgraph has a \gloss{Kademlia topology}. In a graph with kademlia topology, (1) a path between any two points exists, (2) it can be found using only local decisions on each hop and (3) is guaranteed to terminate in no more steps than the depth of the destination plus one. 
+If each point of a connected subgraph has Kademlia connectivity, then we say the subgraph has a \gloss{Kademlia topology}. In a graph with Kademlia topology, (1) a path between any two arbitrary points must exist, (2) this path can be discovered using decisions based on only information local to each hop and (3) is guaranteed to terminate in no more steps than the depth of the destination from the start point plus one. 
 
-The procedure is as follows. Given point $x$ and $y$, construct the path $x_0=x , x_1, ..., x_k=y$ such that $x_{i+1}\in \mathit{PO}(x_i, x_{i+1})=\mathit{PO}(x_i, y)$, i.e., starting from the source point, choose the next point from the PO bin that the destination address falls into: because of the assumption of kademlia connectivity (1) such a point exists. Due to our previous conjecture, the actual bin is monotonically increasing at each step and can start with zero, therefore for every $0<i<=l$, $\mathit{PO}(x_{i}, y)\geq i$. So there exists a $d\leq d_y$, such that 
-$\mathit{PO}(x_{d}, y)\geq d_y$, which together with kademlia connectivity criterion (2) entails that either $x_d=y$ and $k=d$, or $y$ is connected to $x_d$, so we can choose $x_{d+1}=y$, and $k=d+1\leq d_y+1$.
+The procedure is as follows. Given point $x$ and $y$, construct the path $x_0=x , x_1, ..., x_k=y$ such that $x_{i+1}\in \mathit{PO}(x_i, x_{i+1})=\mathit{PO}(x_i, y)$, i.e. starting from the source point, choose the next point from the available options in the PO bin that the destination address falls into. Because of the first assumption of Kademlia connectivity as defined above, such a point must exist. Due to another previous conjecture, the actual bin must be monotonically increasing at each step and is able to start with zero. Therefore for every $0<i\leq l$, $\mathit{PO}(x_{i}, y)\geq i$. Hence, since there exists a $d\leq d_y$, such that 
+$\mathit{PO}(x_{d}, y)\geq d_y$. This, together with the second Kademlia connectivity criterion above, entails that either $x_d=y$ and $k=d$ or $y$ is connected to $x_d$, and so we can choose $x_{d+1}=y$, and $k=d+1\leq d_y+1$.
 
-\begin{theorem}{In graphs with kademlia topology, any two points are connected and traversal path can be constructed based on local kademlia tables where the path length upper bound is logarithmic in the number of nodes.}
+\begin{theorem}{In graphs with Kademlia topology, any two points are connected and traversal path can be constructed based on local Kademlia tables where the path length upper bound is logarithmic in the number of nodes.}
 
 \begin{proof}
 
@@ -119,8 +120,8 @@ $\mathit{PO}(x_{d}, y)\geq d_y$, which together with kademlia connectivity crite
 
 \section{Complexity of filling up a postage stamp batch \statusgreen}\label{sec:complexity-filling}
 
-A postage batch is utilised optimally if each of its collision slots are filled. Although hashes are uniform, due to variance one cannot guarantee that $2^d$ independent hashes map to the collision slots of a batch of depth $d$.
-We presented various ways of mining chunks: by (1) choosing the nonce of a trojan chunk (see \ref{sec:trojan}), (2) choosing the encryption key (see \ref{sec:postage-stamps}), or choosing the index of a single owner chunk (see \ref{sec:addressed-envelopes}). Whichever way we are mining the chunks, the chance of finding an address that takes the $i$-th collision slot of the stamp, i.e., 
+A postage batch is utilised optimally when each of its collision slots are filled. Although hashes are uniform, due to variance one cannot guarantee that $2^d$ independent hashes will always map to the collision slots of a batch of depth $d$.
+We have presented various ways of mining chunks: by (1) choosing the nonce of a trojan chunk (see \ref{sec:trojan}), (2) choosing the encryption key (see \ref{sec:postage-stamps}), or (3) choosing the index of a single owner chunk (see \ref{sec:addressed-envelopes}). Whichever way we are mining the chunks, we may calculate in the same manner the chance of finding an address that takes the $i$-th collision slot of the stamp, i.e.
 
 
 \begin{equation}
@@ -129,14 +130,14 @@ We presented various ways of mining chunks: by (1) choosing the nonce of a troja
 \text{ for }0\leq i\leq  2^D.
 \end{equation}
 
-Now, if the user wishes to always fill their postage stamp batch before using another one, for each new chunk there is one less choice to pick a free collision slot. Let the probabilistic variable $X^n_i$ denote  the number of trials one needed to find a slot when $i$ out of $n$ slots are free. The probability that it is at least 1 is $\frac{n-i}{n}$, and in general:
+If a user wishes to always fill their postage stamp batch before using another one, for each new chunk there is one less choice to pick a free collision slot. Let the probabilistic variable $X^n_i$ denote  the number of trials one needed to find a slot when $i$ out of $n$ slots are free. The probability that we will require at least 1 trial is $\frac{n-i}{n}$, and in general:
 
 
 \begin{equation}\label{eq:conditional}
 \mathit{P}(X^n_i\geq j+1|X^n_i\geq j)=\frac{n-i}{n}\\
 \end{equation}
 
-The expected number of trials for the $i$-th chunk is 
+Therefore, the expected number of trials for the $i$-th chunk is: 
 
  \begin{subequations}   \begin{align}
 \mathit{E}(X^n_i)&=\sum^\infty_{j=1}j\mathit{P}(X^n_i=j)\\
@@ -144,7 +145,7 @@ The expected number of trials for the $i$-th chunk is
 &= \mathit{P}(X^n_i\geq 1)+\mathit{P}(X^n_i\geq 2)+\ldots
 \end{align} \end{subequations}
 
-Multiplying both sides with $\frac{n-i}{n}$, then using  the equivalence in  \ref{eq:conditional}:
+Multiplying both sides with $\frac{n-i}{n}$, then using  the equivalence defined in  \ref{eq:conditional} we get:
 
  \begin{subequations}   \begin{align}
 \mathit{E}(X^n_i)\frac{n-i}{n}&=\mathit{P}(X^n_i\geq 1)\mathit{P}(X^n_i\geq 2|X^n_i\geq 1)+\mathit{P}(X^n_i\geq 2)\mathit{P}(X^n_i\geq 3|X^n_i\geq 2)+\ldots\\
@@ -284,7 +285,7 @@ Although not drawn above, it is easy to see the pattern: LA4 and LB5 would then 
 
 This example is simplified -- with the current algorithm parameters, there can potentially be around 30 lookups taking place concurrently, exploring the search space for updates and pruning entire branches recursively once a better path is found. This can be configured by adjusting the lookup timeout and headstart times.
 
-If the algorithm failed to find an update (i.e., if U3-U9 did not actually exist), then the hint in $\langle  0, 3 \rangle$ (U2) would be challenged for validity: In this situation if the hint actually contains an update, that is then returned the last update and we're done. If the hint, however, is proven false then the algorithm restarts without hint at that point.
+If the algorithm failed to find an update (i.e.\ if U3-U9 did not actually exist), then the hint in $\langle  0, 3 \rangle$ (U2) would be challenged for validity: In this situation if the hint actually contains an update, that is then returned the last update and we're done. If the hint, however, is proven false then the algorithm restarts without a hint at that point.
 
 
 % \chapter{Implementers' guide}\label{sec:implementor-guide}

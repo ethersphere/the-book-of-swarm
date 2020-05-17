@@ -2,28 +2,77 @@
 \subsection{Signer}\label{spec:api:signer}
 % \input{specs/api/signer.tex}
 
-\UseRawInputEncoding
-\begin{apiRoute}{GET}{/signer/\param{id}/\param{document}}{signature}
+% \UseRawInputEncoding
+\begin{apiRoute}{GET}{/sign/\param{id}/\param{document}}{signature}
  {
 }
 { }
-\begin{routeParameter} \routeParamItem{id}{eth address}
-\routeParamItem{document}{document to sign (is prefixed and hashed before signing)}
+\begin{routeParameter} \routeParamItem{id}{hex string - eth address}
+\routeParamItem{document}{(hex) string -  document to sign (is prefixed and hashed before signing)}
 \end{routeParameter} \begin{routeResponse}{application/json}
-\begin{routeResponseItem}{200}{ok} \begin{routeResponseItemBody}
-\end{routeResponseItemBody} \end{routeResponseItem}
-\begin{routeResponseItem}{404}{error : chunk not found}
-\begin{routeResponseItemBody} 
-\end{routeResponseItemBody} \end{routeResponseItem}
+\responseItem{200}{ok}{}
+\responseItem{401}{Unauthorised}{failed authentication on existing identity} 
+\responseItem{404}{Not found}{unknown identity} 
+\end{routeResponse} 
+\end{apiRoute}
+
+\begin{apiRoute}{GET}{/dh/\param{id}/\param{pubkey}}{Diffie-Hellman shared secret}
+ {
+}
+{ }
+\begin{routeParameter} \routeParamItem{id}{hex string - eth address}
+\routeParamItem{pubkey}{hex string - represents the remote party in the shared secret arrangement}
+\end{routeParameter} \begin{routeResponse}{application/json}
+\responseItem{200}{ok}{} \responseItem{401}{Unauthorised}{failed authentication on existing identity}
+\responseItem{404}{Not found}{unknown identity}
 \end{routeResponse} \end{apiRoute}
 
 
-\subsection{Blockchain \statusred}\label{spec:api:blockchain}
+\subsection{Blockchain \statusgreen}\label{spec:api:blockchain}
 % \input{specs/api/blockchain.tex}
 
-\subsection{Local \statusred}\label{spec:api:local}
-% \input{specs/api/local.tex}
+\begin{apiRoute}{GET}{/eth/\param{contract}/\param{function}/\param{args}}
+{ethereum API call}
+ {
+}
+{ }
+\begin{routeParameter}
+\routeParamItem{contract}{hex string, eth address of contract}
+\routeParamItem{function}{endpoint within contract}
+\routeParamItem{args}{arguments for the eth API call}
+\end{routeParameter} \begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}  \responseItem{400}{Bad request}{unknown contract or function endpoint given} 
+\responseItem{404}{Not Found}{unknown contract or function endpoint} \responseItem{422}{Unprocessable entity}{incorrect ABI,  error by eth API}
+\end{routeResponse} \end{apiRoute}
 
-\subsection{State store \statusred}\label{spec:api:statestore}
-% \input{specs/api/statestore.tex}
+\begin{apiRoute}{POST}{/eth/\param{contract}/\param{function}/\param{args}}
+{ethereum API send transaction}
+ {
+}
+{ }
+\begin{routeParameter}
+\routeParamItem{contract}{hex string, eth address of contract}
+\routeParamItem{function}{endpoint within contract}
+\routeParamItem{args}{arguments for the eth API call}
+\end{routeParameter} \begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\responseItem{401}{Unauthorised}{failure signing transaction}
+\responseItem{400}{Bad request}{unknown contract or function endpoint given} 
+\responseItem{404}{Not Found}{unknown contract or function endpoint} 
+\responseItem{422}{Unprocessable entity}{incorrect ABI,  error by eth API}
+\end{routeResponse} \end{apiRoute}
 
+
+\subsection{User input}\label{spec:api:input}
+
+
+\begin{apiRoute}{GET}{/input/\param{id}}
+ {
+}
+{ }
+\begin{routeParameter}
+\routeParamItem{id}{hex string - eth address of the persona the input is expected from}
+\routeParamItem{note}{the question to be answered or instruction to select}
+\end{routeParameter} \begin{routeResponse}{application/json}
+\responseItem{200}{ok}{}
+\end{routeResponse} \end{apiRoute}
