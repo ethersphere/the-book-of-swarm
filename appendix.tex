@@ -183,8 +183,8 @@ Hop-count in traditional kademlia has already been  analysed \cite{roos2013compr
 
 In this section we derive the distribution of requests per PO bin that an average node experiences.
 
-\section{epoch-based feeds \statusgreen}\label{sec:epoch-based-feeds-appendix}
-\subsection{Update example \statusgreen}
+\section{Epoch-based feeds \statusgreen}\label{sec:epoch-based-feeds-appendix}
+\subsection*{Update example \statusgreen}
  
 Let's say that we want to update our resource 5 minutes later. The Unix Time is now $1534093015$.
 We calculate $\mathit{epochBaseTime}(1534093015, 25) = 1509949440$.
@@ -248,7 +248,7 @@ update & timestamp & epoch representation\\
 
 If the publisher keeps updating every 5 minutes ($300s$), we can expect the updates to stay around level 8-9 ($2^8 = 256s$, $2^9 = 512s$). The publisher can however, at any time vary this update frequency or just update randomly. This does not affect the algorithm.
 
-\subsection{Parallel algorithm to look up the latest update \statusorange}\label{sec:feeds-lookup-algo}
+\subsection*{Parallel algorithm to look up the latest update \statusorange}\label{sec:feeds-lookup-algo}
 
 This section gives a walkthrough about the steps of the algorithm that finds the latest update of a epoch-based feed  (see \ref{sec:epoch-based-feeds}).
 

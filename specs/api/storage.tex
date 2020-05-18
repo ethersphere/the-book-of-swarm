@@ -13,7 +13,9 @@
 \end{headerParameter}
 \begin{routeResponse}{application/json}
 \responseItem{200}{ok}{}
-\responseItem{403}{Forbidden}{} 
+\responseItem{403}{Forbidden}{}
+\responseItem{408}{Request Timeout}{} 
+\responseItem{420}{Enhance your calm}{} 
 \end{routeResponse}
 \end{apiRoute}
 
@@ -40,6 +42,8 @@
 \begin{routeResponse}{application/json}
 \responseItem{200}{ok}{}
 \responseItem{400}{Bad request}{} 
+\responseItem{400}{Bad request}{} 
+\responseItem{413}{Payload Too Large}{} 
 
 \end{routeResponse}
 \end{apiRoute}

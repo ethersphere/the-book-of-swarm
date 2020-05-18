@@ -21,6 +21,7 @@
 % \usepackage{listings-golang} % import this package after listings
 % \usepackage[labelfont=bf]{caption} % bold captions for images
 \interfootnotelinepenalty=10000 %% Completely prevent breaking of footnotes
+\usepackage{csquotes}
 
 \lstdefinestyle{bos}{
 %   frame=lines,
@@ -67,6 +68,20 @@
 \let\headheight=\baselineskip
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% centered verbatim command
+\usepackage{varwidth}
+\newenvironment{centerverbatim}{%
+  \par
+  \centering
+  \varwidth{\linewidth}%
+  \verbatim
+}{%
+  \endverbatim
+  \endvarwidth
+  \par
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % make first use \emph
 % see: https://tex.stackexchange.com/questions/449104/how-to-style-first-acronym-and-first-glossary-appearance
 \newcommand{\firstuseformat}[1]{\emph{#1}}
@@ -103,7 +118,7 @@
 %%% make condition to render text based on it
 %%% following example here: https://tex.stackexchange.com/questions/16711/minimal-option-for-cv/21642#21642
 \newif\ifdraft
-\drafttrue % Uncomment to compile whole draft document / comment to compile only finished sections.
+% \drafttrue % Uncomment to compile whole draft document / comment to compile only finished sections.
 \ifdraft
 \else 
 \fi
@@ -160,8 +175,8 @@
 \newcommand\statusgreen{\ifdraft \textcolor{green}{\cmark}\fi} 
 \newcommand\statusyellow{\ifdraft \textcolor{green}{?}\fi} 
 \newcommand\statusorange{\ifdraft \textcolor{orange}{WIP}\fi} 
-%\newcommand\statusred{\ifdraft \textcolor{red}{\xmark}\fi} 
-\newcommand\statusred{ \textcolor{red}{\xmark}} 
+\newcommand\statusred{\ifdraft \textcolor{red}{\xmark}\fi} 
+% \newcommand\statusred{ \textcolor{red}{\xmark}} 
 \newcommand\statuspriority{\ifdraft \textcolor{blue}{PRIORITY}\fi}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -207,20 +222,21 @@ spaceabove=6pt, spacebelow=6pt,headfont=\normalfont\bfseries,notefont=\mdseries,
 %\DeclareOldFontCommand{\sl}{\normalfont\slshape}{\@nomath\sl}
 \DeclareOldFontCommand{\sc}{\normalfont\scshape}{\@nomath\sc}
 \makeatother
-
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the book of swarm
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \title{\Huge\sc the book of Swarm\\
-\Large storage and communication infrastructure for self-sovereign digital society\\
-backend stack for the decentralised web}
+\Large storage and communication infrastructure for the self-sovereign digital society.\\
+back-end stack for the decentralised web}
 \author{Viktor Trón}
-\date{v0.2 \today}
+\date{v1.0 pre-release \today}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 \frontmatter
 \maketitle
 \setcounter{tocdepth}{2}
+\input{quote.tex}
 \tableofcontents
 \listoffigures
 % \listoftables % remove if less than 5 tables?

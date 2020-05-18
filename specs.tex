@@ -141,17 +141,20 @@ The constraints put on strategic choice are crucial in terms of rendering the ga
 \\
 401 & Unauthorized & returned by access control if auth fails
 \\
-402 & Payment Required & returned if no swap balance or missing/invalid postage stamp
+402$^{*}$ & Payment Required & returned if no swap balance or missing/invalid postage stamp
 \\
-403 & Forbidden & returned if retrieved chunk is encrypted  but reference is. missing decryption key
-\\
+403 & Forbidden & returned if retrieved chunk is encrypted  but the reference has no decryption key
+\\     
 404 & Not Found &
 returned if a local prerequisite is not found
 \\
-405 & Method Not Allowed & HTTP verb  not allowed for this endpoint
+405$^{*}$& Method Not Allowed & HTTP verb  not allowed for this endpoint
 \\
-406 & Not Acceptable &
-the Accept header explicit in the request.
+406$^{*}$
+\footnote[*]{These statuses are generic not documented}
+%
+& Not Acceptable &
+the Accept header explicit in the request. 
 \\
 408 & Request Timeout & retrieve requests fallback error after TTL passed
 \\
@@ -161,7 +164,7 @@ the Accept header explicit in the request.
 413 & Payload Too Large  &
 length of payload to upload beyond (chunk API)
 \\
-414 & URI Too Long  & manifest path  $\leq $ 32
+414 & URI Too Long  & manifest path  $>32 $
 \\
 416 & Range Not Satisfiable  & offset in range query out of range
 \\
