@@ -118,7 +118,7 @@
 %%% make condition to render text based on it
 %%% following example here: https://tex.stackexchange.com/questions/16711/minimal-option-for-cv/21642#21642
 \newif\ifdraft
-% \drafttrue % Uncomment to compile whole draft document / comment to compile only finished sections.
+\drafttrue % Uncomment to compile whole draft document / comment to compile only finished sections.
 \ifdraft
 \else 
 \fi
@@ -227,10 +227,10 @@ spaceabove=6pt, spacebelow=6pt,headfont=\normalfont\bfseries,notefont=\mdseries,
 % the book of swarm
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \title{\Huge\sc the book of Swarm\\
-\Large storage and communication infrastructure for the self-sovereign digital society.\\
+\Large storage and communication infrastructure for self-sovereign digital society\\
 back-end stack for the decentralised web}
 \author{Viktor Trón}
-\date{v1.0 pre-release \today}
+\date{v1.0 pre-release 2 \today}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 \frontmatter
@@ -254,11 +254,11 @@ back-end stack for the decentralised web}
 \input{specs.tex}
 %%%%%%%%%%%%%%%%%%%%%%
 \phantomsection 
-\addcontentsline{toc}{chapter}{Bibliography} 
+\addcontentsline{toc}{chapter}{Bibliography}
 \bibliography{refs.bib}
 %%%%%%%%%%%%%%%%%%%%%
 \appendix
-\part{Appendix} \label{part:appendix}
+\part{Appendix}\label{part:appendix}
 \input{appendix.tex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \backmatter

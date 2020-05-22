@@ -1,58 +1,79 @@
 
-\begin{apiRoute}{POST}{/access/\{address\} }{Lock ACT for address as in \ref{def:ac-api}}
+\begin{apiRoute}{POST}{/access/\param{address} }{Lock ACT for address as in \ref{def:ac-api}}
 {
 }
 { }
 
 \begin{routeParameter} 
-\routeParamItem{address}{string}
+\routeParamItem{address}{hex string}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{201}{Created}{root access manifest reference in response body}
+\responseItem{400}{Bad Request}{Encrypted content but no decryption key in reference}
+\responseItem{403}{Forbidden}{Encrypted content but no decryption key in reference}
+\responseItem{404}{Not found}{}
+\responseItem{408}{Request Timeout}{Timeout retrieving referenced manifest}
+\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out}
 \end{routeResponse}
 \end{apiRoute}
 
 
 
-\begin{apiRoute}{GET}{/access/\{address\} }{Unlock ACT for address as in \ref{def:ac-api}}
+\begin{apiRoute}{GET}{/access/\param{address} }{Unlock ACT for address as in \ref{def:ac-api}}
 {
 }
 { }
 
 \begin{routeParameter} 
-\routeParamItem{address}{string}
+\routeParamItem{address}{hex string}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
 \responseItem{200}{ok}{}
-\end{routeResponse}
+\responseItem{400}{Bad Request}{Address not well formed}
+\responseItem{401}{Unauthorized}{Access denied: AC unlock failed}
+\responseItem{403}{Forbidden}{Encrypted content but no decryption key in reference}
+\responseItem{408}{Request Timeout}{Timeout retrieving referenced manifest}
+\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out}\end{routeResponse}
 \end{apiRoute}
 
 
 
 
-\begin{apiRoute}{PUT}{/access/\{root\}/\{pubkey\}}{Add entry for pubkey to the  ACT referred in the root access manifest \ref{def:act-api}}
+\begin{apiRoute}{PUT}{/access/\param{root}/\param{pubkey}}{Add entry for pubkey to the  ACT referred in the root access manifest \ref{def:act-api}}
 {
 }
 { }
 
 \begin{routeParameter} 
-\routeParamItem{root}{string}
+\routeParamItem{root}{hex string - reference to root access manifest}
+\routeParamItem{pubkey}{hex string - public key of grantee}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{201}{Created}{Reference to new manifest root in response body}
+\responseItem{400}{Bad Request}{Address or public key not well formed}
+\responseItem{401}{Unauthorized}{Permission denied: creating session key failed}
+\responseItem{403}{Forbidden}{Encrypted content but no decryption key in reference}
+\responseItem{408}{Request Timeout}{Timeout retrieving referenced manifest}
+\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out}
 \end{routeResponse}
 \end{apiRoute}
 
 
-\begin{apiRoute}{DELETE}{/access/\{root\}/\{pubkey\}}{Remove entry for pubkey from ACT referred in the root access manifest, see \ref{def:act-api}}
+\begin{apiRoute}{DELETE}{/access/\param{root}/\param{pubkey}}{Remove entry for pubkey from ACT referred in the root access manifest, see \ref{def:act-api}}
 {
 }
 { }
 
 \begin{routeParameter} 
-\routeParamItem{root}{string}
+\routeParamItem{root}{hex string - reference to root access manifest}
+\routeParamItem{pubkey}{hex string - public key of grantee}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{201}{Created}{Reference to new manifest root in response body}
+\responseItem{400}{Bad Request}{Address or public key not well formed}
+\responseItem{401}{Unauthorized}{Permission denied: creating session key failed}
+\responseItem{403}{Forbidden}{Encrypted content but no decryption key in reference}
+\responseItem{408}{Request Timeout}{Timeout retrieving referenced manifest}
+\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out}
 \end{routeResponse}
 \end{apiRoute}

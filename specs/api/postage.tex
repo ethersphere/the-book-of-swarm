@@ -1,14 +1,17 @@
 
-\begin{apiRoute}{GET}{/stamp}{View all postage stamps}
+\begin{apiRoute}{GET}{/stamp?offset=\param{offset}\&length=\param{length}}{View all postage stamps}
 {
 }
 { }
+\begin{queryParameter} 
+\queryParamItem{offset}{integer}
+\queryParamItem{length}{integer}
+\end{queryParameter}
 
 \begin{routeResponse}{application/json}
 \responseItem{200}{ok}{}
 \end{routeResponse}
 \end{apiRoute}
-
 
 
 
@@ -22,6 +25,8 @@
 \end{routeParameter}
 \begin{routeResponse}{application/json}
 \responseItem{200}{ok}{}
+\responseItem{400}{Bad Request}{ID not well formed}
+\responseItem{404}{Not found}{Stamp with ID does not exists.}
 \end{routeResponse}
 \end{apiRoute}
 
@@ -36,14 +41,20 @@
 \begin{routeParameter} 
 \routeParamItem{id}{}
 \end{routeParameter}
+\begin{queryParameter} 
+\queryParamItem{amount}{integer}
+\end{queryParameter}
+
 \begin{routeResponse}{application/json}
 \responseItem{200}{ok}{}
+\responseItem{400}{Bad Request}{ID not well formed}
+\responseItem{404}{Not found}{Stamp with ID does not exists.}
 \end{routeResponse}
 \end{apiRoute}
 
 
 
-\begin{apiRoute}{DELETE}{/stamp/{id}}{Drain and expire stamp with id}
+\begin{apiRoute}{DELETE}{/stamp/\param{id}}{Drain and expire stamp with id}
 {
 }
 { }
@@ -53,19 +64,20 @@
 \end{routeParameter}
 \begin{routeResponse}{application/json}
 \responseItem{200}{ok}{}
+\responseItem{400}{Bad Request}{ID not well formed}
+\responseItem{404}{Not found}{Stamp with ID does not exists.}
 \end{routeResponse}
 \end{apiRoute}
 
 
-\begin{apiRoute}{POST}{/stamp/{id}}{Create a new postage stamp}
+\begin{apiRoute}{POST}{/stamp/}{Create a new postage stamp, return ID in reponse body}
 {
 }
 { }
 
 \begin{routeParameter} 
-\routeParamItem{id}{}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{201}{created}{ID in response body}
 \end{routeResponse}
 \end{apiRoute}

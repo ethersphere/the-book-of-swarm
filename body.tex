@@ -143,7 +143,7 @@ If all peer connections are stably online, a \gloss{thin Kademlia table}, i.e.\ 
 
 
 
-With \gloss{Kademlia} saturation guaranteed, a node will always be able to forward a message and ensure \gloss{routability}. If nodes comply with the forwarding principles (and that is ensured by \gloss{aligned incentives} (see \ref{spec:strategy:forwarding}) the only case when relaying could possibly break down is in the case that a node drops out of the network after having received a message but before it has had chance to forward it.%
+With \gloss{Kademlia} saturation guaranteed, a node will always be able to forward a message and ensure \gloss{routability}. If nodes comply with the forwarding principles (and that is ensured by \gloss{aligned incentives}, see \ref{spec:strategy:forwarding}) the only case when relaying could possibly break down is when a node drops out of the network after having received a message but before it has had chance to forward it.%
 %
 \footnote{Healthy nodes could commit to being able to forward within a (very short) constant time we can call the \gloss{forwarding lag}. In the case that a \gloss{downstream peer} disconnects before this forwarding lag passes, then the \gloss{upstream peer} can re-forward the message to an alternative peer, thereby keeping the message passing unbroken. See \ref{sec:retrieval} for more detail.
 } 
@@ -212,7 +212,7 @@ In this section, we first show how a network with quasi-permanent connections in
 
 \subsection{Distributed immutable store for chunks\statusgreen}\label{sec:disc}
  
-In this section we discuss how networks using Kademlia overlay routing are a suitable basis on which to implement distributed peer-to-peer storage using a \glossplural{distributed hash table} (\glossplural{DHT}). Then we introduce the \gloss{DISC}%
+In this section we discuss how networks using Kademlia overlay routing are a suitable basis on which to implement  serverless storage solution using \glossplural{distributed hash table} (\glossplural{DHT}). Then we introduce the \gloss{DISC}%
 %
 \footnote{DISC is \gloss{distributed immutable store for chunks}. In earlier work, we have referred to this component as the 'distributed preimage archive' (DPA), however, this phrase became misleading since we now also allow chunks that are not the preimage of their address.}
 % 
@@ -250,7 +250,7 @@ DHTs used for \gloss{distributed storage} typically associate content identifier
 \begin{figure}[htbp]
    \centering
    \includegraphics[width=0.7\textwidth]{fig/disc.pdf}
-   \caption[Swarm DISC: Distributed Immutable Store for Chunks \statusgreen]{Swarm DISC:  Distributed Immutable Store for Chunks. In step $1$, downloader node $D$ uses forwarding Kademlia routing to request the chunk from a storer node $S$ in the neighbourhood of the chunk address. In step $2$ the chunk is delivered along the same route using pass-back response.   }
+   \caption[Swarm DISC: Distributed Immutable Store for Chunks \statusgreen]{Swarm DISC:  Distributed Immutable Store for Chunks. In step $1$, downloader node $D$ uses forwarding Kademlia routing to request the chunk from a storer node $S$ in the neighbourhood of the chunk address. In step $2$ the chunk is delivered along the same route using forwarding step just backwards.   }
    \label{fig:disc}
 \end{figure}
 
@@ -438,14 +438,14 @@ For retrieval, accessibility needs to be complemented with a process to have the
 \begin{enumerate}
     \item \gloss{direct delivery} -- The chunk delivery is sent via a direct underlay connection. 
     \item \gloss{routed delivery} -- The chunk delivery is sent as message using routing.
-    \item \gloss{pass-back delivery} -- The chunk delivery response simply follows the request's route back to the originator.
+    \item \gloss{backwarding} -- The chunk delivery response simply follows the route along which the request was forwarded, just backwards all the way. to the originator.
 \end{enumerate}
 
 
 \begin{figure}[htbp]
    \centering
    \includegraphics[width=\textwidth]{fig/chunk-delivery.pdf}
-   \caption[Alternative ways to deliver chunks: direct, routed and pass-back \statusgreen]{Alternative ways to deliver chunks. \textbf{Top:} \emph{direct delivery}: via direct underlay connection. \textbf{Centre:} \emph{routed delivery}: chunk is sent using Kademlia routing. \textbf{Bottom:}  \emph{pass-back delivery} re-uses the exact peers on the path of the request route to relay the delivery response.}
+   \caption[Alternative ways to deliver chunks: direct, routed and backward \statusgreen]{Alternative ways to deliver chunks. \textbf{Top:} \emph{direct delivery}: via direct underlay connection. \textbf{Centre:} \emph{routed delivery}: chunk is sent using Kademlia routing. \textbf{Bottom:} \gloss{backwarding} re-uses the exact peers on the path of the request route to relay the delivery response.}
    \label{fig:chunk-delivery}
 \end{figure}
 
@@ -453,12 +453,12 @@ Firstly, using the obvious direct delivery, the chunk is delivered in one step v
 %
 \footnote{Beeline delivery has some merit, i.e. bandwidth saving and better latency, so we do not completely rule out the possibility of implementing it. 
 }
-Secondly, using routed delivery, a chunk is delivered back to it's requestor using ad-hoc routing as determined from the storer's perspective at the time of sending it. Whether direct or routed, allowing deliveries routed independently of the request route presupposes that the requestor's address is (at least partially) known by the storer and routing nodes and as a consequence, these methods leak information identifying the requestor. However, with forwarding Kademlia and the third option, pass-back delivery, this is not necessary: The storer node responds back to their requesting peer with the delivery while intermediate \glossplural{forwarding node} remember which of their peers requested what chunk. When the delivery eventually arrives back, they pass it on to their immediate requestor, and so on until it arrives at the node that requested it originally. In other words, the chunk delivery response simply follows the request route back to the originator (see figure \ref{fig:request-response}). Swarm uses this option, which makes it possible to disclose no requestor identification in any form, and thus Swarm implements completely \gloss{anonymous retrieval}. 
+Secondly, using routed delivery, a chunk is delivered back to its requestor using ad-hoc routing as determined from the storer's perspective at the time of sending it. Whether direct or routed, allowing deliveries routed independently of the request route presupposes that the requestor's address is (at least partially) known by the storer and routing nodes and as a consequence, these methods leak information identifying the requestor. However, with forwarding--backwarding Kademlia this is not necessary: The storer node responds back to their requesting peer with the delivery while intermediate \glossplural{forwarding node} remember which of their peers requested what chunk. When the chunk is delivered, they pass it on back to their immediate requestor, and so on until it eventually arrives at the node that originally requested it. In other words, the chunk delivery response simply follows the request route back to the originator (see figure \ref{fig:request-response}).  Since it is the reverse of the forwarding, we can playfully call this \gloss{backwarding}. Swarm uses this option, which makes it possible to disclose no requestor identification in any form, and thus Swarm implements completely \gloss{anonymous retrieval}. 
 
 \begin{figure}[htbp]
    \centering
    \includegraphics[width=\textwidth]{fig/request-response-forwarding.pdf}
-   \caption[Pass-back: a pattern for anonymous request-response round-trips in forwarding Kademlia \statusgreen]{Pass-back: pattern for anonymous request-response round-trips in forwarding Kademlia. Here a node with overlay address $...0000...$ sending a request to target $....1111...$ to which the closest online node is $...1110...$ The leading ellipsis represents the prefix shared by the requestor and target and has a length of $n$ bits the trailing ellipsis represents part of the address that is not relevant for routing as at that depth nodes are already unique. The request uses the usual Kademlia forwarding, but the relaying nodes on the way remember the peer a request came from so that when the response arrives, they can pass it back along the same route.}
+   \caption[Backwarding: a pattern for anonymous request-response round-trips in forwarding Kademlia \statusgreen]{Backwarding: pattern for anonymous request--response round-trips in forwarding Kademlia. Here a node with overlay address $...0000...$ sending a request to target $....1111...$ to which the closest online node is $...1110...$ The leading ellipsis represents the prefix shared by the requestor and target and has a length of $n$ bits, the trailing ellipsis represents part of the address that is not relevant for routing as at that depth nodes are already unique. The request uses the usual Kademlia forwarding, but the relaying nodes on the way remember the peer a request came from so that when the response arrives, they can \emph{backward} it (i.e.\ pass it back) along the same route.}
    \label{fig:request-response}
 \end{figure}
 
@@ -471,7 +471,7 @@ Requestor anonymity by default in the retrieval protocol is a crucial feature th
    \label{fig:retrieval}
 \end{figure}
 
-The generic solution of implementing retrieval by pass-back delivery as depicted in figure \ref{fig:retrieval} has further benefits relating to spam protection, scaling and incentivisation, which are now discussed in the remainder of this section.
+The generic solution of implementing retrieval by backwarding as depicted in figure \ref{fig:retrieval} has further benefits relating to spam protection, scaling and incentivisation, which are now discussed in the remainder of this section.
 
 \subsubsection{Protection against unsolicited chunks}
 
@@ -493,7 +493,7 @@ All in all, as long as delivery has the potential to create earnings for the sto
 
 \subsubsection{Opportunistic caching}
 
-Using the pass-back mechanism for request-delivery also enables \gloss{opportunistic caching}, where a \gloss{forwarding node} receives a chunk and the chunk is then saved in case it will be requested again. This mechanism is crucial in ensuring that Swarm scales the storage and distribution of popular content automatically (see \ref{sec:caching}).
+Using the backwarding for chunk delivery responses to retrieve requests also enables \gloss{opportunistic caching}, where a \gloss{forwarding node} receives a chunk and the chunk is then saved in case it will be requested again. This mechanism is crucial in ensuring that Swarm scales the storage and distribution of popular content automatically (see \ref{sec:caching}).
 
 \subsubsection{Incentives}
 
@@ -502,7 +502,7 @@ So far, we have shown that by using the retrieval protocol and maintaining Kadem
 \subsection{Push syncing\statusgreen}\label{sec:push-syncing}
  
 In the previous sections, we presented how a network of nodes maintaining a Kademlia overlay topology can be used as a distributed chunk store and how Forwarding Kademlia routing can be used to define a protocol for retrieving chunks.
-When discussing retrieval, we assumed that chunks are located with the node whose address is closest to theirs. This section describes the protocol responsible for realising this assumption: ensuring delivery of the chunk to it's prescribed storer after it has been uploaded to any arbitrary node.
+When discussing retrieval, we assumed that chunks are located with the node whose address is closest to theirs. This section describes the protocol responsible for realising this assumption: ensuring delivery of the chunk to its prescribed storer after it has been uploaded to any arbitrary node.
 
 This network protocol, called \gloss{push syncing}, is analogous to chunk retrieval: First, a chunk is relayed to the node closest to the chunk address via the same route as a retrieval request would be, and then in response a \gloss{statement of custody receipt} is passed back along the same path (see figure \ref{fig:push-syncing}). The statement of custody sent back by the storer to the \gloss{uploader} indicates that the chunk has reached the neighbourhood from which it is then universally retrievable. By tracking these responses for each constituent chunk of an upload, uploaders can make sure that their upload is fully retrievable by any node in the network before sharing or publishing the address of their upload. Keeping this count of chunks push-synced and receipts received serves as the back-end for a \emph{progress bar} that can be displayed to the uploader to give positive feedback of the successful propagation of their data across the network (see \ref{sec:upload} and \ref{spec:api:tags}).
 
@@ -517,9 +517,9 @@ This network protocol, called \gloss{push syncing}, is analogous to chunk retrie
 Statements of custody are signed by the nodes that claim to be the closest to the address. 
 Similarly to downloaders in the retrieval protocol, the identity of uploaders can also remain hidden, hence forwarding Kademlia can implement \gloss{anonymous uploads}.
 
-Another similarity is that in order to allow the pass-back mechanism for responses, nodes should remember which peer sent a particular chunk. This record should persist for a short period while the statement of custody responses are expected. When this period ends, the record is removed. A statement of custody not matching a record is considered unsolicited and is allowed only up to a small percentage of all push-sync traffic with a peer. Going above this tolerance threshold is sanctioned with disconnection and blacklisting (see \ref{sec:sanctions}).
+Another similarity is that in order to allow backwarding for responses, nodes should remember which peer sent a particular chunk. This record should persist for a short period while the statement of custody responses are expected. When this period ends, the record is removed. A statement of custody not matching a record is considered unsolicited and is allowed only up to a small percentage of all push-sync traffic with a peer. Going above this tolerance threshold is sanctioned with disconnection and blacklisting (see \ref{sec:sanctions}).
 
-In this section we described how the logistics of chunk uploads can be organised with a network protocol using Forwarding Kademlia routing with response pass-backs. However, this solution is not complete until it is secured with aligned incentives: The strategy to follow this protocol should be incentivised and DoS abuse should be disincentivised. These are discussed later in detail in \ref{sec:postage-stamps} and \ref{sec:push-sync-incentives}).
+In this section we described how the logistics of chunk uploads can be organised with a network protocol using Forwarding Kademlia routing with response backwarding. However, this solution is not complete until it is secured with aligned incentives: The strategy to follow this protocol should be incentivised and DoS abuse should be disincentivised. These are discussed later in detail in \ref{sec:postage-stamps} and \ref{sec:push-sync-incentives}).
 
 \subsection{Pull syncing\statusgreen}\label{sec:pull-syncing}
 
@@ -559,7 +559,7 @@ The concept of a \gloss{light node} refers to a special mode of operation necess
 
 A node is said to be light by virtue of not participating fully in the usual protocols detailed in the previous sections, i.e. retrieval, push syncing or pull syncing. 
 
-A node that has restricted bandwidth environment or in whatever way has limited capacity to maintain underlay connections is not expected to be able to forward messages conforming to the rules of Kademlia routing. This needs to be communicated to it's peers so that they do not relay messages to it. 
+A node that has restricted bandwidth environment or in whatever way has limited capacity to maintain underlay connections is not expected to be able to forward messages conforming to the rules of Kademlia routing. This needs to be communicated to its peers so that they do not relay messages to it. 
 
 As all protocols in Swarm are modular, a node may switch on or off any protocol independently (depending on capacity and earnings requirements). To give an example: a node that has no storage space available, but has spare bandwidth, may participate as a forwarding node only. Of course, while switching off protocols is technically feasible, a node must at all times take into account the fact that his/her peers expect a certain level of service if this is advertised and may not accept that some services are switched off and choose not to interact with that node. 
 
@@ -608,7 +608,7 @@ Retrieval of a chunk is ultimately initiated by someone accessing content and th
 
 As we use Forwarding Kademlia, chunk retrieval subsumes a series of relaying actions performed by forwarding nodes. Since these are independent actors, it is already necessary to incentivise each act of relaying independently. Importantly, if only instances of relaying are what matters, then, irrespective of the details of accounting and compensation (see \ref{sec:accounting}), transactors are restricted to connected peers. Given the set of ever connected peers is a quasi-permanent set across sessions, this allows us to frame the interaction in the context of repeated dealings. Such a setting always creates extra incentive for the parties involved to play nice. It is reasonable to exercise preference for peers showing untainted historical record. Moreover, since this quasi-permanent set is logarithmic to network size, any book-keeping or blockchain contract that the repeated interaction with a peer might necessitate is kept manageable, offering a scalable solution. Turning the argument around, we could say that keeping balances with a manageable number of peers, as well as the ambiguity of request origination are the very reasons for nodes to have limited connectivity, i.e., that they choose leaner Kademlia bins.
 
-\subsubsection{Charging for pass-back response}
+\subsubsection{Charging for backwarded response}
 
 If accepting a retrieve request already constitutes revenue for forwarding nodes, i.e. an accounting event crediting the downstream peer is triggered before the response is delivered, then it creates a perverse incentive not to forward the requests. Conditioning the request revenue fulfilment on successful retrieval is the natural solution: The accounting event is triggered only when a requested chunk is delivered back to its requestor, see figure \ref{fig:retrieval-payment}.
 
@@ -678,7 +678,7 @@ Take a node $A$ that needs to forward a request for a chunk which falls into $A$
 
 Similarly, peers of $A$ in shallower bins that have lower price than $A$ for their respective bins, e.g. $B$ in bin $n-1$ is cheaper than $A$ in bin $n$, then $A$ can always forward any request to $B$ and pocket the difference.
 
-Now let's assume that all peers have price tables which are monotonically decreasing as PO decreases. Also assume that shallower bins have higher prices for bins less than $n$ and all deeper peers in bins higher than $n$ have the same prices for $n$. Let $B$, $C$, $D$ and $E$ be the peers in bin $n$ densely balanced. $A$ wants to  forward a chunk to a peer so that the PO with it's target address increases by 3. If the peers $B$ and $C$ attempt to collude against $A$ and raise the price of forwarding chunks to bin $n+3$, they are still bound by $D$ and $E$'s price on PO bin $n+2$. In particular if they are lower than $B$ and $C$ for $n+3$.
+Now let's assume that all peers have price tables which are monotonically decreasing as PO decreases. Also assume that shallower bins have higher prices for bins less than $n$ and all deeper peers in bins higher than $n$ have the same prices for $n$. Let $B$, $C$, $D$ and $E$ be the peers in bin $n$ densely balanced. $A$ wants to  forward a chunk to a peer so that the PO with its target address increases by 3. If the peers $B$ and $C$ attempt to collude against $A$ and raise the price of forwarding chunks to bin $n+3$, they are still bound by $D$ and $E$'s price on PO bin $n+2$. In particular if they are lower than $B$ and $C$ for $n+3$.
 
 Such price discrepancies offer nodes an arbitrage opportunity; the strategy to forward to the cheapest peer will direct traffic away from expensive peers and increase traffic for cheaper ones. As a consequence prices will adjust. 
 
@@ -719,7 +719,7 @@ Push-syncing (see \ref{sec:push-syncing}) is the protocol which ensures that chu
 \footnote{To complement our solution for bandwidth compensation, further measures are needed for spam protection and storage incentivisation which are discussed later in \ref{sec:postage-stamps} and \ref{sec:postage-lottery}, respectively.}
 
 The push-sync protocol is analogous to the pull-sync protocol in the sense that their respective message exchange sequences travel the same route.
-The delivery of the chunk in the push sync protocol is analogous to a retrieval request and, conversely, the statement of custody receipt in push sync is analogous to the chunk delivery response in retrieval. However, in the case of the retrieval protocol, only the statement of custody pass-back responses will trigger an accounting event.
+The delivery of the chunk in the push sync protocol is analogous to a retrieval request and, conversely, the statement of custody receipt in push sync is analogous to the chunk delivery response in retrieval. However, in the case of the retrieval protocol, only the statement of custody responses will trigger an accounting event.
 
 Requiring payment for push-sync delivery by the downstream peers would put the forwarder in a position to bargain with a storer node on the delivery of the chunk. The possession of a chunk is valuable for the prospective storer node because there is also a system of rewards for storage ( see \ref{sec:postage-lottery}). Given this, the forwarder node could in theory hold onto the chunk unless the storer node pays marginally more than what the possession of this chunk is worth for them. In particular, since forwarders on the route from the uploader are not numerous, any profit coming from a reward mechanism for storage could then be captured by the forwarding nodes.
 
@@ -807,7 +807,7 @@ One of the major issues with direct \gloss{on-chain payment} in a blockchain net
 
 \subsubsection{The chequebook contract}
 
-A very simple smart contract that allows the beneficiary to choose when payments are to be processed was introduced in \cite{ethersphere2016sw3}. This \gloss{chequebook contract} is a wallet that can process \glossplural{cheque} issued by it's owner. These cheques are analogous to those used in traditional financial transactions: The issuer signs a \emph{cheque} specifying a \emph{beneficiary}, a \emph{date} and an \emph{amount}, gives it to the recipient as a token of promise to pay at a later date. The smart contract plays the role of the bank. When the recipient wishes to get paid, they "cash the cheque" by submitting it to the smart contract. The contract, after validating the signature, date and the amount specified on the cheque, transfers the amount to the beneficiary's account (see figure \ref{fig:swap-chequebook}). Analogous to the person taking the cheque to the bank to cash it, anyone can send the digital cheque in a transaction to the owner's chequebook account and thus trigger the transfer. 
+A very simple smart contract that allows the beneficiary to choose when payments are to be processed was introduced in \cite{ethersphere2016sw3}. This \gloss{chequebook contract} is a wallet that can process \glossplural{cheque} issued by its owner. These cheques are analogous to those used in traditional financial transactions: The issuer signs a \emph{cheque} specifying a \emph{beneficiary}, a \emph{date} and an \emph{amount}, gives it to the recipient as a token of promise to pay at a later date. The smart contract plays the role of the bank. When the recipient wishes to get paid, they "cash the cheque" by submitting it to the smart contract. The contract, after validating the signature, date and the amount specified on the cheque, transfers the amount to the beneficiary's account (see figure \ref{fig:swap-chequebook}). Analogous to the person taking the cheque to the bank to cash it, anyone can send the digital cheque in a transaction to the owner's chequebook account and thus trigger the transfer. 
 
 The swap protocol specifies that when the \emph{payment threshold} is exceeded, a cheque is sent over by the creditor peer. Such cheques can be cashed immediately by being sent to the issuer's chequebook contract. Alternatively, cheques can also be held. Holding a cheque is effectively lending on credit, which enables the parties to save on transaction costs. 
 
@@ -943,7 +943,7 @@ Syncing involves transferring chunks from the uploader to storers, i.e. from whe
 
 Taking inspiration from international mail delivery, the entire delivery path (as well as storage) can be pre-paid. The proof of this payment called a \gloss{postage stamp}, and must be attached to the payload by the sender.
 
-This cost need not necessarily be borne by the uploader, but they are the ones that will need to make sure a postage stamp is attached to each chunk, otherwise the upload will not succeed. Conversely, this down-payment need not necessarily be paid out as revenue to anyone in particular, i.e. it could be burnt or otherwise redistributed. The actual cost of uploading a chunk can serve as a signal of it's relative importance (somewhat analogously to priority mail), that storer nodes can then use to rank chunks when selecting which ones to retain and serve, and which ones to garbage collect (see \ref{spec:strategy:garbage-collection}) in the event of capacity shortage.
+This cost need not necessarily be borne by the uploader, but they are the ones that will need to make sure a postage stamp is attached to each chunk, otherwise the upload will not succeed. Conversely, this down-payment need not necessarily be paid out as revenue to anyone in particular, i.e. it could be burnt or otherwise redistributed. The actual cost of uploading a chunk can serve as a signal of its relative importance (somewhat analogously to priority mail), that storer nodes can then use to rank chunks when selecting which ones to retain and serve, and which ones to garbage collect (see \ref{spec:strategy:garbage-collection}) in the event of capacity shortage.
 
 A postage stamp is modelled as a proof of payment associated with a chunk using a \gloss{witness}. The witness is implemented as a digital signature issued by a third party entity who is designated by the payer.
 
@@ -964,7 +964,7 @@ The proof of payment can lend itself to a number of different implementations. T
 However, because of the high transaction cost, requiring an on-chain payment for each chunk would be prohibitively expensive. Instead, we need a solution that allows the uploader to purchase the postage stamps in a \gloss{postage batch} and then re-use it over many chunks. 
 
 
-The batches are created by a central postage smart contract when a transaction is sent to it's creation endpoint, together with an amount of Honey tokens and the following transaction data:
+The batches are created by a central postage smart contract when a transaction is sent to its creation endpoint, together with an amount of Honey tokens and the following transaction data:
 
 \begin{itemize}
 \item \emph{owner address} -- The owner that is entitled to use the batches created to stamp chunks.
@@ -1493,7 +1493,7 @@ In this section, we presented Swarm hash, a data structure over chunks that repr
 
 \subsection{Collections and manifests\statusgreen}\label{sec:collections}
 
-The \gloss{Swarm manifest} is a structure that defines a mapping between arbitrary paths and files to represent collections. It also contains metadata associated with the collection and it's objects (files). A \gloss{manifest entry} contains a reference to a file, more precisely a reference to the Swarm root chunk of the representation of file (see \ref{sec:files}) and also specifies the media mime type of file so that browsers will know how to handle it. You can think of a manifest as (1) a routing table, (2) a directory tree, or  (3) an index, which makes it possible for Swarm to implement (1) web sites, (2) file-system directories, or (3) key--value stores (see \ref{sec:maps}), respectively. Manifests provide the main mechanism to enable URL based addressing in Swarm (see \ref{sec:urls}). 
+The \gloss{Swarm manifest} is a structure that defines a mapping between arbitrary paths and files to represent collections. It also contains metadata associated with the collection and its objects (files). A \gloss{manifest entry} contains a reference to a file, more precisely a reference to the Swarm root chunk of the representation of file (see \ref{sec:files}) and also specifies the media mime type of file so that browsers will know how to handle it. You can think of a manifest as (1) a routing table, (2) a directory tree, or  (3) an index, which makes it possible for Swarm to implement (1) web sites, (2) file-system directories, or (3) key--value stores (see \ref{sec:maps}), respectively. Manifests provide the main mechanism to enable URL based addressing in Swarm (see \ref{sec:urls}). 
 
 Manifests are represented as a compacted trie%
 %
@@ -1512,9 +1512,14 @@ in which individual trie nodes are serialised as chunks (see \ref{spec:format:ma
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{fig/manifest-entry.pdf}
-\caption[Manifest entry \statusgreen]{Manifest entry.}
+\caption[Manifest entry \statusgreen]{Manifest entry is a data  structure that contains the reference to a fileing metadata about a file or directory  pertaining to the assembler, access control, http header.}
 \label{fig:manifest-entry}
 \end{figure}
+
+Manifest entry is a data  structure that encapsulates all metadata about a file or directory.
+The information minimally includes a swarm reference to the file, complemented with file information
+relevant either as a (1) parameter for the downloader component which assembles chunks into a byte stream or (2) for the client side rendering handled by the browser or (3) for the mapping of manifests to file system directory tree. (1) is exemplified by access control information and erasure coding parameters but also the publisher needed for doing chunk recovery. (2) includes content type headers, or generically HTTP headers that the local swarm client will pick them up by the API and set in the response header when the file is retrieved. 
+and (3) file info mapped to file system when downloading such as file permissions.
 
 The high level API (see \ref{spec:api:storage}) to the manifests provides functionality to upload and download files and directories. It also provides an interface to add documents to a collection on a path and to delete a document from a collection. Note that deletion here only means that a new manifest is created in which the path in question is missing. There is no other notion of deletion in the Swarm, i.e. the value that was referenced in the deleted manifest entry remains in Swarm. Swarm exposes the manifest API via the \emph{bzz URL scheme} (see \ref{spec:api:storage}).
 
@@ -1629,13 +1634,12 @@ access key decryption keys for each grantee. Thereafter, a lookup table is creat
 
 This lookup table is implemented as an \gloss{access control trie} (\gloss{ACT}) in Swarm manifest format with paths corresponding to lookup keys and manifest entries containing the ciphertext of the encrypted access keys as metadata attribute values. The ACT manifest is an independent resource referenced by a URL which is included among the root access metadata so that users know whether or not an ACT is to be used. Its exact format is specified in \ref{spec:format:access-control}.
 
-When accessing content, the user retrieves the root access meta data, identifies the ACT resource and then calculates their session key using either their passphrase and the scrypt parameters or the publisher public key and their private key and a salt. From the session key they can derive the lookup key by hashing it with $0$ and then retrieve the manifest entry from ACT. For this they will need to know the root of the ACT manifest and then use the lookup key as the URL path. If the entry exists, the user takes the value of the access key attribute in the form of a ciphertext that is decrypted with a key derived by hashing the session key with the constant $1$. The resulting access key can then be used to decrypt the encrypted reference included in the root access manifest, see figure \ref{fig:access-control-multiple-party}.
-
+When accessing content, the user retrieves the root access meta data, identifies the ACT resource and then calculates their session key using either their passphrase and the scrypt parameters or the publisher public key and their private key and a salt. From the session key they can derive the lookup key by hashing it with $0$ and then retrieve the manifest entry from ACT. For this they will need to know the root of the ACT manifest and then use the lookup key as the URL path. If the entry exists, the user takes the value of the access key attribute in the form of a ciphertext that is decrypted with a key derived by hashing the session key with the constant $1$. The resulting access key can then be used to decrypt the encrypted reference included in the root access manifest, see figure \ref{fig:access-control-multiple-party}. Once we unlock the manifest root, all references contain the decryption key.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{fig/access-control-multiple-party.pdf}
-\caption[Access control for multiple grantees \statusyellow]{Access control for multiple grantees.}
+\caption[Access control for multiple grantees \statusyellow]{Access control for multiple grantees involves an additional layer to get from the session key to the access key. Each user must lookup the global access key specifically encrypted to them. Both the key to look up and the key to decrypt the access key are derived from the session key which in turn requires their credentials.} 
 \label{fig:access-control-multiple-party}
 \end{figure}
 
@@ -2055,7 +2059,7 @@ Let us make explicit the roles relevant to this construct:
 \begin{itemize}
 \item \emph{issuer} ($I$) - creates the envelope by mining an address. 
 \item \emph{poster} ($P$) - puts the content into the envelope and posts it as a valid single owner chunk to Swarm.
-\item \emph{owner} - ($O$) possesses the private key to the account part of the address and can thus sign off on the association of the payload to the identifier. This effectively decides on the contents of the envelope.
+\item \emph{owner} ($O$) - possesses the private key to the account part of the address and can thus sign off on the association of the payload to the identifier. This effectively decides on the contents of the envelope.
 \item \emph{target} ($T$) - the constraint for mining: a bit sequence that must form the prefix of the mined address. It represents a neighbourhood in the overlay address space where the envelope will be sent. The length of the target sequence corresponds to the difficulty for mining. The longer this target is, the smaller the neighbourhood that the envelope will be able to reach.
 \item \emph{recipient} ($R$) - the party whose overlay address has the target sequence as its prefix and therefore the destination of the message
 \end{itemize}
@@ -2207,7 +2211,7 @@ Note that the feed update address as well as identifier can be known if the feed
 
 \subsubsection{Targeted chunk delivery}
 
-Normally, in Swarm's DISC model, chunks are requested with retrieve requests, which are forwarded towards the neighbourhood designated by the requested chunk address (see \ref{sec:retrieval}). The first node on the route that has the chunk will respond with it and the chunk is delivered as a pass-back response travelling back along the same route that the request has taken. In certain cases, however, it may be useful to have a mechanism to request a chunk from an arbitrary neighbourhood where it is known to be stored and send it to an arbitrary neighbourhood where it is known to be needed. A construct called \gloss{targeted chunk delivery} is meant for such a use case: the request is a Trojan pss message while the response, the delivery, must be a single owner chunk wrapping the requested chunk, with an address mined to fall into the neighbourhood of the recipient.  
+Normally, in Swarm's DISC model, chunks are requested with retrieve requests, which are forwarded towards the neighbourhood designated by the requested chunk address (see \ref{sec:retrieval}). The first node on the route that has the chunk will respond with it and the chunk is delivered as a backwarded response travelling back along the same route that the request has taken. In certain cases, however, it may be useful to have a mechanism to request a chunk from an arbitrary neighbourhood where it is known to be stored and send it to an arbitrary neighbourhood where it is known to be needed. A construct called \gloss{targeted chunk delivery} is meant for such a use case: the request is a Trojan pss message while the response, the delivery, must be a single owner chunk wrapping the requested chunk, with an address mined to fall into the neighbourhood of the recipient.  
 
 
 \begin{figure}[htbp]
@@ -2437,7 +2441,7 @@ Hosts pin the data and re-upload it to its designated area when prompted with a 
 
 \glossupperplural{recovery host} are pinners that are willing to provide pinned chunks in the context of recovery. These pinners are supposed to have indicated that they will take on this task to the publisher and to have downloaded all the relevant chunks and have pinned them all in their local instance. 
 
-The publisher that wishes to advertise its publication as globally pinned or repairable would then gather the overlay addresses of these volunteering recovery hosts. In fact, it is sufficient to collect just the prefixes of the underlay with a length greater than Swarm's depth. We will call these nodes \gloss{recovery targets}.
+The publisher that wishes to advertise its publication as globally pinned or repairable would then gather the overlay addresses of these volunteering recovery hosts. In fact, it is sufficient to collect just the prefixes of the overlay with a length greater than Swarm's depth. We will call these partial addresses \gloss{recovery targets}.
 
 Publishers will advertise the recovery targets for their content to the consumers of their data via a feed called a \gloss{recovery feed}. This feed can be tracked by consumers of the publisher's data based on the convention of constructing the topic using a simple sequential indexing scheme (see \ref{spec:format:recovery}). 
 
@@ -2663,7 +2667,7 @@ As described in \ref{sec:collections} and specified in \ref{spec:format:manifest
 
 \subsubsection{Manifest entries vs singleton manifests}
 
-Manifest entries are also needed for single files since they contain the manifest entry which holds key information about the file such as content type, pinners, insurance and erasure coding which is needed for correct retrieval. A manifest that would contain a single entry to a file on  the empty path is called a \gloss{singleton manifest}. This contains no more information than the the entry itself.  
+Manifest entries are also needed for single files since they contain key information about the file such as content type, erasure coding which is needed for correct retrieval. A manifest that would contain a single entry to a file on  the empty path is called a \gloss{singleton manifest}. This contains no more information than the the entry itself.  
 
 The http server provides the \lstinline{bzz} URL scheme that implements the collection storage API (see  \ref{spec:api:storage}). When a single file is uploaded via a \lstinline{POST} request the \lstinline{bzz} scheme, the manifest entry is created and stored and the response contains the reference to it.
 
@@ -2748,7 +2752,7 @@ The default strategy choice is \lstinline{race}, if the user wants to save on do
 
 If a chunk is found missing, we can fall back on the missing chunk notification protocol (see \ref{sec:reupload}). Reference to the root of the data structure representing the set of \gloss{recovery targets} is found at the latest update of the recovery feed. 
 
-When a chunk request times out, the client can start creating the recovery message using the set of pinner hosts (see \ref{spec:format:recovery}). Once it's created it is sent to the host. If this times out, the next recovery chunk is tried using a different pinner host node. This is repeated until the recovery chunk arrives or all the pinners and insurers are exhausted.
+When a chunk request times out, the client can start creating the recovery message using the set of pinner hosts (see \ref{spec:format:recovery}). Once created it is sent to the host. If this times out, the next recovery chunk is tried using a different pinner host node. This is repeated until the recovery chunk arrives or all the pinners and insurers are exhausted.
 
 \subsubsection{Litigation}
 

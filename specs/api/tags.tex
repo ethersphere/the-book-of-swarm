@@ -5,14 +5,14 @@
 { }
 
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{201}{Created}{ID in response body}
 \end{routeResponse}
 \end{apiRoute}
 
 
 
 
-\begin{apiRoute}{GET}{/tags?offset=\{offset\}\&length=\{length\}}{Get all tags}
+\begin{apiRoute}{GET}{/tags?offset=\param{offset}\&length=\param{length}}{Get all tags}
 {
 }
 { }
@@ -29,7 +29,7 @@
 
 
 
-\begin{apiRoute}{GET}{/tags/\{id\}}{View details tag with given ID}
+\begin{apiRoute}{GET}{/tags/\param{id}}{View details tag with given ID}
 {
 }
 { }
@@ -39,12 +39,14 @@
 \end{routeParameter}
 \begin{routeResponse}{application/json}
 \responseItem{200}{ok}{}
+\responseItem{400}{Bad Request}{ID not well formed}
+\responseItem{404}{Not found}{Tag with ID does not exists.}
 \end{routeResponse}
 \end{apiRoute}
 
 
 
-\begin{apiRoute}{DELETE}{/tags/\{id\}}{Path description}
+\begin{apiRoute}{DELETE}{/tags/\param{id}}{Path description}
 {
 }
 { }
@@ -53,7 +55,10 @@
 \routeParamItem{id}{string}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{204}{No content}{}
+\responseItem{400}{Bad Request}{ID not well formed}
+\responseItem{404}{Not found}{Tag with ID does not exists.}
+
 \end{routeResponse}
 \end{apiRoute}
 

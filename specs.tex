@@ -12,7 +12,8 @@ APIs (\ref{spec:api}) gives a formal specification of the high level interfaces 
 %
 which is an API description format for REST APIs.
 
-
+\newpage\phantomsection 
+\addcontentsline{toc}{chapter}{List of definitions}
 \listoftheorems[ignoreall,show={definition}]
 
 \chapter{Data types and algorithms}\label{spec:convention}
@@ -128,14 +129,14 @@ The constraints put on strategic choice are crucial in terms of rendering the ga
 \begin{definition}[HTTP status codes used in swarm]
 \begin{lstlisting}
 \end{lstlisting}
-\begin{tabular}{c|p{0.25\linewidth}|p{0.6\linewidth}}
+\begin{tabular}{l|p{0.25\linewidth}|p{0.6\linewidth}}
 103 & Checkpoint & returns temporary root hash for resumable uploads
 \\\hline
 200 & ok &
 \\
 201 & Created & returned by POST requests upon successful creation of file/manifest/tag/stamp/
-\\
-206 & Partial Content &
+% \\
+% 206 & Partial Content &
 \\\hline
 400 & Bad request & returned if request or its parameters are not well formed or missing
 \\
@@ -146,23 +147,21 @@ The constraints put on strategic choice are crucial in terms of rendering the ga
 403 & Forbidden & returned if retrieved chunk is encrypted  but the reference has no decryption key
 \\     
 404 & Not Found &
-returned if a local prerequisite is not found
+returned if a local prerequisite is not found or manifest path does not exist.
 \\
 405$^{*}$& Method Not Allowed & HTTP verb  not allowed for this endpoint
 \\
 406$^{*}$
-\footnote[*]{These statuses are generic not documented}
 %
-& Not Acceptable &
-the Accept header explicit in the request. 
+& Not Acceptable & No format acceptable by the {ACCEPT} header explicit in the request. 
 \\
-408 & Request Timeout & retrieve requests fallback error after TTL passed
+408 & Request Timeout & Retrieve requests fallback error after TTL passed
 \\
-411 & Length Required & returned by chunk upload API if length of file uploaded is beyond limit
+% 411 & Length Required & returned by chunk upload API if length of file uploaded is beyond limit
 % 412 & Precondition Failed (RFC 7232)
-\\
+% \\
 413 & Payload Too Large  &
-length of payload to upload beyond (chunk API)
+Payload size exceeds maximum chunk size or span given (chunk API)
 \\
 414 & URI Too Long  & manifest path  $>32 $
 \\
@@ -170,11 +169,13 @@ length of payload to upload beyond (chunk API)
 \\
 420 & Enhance your calm & returned when recovery was initiated but retrieval timed out
 \\
-422 & Unprocessable Entity & returned by the blockchain external API if eth api returns an error 
+422 & Unprocessable Entity & returned by the blockchain external API if eth api returns an error or by single owner chunk post API if owner/id pair already exists
 % 417 & Expectation Failed
 % 421 & Misdirected Request (RFC 7540)
 % 451 & Unavailable For Legal Reasons (RFC 7725)
 \end{tabular}
+
+\footnotesize{$^{*}$Generic errors detectable before endpoint API call so not documented.}
 \end{definition}
 
 

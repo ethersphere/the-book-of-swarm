@@ -8,14 +8,11 @@
 \begin{routeParameter} 
 \routeParamItem{reference}{hex string}
 \end{routeParameter}
-\begin{headerParameter} 
-\headerParamItem{SWARM-ENCRYPTION}{hex string}
-\end{headerParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
-\responseItem{403}{Forbidden}{}
+\responseItem{200}{ok}{Chunk data as response body}
+\responseItem{403}{Forbidden}{chunk encrypted but no decryption key in reference}
 \responseItem{408}{Request Timeout}{} 
-\responseItem{420}{Enhance your calm}{} 
+\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out} 
 \end{routeResponse}
 \end{apiRoute}
 
@@ -40,10 +37,9 @@
 \end{headerParameter}
 
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
-\responseItem{400}{Bad request}{} 
-\responseItem{400}{Bad request}{} 
-\responseItem{413}{Payload Too Large}{} 
+\responseItem{200}{ok}{Minimal manifest entry in response body}
+\responseItem{400}{Bad request}{Span parameter not well formed. } 
+\responseItem{413}{Payload Too Large}{Payload size exceeds span value or 4096} 
 
 \end{routeResponse}
 \end{apiRoute}
@@ -51,7 +47,7 @@
 
 
 
-\begin{apiRoute}{GET}{/soc/\{owner\}/\{id\}}{Retrieve single owner chunk as in \ref{def:soc-retrieve} }
+\begin{apiRoute}{GET}{/soc/\param{owner}/\param{id}}{Retrieve single owner chunk as in \ref{def:soc-retrieve} }
 {
 }
 { }
@@ -64,16 +60,18 @@
 \queryParamItem{key}{string}
 \end{queryParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
-\responseItem{400}{Bad request}{} 
-
+\responseItem{200}{ok}{single owner chunk payload in response body}
+\responseItem{400}{Bad request}{if owner, id or key is not well formed}
+\responseItem{403}{Forbidden}{Single owner chunk encrypted but no decryption key given}
+\responseItem{408}{Request Timeout}{} 
+\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out}
 \end{routeResponse}
 \end{apiRoute}
 
 
 
 
-\begin{apiRoute}{POST}{/soc/\{owner\}/\{id\}?span=\{span\}}{Create new single owner chunk as in \ref{def:soc-store} }
+\begin{apiRoute}{POST}{/soc/\param{owner}/\param{id}?span=\param{span}}{Create new single owner chunk as in \ref{def:soc-store} }
 {
 }
 { }
@@ -90,10 +88,15 @@
 \headerParamItem{SWARM-PARITIES}{integer}
 \end{headerParameter}
 \begin{queryParameter} 
-\queryParamItem{span}{string}
+\queryParamItem{span}{integer}
 \end{queryParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{201}{Created}{Reference in response body}
+\responseItem{400}{Bad request}{owner,  id or span is not well formed} 
+\responseItem{401}{Unauthorized}{signing fails} 
+\responseItem{404}{Not found}{owner keypair is found} 
+\responseItem{413}{Payload Too Large}{Payload size exceeds span value or 4096} 
+\responseItem{422}{Unprocessable entity}{owner/id pair already exists} 
 \end{routeResponse}
 \end{apiRoute}
 
@@ -112,14 +115,46 @@
 \headerParamItem{SWARM-PARITIES}{integer}
 \end{headerParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{201}{Created}{Minimal manifest entry as response body}
+
+
 \end{routeResponse}
 \end{apiRoute}
 
 
 
 
-\begin{apiRoute}{GET}{/file/\{reference\}}{Retrieve file by reference as in \ref{def:file-retrieval}}
+
+
+\begin{apiRoute}{PUT}{/file/\param{reference} }{Append body to file, returns new reference. Note that any intermediate chunk of a file is a file.}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{reference}{hex string}
+\routeParamItem{file}{binary as request body}
+\end{routeParameter}
+\begin{headerParameter} 
+\headerParamItem{SWARM-TAG}{hex string}
+\headerParamItem{SWARM-STAMP}{hex string}
+\headerParamItem{SWARM-ENCRYPTION}{hex string}
+\headerParamItem{SWARM-PIN}{bool}
+\headerParamItem{SWARM-PARITIES}{integer}
+\end{headerParameter}
+\begin{routeResponse}{application/json}
+\responseItem{201}{Created}{Minimal manifest entry as request body}
+\responseItem{400}{Bad Request}{Reference is not well formed}
+\responseItem{403}{Forbidden}{Encrypted content but no decryption key in. reference}
+\responseItem{408}{Request Timeout}{Retrieval of file to append to times out} 
+\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out}
+\responseItem{413}{Payload Too Large}{}
+\end{routeResponse}
+\end{apiRoute}
+
+
+
+\begin{apiRoute}{GET}{/file/\param{reference}}{Retrieve file by reference as in \ref{def:file-retrieval}}
 {
 }
 { }
@@ -128,33 +163,14 @@
 \routeParamItem{reference}{string}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{200}{ok}{file contents streamed in response body}
+\responseItem{400}{Bad Request}{Reference is not well formed}
+\responseItem{403}{Forbidden}{Encrypted content but no decryption key in reference}
+\responseItem{408}{Request Timeout}{} 
+\responseItem{416}{Range Not Satisfiable}{Offset in range query out of range}
+\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out}
 \end{routeResponse}
 \end{apiRoute}
-
-
-
-
-\begin{apiRoute}{PUT}{/file/ }{Update file, returns new reference}
-{
-}
-{ }
-
-\begin{routeParameter} 
-\routeParamItem{file/collection}{as request body}
-\end{routeParameter}
-\begin{headerParameter} 
-\headerParamItem{SWARM-TAG}{hex string}
-\headerParamItem{SWARM-STAMP}{hex string}
-\headerParamItem{SWARM-ENCRYPTION}{hex string}
-\headerParamItem{SWARM-PIN}{bool}
-\headerParamItem{SWARM-PARITIES}{integer}
-\end{headerParameter}
-\begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
-\end{routeResponse}
-\end{apiRoute}
-
 
 
 \subsection{Manifest \statusgreen}\label{spec:api:manifest}
@@ -162,78 +178,104 @@
 
 
 
-\begin{apiRoute}{GET}{/manifest/\{node:reference\}/\{path\}}{Lookup manifest by path as in \ref{def:manifests-lookup}}
+\begin{apiRoute}{GET}{/manifest/\param{reference}/\param{path}}{Lookup entry by path in manifest, see \ref{def:manifests-lookup}}
 {
 }
 { }
 
 \begin{routeParameter} 
-\routeParamItem{node reference}{hex string}
+\routeParamItem{reference}{hex string}
 \routeParamItem{path}{string}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{200}{ok}{Manifest entry in response body}
+\responseItem{400}{Bad Request}{Reference or path is not well formed}
+\responseItem{403}{Forbidden}{Encrypted content but no decryption key in reference}
+\responseItem{404}{Not found}{Path does not exist}
+\responseItem{408}{Request Timeout}{Timeout retrieving referenced manifest}
+\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out}
 \end{routeResponse}
 \end{apiRoute}
 
 
 
-\begin{apiRoute}{DELETE}{/manifest/\{node\}/\{path\} }{Delete manifest by path as in \ref{def:manifest-remove}}
+\begin{apiRoute}{DELETE}{/manifest/\param{reference}/\param{path} }{Delete entry on path in referenced manifest, see \ref{def:manifest-remove}}
 {
 }
 { }
 
 \begin{routeParameter} 
-\routeParamItem{node}{string}
+\routeParamItem{reference}{hex string}
 \routeParamItem{path}{string}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{204}{No content}{Successful deletion}
+\responseItem{400}{Bad Request}{Reference or path is not well formed}
+\responseItem{403}{Forbidden}{Encrypted content but no decryption key in reference}
+% \responseItem{404}{Not found}{Path does not exist}
+\responseItem{408}{Request Timeout}{Timeout retrieving referenced manifest}
+\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out}
+% \responseItem{404}{Not found}{Path does not exist}
 \end{routeResponse}
 \end{apiRoute}
 
 
 
-\begin{apiRoute}{PUT}{/manifest/\{old\} }{Update manifest as in \ref{def:manifest-update}}
+\begin{apiRoute}{PUT}{/manifest/\param{reference}/\param{path}}{Update manifest as in \ref{def:manifest-update}}
 {
 }
 { }
 
 \begin{routeParameter} 
-\routeParamItem{old}{string}
+\routeParamItem{reference}{hex string}
+\routeParamItem{path}{(hex) string}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-v
+\responseItem{200}{ok}{}
+\responseItem{400}{Bad Request}{Reference is not well formed}
+\responseItem{403}{Forbidden}{Encrypted content but no decryption key in reference}
+\responseItem{404}{Not found}{Path does not exist}
+\responseItem{408}{Request Timeout}{Timeout retrieving referenced manifest}
+\responseItem{414}{URI Too Long}{Path exceeds 32 byte limit}
+\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out}
+
 \end{routeResponse}
 \end{apiRoute}
 
 
 
 
-\begin{apiRoute}{POST}{/manifest/\{old\}/\{new\}}{Merge manifests as in \ref{def:manifest-merge}}
+\begin{apiRoute}{POST}{/manifest/\param{old}/\param{new}}{Merge manifests as in \ref{def:manifest-merge}}
 {
 }
 { }
 
 \begin{routeParameter} 
-\routeParamItem{old}{string}
-\routeParamItem{new}{string}
+\routeParamItem{old}{hex string}
+\routeParamItem{new}{hex string}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{201}{Created}{Reference in response body}
+\responseItem{400}{Bad Request}{Reference is not well formed}
+\responseItem{403}{Forbidden}{Encrypted content but no decryption key in reference}
+\responseItem{404}{Not found}{Path does not exist}
+\responseItem{408}{Request Timeout}{Timeout retrieving referenced manifest}
+\responseItem{414}{URI Too Long}{Path exceeds 32 byte limit}
+\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out}
 \end{routeResponse}
 \end{apiRoute}
 
 \subsection{High level storage API \statusyellow}\label{spec:api:manifest}
 
 
-\begin{apiRoute}{GET}{/bzz:/\{host\}/\{path\}}{Append to upload, returns new manifest}
+\begin{apiRoute}{GET}{/bzz:/\param{host}/\param{path}}{Download file}
 {
 }
 { }
 
 \begin{routeParameter} 
-\routeParamItem{file/collection}{as request body}
+\routeParamItem{host}{}
+\routeParamItem{path}{}
 \end{routeParameter}
 \begin{headerParameter} 
 \headerParamItem{SWARM-TAG}{hex string}
@@ -244,12 +286,18 @@ v
 \end{headerParameter}
 \begin{routeResponse}{application/json}
 \responseItem{200}{ok}{}
+\responseItem{400}{Bad Request}{Host/Reference or path is not well formed}
+\responseItem{401}{Unauthorized}{Access denied: AC unlock failed}
+\responseItem{403}{Forbidden}{Encrypted content but no decryption key in reference}
+\responseItem{404}{Not found}{Host cannot be resolved or Path does not exist}
+\responseItem{408}{Request Timeout}{Timeout retrieving referenced manifest}
+\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out}
 \end{routeResponse}
 \end{apiRoute}
 
 
 
-\begin{apiRoute}{PUT}{/bzz:/}{Append to upload, returns new manifest}
+\begin{apiRoute}{PUT}{/bzz:/\param{host}/\param{path}}{Append upload to file referenced, add new entry to path, returns new manifest}
 {
 }
 { }
@@ -265,14 +313,21 @@ v
 \headerParamItem{SWARM-PARITIES}{integer}
 \end{headerParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{201}{Created}{New manifest root reference in response body}
+\responseItem{400}{Bad Request}{Host/Reference is not well formed}
+\responseItem{401}{Unauthorized}{Accessdenied: AC unlock failed}
+\responseItem{403}{Forbidden}{Encrypted content but no decryption key in reference}
+\responseItem{404}{Not found}{Host cannot be resolved or Path does not exist}
+\responseItem{408}{Request Timeout}{Timeout retrieving referenced manifest}
+\responseItem{414}{URI Too Long}{Path exceeds 32 byte limit}
+\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out}
 \end{routeResponse}
 \end{apiRoute}
 
 
 
 
-\begin{apiRoute}{POST}{/bzz:/}{Upload file or collection, returns tag used for tracking global sync state}
+\begin{apiRoute}{POST}{/bzz:/\param{host}/\param{path}}{Upload file or collection, returns new manifest root reference}
 {
 }
 { }
@@ -288,7 +343,14 @@ v
 \headerParamItem{SWARM-PARITIES}{integer}
 \end{headerParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{201}{Created}{New manifest root reference in response body}
+\responseItem{400}{Bad Request}{Host/Reference is not well formed}
+\responseItem{401}{Unauthorized}{Accessdenied: AC unlock failed}
+\responseItem{403}{Forbidden}{Encrypted content but no decryption key in reference}
+\responseItem{404}{Not found}{Host cannot be resolved or Path does not exist}
+\responseItem{408}{Request Timeout}{Timeout retrieving referenced manifest}
+\responseItem{414}{URI Too Long}{Path exceeds 32 byte limit}
+\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out}
 \end{routeResponse}
 \end{apiRoute}
 

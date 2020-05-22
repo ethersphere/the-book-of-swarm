@@ -135,12 +135,16 @@ as
 
 define function receive about topic 
     on uint64 @channel
-has api GET on "/pss/<topic>/<channel>"
+has api POST on "/pss/subscribe/<topic>(?on=<channel>)"
 as 
     @stream = open @channel
     context mailboxes append= mailbox{ @topic, @stream }
     
-define function cancel topic 
+define function cancel topic
+    on @channel uint64
+has api DELETE on "/pss/subscribe/<topic>(?on=<channel>)"
+as
+    context mailboxes any ch
 \end{lstlisting}
 \end{definition}
 
@@ -151,7 +155,7 @@ define function cancel topic
 // /pss
 
 define type envelope
-    id  [32]byte
+    id  [segment size]byte
     sig crypto/signature
     ps  postage/stamp   
     

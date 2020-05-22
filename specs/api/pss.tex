@@ -1,31 +1,62 @@
 
-\begin{apiRoute}{POST}{/pss/\{recipient\}/\{topic\}(?targets=\{targets\})}{Send private message to recipient(s) as in \ref{def:send}}
+\begin{apiRoute}{POST}{/pss/send/\param{topic}(?targets=\param{targets}\&recipient=\param{recipient})}{Send private message with topic to targets, encrypted for recipient, see \ref{def:send}}
 {
 }
 { }
 
 \begin{routeParameter} 
-\routeParamItem{recipient}{string}
 \routeParamItem{topic}{string}
 \end{routeParameter}
+\begin{queryParameter} 
+\queryParamItem{recipient}{hex string - recipient public key for encryption}
+\queryParamItem{targets}{hex string - comma separated list of targets}
+\end{queryParameter} 
+\begin{headerParameter} 
+\headerParamItem{SWARM-TAG}{hex string}
+\headerParamItem{SWARM-STAMP}{hex string}
+\end{headerParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{209}{sent}{Tag to monitor}
+\responseItem{400}{Bad Request}{Topic, targets or recipient not well formed.}
 \end{routeResponse}
 \end{apiRoute}
 
 
 
 
-\begin{apiRoute}{GET}{/pss/\{topic\}/\{channel\}}{Subscribe to messages with topic to delivered on given channel, see \ref{def:receive}}
+\begin{apiRoute}{POST}{/pss/subscribe/\param{topic}/(?on=\param{channel})}{Subscribe to messages with topic to be delivered on given channel, see \ref{def:receive}}
 {
 }
 { }
 
 \begin{routeParameter} 
 \routeParamItem{topic}{string}
-\routeParamItem{channel}{string}
 \end{routeParameter}
+\begin{queryParameter} 
+\queryParamItem{on}{hex string - channel ID}
+\end{queryParameter} \begin{routeResponse}{application/json}
+\responseItem{201}{Created}{}
+\responseItem{400}{Bad Request}{Topic. or channel not well formed.}
+\end{routeResponse}
+\end{apiRoute}
+
+ 
+\begin{apiRoute}{DELETE}{/pss/subscribe/\param{topic}/(?on=\param{channel})}{Unsubscribe for topic on channel, see \ref{def:receive}}
+{
+}
+{ }
+
+\begin{routeParameter} 
+\routeParamItem{topic}{string}
+\end{routeParameter}
+\begin{queryParameter} 
+\queryParamItem{on}{hex string - channel ID}
+\end{queryParameter} \begin{headerParameter} 
+\headerParamItem{SWARM-TAG}{hex string}
+\headerParamItem{SWARM-STAMP}{hex string}
+\end{headerParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{204}{No content}{Successfully uninstall}
+\responseItem{400}{Bad Request}{Topic. or channel not well formed.}
 \end{routeResponse}
 \end{apiRoute}

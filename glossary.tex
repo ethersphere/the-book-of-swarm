@@ -54,7 +54,7 @@
 \longnewglossaryentry{garbage collection}{name=garbage collection}{The process that selectively purges chunks from a node's local storage.}
 \longnewglossaryentry{garbage collection strategy}{name=garbage collection strategy}{The process that dictates which chunks are chosen for garbage collection.}
 \longnewglossaryentry{direct delivery}{name=direct delivery}{Chunk delivery happens in one step via some lower level network protocol.}
-\longnewglossaryentry{pass-back delivery}{name=pass-back delivery}{A method of chunk delivery where the chunk delivery response simply follows the request route back to the originator.}
+\longnewglossaryentry{backwarding}{name=backwarding}{A method of delivering a response to a forwarded request, where the response simply follows the request route back to the originator.}
 \longnewglossaryentry{routed delivery}{name=routed delivery}{Hypothetical way of implementing chunk delivery using Kademlia routing independently of the initial request.}
 \longnewglossaryentry{opportunistic caching}{name=opportunistic caching}{When a forwarding node receives a chunk, then the chunk is saved in case it will be requested again.}
 \longnewglossaryentry{light node}{name=light node, plural={light nodes}}{Concept of light node refer to a special mode of operation necessitated by poor bandwidth environments, e.g., mobile devices on low throughput networks or devices allowing only transient or low-volume storage. Such nodes do not accept incoming connections.}
@@ -181,7 +181,7 @@ resource updates}{Feeds that represent revisions of the same semantic entity.}
 \longnewglossaryentry{swear}{name=swear}{Incentive scheme where nodes registered on the Swarm network are accountable and stand to lose their deposit if they are found to violate the rules of the Swarm in an on-chain litigation process.}
 % \longnewglossaryentry{swap}{name=swap}{Incentive scheme where nodes are in quasi-permanent long term contact with their registered peers. Along these connections the peers are swapping chunks and receipts triggering swap accounting.}
 \longnewglossaryentry{swap}{name=swap}{swap is a Swarm accounting protocol with a tit-for-tat accounting scheme that scales microtransactions. Includes a network protocol also called Swap.}
-\longnewglossaryentry{chunk-epoch}{name=chunk-epoch}{TBD}
+% \longnewglossaryentry{chunk-epoch}{name=chunk-epoch}{TBD}
 \longnewglossaryentry{collect-and-run attack}{name=collect-and-run attack}{Situation where a party would collect the funds for some promised work, but not actually do the work.}
 \longnewglossaryentry{addressed envelope}{name=addressed envelope}{A construct where the address of the single owner chunk is created before the chunk content is associated with it.}
 \longnewglossaryentry{stamped addressed envelope}{name=stamped     addressed envelope}{Addressed envelope with an attached stamp.}
@@ -272,8 +272,8 @@ used in single owner chunks: the payload is signed against it by the owner and h
 \longnewglossaryentry{FAANG}{name=FAANG}{Facebook, Apple, Amazon, Netflix and Google.}
 
 \longnewglossaryentry{blockchain}{name=blockchain}{An immutable list of blocks, where each next block contains a cryptographic hash of the previous block. }
-%\longnewglossaryentry{zzz}{name=zzz}{TBD}
-%\longnewglossaryentry{zzz}{name=zzz}{TBD}
+\longnewglossaryentry{trustless}{name=trustless}{property of a system of economic interaction where service provision is either realtime verifiable and/or providers are accountable, reward and penalties are automatically enforced, and where -- as a result -- transaction security is no longer contingent upon reputation or trust and is therefore scalable.}
+\longnewglossaryentry{Ethereum Virtual Machine}{name=Ethereum Virtual Machine (EVM)}{A Turing complete byte code interpreter that is responsible to calculate state changes by executing the instructions of smart contracts.}
 %\longnewglossaryentry{zzz}{name=zzz}{TBD}
 %\longnewglossaryentry{zzz}{name=zzz}{TBD}
 %\longnewglossaryentry{zzz}{name=zzz}{TBD}

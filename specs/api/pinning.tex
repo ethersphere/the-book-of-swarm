@@ -1,5 +1,5 @@
 
-\begin{apiRoute}{GET}{/pin/?offset=\{offset\}\&length=\{length\}}{List Pinned Content and metadata}
+\begin{apiRoute}{GET}{/pin/?offset=\param{offset}\&length=\param{length}}{List Pinned Content and metadata}
 {
 }
 { }
@@ -23,23 +23,27 @@
 \queryParamItem{id}{hex string}{}
 \end{queryParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{200}{ok}{pin in response body}
+\responseItem{400}{Bad Request}{ID not well formed}
+\responseItem{404}{Not found}{Pin with ID does not exists.}
 \end{routeResponse}
 \end{apiRoute}
 
 
 
 
-\begin{apiRoute}{POST}{/pin/\param{id}}{Pin an already uploaded content}
+\begin{apiRoute}{PUT}{/pin/\param{id}}{Pin an already uploaded content}
 {
 }
 { }
 
 \begin{routeParameter} 
-\routeParamItem{id}{}
+\routeParamItem{id}{hex string}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
 \responseItem{200}{ok}{}
+\responseItem{400}{Bad Request}{ID not well formed}
+\responseItem{404}{Not found}{Pin with ID does not exists.}
 \end{routeResponse}
 \end{apiRoute}
 
@@ -66,7 +70,7 @@
 
 
 
-\begin{apiRoute}{DELETE}{/pin/\{id\}}{Remove pinning from content}
+\begin{apiRoute}{DELETE}{/pin/\param{id}}{Remove pinning from content}
 {
 }
 { }
@@ -75,7 +79,9 @@
 \routeParamItem{id}{}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{204}{No Content}{}
+\responseItem{400}{Bad Request}{ID not well formed}
+\responseItem{404}{Not found}{Pin with ID does not exists.}
 \end{routeResponse}
 \end{apiRoute}
 
