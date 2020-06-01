@@ -84,3 +84,8 @@ Standard header key names are defined here:
 \begin{enumerate}
 \item tracing-span-context
 \end{enumerate}
+
+
+\subsection{Encapsulation of context for tracing \statusgreen}
+
+P2P Stream scoped tracing span context is exchanged by using stream headers. Header key "tracing-span-context" is reserved for binary encoded tracing span context data. This context should be used in tracing messages. The stream initiator node should provide tracing span context to the responding node. This context is optional and all nodes must function the same as span context is provided by other nodes or not regardless if the node has tracing configured or not.
