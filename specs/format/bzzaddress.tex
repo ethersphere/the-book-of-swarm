@@ -53,11 +53,12 @@ Here the signature is attesting to the association of an overlay and an underlay
 
 \begin{definition}[Signed underlay address of node A]\label{def:signed-underlay}
 \begin{equation}
-\mathit{signedUnderlay}(A) \defeq \mathit{Sign}(\mathit{underlay}|\mathit{bzzNetworkID})         
+\mathit{signedUnderlay}(A) \defeq \mathit{Sign}(\mathit{underlay}|
+\mathit{overlay}|\mathit{bzzNetworkID})         
 \end{equation}
 \end{definition}
 
-of the underlay with bzz network ID appended as plaintext and hashes the resulting public key together with the bzz network ID. 
+of the underlay with overlay and bzz network ID appended as plaintext and hashes the resulting public key together with the bzz network ID. 
 
 \begin{definition}[Node addresses: overlay, underlay,  bzz address]\label{def:bzz-types}
 \begin{lstlisting}[language=buzz1]
