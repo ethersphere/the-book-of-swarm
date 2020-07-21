@@ -930,7 +930,7 @@ In particular blacklists should be consulted when accepting incoming connections
 
 \wip{the lottery is not completely finalised}
 
-In \ref{sec:postage-stamps}, we introduce postage stamps, primarily as a measure against spam protection.  
+In \ref{sec:postage-stamps}, we introduce postage stamps, primarily as a measure for spam protection.  
 Then, in \ref{sec:postage-lottery}, we turn to the \gloss{postage lottery}, explaining how \glossplural{postage stamp} used for spam protection can be modified to create positive incentives for storer nodes to store files and for those uploading them to indicate their importance. In \ref{sec:capacity-pressure} we describe how the pricing mechanism can be used to signal capacity pressure of the network and how the incentives work to rectify this. Finally, \ref{sec:chunk-insurance} shows how the  positive rewards provided by the postage lottery can be complemented by introducing staked insurers who stand to lose their deposit if they lose  the chunks they have insured. We argue that such punitive measures are crucial in mitigating the \gloss{tragedy of commons} problem, which can afflict systems implementing positive storage incentives only. 
 
 \subsection{Spam protection with postage stamps\statusgreen}\label{sec:postage-stamps}
@@ -1405,13 +1405,13 @@ In the first two chapters of the architecture part of the book we introduced the
 
 This chapter is building on the distributed chunk store and introduces data structures and processes enabling higher level functionality to offer a rich experience handling data. In particular we show how chunks can be organised to represent files (\ref{sec:files}), how files can be organised to represent collections (\ref{sec:collections}), introduce key--value maps (\ref{sec:maps}) and then briefly discuss the possibility of arbitrary functional data structures. We then turn to giving our solution to providing confidentiality and access control (\ref{sec:access-control}). 
 
-In \ref{sec:feeds}, we introduce Swarm feeds, which are suitable for representing a wide variety of sequential data, such as versioning updates of a mutable resource or indexing messages for real-time data exchange: offering a system of persisted pull messaging. To implement push-notifications of all kinds, \ref{sec:pss} introduces the novel concept of \glossplural{Trojan chunk} that allow messages to be disguised as chunks be directed to their desired recipient in the swarm. We explain how trojan chunks and feeds can be used together to form a fully fledged communication system with very strong privacy features.                                                       
+In \ref{sec:feeds}, we introduce Swarm feeds, which are suitable for representing a wide variety of sequential data, such as versioning updates of a mutable resource or indexing messages for real-time data exchange: offering a system of persisted pull messaging. To implement push-notifications of all kinds, \ref{sec:pss} introduces the novel concept of \glossplural{Trojan chunk} that allows messages to be disguised as chunks be directed to their desired recipient in the swarm. We explain how trojan chunks and feeds can be used together to form a fully fledged communication system with very strong privacy features.                                                       
 
 \section{Data structures\statusgreen}\label{sec:datastructures}
 
 \green{}
 
-In the first two chapters, we assumed that data is in the form of chunks, fixed size data blobs. We now present the algorithms and structures which make it possible to represent data of arbitrary length. We then introduce \glossplural{Swarm manifest} which form the basis of representing collections, indexes, and routing tables allowing Swarm to host websites and offer URL-based addressing.
+In the first two chapters, we assumed that data is in the form of chunks, i.e. fixed size data blobs. We now present the algorithms and structures which make it possible to represent data of arbitrary length. We then introduce \glossplural{Swarm manifest} which form the basis of representing collections, indexes, and routing tables allowing Swarm to host websites and offer URL-based addressing.
 
 \subsection{Files and the Swarm hash\statusgreen}\label{sec:files}
 
@@ -1573,10 +1573,10 @@ The only difference between accessing private and public data is the presence of
 
 %, a constant or linear factor.
 
-The storage API's raw GET endpoint allows both encrypted and unencrypted chunk references. 
-Decryption is triggered if the chunk reference is double size; consisting of the address of the encrypted chunk and a decryption key. Using the address, the encrypted chunk is retrieved, stored and decrypted using the supplied decryption key. The APi responds with the resulting plaintext.
+The storage API's raw \lstinline{GET} endpoint allows both encrypted and unencrypted chunk references. 
+Decryption is triggered if the chunk reference is double size; consisting of the address of the encrypted chunk and a decryption key. Using the address, the encrypted chunk is retrieved, stored and decrypted using the supplied decryption key. The API responds with the resulting plaintext.
 
-The chunk store API's \lstinline{POST} endpoint expects users to indicate if they want to have encryption on the upload or not. In both cases the chunk will be stored and push-synced to the network, but if encryption is desired, the encrypted chunk needs to be created first. If no further context is given, a random encryption key is generated which is used as a seed to generate random padding to fill the chunk up to a complete 4096 bytes if needed, and finally this plaintext is encrypted with the key. In the case of encryption, the API \lstinline{POST} call returns the Swarm reference consisting of the Swarm hash as chunk address and the encryption key. 
+The storage API's \lstinline{POST} endpoint expects users to indicate if they want to have encryption on the upload or not. In both cases the chunk will be stored and push-synced to the network, but if encryption is desired, the encrypted chunk needs to be created first. If no further context is given, a random encryption key is generated which is used as a seed to generate random padding to fill the chunk up to a complete 4096 bytes if needed, and finally this plaintext is encrypted with the key. In the case of encryption, the API \lstinline{POST} call returns the Swarm reference consisting of the Swarm hash as chunk address and the encryption key. 
 
 In order to guarantee the uniqueness of encryption keys as well as to ease the load on the OS's entropy pool, it is recommended (but not required) to generate the key as the \gloss{MAC} of the plaintext using a (semi-) permanent random key stored in memory. 
 This key can be permanent and generated using \lstinline{scrypt} \cite{percival2009stronger}
@@ -1606,7 +1606,7 @@ The access key can be obtained from a variety of sources, three of which we will
 First, a \gloss{session key} is derived from the provided credentials. In the case of granting access to a single party, the session key is used directly as the access key, see figure \ref{fig:access-control-single-party}. In the case of multiple parties, an additional mechanism is used for turning the session key into the access key.
 
 \subsubsection{Passphrase}
-The simplest credential is a \emph{passhrase}. The session key is derived from a passphrase using \lstinline{scrypt} with parameters that are specified within the root access meta-information. The output of scrypt is a 32-byte key that may be directly used for Swarm encryption and decryption algorithms.
+The simplest credential is a \emph{passphrase}. The session key is derived from a passphrase using \lstinline{scrypt} with parameters that are specified within the root access meta-information. The output of scrypt is a 32-byte key that may be directly used for Swarm encryption and decryption algorithms.
 
 In typical use cases, the passphrase is distributed by an off-band means with adequate security measures, or exchanged in person. Any user knowing the passphrase from which the key was derived will be able to access the content.
 
@@ -1961,7 +1961,7 @@ Knowing the public key of the recipient, the sender wraps the message in a troja
 
 \subsubsection{Receiving Trojan messages}
 
-The recipient only knows that a chunk is a pss message if and when they try succesfully to open the Trojan message with the private key corresponding to the public key that they advertise as their resident key (see \ref{sec:pss-key-exchange}). Nodes that want to receive such Trojan Messages will keep trying to open all messages that they are closest to. Forwarding nodes (or anyone else apart from sender and recipient) have no way to distinguish between a random encrypted chunk and a trojan message, which means that communication is perfectly obfuscated as generic chunk traffic.
+The recipient only knows that a chunk is a pss message if and when they successfully opened the Trojan message with the private key corresponding to the public key that they advertise as their resident key (see \ref{sec:pss-key-exchange}) and do an integrity check/topic matching. Nodes that want to receive such Trojan Messages will keep trying to open all messages that they are closest to. Forwarding nodes (or anyone else apart from sender and recipient) have no way to distinguish between a random encrypted chunk and a trojan message, which means that communication is perfectly obfuscated as generic chunk traffic.
 
 After the recipient has opened the envelope using asymmetric decryption, there is a combined step of integrity check and topic matching. Knowing the length of the payload (from the first 2 bytes of the message), the recipient takes the payload slice and calculates the Keccak256 hash of it. Now for each topic the client has a subscription to, it then hashes the payload hash together with the topic. If the resulting segment xor-ed with the topic matches the obfuscated topic id in the message then the message is indeed meant as a message with the said topic and the registered handler is called with the payload as argument.
 
