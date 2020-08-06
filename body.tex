@@ -9,7 +9,7 @@ The Swarm project is set out to build permissionless storage and communication i
   \caption[Swarm's layered design \statusgreen]{Swarm's layered design}
 \label{fig:Swarm-layered-design}
 \end{figure}
-dx
+
 This part details the design and architecture of the system. In accordance with the principles laid out in \ref{sec:design-principles}, we put an emphasis on modular design, and conceive of Swarm as having clearly separable layers, each dependent on the previous one (see figure \ref{fig:Swarm-layered-design}):
 
 \begin{itemize}
@@ -930,18 +930,18 @@ In particular blacklists should be consulted when accepting incoming connections
 
 \wip{the lottery is not completely finalised}
 
-In \ref{sec:postage-stamps}, we introduce postage stamps, primarily as a measure for spam protection.  
-Then, in \ref{sec:postage-lottery}, we turn to the \gloss{postage lottery}, explaining how \glossplural{postage stamp} used for spam protection can be modified to create positive incentives for storer nodes to store files and for those uploading them to indicate their importance. In \ref{sec:capacity-pressure} we describe how the pricing mechanism can be used to signal capacity pressure of the network and how the incentives work to rectify this. Finally, \ref{sec:chunk-insurance} shows how the  positive rewards provided by the postage lottery can be complemented by introducing staked insurers who stand to lose their deposit if they lose  the chunks they have insured. We argue that such punitive measures are crucial in mitigating the \gloss{tragedy of commons} problem, which can afflict systems implementing positive storage incentives only. 
+In \ref{sec:postage-stamps}, we introduce \glossplural{postage stamp}, primarily as a measure for spam protection.  
+Then, in \ref{sec:postage-lottery}, we turn to the \gloss{postage lottery}, explaining how postage stamps used for spam protection can be modified to create positive incentives for storer nodes to store files and for those uploading them to indicate their importance. In \ref{sec:capacity-pressure} we describe how the pricing mechanism can be used to signal capacity pressure of the network and how the incentives work to rectify this. Finally, \ref{sec:chunk-insurance} shows how the  positive rewards provided by the postage lottery can be complemented by introducing staked insurers who stand to lose their deposit if they lose  the chunks they have insured. We argue that such punitive measures are crucial in mitigating the \gloss{tragedy of commons} problem, which can afflict systems implementing positive storage incentives only. 
 
 \subsection{Spam protection with postage stamps\statusgreen}\label{sec:postage-stamps}
 \green{}
 
-Syncing involves transferring chunks from the uploader to storers, i.e. from where they enter the network, to the neighbourhood where the chunk falls within the nodes' areas of responsibility. A storer node's role is to aspire to serve content as a response to retrieve requests. All else being equal, given Kademlia routing, the closer a node is to the chunk address, the more likely it is that a request for that chunk will end up with them. This creates a weak incentive for storer nodes to sync content. However, it presupposes that the chunk has the promise of some profit. This assumption is not warranted if an adversary can spam the network with chunks (maybe randomly generated) that are never requested. From the network's point of view, this means that useless chunks would simply replace useful ones. By attaching a cost to uploading a chunk, Swarm can mitigate such an attack.
+Syncing involves transferring chunks from the uploader to storers, i.e. from where they enter the network, to the neighbourhood where the chunk falls within the nodes' areas of responsibility. A storer node's role is to serve content by responding to retrieve requests with chunk data. All else being equal, given Kademlia routing, the closer a node is to the chunk address, the more likely it is that a request for that chunk will end up with them. This creates a weak incentive for storer nodes to sync content. However, it presupposes that the chunk has the promise of some profit. This assumption is not warranted if an adversary can spam the network with chunks (maybe randomly generated) that are never requested. From the network's point of view, this means that useless chunks would simply replace useful ones. By attaching a cost to uploading a chunk, Swarm can mitigate such an attack.
 
 
 \subsubsection{Postage stamps}
 
-Taking inspiration from international mail delivery, the entire delivery path (as well as storage) can be pre-paid. The proof of this payment called a \gloss{postage stamp}, and must be attached to the payload by the sender.
+Taking inspiration from international mail delivery, the entire delivery path (as well as storage) can be pre-paid. The proof of this payment is called a \gloss{postage stamp}, and must be attached to the payload by the sender.
 
 This cost need not necessarily be borne by the uploader, but they are the ones that will need to make sure a postage stamp is attached to each chunk, otherwise the upload will not succeed. Conversely, this down-payment need not necessarily be paid out as revenue to anyone in particular, i.e. it could be burnt or otherwise redistributed. The actual cost of uploading a chunk can serve as a signal of its relative importance (somewhat analogously to priority mail), that storer nodes can then use to rank chunks when selecting which ones to retain and serve, and which ones to garbage collect (see \ref{spec:strategy:garbage-collection}) in the event of capacity shortage.
 
@@ -959,7 +959,7 @@ A postage stamp is modelled as a proof of payment associated with a chunk using 
 
 The proof of payment can lend itself to a number of different implementations. The most obvious choice is to make payments to a central postage stamp issuer smart contract on the blockchain.%
 %
-\footnote{Using a cheque seems like one option, however, since cheques are signed against cumulative debt and therefore assume the single beneficiary is able to reconstruct the added value over the previously sent cheque. In other words, cheques are not an appropriate means to communicate value to non-peers.}
+\footnote{Using a cheque seems like one option, however, since cheques are signed against cumulative debt and assume the single beneficiary is able to reconstruct the added value over the previously sent cheque. In other words, cheques are not an appropriate means to communicate value to non-peers.}
 %
 However, because of the high transaction cost, requiring an on-chain payment for each chunk would be prohibitively expensive. Instead, we need a solution that allows the uploader to purchase the postage stamps in a \gloss{postage batch} and then re-use it over many chunks. 
 
@@ -982,8 +982,12 @@ This postage payment then results in the following information being recorded:
 \item \emph{batch depth} -- Logarithm of the number of chunks that can be stamped with each batch created.
 \end{itemize}
 
-The payment transaction will create multiple batches the number of which is specified in the transaction. The batch depth is fixed at any moment in time by the contract itself, as is explained below. Since this can change over time and would then influence how many stamps the owner can issue, it is also specified in the transaction. If there is a mismatch between these two values the transaction will be rejected by the contract.
-The owner is the address that is specified in the transaction data and recorded as the party authorised to use the batches created to stamp chunks; if not specified, it is assumed to be the transaction sender by default. A random identifier is generated to provide a reference to the payment. The number of batches created and the batch depth used gets recorded against this payment ID. The number of chunks covered by this payment can then be calculated as the multiple of the batch depth and number of payments. The amount of honey sent with the transaction is then allocated equally to all chunks covered by the payment, i.e. the total amount of tokens, divided by the number of chunks covered is assigned to the payment ID to represent the per-chunk balance of the batches. Anyone can then choose to top up this balance at a later date. 
+
+The owner is the address that is specified in the transaction data and recorded as the party authorised to use the batches created to stamp chunks; if not specified, it is assumed to be the transaction sender by default. 
+
+A random identifier is generated to provide a reference to the payment. 
+The payment transaction will create multiple batches the number of which is specified in the transaction. The batch depth is eventually recorded for each batch separately. New batches can be created for each payment.
+The number of chunks covered by this payment can then be calculated as the sum of the batch sizes. The initial batch depth is meant to apply to all batches created by  the payment transaction. The amount of honey sent with the transaction is then allocated equally to all chunks covered by the payment, i.e. the total amount of tokens, divided by the number of chunks covered is assigned to the payment ID to represent the per-chunk balance of the batches. Anyone can then choose to top up this balance at a later date. 
 
 
 \begin{figure}[htbp]
@@ -1012,7 +1016,7 @@ A postage stamp's validity can be checked by ensuring the following criteria are
 \begin{itemize}
 \item \emph{authentic} -- The batch identifier is valid, i.e. the payment ID exists and is registered, and the batch index is less than the number of batches associated with the payment ID.
 \item \emph{authorised} -- The witness is signed by the address specified as the owner of the batch.
-\item \emph{funded} -- The referenced batch has not yet exhausted its balance. 
+\item \emph{funded} -- The referenced batch has not yet exhausted its balance and is sufficiently funded to cover at least a single storage epoch for the latest  price.
 \end{itemize}
 
 All this can be easily checked by the smart contract itself. Validating that less than the total amount of chunks that are allowed to be stamped by a batch are contained within it is crucial. Without further measures, there could be a possibility for an overspend attack in which the uploader reuses the stamp over more chunks than the batch size would warrant and thereby trick the unsuspecting storers into underpaid extra work. 
@@ -1021,7 +1025,12 @@ Protection against such \emph{overissuance} is not trivial: In the absence of gl
 
 \subsubsection{Limiting batch size by constraining prefix collisions}
 
-A solution is to impose an explicit \gloss{uniformity requirement} on the batches: a constraint that chunks signed with the same batch identifier have no \gloss{prefix collision} longer than the depth. A postage stamp with a batch size of $2^d$ can be thought of as a balanced binary tree of depth $d$, where the leaves correspond to maximum length \glossplural{collision slot} of the batch. If the depth of a batch is greater than the depth of the network (log of the number of nodes in the network), then all chunks matching the same collision slot are guaranteed to land in the same neighbourhoods, and, as a result, "violations" of the uniformity requirement can be locally detected by nodes (see figure \ref{fig:prefix-collision}). If storers respond to this violation by randomly keeping only one of the chunks for each collision slot, uploaders will not only lose one chunk if they try to store more then their allowed allocation, but also lose the  predictability of which one on top.
+A solution is to impose an explicit \gloss{uniformity requirement} on the batches: a constraint that chunks signed with the same batch identifier have no \gloss{prefix collision} longer than the depth. A postage stamp with a batch size of $2^d$ can be thought of as a balanced binary tree of depth $d$, where the leaves correspond to maximum length \glossplural{collision slot} of the batch. If the depth of a batch is greater than the depth of the network (log of the number of nodes in the network), then all chunks matching the same collision slot are guaranteed to land in the same neighbourhoods, and, as a result, "violations" of the uniformity requirement can be locally detected by nodes (see figure \ref{fig:prefix-collision}). 
+% If storers respond to this violation by randomly keeping only one of the chunks for each collision slot, uploaders will not only lose one chunk if they try to store more then their allowed allocation, but also lose the  predictability of which one on top.
+Storer nodes then are expected to  correct the depth recorded with a batch.
+They can do the correction by reporting two postage stamps issued by the owner against a batch that are closer than the currently recorded depth for the batch.
+The incentive to do this comes from the possibility for a storer to obtain the extra storage cost above the one already paid out.
+
 
 \begin{figure}[htbp]
   \centering
@@ -1039,7 +1048,8 @@ This will be significant for the later discussion of decentralised file insuranc
 Another advantage of limiting batch size based on prefix collisions is that with prefix collisions, the absolute value of a postage stamp can be estimated. This comes in handy later when designing the postage lottery (see: \ref{sec:postage-lottery}). 
 
 
-In order for these collisions to be detectable, the batch size needs to be higher than the estimated neighbourhood depth over the whole lifetime of the batch. In any case, it is not in the interest of users to have batches much deeper than that, since the longer the collision prefixes, the more difficult it becomes to achieve uniformity and fill the entire batch. We will, for now, just assume that the depth of a batch is a fixed number set centrally in the contract and that follows the depth of Swarm. The effect of network growth on the already used stamps is discussed below.
+In order for these collisions to be detectable, the batch size needs to be higher than the estimated neighbourhood depth over the whole lifetime of the batch. In any case, it is not in the interest of users to have batches much deeper than that, since the longer the collision prefixes, the more difficult it becomes to achieve uniformity and fill the entire batch  (see \ref{sec:complexity-filling} of the appendix). 
+% We will, for now, just assume that the depth of a batch is a fixed number set centrally in the contract and that follows the depth of Swarm. The effect of network growth on the already used stamps is discussed below.
 
 
 \subsubsection{Mining chunks using encryption}
@@ -1048,14 +1058,14 @@ One neat solution to completely fill up \glossplural{postage batch} relies on th
 
 The process of finding an encryption key to generate a content hash close to an address is analogous to mining blocks in a blockchain. Encryption of chunks requires a 32-byte key, which plays the role of the nonce in a block, that is: It provides enough entropy to guarantee that one is able to find an encryption key such that the hash digest of the resulting encrypted chunk produce an address which falls into a particular slot within an open postage batch. The difficulty of mining is determined by the batch depth. 
 
-Consider the thrifty uploader that only has as many postage collision slots as chunks. Given a postage batch with depth $d$, they encrypt the chunk with a key chosen such that the resulting encrypted chunk's address fills a free collision slot of an open postage batch. As shown in the anlaysis found in appendix  (\ref{sec:complexity-filling}), this strategy of filling a batch requires an average of $0.69d+1$ trials per chunk, i.e. 8, 15, 22 for a thousand, million and billion nodes respectively. This is found to be of a reasonable complexity.
+Consider the thrifty uploader that only has as many postage collision slots as chunks to send. Given a postage batch with depth $d$, they encrypt the chunk with a key chosen such that the resulting encrypted chunk's address fills a free collision slot of an open postage batch. As shown in the analysis found in appendix  (\ref{sec:complexity-filling}), this strategy of filling a batch requires an average of $0.69d+1$ trials per chunk, i.e. 8, 15, 22 for a thousand, million and billion nodes respectively. This is found to be of a reasonable complexity.
 
 
 \subsection{Postage lottery: positive incentives for storage \statusyellow}\label{sec:postage-lottery}
 
 \yellow{}
 
-As discussed in \ref{sec:accounting}, the primary incentive mechanism in Swarm is providing compensation for retrieval, where nodes are rewarded for successfully having served a chunk. This reward mechanism has the added benefit of encouraging opportunistic caching. Profit-maximising storage nodes serve chunks that they are often requested and as a result, ensure that popular content becomes widely distributed across the network and so, the retrieval latency is decreased.
+As discussed in \ref{sec:accounting}, the primary incentive mechanism in Swarm is providing compensation for retrieval, where nodes are rewarded for successfully having served a chunk. This reward mechanism has the added benefit of encouraging opportunistic caching. Profit-maximising storage nodes serve chunks that are often requested from them and as a result, ensure that popular content becomes widely distributed across the network and thus also the retrieval latency is decreased.
 
 The flipside of using only this incentive, is that chunks that are rarely retrieved may end up being lost: If a chunk is not being accessed for a long time, then as a result of limited storage capacity, it will eventually end up garbage collected to make room for new arrivals. In order for the swarm to guarantee long-term availability of data, the incentive system needs to make sure that additional revenue is generated for chunks that would otherwise be deleted. In other words, unpopular chunks that do not generate sufficient profit from retrievals should compensate the nodes that store them for their opportunities forgone. The \gloss{postage lottery} presented in this section provides such a compensation through redistributing the revenue coming from postage stamps among the storer nodes in a fair way.
 
@@ -1094,7 +1104,7 @@ The RACE process is initialised with the raffle phase. First, the hash of the st
 Once these winning tickets have been produced, nodes whose addresses are in the close proximity of the ticket $r_i$ are then able to apply to participate in the applicable raffle.
 
 
-From the network perspective, these raffles serve as spot checks on storer nodes, whereas for the storer nodes, raffles represent the means of securing compensation for providing network storage within the swarm. 
+From the network perspective, these raffles serve as spot checks on storer nodes, whereas from the storer nodes' perspective, raffles represent the means of securing compensation for providing network storage within the swarm. 
 
 
 \begin{figure}[htbp]
@@ -1107,7 +1117,7 @@ From the network perspective, these raffles serve as spot checks on storer nodes
 
 \subsubsection{Apply: precommit to raffle challenge}
 
-In the first interactive phase, in order to apply for the prize, all nodes in the proximity of the winning ticket must send a transaction to the lottery contract including a price offer for storing a chunk per block. By submitting such a price, a node implicitly declares that it has in its possession all chunks of all batches with value higher than the price within their radius of responsibility. This radius of responsibility is self-claimed by the nodes and is part of the pre-committal.
+In the first interactive phase, in order to apply for the prize, all nodes in the proximity of the winning ticket must send a transaction to the lottery contract including a price offer for storing a chunk per block. By submitting such a price, a node implicitly declares that it has in its possession all chunks of all batches with value higher than the price within their radius of responsibility. This radius of responsibility is self-claimed by the nodes and is part of the pre-committal. 
 
 % \begin{figure}[htbp]
 %   \centering
@@ -1118,14 +1128,14 @@ In the first interactive phase, in order to apply for the prize, all nodes in th
 
 \subsubsection{Claim: submit proofs to win}
 
-After this application deadline has passed, the raffle enters into the claim phase by designating a \gloss{witness batch} for each applicant. This witness batch serves as a spot check for the applicant's claim that they store all the chunks that they are responsible for. Analogous to the winning tickets, the witness batch is selected based on randomness provided by the \gloss{blockhash} of the block that closes the application round $h_1$. First create an anchor by hashing together the blockhash $h_1$ and the applicant's address, and then  choose the batch which has the id closest to the anchor and has a value above the price submitted in the application. This batch serves as the random witness batch against which applicants will submit evidence that they are still in custody of all their allocated chunks. 
+After this application deadline has passed, the raffle enters into the claim phase by designating a \gloss{witness batch} for each applicant. This witness batch serves as a spot check for the applicant's claim that they store all the chunks that they are responsible for. Analogous to the winning tickets, the witness batch is selected based on randomness provided by the \gloss{blockhash} of the block that closes the application round $h_1$.  The spot check is implemented  by the following procedure. First create an anchor by hashing together the blockhash $h_1$ and the applicant's address, and then choose the batch which has the id closest to the anchor and has a value above the price submitted in the application. This batch serves as the random witness batch against which applicants will submit evidence that they are still in custody of all their allocated chunks. 
 
-As we have discussed previously, stamps attached to a chunk endow that chunk with their value, as defined by the per-chunk balance of the batch. Pursuing a \gloss{value-consistent garbage collection strategy} (see \ref{spec:strategy:garbage-collection}) implies that the minimum postage stamp value accepted on a chunk will coincide with the storer node's garbage collection cutoff value. Nodes that follow this strategy faithfully, know that they have never deleted a chunk whose postage value was above their minimum required postage value. In this way, they can be confident that they are able to include all relevant chunks above that value, no matter which batch is selected to be the witness.
+As we have discussed previously, stamps attached to a chunk endow that chunk with a value, as defined by the per-chunk balance of the batch. Pursuing a \gloss{value-consistent garbage collection strategy} (see \ref{spec:strategy:garbage-collection}) implies that the minimum postage stamp value accepted on a chunk will coincide with the storer node's garbage collection cutoff value. Nodes that follow this strategy faithfully, know that they have never deleted a chunk whose postage value was above their minimum required postage value. In this way, they can be confident that they are able to include all relevant chunks above that value, no matter which batch is selected to be the witness.
 
-The claim phase is separated from the application phase exactly in order to force applicants to pre-commit to any spot check, since: if the witness was known at the time of application, frivolous nodes could simply claim the prize even if they just serendipitously stored only the chunks of the witness batch.
+The claim phase is separated from the application phase exactly in order to force applicants to pre-commit to any spot check, since: if the witness was known at the time of application, frivolous nodes could simply claim the prize even if they just serendipitously stored only the chunks of the witness batch.  In  order to discourage such     opportunistic   behaviour, participation in the raffle requires a deposit sent  with the precommittal. This amount is added to the reward pool if the node fails to survive the remaining phases of  the raffle round, otherwise given back to the applicant.
 
-To claim the raffle prize, a node must show that they have every witness chunk, i.e. every chunk stamped with the witness batch that falls within their radius of responsibility and that they have issued receipts for. In order to prove possession of chunk data, nodes must submit a \gloss{batch proof of custody}, a canonically ordered list of \glossplural{BMT proof} (see \ref{spec:format:bmt}), one for each witness chunk (see figure 
-\ref{fig:batch-proof-of-custody}). Applicants have $N_2$ blocks to submit their claim, after which the raffle enters the challenge phase. Applicants that applied but failed to submit a claim are treated as if they have  submitted an invalid claim or did not apply.
+To claim the raffle prize, a node must show that they have every witness chunk, i.e. every chunk stamped with the witness batch that falls within their radius of responsibility. In order to prove possession of chunk data, nodes must submit a \gloss{batch proof of custody}, a canonically ordered list of \glossplural{BMT proof} (see \ref{spec:format:bmt}), one for each witness chunk (see figure 
+\ref{fig:batch-proof-of-custody}). Applicants have $N_2$ blocks to submit their claim, after which the raffle enters the challenge phase. Applicants that applied but failed to submit a claim are treated as if they had submitted an invalid claim.   
 
 
 \begin{figure}[htbp]
@@ -1137,44 +1147,61 @@ To claim the raffle prize, a node must show that they have every witness chunk, 
 
 \subsubsection{Earn: challenging the applicants}
 
-If the set of chunks presented to the blockchain is incomplete (i.e. it doesn't contain all chunks for which a statement of custody receipt was issued), the applicants can be challenged on the blockchain. The challenge contains a statement of custody receipt that was signed previously by the applicant (see \ref{sec:push-syncing} and \ref{sec:push-sync-incentives}). This receipt can then be submitted by any third party and is validated right away by the smart contract. If the challenge is valid, the applicant loses their registration immediately and more punitive measures may be enacted by his peers. Challengers have till the end of the raffle round to challenge applicants.
+% If the set of chunks presented to the blockchain is incomplete (i.e. it doesn't contain all chunks for which a statement of custody receipt was issued), the applicants can be challenged on the blockchain. The challenge contains a statement of custody receipt that was signed previously by the applicant (see \ref{sec:push-syncing} and \ref{sec:push-sync-incentives}). This receipt can then be submitted by any third party and is validated right away by the smart contract. If the challenge is valid, the applicant loses their registration immediately and more punitive measures may be enacted by his peers. Challengers have till the end of the raffle round to challenge applicants.
 
 \subsubsection{Choosing the winner}
 
-After the challenge phase ended ($N$ blocks after the beginning of the raffle round), from amongst the applicants that have survived the challenge period, for each raffle, the ones that offered the lowest prices will win the round. 
+After the challenge phase ended ($N$ blocks after the beginning of the raffle round), from amongst the applicants that have survived the challenge period, for each raffle, the ones that offered the lowest prices will win the round. The  price itself is the lowest price that any of the neighbourhood's winners applied with.
 
-The lottery prize payout needs to take into account the number of winners, blocks and chunks.
-The period that the payout is for is equally distributed among winners. For ease of reasoning, it is possible to calibrate blocks = winners. The winner is entitled to collect the price for each chunk whose price is not lower than the minimum required by the winner. The sum of all winners' prices is subtracted from the remaining balance of each batch. The postage batches whose balance is dried out after the payout are removed from the contract.
+The lottery prize payout needs to take into account the number of winners, the number of chunks, the proportion of a nodes' storage with respect to the total volume stored in Swarm.
+The period that the payout is for is equally distributed among winners. For ease of reasoning, it is possible to calibrate blocks = winners, so that we can say a node when it wins gets paid for all chunks for a block. The winner is entitled to collect the price for each chunk whose price is not lower than the minimum required by the winner. The sum of all winners' proceeds is subtracted from the remaining balance of each batch. The postage batches whose balance is dried out after the payout are removed from the contract.%
+%
+\footnote{In practice, such a balance adjusment is unnecessary, see \ref{spec:format:postage-stamps}).
+}
 
 While winning nodes could try to benefit from a higher price for a bigger win, they are competing with each other to try to win the raffle, so they are incentivised to secure their win by offering the actual cutoff value they used for garbage collection. As a result of competitive payouts, it is expected that the unit prices will converge on the marginal cost of storing one more chunk.
 
-\subsubsection{Changing batch depth}
 
-So far we just assumed that the batch depth was given by the contract for ease of reasoning. The requirements of batch depth are that it is deeper than the neighbourhood depth so that prefix collisions are always caught by storer nodes, yet not too much deeper so that it would make batches too difficult to fill completely (see \ref{sec:complexity-filling}). If the collision slots of the batch have been completely filled, then the number of chunks per batch for a winner to demonstrate ownership of is expected to be on average $2^{d-b}$ where $b$ is the depth of the current batch and $d$ is the node's radius of responsibility (neighbourhood depth). Conversely, based on the actual number of chunks per batch, $C$ presented to the contract by winners, we can make an estimate of the current neighbourhood depth in Swarm as $d'\defeq\mathit{log}_2(C)+b$. This gives the chance for the lottery smart contract to reset $b$ after each raffle so that the postage batch depth always follows the neighbourhood depth, then no matter how Swarm is growing, the batch depth will have the required properties. 
 
-Let us now investigate what happens to the value of an already existing batch if the official batch depth changes. If the batch depth increases, then a batch bought earlier when the depth was smaller will simply behave as if it was a new batch not completely filled. This makes the reasoning about them relatively easy: with batch depth increased, the value of the postage decreases and the owner can act accordingly.
 
-Practically old completely filled postage batches should either be retained or the content they cover should be re-insured. In the former case, a node would want to retain the batch in case the network batch depth grows and one is able to add chunks to it legitimately. 
+\subsubsection{Batch depth and volume adjusted payouts}
+
+So far, for ease of reasoning, we assumed that the depth of each batch was given.  The requirements of batch depth are that it is deeper than the neighbourhood depth so that prefix collisions are always caught by storer nodes, yet not too much deeper so that it would make batches too difficult to fill completely (see \ref{sec:complexity-filling}). If a batch of depth $b$ has been filled completely, then a storer node with radius of responsibility $d$ is expected to store  $2^{b-d}$ chunks belonging to this batch.
+Half of these with proximity of order $d$ to the winner's address. 
+
+In order to incentivise $r$ redundant replicas of chunks, each stored at one of  the  nodes in a neighbourhood, winners are expected to store the same chunks. 
+Moreover, partial storage of a batch's chunks should be discouraged. 
+Both are  taken care of if nodes are incentivised to present the most chunks they possibly can for a batch.
+This incentive translates to partial  storage of local chunks of a match leads to lower winnings. This is achieved if each batch detected depth as well as actual size are both reported as part of the precommit. Falsely committing to more chunks than stored by the node for a batch runs the risk of an unrefutable challenge on the batch (if designated as a witness) resulting in losing the price one-time raffle ticket on top of not earning  the raffle prizepool. All this aligns uploaders   and storers on attempting to use completely filled batc hes (the collision slots constituting a balanced binary tree of depth $b$.)
+Since the actual sizes constitute an estimation of actual chunk volume is swarm. 
+
+The best arrangement of storer is if the 
+In particular we propose that a volume-adjustment scheme is used  when applicants 
+
+This is implicit in the require
+Conversely, based on the actual number of chunks per batch presented to the contract by winners, $C$ we can make an estimate of the current neighbourhood depth in Swarm as $d'\defeq b - \mathit{log}_2(C)$. This gives the chance for the lottery smart contract to serve as a depth oracle. The oracle value can also be used as the minimum depth for any postage batch in the raffle calculations. Note that if self-claimed depth of a batch can be lower than the typical neighbourhood depth, then nodes are expected to have at  most one chunk of a batch in their storage and therefore unable to report overissued batches. Therefore active batches has the minimum size of $2^{d+1}$.
+
+
+Practically old completely filled postage batches can either be retained or the content they cover can be re-insured. In the former case, a node would want to retain the batch in case the network wide neighbourhood depth grows and exceeds the original depth of the batch, in which case the owner is able to add chunks to it legitimately. 
 In order to add new chunks to a batch without collisions, one must remember the chunks they have already associated with the batch.%
 %
-\footnote{It is sufficient to just remember which collision slots were filled up to a depth that could possibly be reached by the growing network. In practice, collision slots are recorded using a bit vector of length  $2^b$}
+\footnote{In fact is actually sufficient to just remember which collision slots were filled up to a depth that could possibly be reached by the growing network. In practice, as an optimisation, potential collision slots for depth  $b' >b$ can be recorded using a bit vector of length $2^{b'-1}$}
 %
-If the batch was filled completely at the time of upload and the batch is not retained, when batch depth increases, the owner can cash out from the batch, let its balance be drained and then re-upload the associated content with a new postage stamp. The strategy of re-batching chunks would also be useful in cases where the network batch decreases, if these ever occur, such as when the network is reaching homeostasis.
 
 Note that owners can choose to pay an amount for postage that, even if the swarm grows a thousand fold, the balance would run dry only after a desired period. This becomes important in the context of \gloss{upload and disappear}.
+Such deep batches require the same $O(\mathit{log}(n))$ computational overhead (see \ref{sec:complexity-filling}). This essentially means a discount   requiring  bulk purchase/use.
 
 
 
 
 
+% \subsubsection{Statement of custody receipts}
 
-\subsubsection{Statement of custody receipts}
+% Statement of custody receipts are crucial in the lottery, as they enable nodes to challenge. The challenge constitutes of submitting a receipt signed by the applicant. It is either a chunk closest to the applicant or to one of its neighbours. If the challenge is valid, the applicant loses their registered status. 
 
-Statement of custody receipts are crucial in the lottery, as they enable nodes to challenge. The challenge constitutes of submitting a receipt signed by the applicant. It is either a chunk closest to the applicant or to one of its neighbours. If the challenge is valid, the applicant loses their registered status. 
+% In order for syncing neighbours to be able to challenge, nodes need to attach a statement of custody receipt to all the chunks that they are closest to or that their neighbour peer is closest to. The peers can be sanctioned with disconnection and blacklisting in case of non-compliance. 
 
-In order for syncing neighbours to be able to challenge, nodes need to attach a statement of custody receipt to all the chunks that they are closest to or that their neighbour peer is closest to. The peers can be sanctioned with disconnection and blacklisting in case of non-compliance. 
-
-As part of syncing, an aspiring storer node must sign statements of custody receipts for all the chunks that it is closest to. If the upstream peer did not require these, then they could not defend their territory as it were, i.e. they would have no grounds to challenge the new node when they apply for winning a raffle round after registering. Note that they do not need to keep all of the chunks, since one is enough to mount a challenge. Additionally, the upstream node is not incentivised to withhold chunks that belong to the new node as they cannot earn any lottery winnings from them once the new node enters the race. 
+% As part of syncing, an aspiring storer node must sign statements of custody receipts for all the chunks that it is closest to. If the upstream peer did not require these, then they could not defend their territory as it were, i.e. they would have no grounds to challenge the new node when they apply for winning a raffle round after registering. Note that they do not need to keep all of the chunks, since one is enough to mount a challenge. Additionally, the upstream node is not incentivised to withhold chunks that belong to the new node as they cannot earn any lottery winnings from them once the new node enters the race. 
 
 \subsubsection{Incentives implicit in the lottery}
 
@@ -1182,16 +1209,17 @@ This procedure incentivises nodes to adhere to the following behaviors:
 
 \begin{itemize}
 \item \emph{stay online} -- Otherwise the raffle is missed.
-\item \emph{have a redundantly synced area of responsibility} -- Remain fully synced with their neighbourhood. Otherwise the claim may be incomplete.
-\item \emph{have a fully indexed local store} -- To be able to list all chunks of a batch, nodes need to preserve postage stamps and keep an associated set of chunk addresses. In order to challenge frivolous registrants, nodes must keep receipts by neighbours.
+\item \emph{have a redundantly synced area of responsibility} -- Remain fully synced with their neighbourhood. Otherwise the claim may be incomplete and the volume-adjustment leaves the node with less.
+\item \emph{have a fully indexed local store} -- To be able to list all chunks of a batch, nodes need to preserve postage stamps and keep an associated set of chunk addresses. 
 \item \emph{perform value consistent garbage collection} -- In order to tell if the node locally stores all previously receipted chunks of a batch they must perform garbage collection value-consistently,%
 %
 \footnote{or store indexes of deleted chunks which is inefficient}
 i.e. the minimum value accepted coincides with the maximum value ever deleted.
 %
-\item \emph{store the data} -- In order to provide BMT proofs the node must possess the data in the chunk content.\footnote{In the special case of addressed envelopes with pre-paid postage, no payout can be collected before the envelope has been filled and sent (see \ref{sec:addressed-envelopes}).}
+\item \emph{store the data} -- In order to provide BMT proofs the node must possess the data in the chunk content.%
+%
+\footnote{In the special case of addressed envelopes with pre-paid postage, no payout can be collected before the envelope has been filled and sent (see \ref{sec:addressed-envelopes}).}
 \end{itemize}
-
 
 
 \subsection{Price signalling capacity pressure \statusyellow}\label{sec:capacity-pressure}
