@@ -43,7 +43,7 @@ d & \text{ if } x=y\\
 \end{definition}
 
 
-In practice, $\PO(x,y)$ is the length of the longest common prefix in the big endian binary representation of $x$ and $y$. It is therefore most practical to calculate by counting the matching bits of the binary form of the addresses from the left. Hence, Kademlia falls into the prefix matching class of DHT-s \cite{rowstron2001pastry,zhao2004tapestry}. The maximum possible value of proximity is the total number of bits $d$. 
+In practice, $\PO(x,y)$ is the length of the longest common prefix in the big-endian binary representation of $x$ and $y$. It is therefore most practical to calculate by counting the matching bits of the binary form of the addresses from the left. Hence, Kademlia falls into the prefix matching class of DHT-s \cite{rowstron2001pastry,zhao2004tapestry}. The maximum possible value of proximity is the total number of bits $d$. 
 
 Taking the proximity order relative to a fixed point $x_0$ partitions all points in
 the space, consisting of all possible bit sequences of length $d$ into equivalence classes. Points in each class are at

@@ -1,11 +1,11 @@
-Garbage collection is the glorified name for the process of puring the local chunk store of the node. 
+Garbage collection is the glorified name for the process of purging the local chunk store of the node. 
 Here the assumption is that storage is s scarce resource and with time nodes will experience capacity shortage and face the problem  of deciding which   existing chunks to remove to make space for new arrivals. 
 
 The garbage collection strategy must reflect the economic potential of chunks, i.e., it should ideally maximise the profit the node makes on storage compensation. Deriving high-level behaviour of Swarm as a network from the assumption that nodes employ a particular strategy is only valid if said strategy align best with the incentive design.
 
 If only Swap is operational only a very simple garbage collection strategy is sufficient. Every time a chunk is retrieved, the node serving it earns SWAP revenue. Ideally, then, those chunks that are retrieved more often should be preferred to those retrieved rarely.
 
-The best predictor for number of accesses is number of accesses in the past. For chunka that exist and been retrieved, these models work well, but they are only optimal for making destinctions among popular, not among the rarely accessed content. A priori estimation for new chunks can instead rely on the postage value, which directly  map onto guaranteed revenue.  
+The best predictor for number of accesses is number of accesses in the past. For chunks that exist and been retrieved, these models work well, but they are only optimal for making distinctions among popular, not among the rarely accessed content. A priori estimation for new chunks can instead rely on the postage value, which directly  map onto guaranteed revenue.  
 
 
 available, value consistent storage

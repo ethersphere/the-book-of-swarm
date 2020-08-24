@@ -438,7 +438,7 @@ For retrieval, accessibility needs to be complemented with a process to have the
 \begin{enumerate}
     \item \gloss{direct delivery} -- The chunk delivery is sent via a direct underlay connection. 
     \item \gloss{routed delivery} -- The chunk delivery is sent as message using routing.
-    \item \gloss{backwarding} -- The chunk delivery response simply follows the route along which the request was forwarded, just backwards all the way. to the originator.
+    \item \gloss{backwarding} -- The chunk delivery response simply follows the route along which the request was forwarded, just backwards all the way to the originator.
 \end{enumerate}
 
 
@@ -510,7 +510,7 @@ This network protocol, called \gloss{push syncing}, is analogous to chunk retrie
 \begin{figure}[htbp]
    \centering
    \includegraphics[width=\textwidth]{fig/push-sync.pdf}
-   \caption[Push syncing \statusgreen]{Push syncing. Node $U$ (Uploader) push-syncs a chunk to the chunk's address. Push-sync uses forwarding, so the chunk is relayed via forwarding nodes $F_0$, ..., $F_n$ all the way to node $S$, the storer node closest to the chunk address. A statement of custody receipt signed by $S$ is then passed back along the same route as an acknowledgment to the uploader.}
+   \caption[Push syncing \statusgreen]{Push syncing. Node $U$ (Uploader) push-syncs a chunk to the chunk's address. Push-sync uses forwarding, so the chunk is relayed via forwarding nodes $F_0$, ..., $F_n$ all the way to node $S$, the storer node closest to the chunk address (the arrows represent transfer of the chunk  via direct peer-to-peer connection). A statement of custody receipt signed by $S$ is then passed back along the same route as an acknowledgment to the uploader.}
    \label{fig:push-syncing}
 \end{figure}
 
