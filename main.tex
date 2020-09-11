@@ -230,12 +230,33 @@ spaceabove=6pt, spacebelow=6pt,headfont=\normalfont\bfseries,notefont=\mdseries,
 \Large storage and communication infrastructure for self-sovereign digital society\\
 back-end stack for the decentralised web}
 \author{Viktor Trón}
-\date{v1.0 pre-release 5 \today}
+\date{v1.0 pre-release 7 - worked on \today}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 \frontmatter
 \maketitle
 \setcounter{tocdepth}{2}
+
+
+% instructions for versioning & deployment
+% they are hidden automatically if draft is FALSE when compiling
+\ifdraft
+Instructions for compiling and distributing.
+
+These are hidden if conditional text is not shown (when publishing a version).
+
+\begin{enumerate}
+    \item any version being worked on should be named "Version vX - worked on";
+    \item when publishing, "worked on" should be removed; 
+    \item drafttrue line should be commented out removing conditional text upon compilation;
+    \item PDF should be generated, saved and pushed to Github repo \\ (https://github.com/ethersphere/publish-bookofswarm/tree/master/pdfs); \item verify that last commit was autodeployed to Swarm \\ (https://swarm-gateways.net/bzz:/latest.bookofswarm.eth/the-book-of-swarm-viktor-tron.pdf);
+    \item PDF commit in Github repo should be named with version number;
+    \item version number in Latex should be bumped up and "worked on" note added: "Version v(X+1) - worked on";
+    \item Goto 1.
+\end{enumerate}
+\fi
+
 \input{quote.tex}
 \tableofcontents
 \listoffigures
