@@ -718,12 +718,16 @@ Push-syncing (see \ref{sec:push-syncing}) is the protocol which ensures that chu
 %
 \footnote{To complement our solution for bandwidth compensation, further measures are needed for spam protection and storage incentivisation which are discussed later in \ref{sec:postage-stamps} and \ref{sec:postage-lottery}, respectively.}
 
-The push-sync protocol is analogous to the pull-sync protocol in the sense that their respective message exchange sequences travel the same route.
-The delivery of the chunk in the push sync protocol is analogous to a retrieval request and, conversely, the statement of custody receipt in push sync is analogous to the chunk delivery response in retrieval. However, in the case of the retrieval protocol, only the statement of custody responses will trigger an accounting event.
 
-Requiring payment for push-sync delivery by the downstream peers would put the forwarder in a position to bargain with a storer node on the delivery of the chunk. The possession of a chunk is valuable for the prospective storer node because there is also a system of rewards for storage ( see \ref{sec:postage-lottery}). Given this, the forwarder node could in theory hold onto the chunk unless the storer node pays marginally more than what the possession of this chunk is worth for them. In particular, since forwarders on the route from the uploader are not numerous, any profit coming from a reward mechanism for storage could then be captured by the forwarding nodes.
 
-Instead, in push-sync, by making only the statement of custody receipt a paid message, roles switch. Now, a forwarder node is not in the position to bargain. To see why, consider what would happen if a forwarding node tries to hold on to a chunk to get a price for pushing this chunk to a storer node. In this case, the uploader will not get a statement of custody receipt in due time, assume the attempt has failed and re-upload the chunk via a different route. Now, suddenly the original forwarding node is forced to compete with another forwarding node in getting compensation for their bandwidth costs. Since all forwarding nodes know this, emergent behavior will produce a series of peers that are willing to forward the chunk to the storer node for a only small compensation and the bandwidth costs incurred. Now there is no need for the original forwarding node to try and bargain with the storer node in the first place: Instead, they can make a small profit immediately when they pass back the statement of custody receipt.
+The push-sync protocol is analogous to the retrieval protocol in the sense that their respective message exchange sequences travel the same route.
+The delivery of the chunk in the push sync protocol is analogous to a retrieval request and, conversely, the statement of custody receipt in push sync is analogous to the chunk delivery response in retrieval.
+
+Push-syncing could in principle be left without explicit forwarding incentives. Due to the retrieval protocol, as nodes expect chunks to be found in the neighbourhood of   their address, participants in swarm are at least weakly incentivised to help uploaded chunks get to their destination by taking part in the protocol. However, we  need to provide the possibility that chunks are uploaded via nodes further from it than the requestor (light  nodes or retries). Thus, if push-syncing was free, nodes could generate wasteful amounts of bandwidth. 
+
+Requiring payment only for push-sync delivery by the downstream peers would put the forwarder in a position to bargain with a storer node on the delivery of the chunk. The possession of a chunk is valuable for the prospective storer node because there is also a system of rewards for storage ( see \ref{sec:postage-lottery}). Given this, the forwarder node could in theory hold onto the chunk unless the storer node pays marginally more than what the possession of this chunk is worth for them factoring in the profit potential due to storage incentives. In particular, since forwarders on the route from the uploader are not numerous, any profit coming from a reward mechanism for storage could then be captured by the forwarding nodes.
+
+Instead, in push-sync, by making the statement of custody receipt a paid message, roles switch. Now, a forwarder node is not in the position to bargain. To see why, consider what would happen if a forwarding node tries to hold on to a chunk to get a price for pushing this chunk to a storer node. In this case, the uploader will not get a statement of custody receipt in due time, assume the attempt has failed and re-upload the chunk via a different route. Now, suddenly the original forwarding node is forced to compete with another forwarding node in getting compensation for their bandwidth costs. Since all forwarding nodes know this, emergent behavior will produce a series of peers that are willing to forward the chunk to the storer node for a only small compensation and the bandwidth costs incurred. Now there is no need for the original forwarding node to try and bargain with the storer node in the first place: Instead, they can make a small profit immediately when they pass back the statement of custody receipt. 
 
 
 \begin{figure}[htbp]
@@ -738,6 +742,7 @@ This scheme makes it clear why the incentivisation of the two protocols relies o
 In this way, we can make sure that (1) storers actually respond with receipts, and (2) have a way to detect timed out or unsolicited receipt responses to protect against DoS, see figure \ref{fig:syncing-swap}.
 
 Just as in the retrieval protocol, the pricing is expected to be different for different proximities (see \ref{sec:diff-pricing-prox} and as the costs of the nodes in the network change (depending on capacity utilization and efficiency of nodes), the pricing will be variable over time as well. Since at the point of accounting the compensation is due for one chunk and one shorter message (retrieve request and custody receipt), we can safely conclude that the price structure for forwarding in the case of the two protocols are identical and therefore one generic forwarding pricing scheme can be used for both (see  \ref{sec:retrieval-price-discovery}) 
+What makes a difference is that unlike the retrieval protocol where the chunk is delivered back and its integrity can be validated, the accounting event in pushsync is a statement of custody which can be spoofed. With the forwarding incentive nodes will have the motivation not to forward and impersonate a storer node and issue the statement of  custody. This makes it advisable to query (retrieve) a chunk via alternative routes. If  such  retrievals fail, it may be necessary to try to push-sync chunks via alternative routes. 
  
 
 \section{Swap: accounting and settlement\statusgreen}\label{sec:accounting-and-settlement}
@@ -747,7 +752,7 @@ Just as in the retrieval protocol, the pricing is expected to be different for d
 This section covers aspects of incentivisation relating to bandwidth sharing. 
 In \ref{sec:accounting}, we introduce a mechanism to keep track of the data traffic between peers and offer peer to peer accounting for message relaying.
 Subsequently, in \ref{sec:cheques}, we describe the conditions of compensating for unbalanced services and show how settlement can be achieved.
-In particular we introduce \glossplural{cheque} and the \gloss{chequebook contract}. In \ref{sec:waiver}, we discuss waivers, a further optimisation allowing for more savings on transaction cost. In \ref{sec:zero-cash-entry} we discuss how an incentivised service of sending in cashing transactions enables zero-cash entry to Swarm and, finally, in \ref{sec:sanctions} we will discuss the basic set of sanctions that serve as a fundamental incentive for nodes to play nice and adhere to the protocols.
+In particular we introduce the concept of a. \glossplural{cheque} and the \gloss{chequebook contract}. In \ref{sec:waiver}, we discuss waivers, a further optimisation allowing for more savings on transaction cost. In \ref{sec:zero-cash-entry} we discuss how an incentivised service of sending in cashing transactions enables zero-cash entry to Swarm and, finally, in \ref{sec:sanctions} we will discuss the basic set of sanctions that serve as a fundamental incentive for nodes to play nice and adhere to the protocols.
 
 \subsection{Peer to peer accounting\statusgreen}\label{sec:accounting}
 
@@ -869,6 +874,9 @@ Let us further suppose that the balance starts tilting in $A$'s favour by some a
 
 This process can be repeated multiple times until the cumulative total is brought back to $t_i$. At this point all outstanding debt has effectively been cancelled and any further payments must be made in the form of a proper cheque from $B$'s chequebook to $A$ (see figure \ref{fig:waivers-diagram}).
 
+\subsection{Best effort settlement strategy}
+
+Abels text
 
 \subsection{Zero cash entry\statusgreen}\label{sec:zero-cash-entry}
 
@@ -885,7 +893,12 @@ service and earn money.}
 \label{fig:zero-cash-entry}
 \end{figure}
 
-The possibility to earn small amounts of money without starting capital is cruicial, as it provides a way for new users to get access to Swarm without the need to purchase the token. This benefit extends to the Ethereum ecosystem in general: using Swarm, anybody can earn small amounts of money to start paying the gas to fuel their dapps, without the need to go through a painful process of acquiring tokens prior to onboarding. 
+The possibility to earn small amounts of money without starting capital is crucial, as it provides a way for new users to get access to Swarm without the need to purchase the token. This benefit extends to the Ethereum ecosystem in general: using Swarm, anybody can earn small amounts of money to start paying the gas to fuel their dapps, without the need to go through a painful process of acquiring tokens prior to onboarding. 
+
+
+\subsection{Cashing out and risk of insolvency}
+
+
 
 \subsection{Sanctions and blacklisting \statusgreen}\label{sec:sanctions}
 \red{}
@@ -964,7 +977,7 @@ The proof of payment can lend itself to a number of different implementations. T
 However, because of the high transaction cost, requiring an on-chain payment for each chunk would be prohibitively expensive. Instead, we need a solution that allows the uploader to purchase the postage stamps in a \gloss{postage batch} and then re-use it over many chunks. 
 
 
-The batches are created by a central postage smart contract when a transaction is sent to its creation endpoint, together with an amount of Honey tokens and the following transaction data:
+The batches are created by a central postage smart contract when a transaction is sent to its creation endpoint, together with an amount of BZZ tokens and the following transaction data:
 
 \begin{itemize}
 \item \emph{owner address} -- The owner that is entitled to use the batches created to stamp chunks.
@@ -987,7 +1000,7 @@ The owner is the address that is specified in the transaction data and recorded 
 
 A random identifier is generated to provide a reference to the payment. 
 The payment transaction will create multiple batches the number of which is specified in the transaction. The batch depth is eventually recorded for each batch separately. New batches can be created for each payment.
-The number of chunks covered by this payment can then be calculated as the sum of the batch sizes. The initial batch depth is meant to apply to all batches created by  the payment transaction. The amount of honey sent with the transaction is then allocated equally to all chunks covered by the payment, i.e. the total amount of tokens, divided by the number of chunks covered is assigned to the payment ID to represent the per-chunk balance of the batches. Anyone can then choose to top up this balance at a later date. 
+The number of chunks covered by this payment can then be calculated as the sum of the batch sizes. The initial batch depth is meant to apply to all batches created by  the payment transaction. The amount of BZZ tokens sent with the transaction is then allocated equally to all chunks covered by the payment, i.e. the total amount of tokens, divided by the number of chunks covered is assigned to the payment ID to represent the per-chunk balance of the batches. Anyone can then choose to top up this balance at a later date. 
 
 
 \begin{figure}[htbp]
