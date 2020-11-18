@@ -1553,11 +1553,11 @@ in which individual trie nodes are serialised as chunks (see \ref{spec:format:ma
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{fig/manifest-entry.pdf}
-\caption[Manifest entry \statusgreen]{Manifest entry is a data  structure that contains the reference to a fileing metadata about a file or directory  pertaining to the assembler, access control, http header.}
+\caption[Manifest entry \statusgreen]{Manifest entry is a data  structure that contains the reference to a file including metadata about a file or directory  pertaining to the assembler, access control and http headers.}
 \label{fig:manifest-entry}
 \end{figure}
 
-Manifest entry is a data  structure that encapsulates all metadata about a file or directory.
+A manifest entry is a data  structure that encapsulates all metadata about a file or directory.
 The information minimally includes a swarm reference to the file, complemented with file information
 relevant either as a (1) parameter for the downloader component which assembles chunks into a byte stream or (2) for the client side rendering handled by the browser or (3) for the mapping of manifests to file system directory tree. (1) is exemplified by access control information and erasure coding parameters but also the publisher needed for doing chunk recovery. (2) includes content type headers, or generically HTTP headers that the local swarm client will pick them up by the API and set in the response header when the file is retrieved. 
 and (3) file info mapped to file system when downloading such as file permissions.
@@ -1917,7 +1917,7 @@ Also note that the latency of $B_2$ and $B_3$ are helped by advance requests:  t
 A key management solution called \gloss{double ratchet} is the de-facto industry standard used for encryption in instant messaging.
 It is customary to use the \gloss{extended triple Diffie--Hellmann key exchange} (\gloss{X3DH}) to establish the initial parameters for the double-ratchet key chains (see \ref{sec:pss-key-exchange}).
 
-double-ratchet combines a ratchet based on a continuous key-agreement protocol with a ratchet based on key-derivation function \cite{perrin2016double}. This scheme can be generalised \cite{alwen2019double} and understood as a combination of well-understood primitives and shown to provide  (1) forward secrecy, (2) backward secrecy,%
+Double-ratchet combines a ratchet based on a continuous key-agreement protocol with a ratchet based on key-derivation function \cite{perrin2016double}. This scheme can be generalised \cite{alwen2019double} and understood as a combination of well-understood primitives and shown to provide  (1) forward secrecy, (2) backward secrecy,%
 %
 \footnote{Also known as future secrecy or post-compromise security.}
 %
