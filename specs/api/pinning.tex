@@ -1,5 +1,5 @@
 
-\begin{apiRoute}{GET}{/pin/?offset=\param{offset}\&length=\param{length}}{List Pinned Content and metadata}
+\begin{apiRoute}{GET}{/pin/?offset=\param{offset}\&length=\param{length}}{List pinned content and metadata}
 {
 }
 { }
@@ -9,23 +9,23 @@
 \queryParamItem{length}{integer}
 \end{queryParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{200}{OK}{json array in response body}
 \end{routeResponse}
 \end{apiRoute}
 
 
-\begin{apiRoute}{GET}{/pin/\param{id}}{View Pinned Content and metadata}
+\begin{apiRoute}{GET}{/pin/\param{id}}{View pinned content and metadata}
 {
 }
 { }
 
-\begin{queryParameter} 
-\queryParamItem{id}{hex string}{}
-\end{queryParameter}
+\begin{routeParameter} 
+\routeParamItem{id}{hex string}
+\end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{pin in response body}
+\responseItem{200}{OK}{pin in response body}
 \responseItem{400}{Bad Request}{ID not well formed}
-\responseItem{404}{Not found}{Pin with ID does not exists.}
+\responseItem{404}{Not Found}{Pin with ID does not exists.}
 \end{routeResponse}
 \end{apiRoute}
 
@@ -41,9 +41,9 @@
 \routeParamItem{id}{hex string}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{200}{OK}{json struct in response body}
 \responseItem{400}{Bad Request}{ID not well formed}
-\responseItem{404}{Not found}{Pin with ID does not exists.}
+\responseItem{404}{Not Found}{Pin with ID does not exists.}
 \end{routeResponse}
 \end{apiRoute}
 
@@ -76,69 +76,12 @@
 { }
 
 \begin{routeParameter} 
-\routeParamItem{id}{}
+\routeParamItem{id}{hex string}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{204}{No Content}{}
+\responseItem{204}{No Content}{successful deletion}
 \responseItem{400}{Bad Request}{ID not well formed}
-\responseItem{404}{Not found}{Pin with ID does not exists.}
+\responseItem{404}{Not found}{pin with ID does not exists}
 \end{routeResponse}
 \end{apiRoute}
 
-
-% Content can be pinned in two different ways. One is during the content upload and the other is thereafter.
-
-%     Pinning during upload
-
-%     Add a header “x-swarm-pin” and set it to “true” when uploading content. This will upload the file and then pin it too. This method can be used for Tar, Multipart and raw file uploads too.
-
-% curl -H "Content-Type: application/x-tar" -H "x-swarm-pin: true"  --data-binary @files.tar http://localhost:8500/bzz:/
-
-%     Pinning after upload
-
-%     If an already uploaded content needs to be pinned, the following HTTP API should be used.
-
-% to pin a Swarm collection
-% POST /bzz-pin:/<MANIFEST OR ENS NAME>
-
-% to pin a RAW file in Swarm
-% POST /bzz-pin:/<SWARM RAW FILE HASH>/?raw=true
-
-% Note
-
-% When pinning a already uploaded file, make sure that the entire file content is available locally by issuing a download once.
-% Unpinning Content
-
-% An already pinned file can be unpinned at anytime. Once the collection is unpinned, the contents will follow the FIFO rule and may be garbage collected in future.
-
-% DELETE /bzz-pin:/<MANIFEST OR ENS NAME OR SWARM RAW FILE HASH>
-
-% Listing Pinning Info
-
-% Pinned contents and their information can be viewed at any point using this API. Information includes The pinned hash, whether the pinned content is a collection or RAW file, the pinned content size in bytes and the no of time the content is pinned.
-
-% % \lstset{basicstyle=\footnotesize}
-% % \lstinline{GET /bzz-pin:/}
-
-% \begin{lstlisting}
-
-% GET /bzz-pin:/
-
-% [
-%  { "Address"    : "0x94f78a45c7897957809544aa6d68aa7ad35df695713895953b885aca274bd955",
-%   "IsRaw"      : "false",
-%   "FileSize"   : "12046",
-%   "PinCounter" : "2",
-%  },
-%  { "Address"    : "0xccef599d1a13bed9989e424011aed2c023fce25917864cd7de38a761567410b8",
-%   "IsRaw"      : "true",
-%   "FileSize"   : "146",
-%   "PinCounter" : "5",
-%  },
-% ]
-
-    
-% \end{lstlisting}
-% Note
-
-% The information will be returned in JSON format shown above

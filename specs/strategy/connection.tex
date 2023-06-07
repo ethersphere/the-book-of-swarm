@@ -7,7 +7,7 @@ node $s$ (sender) notifies an existing peer $r$ (recipient) about peer $p$ if $\
 Without resource constraints the optimal connectivity for a proper storer node is full  connectivity, i.e. when a node has all other nodes in the network as their peer. The chequebook contract also prefers a small number of peer connections to be maintained and other network overhead costs for keepalive connections or network socket shortage also implicates that 
 above a certain network size full connectivity is prohibitive.
 
-The relative gain is maximised if throughput on all keepalive connections are maximised. If network contention prevents a node from forwarding to a peer insantaneously, another peer must to be chosen. 
+The relative gain is maximised if throughput on all keepalive connections are maximised. If network contention prevents a node from forwarding to a peer instantaneously, another peer must to be chosen. 
 Assuming uniformity in the network 
 %(see appendix \ref{sec:distribution}) 
 throughput maximisation in the context of limited number of peer connections can be achieved with a connectivity pattern where each kademlia bin has a constant cardinality of $2^b$ and peers in the bin are balanced, i.e., match each distinct bit prefix of length $b$.

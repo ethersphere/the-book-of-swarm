@@ -133,19 +133,19 @@ The constraints put on strategic choice are crucial in terms of rendering the ga
 \begin{tabular}{l|p{0.25\linewidth}|p{0.6\linewidth}}
 103 & Checkpoint & returns temporary root hash for resumable uploads
 \\\hline
-200 & ok &
+200 & OK &
 \\
-201 & Created & returned by POST requests upon successful creation of file/manifest/tag/stamp/
-% \\
-% 206 & Partial Content &
+201 & Created & returned by POST requests upon successful creation of file/manifest/tag/stamp/\\
+204 & No Content & returned by DELETE requests upon successful  deletion\\
+209 & Sent & returned by pss POST upon successful send
 \\\hline
 400 & Bad request & returned if request or its parameters are not well formed or missing
 \\
-401 & Unauthorized & returned by access control if auth fails
+401 & Unauthorized & returned by access control if authentication fails
 \\
 402$^{*}$ & Payment Required & returned if no swap balance or missing/invalid postage stamp
-\\
-403 & Forbidden & returned if retrieved chunk is encrypted  but the reference has no decryption key
+% \\
+% 403 & Forbidden & returned if retrieved chunk is encrypted  but the reference has no decryption key
 \\     
 404 & Not Found &
 returned if a local prerequisite is not found or manifest path does not exist.
@@ -163,12 +163,12 @@ returned if a local prerequisite is not found or manifest path does not exist.
 % \\
 413 & Payload Too Large  &
 Payload size exceeds maximum chunk size or span given (chunk API)
-\\
-414 & URI Too Long  & manifest path  $>32 $
+% \\
+% 414 & URI Too Long  & manifest path  $>32 $
 \\
 416 & Range Not Satisfiable  & offset in range query out of range
-\\
-420 & Enhance your calm & returned when recovery was initiated but retrieval timed out
+% \\
+% 420 & Enhance your calm & returned when recovery was initiated but retrieval timed out
 \\
 422 & Unprocessable Entity & returned by the blockchain external API if eth api returns an error or by single owner chunk post API if owner/id pair already exists
 % 417 & Expectation Failed

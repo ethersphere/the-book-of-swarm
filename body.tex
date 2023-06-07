@@ -28,7 +28,7 @@ Finally, in chapter \ref{sec:ux} we will look at functionality from a user exper
 
 \chapter{Network}\label{sec:network}
 
-This chapter offers a narrative on how the Swarm overlay network is built on top of a \gloss{peer-to-peer} network protocol to form a topology that allows for routing of messages between nodes (\ref{sec:topology-routing}). In \ref{sec:kademlia-storage}, we describe how such a network can serve as a scalable \gloss{distributed storage} solution for data chunks (\ref{sec:chunks}) and present the logic underpinning the protocols for retrieval/download and syncing/upload (\ref{sec:push-and-pull}).
+This chapter elaborates on how the Swarm overlay network is built on top of a \gloss{peer-to-peer} network protocol to form a topology that allows for routing of messages between nodes (\ref{sec:topology-routing}). In \ref{sec:kademlia-storage}, we describe how such a network can serve as a scalable \gloss{distributed storage} solution for data chunks (\ref{sec:chunks}) and present the logic underpinning the protocols for retrieval/download and syncing/upload (\ref{sec:push-and-pull}).
 
 \section{Topology and routing \statusgreen}\label{sec:topology-routing}
 
@@ -62,14 +62,14 @@ In its overall design, Swarm is agnostic of the particular underlay transport us
 
 The \gloss{libp2p} library can provide all the needed functionality and is the one given in the specification as underlay connectivity driver, see \ref{spec:protocol:intro}.%
 %
-\footnote{Swarm's current golang implementation uses Ethereum's \gloss{devp2p}/rlpx which satisfies the above criteria and uses TCP/IP with custom cryptography added for security. The underlay network address devp2p uses is represented using the \gloss{enode URL scheme}. Devp2p dispatches protocol messages based on their message ID. It uses RLP serialisation which is extended with higher level data type representation conventions. In order to provide support for Ethereum 1.x blockchain and state on Swarm, we may provide a thin devp2p node that proxies queries to a libp2p-based Swarm client or just uses its API. Otherwise we expect the devp2p networking support to be discontinued.}
+\footnote{Swarm's initial golang implementation uses Ethereum's \gloss{devp2p}/rlpx which satisfies the above criteria and uses TCP/IP with custom cryptography added for security. The underlay network address that devp2p uses is represented using the \gloss{enode URL scheme}. Devp2p dispatches protocol messages based on their message ID. It uses RLP serialisation which is extended with higher level data type representation conventions. In order to provide support for the Ethereum 1.x blockchain and for storing its state on Swarm, we may provide a thin devp2p node that proxies queries to the new libp2p-based Swarm client, or just uses its API. Otherwise we expect the devp2p networking support to be discontinued.}
 
 \subsection{Overlay addressing\statusgreen}\label{sec:overlay-addressing} 
 \green{}
 
 While clients use the \gloss{underlay address} to establish connections to peers, each node running Swarm is additionally identified with an \gloss{overlay address}. It is this address that determines which peers a node will connect to and directs the way that messages are forwarded. The overlay address is assumed to be stable as it defines a nodes' identity across sessions and ultimately affects which content is most worth storing in the nodes' local storage.
 
-The node's \gloss{overlay address} is derived from an Ethereum account by hashing the corresponding elliptic curve public key with the \gloss{BZZ network ID}, using the 256-bit Keccak algorithm (see \ref{spec:format:bzzaddress}). The inclusion of the BZZ network ID stems from the fact that there can be many Swarm networks (e.g.\ test net, main net, or private Swarms). Including the BZZ network ID makes it impossible to use the same address across networks. Assuming any sample of base accounts independently selected, the resulting overlay addresses are expected to have a uniform distribution in the address space of 256-bit integers. This is important to deriving the address from a public key as it allows the nodes to issue commitments associated with an overlay location using cryptographic signatures which are verifiable by 3rd parties. 
+The node's \gloss{overlay address} is derived from an Ethereum account by hashing the corresponding elliptic curve public key with the \gloss{BZZ network ID}, using the 256-bit Keccak algorithm (see \ref{spec:format:bzzaddress}). The inclusion of the BZZ network ID stems from the fact that there can be many Swarm networks (e.g.\ test net, main net, or private Swarms). Including the BZZ network ID makes it impossible to use the same address across networks. Assuming any sample of base accounts independently selected, the resulting overlay addresses are expected to have a uniform distribution in the address space of 256-bit integers. It is important to derive the address from a public key as it allows the nodes to issue commitments associated with an overlay location using cryptographic signatures that are verifiable by 3rd parties. 
 
 Using the long-lived communication channels of the \gloss{underlay network}, Swarm nodes form a network with \emph{quasi-permanent} peer connections. The resulting connectivity graph can then realise a particular topology defined over the address space. The \gloss{overlay topology} chosen is called \gloss{Kademlia}: It enables communication between any two arbitrary nodes in the Swarm network by providing a strategy to relay messages using only underlay peer connections. The protocol that describes how nodes share information with each other about themselves and other peers, called 'Hive' is described in \ref{spec:protocol:hive}. How nodes use this protocol to bootstrap the \gloss{overlay topology} is discussed in \ref{sec:bootstrapping}. The  theoretical basis for \gloss{Kademlia topology} is formalised rigorously in \ref{sec:kademlia-connectivity}. 
 
@@ -131,34 +131,34 @@ critically depends on the nodes' ability to find peers that are currently online
 
 
 Swarm uses an alternative flavour of Kademlia routing which is first described in \cite{heep2010r} and then expanded on and worked out in \cite{tronetal2019-network}. Here, a recursive method is employed, whereby the successive steps of the iteration are "outsourced" to a \gloss{downstream peer}.
-Each node recursively passes a message to a direct peer at least one \gloss{proximity order} closer to the destination. \glossupper{routing} here then means simply relaying messages via a chain of peers which are ever closer to the destination, as shown in figure \ref{fig:iterative-forwarding-kademlia}.
+Each node recursively passes a message to a direct peer at least one \gloss{proximity order} closer to the destination. Thus, \gloss{routing} using this approach, simply means relaying messages via a chain of peers which are ever closer to the destination, as shown in figure \ref{fig:iterative-forwarding-kademlia}.
 
 
-In this way, Swarm's underlay transport offers quasi-stable peer connections over TCP with communication channels that are kept alive. These open connections can then be used as $R$ to define another notion of a \gloss{peer}. The two criteria of healthy \gloss{Kademlia connectivity} in the swarm translate as: For each node $x$, there exists a \gloss{neighbourhood depth} $d_x$ such that (1) node $x$ has an open connection with at least one node for each \gloss{proximity order bin} up to but excluding $d_x$ and (2) is connected to all the online nodes that are at least as near as $d_x$. If each node in the network has a saturated Kademlia table of peers, then the network is said to have \gloss{Kademlia topology}. Since connected peers are guaranteed to be online, the recursive step consists solely of forwarding the message to a connected peer strictly closer to the destination. We can call this alternative a \gloss{forwarding Kademlia}.
+In this way, Swarm's underlay transport offers quasi-stable peer connections over TCP with communication channels that are kept alive. These open connections can then be used as $R$ to define another notion of a \gloss{peer}. The two criteria of healthy \gloss{Kademlia connectivity} in Swarm translate as: For each node $x$, there exists a \gloss{neighbourhood depth} $d_x$ such that (1) node $x$ has an open connection with at least one node for each \gloss{proximity order bin} up to but excluding $d_x$ and (2) is connected to all the online nodes that are at least as near as $d_x$. If each node in the network has a saturated Kademlia table of peers, then the network is said to have \gloss{Kademlia topology}. Since connected peers are guaranteed to be online, the recursive step consists solely of forwarding the message to a connected peer strictly closer to the destination. We can call this alternative a \gloss{forwarding Kademlia}.
 
 
 In a \gloss{forwarding Kademlia} network, a message is said to be \emph{routable} if there exists a path from sender to destination through which the message can be relayed. In a mature subnetwork with \gloss{Kademlia topology} every message is routable. 
 
-If all peer connections are stably online, a \gloss{thin Kademlia table}, i.e.\ a single \gloss{peer} for each bin up to $d$, is sufficient to guarantee routing between nodes. In reality, however, networks are subject to \gloss{churn}, i.e.\ nodes may be expected to go offline regularly. In order to ensure \gloss{routability} in the face of churn, the network needs to maintain \gloss{Kademlia topology}. This means that each individual node needs to have a \gloss{saturated Kademlia table} at all times. By keeping several connected peers in each \gloss{proximity order bin}, a node can ensure that node dropouts do not damage the saturation of their Kademlia table. Given a model of node dropouts, we can calculate the minimum number of peers needed per bin to guarantee that nodes are saturated with a probability that is arbitrarily close to 1. The more peers a node keeps in a particular proximity order bin, the more likely that the message destination address and the peer will have a longer matching prefix. As a consequence of forwarding the message to that peer, the \gloss{proximity order} increases more quickly, and the message ends up closer to the destination than it would with less peers in each bin (see also figure \ref{fig:bindensity}).
+If all peer connections are stably online, a \gloss{thin Kademlia table}, i.e.\ a single \gloss{peer} for each bin up to $d$, is sufficient to guarantee routing between nodes. In reality, however, networks are subject to \gloss{churn}, i.e.\ nodes are expected to go offline regularly. In order to ensure \gloss{routability} in the face of churn, the network needs to maintain \gloss{Kademlia topology}. This means that each individual node needs to have a \gloss{saturated Kademlia table} at all times. By keeping several connected peers in each \gloss{proximity order bin}, a node can ensure that node dropouts do not damage the saturation of their Kademlia table. Given a model of node dropouts, we can calculate the minimum number of peers needed per bin to guarantee that nodes are saturated with a probability that is arbitrarily close to 1. The more peers a node keeps in a particular proximity order bin, the more likely that the message destination address and the peer will have a longer matching prefix. As a consequence of forwarding the message to that peer, the \gloss{proximity order} increases more quickly, and the message ends up closer to the destination than it would with less peers in each bin (see also figure \ref{fig:bindensity}).
 
 
 
-With \gloss{Kademlia} saturation guaranteed, a node will always be able to forward a message and ensure \gloss{routability}. If nodes comply with the forwarding principles (and that is ensured by \gloss{aligned incentives}, see \ref{spec:strategy:forwarding}) the only case when relaying could possibly break down is when a node drops out of the network after having received a message but before it has had chance to forward it.%
+With \gloss{Kademlia} saturation guaranteed, a node will always be able to forward a message and ensure \gloss{routability}. If nodes comply with the forwarding principles (and that is ensured by \gloss{aligned incentives}, see \ref{spec:strategy:forwarding}) the only case when relaying could possibly break down is when a node drops out of the network after having received a message but before it managed to forward it.%
 %
-\footnote{Healthy nodes could commit to being able to forward within a (very short) constant time we can call the \gloss{forwarding lag}. In the case that a \gloss{downstream peer} disconnects before this forwarding lag passes, then the \gloss{upstream peer} can re-forward the message to an alternative peer, thereby keeping the message passing unbroken. See \ref{sec:retrieval} for more detail.
+\footnote{Healthy nodes could commit to being able to forward within a (very short) constant time; let's call this the \gloss{forwarding lag}. In the case that a \gloss{downstream peer} disconnects before this forwarding lag passes, then the \gloss{upstream peer} can re-forward the message to an alternative peer, thereby keeping the message passing unbroken. See \ref{sec:retrieval} for more detail.
 } 
 
 An important advantage of forwarding Kademlia is that this method of routing requires a lot less bandwidth than the iterative algorithm. In the iterative version, known peers are not guaranteed to be online, so finding one that is adds an additional level of unpredictability.
 
 \subsubsection{Sender anonymity}
-\glossupper{sender anonymity} is a crucial feature of  Swarm. It is important that since requests are relayed from peer-to-peer, those peers further down in the request cascade can never know who the originator of the request was. 
+\glossupper{sender anonymity} is a crucial feature of Swarm. It is important that peers further down in the request cascade can never know who the originator of the request was, because requests are relayed from peer-to-peer. 
 
-The above rigid formulation of Kademlia routing would suggest that if a node receives a message from a peer and that message and peer have a proximity order of $0$, then the recipient would be able to conclude that the peer it received the message from must be the sender. If we allow \gloss{light node} Swarm clients who, since they are running in a low-resource environment, do not keep a full Kademlia saturation but instead have just a local neighbourhood, even a message from a peer in bin $0$ remains of ambiguous origin. 
+The above rigid formulation of Kademlia routing would suggest that if a node receives a message from a peer and that message and peer have a proximity order of $0$, then the recipient would be able to conclude that the peer it received the message from must be the sender. If we allow \gloss{light node} Swarm clients, i.e. clients that due to resource constraints do not keep a full Kademlia saturation but instead have just a local neighbourhood, then even a message from a peer in bin $0$ remains of ambiguous origin. 
 
 \subsubsection{Bin density and multi-order hops} \label{sec:bindensity}
 
 As a consequence of logarithmic distance and uniform node distribution, farther peers of a particular node are exponentially more numerous. 
-As long as the number of connected peers is less than double the number in the bin one closer, then shallower bins will always allow more choice for nodes. In particular, nodes have a chance to increase the number of connections per bin in such a way that peer addresses maximise density (in proximity order bin $b$, the subsequent bits of peers addresses form a \gloss{balanced binary tree}). Such an arrangement is optimal in the sense that for a bin depth of $d$, nodes are able to relay all messages so that in one hop, the proximity order of the destination address will increase by $d$ (see figure \ref{fig:bindensity}). 
+This means that unless the number of required connections in a bin doubles as bins go farther from the node, shallower bins will always allow more choice of nodes for potential connection. In particular, nodes have a chance to increase the number of connections per bin in such a way that peer addresses maximise density (i.e., in proximity order bin $b$, the subsequent bits of peer addresses form a \gloss{balanced binary tree}). Such an arrangement is optimal in the sense that for a bin depth of $d$, nodes are able to relay all messages so that in one hop the proximity order of the destination address will increase by $d$ (see figure \ref{fig:bindensity}). 
 
 
 \begin{figure}[htbp]
@@ -169,24 +169,24 @@ As long as the number of connected peers is less than double the number in the b
 \end{figure}
 
 \subsubsection{Factoring in underlay proximity}
-It is expected that as Swarm clients continue to evolve and develop, nodes may factor in throughput when they select peers for connection. All things being equal, nodes in geographic physical proximity tend to have higher throughput, and therefore will be preferred in the long run. This is how forwarding Kademlia is implicitly aware of underlay topology \cite{heep2010r}. See \ref{spec:strategy:connection} for a more detailed discussion of connectivity strategy.
+It is expected that as Swarm clients continue to evolve and develop, nodes may factor in throughput when they select peers for connection. All things being equal, nodes physically closer to each other tend to have higher throughput, and therefore will be preferred in the long run. This is how forwarding Kademlia is implicitly aware of underlay topology \cite{heep2010r}. See \ref{spec:strategy:connection} for a more detailed discussion of connectivity strategy.
 
 
 \subsection{Bootstrapping and maintaining Kademlia topology \statusgreen}\label{sec:bootstrapping}
  
 \orange{rework based on new hive protocol}
  
-This section discusses how a stable Kademlia topology can emerge. In particular, the exact bootstrapping protocol each node must follow to reach a saturated Kademlia connectivity and maintain it. Nodes joining a \gloss{decentralised network} are supposed to be initially naive, potentially initiating connection via only a single known peer with no prior knowledge. For this reason, the bootstrapping process needs to include a discovery component with the help of which nodes exchange information about each other. This protocol is called the \gloss{hive protocol} and is formally specified in \ref{spec:protocol:hive}.
+This section discusses how a stable Kademlia topology can emerge. In particular, the exact bootstrapping protocol that each node must follow to reach and maintain a saturated Kademlia connectivity. Nodes joining a \gloss{decentralised network} are supposed to be initially naive, potentially initiating connection via only a single known peer with no prior knowledge. For this reason, the bootstrapping process needs to include an initial step that helps naive nodes to begin exchanging information about each other. This discovery process is called the \gloss{hive protocol} and is formally specified in \ref{spec:protocol:hive}.
 
 \subsubsection{Bootnodes}
 
-Swarm has no distinct node type or operation  mode for bootnodes. This means that naive nodes should be able to connect to any node on the  network and bootstrap their desired connectivity. In order not to overburden any single node, specifying a particular node as an initial connection should be avoided and the role of bootnode with respect to new naive nodes should ideally be balanced between participant nodes. This is achieved either with an invite system or a centralised bootnode service running a public gateway which responds to an API call with the bzz address of a randomly chosen node among online peers. 
+Swarm has no distinct node type or operation mode for bootnodes. This means that naive nodes should be able to connect to any node on the  network and bootstrap their desired connectivity. In order not to overburden any single node, electing one particular node as an initial connection should be avoided, and the role of being a bootnode for the newly connecting naive nodes should ideally be distributed among participant nodes. This is achieved either with an invite system, or a centralised bootnode service running a public gateway that responds to an API call with the bzz address of a randomly chosen node among online peers. 
 
-Once connected to a node in the network, the hive protocol will kick in and the naive node will learn about the bzz addresses of other nodes and can start bootstrapping its connectivity.
+Once connected to a node in the network, the hive protocol kicks in and the naive node begins to learn about the bzz addresses of other nodes, and thus it can start bootstrapping its connectivity.
 
 \subsubsection{Building up connections}
 
-Initially, each node begins with zero as their \gloss{saturation depth}. Nodes keep advertising their saturation depth to their connected peers as it changes. When a node $A$ receives an attempt to establish a new connection from a node $B$, she notifies each of her other peers of the node $B$ connecting to her only in the case that each peer's proximity order relative to the connecting node $A$ is not lower than that peer's advertised saturation depth. The notification is always sent to a peer that shares a proximity order bin with the new connection. Formally, when $x$ connects with a peer $y$, $x$ notifies each of her peers if $\mathit{PO}(x, p) = \mathit{PO}(x, y)$ or $d_p\leq \mathit{PO}(y, p)$. In particular, notification includes the full \gloss{overlay address} and \gloss{underlay address} information (see \ref{spec:format:bzzaddress}).%
+Initially, each node begins with zero as their \gloss{saturation depth}. Nodes keep advertising their saturation depth to their connected peers as it changes. When a node $A$ receives an attempt to establish a new connection from a node $B$, she notifies each of her other peers about $B$ connecting to her only in the case that each peer's proximity order relative to the connecting node $A$ is not lower than that peer's advertised saturation depth. The notification is always sent to a peer that shares a proximity order bin with the new connection. Formally, when $y$ connects to $x$, $x$ notifies a subset of its connected peers. A peer $p$ belongs to this subset if $\mathit{PO}(x, p) = \mathit{PO}(x, y)$ or $d_p\leq \mathit{PO}(y, p)$. The notification takes the form of a protocol message and includes the full \gloss{overlay address} and \gloss{underlay address} information (see \ref{spec:format:bzzaddress}).%
 %
 \footnote{Light nodes that do not wish to relay messages and do not aspire to build up a healthy Kademlia, are not included, see section \ref{sec:light}. }
 
@@ -202,17 +202,17 @@ Initially, each node begins with zero as their \gloss{saturation depth}. Nodes k
 
 After a sufficient number of nodes are connected, a bin becomes saturated, and the node's neighbourhood depth can begin to increase. Nodes keep their peers up to date by advertising their current depth if it changes. As their depth increases, nodes will get notified of fewer and fewer peers. Once the node finds all their nearest neighbours and has saturated all the bins, no new peers are to be expected. For this reason, a node can conclude a saturated Kademlia state if it receives no new peers for some time.%
 %
-\footnote{Although the node does not need to know the number of nodes in the network. In fact, some time after the node stops receiving new peer addresses, the node can effectively estimate the size of the network: the depth of network is $\log_2(n+1)+ d$ where $n$ is the number of remote peers in the nearest neighbourhood and $d$ is the depth of that neighbourhood. It then  follows that the total number of nodes in the network can be estimated simply by taking this the exponent of 2 .}
+\footnote{Note that the node does not need to know the total number of nodes in the network. In fact, some time after the node stops receiving new peer addresses, the node can effectively estimate the size of the network: the depth of network is $\log_2(n+1)+ d$ where $n$ is the number of remote peers in the nearest neighbourhood and $d$ is the depth of that neighbourhood. It then follows that the total number of nodes in the network can be estimated simply by taking this to the power of 2.}
 %
 Instead of having a hard deadline and a binary state of saturation, we can quantify the certainty of saturation by the age of the last new peer received. Assuming stable connections, eventually each node online will get to know its nearest neighbours and connect to them while keeping each bin up to $d$ non-empty. Therefore each node will converge on the saturated state. If no new nodes join, health (Kademlia topology) is maintained even if peer connections change. A node is not supposed to go back to a lower saturation state for instance. This is achieved by requiring several peers in each proximity order bin. 
 
 \section{Swarm storage\statusgreen}\label{sec:kademlia-storage}
 
-In this section, we first show how a network with quasi-permanent connections in a Kademlia topology can support a \gloss{load balancing}, \gloss{distributed storage} of fixed-sized datablobs in \ref{sec:disc}. In \ref{sec:chunks}, we detail the generic requirements on chunks and introduce actual chunk types. Finally, in \ref{sec:redundancy-by-local-replication}, we turn to \gloss{redundancy} by neighbourhood replication as a fundamental measure for churn-resistance.
+In this section, in \ref{sec:disc}, we first show how a network with quasi-permanent connections in a Kademlia topology can support a \gloss{load balancing}, \gloss{distributed storage} of fixed-sized datablobs. In \ref{sec:chunks}, we detail the generic requirements on chunks and introduce actual chunk types. Finally, in \ref{sec:redundancy-by-local-replication}, we turn to \gloss{redundancy} by neighbourhood replication as a first line of defense against node churn.
 
 \subsection{Distributed immutable store for chunks\statusgreen}\label{sec:disc}
  
-In this section we discuss how networks using Kademlia overlay routing are a suitable basis on which to implement  serverless storage solution using \glossplural{distributed hash table} (\glossplural{DHT}). Then we introduce the \gloss{DISC}%
+In this section we discuss how networks using Kademlia overlay routing are a suitable basis on which to implement a serverless storage solution using \glossplural{distributed hash table} (\glossplural{DHT}). Then we introduce the \gloss{DISC}%
 %
 \footnote{DISC is \gloss{distributed immutable store for chunks}. In earlier work, we have referred to this component as the 'distributed preimage archive' (DPA), however, this phrase became misleading since we now also allow chunks that are not the preimage of their address.}
 % 
@@ -232,10 +232,10 @@ As is customary in Swarm, we provide a few resolutions of this acronym, which su
 \end{itemize}
  
 \subsubsection{From DHT to DISC}
-Swarm's \gloss{DISC} shares many similarities with the more familiar \glossplural{distributed hash table}. The most important difference is that Swarm does not keep a list of \emph{where} files are to be found, instead it actually \emph{stores pieces of the file itself} directly with the closest node(s). 
+Swarm's \gloss{DISC} shares many similarities with the wider known \glossplural{distributed hash table}. The most important difference is that Swarm does not keep track of \emph{where} files are to be found, instead it actually \emph{stores pieces of the file itself} directly with the closest node(s). 
 In what follows, we review DHTs, as well as dive into the similarities and differences with DISC in more detail. 
  
-\glossupperplural{distributed hash table} use an overlay network to implement a key--value container distributed over the nodes (see figure \ref{fig:DHT}). The basic idea is that the keyspace is mapped on to the overlay address space, and the value for a key in the container is to be found with nodes whose addresses are in the proximity of the key. In the simplest case, let us say that this is the single closest node to the key that stores the value. In a network with Kademlia connectivity, any node can route to a node whose address is closest to the key, therefore a \emph{lookup} (i.e.\ looking up the value belonging to a key) is reduced simply to routing a request. 
+\glossupperplural{distributed hash table} use an overlay network to implement a key--value container distributed over the nodes (see figure \ref{fig:DHT}). The basic idea is that the keyspace is mapped onto the overlay address space, and the value for a key in the container is to be found with nodes whose addresses are in the proximity of the key. In the simplest case, let us say that this is the single closest node to the key that stores the value. In a network with Kademlia connectivity, any node can route to a node whose address is closest to the key, therefore a \emph{lookup} (i.e.\ looking up the value belonging to a key) is reduced simply to routing a request. 
 
 \begin{figure}[htbp]
    \centering
@@ -250,7 +250,7 @@ DHTs used for \gloss{distributed storage} typically associate content identifier
 \begin{figure}[htbp]
    \centering
    \includegraphics[width=0.7\textwidth]{fig/disc.pdf}
-   \caption[Swarm DISC: Distributed Immutable Store for Chunks \statusgreen]{Swarm DISC:  Distributed Immutable Store for Chunks. In step $1$, downloader node $D$ uses forwarding Kademlia routing to request the chunk from a storer node $S$ in the neighbourhood of the chunk address. In step $2$ the chunk is delivered along the same route using forwarding step just backwards.   }
+   \caption[Swarm DISC: Distributed Immutable Store for Chunks \statusgreen]{Swarm DISC:  Distributed Immutable Store for Chunks. In step $1$, downloader node $D$ uses forwarding Kademlia routing to request the chunk from a storer node $S$ in the neighbourhood of the chunk address. In step $2$ the chunk is delivered along the same route using forwarding step just backwards.}
    \label{fig:disc}
 \end{figure}
 
@@ -258,17 +258,17 @@ DHTs used for \gloss{distributed storage} typically associate content identifier
 The \gloss{DISC} storage model is opinionated about which nodes store what content and this implies the following restrictions: 
 
 \begin{enumerate}
-    \item \emph{fixed-size chunks} -- Load balancing of content is required among nodes and is realised by splitting content into equal sized units called  \glossplural{chunk} (see \ref{sec:chunks}).
-    \item \emph{syncing} -- There must be a process whereby chunks get to where they are supposed to be stored no matter which node uploads them (see \ref{sec:push-syncing}).
-    \item \emph{plausible deniability} -- Since nodes do not have a say in what they store, measures should be employed which serve as the basis of legal protection for node operators to plausibly deny knowing (or even being able to know) anything about the chunks' contents (see \ref{sec:chunk-encryption}).
+    \item \emph{fixed-size chunks} -- Load balancing of content is required among nodes and is realised by splitting content into equal sized units called \glossplural{chunk} (see \ref{sec:chunks}).
+    \item \emph{syncing} -- There must be a process whereby chunks get to where they are supposed to be stored, no matter which node uploads them (see \ref{sec:push-syncing}).
+    \item \emph{plausible deniability} -- Since nodes do not have a say in what they store, measures should be employed that serve as the basis of legal protection for node operators. They need to be able to plausibly deny knowing (or even being able to know) anything about the chunks' contents (see \ref{sec:chunk-encryption}).
     \item \emph{garbage collection} -- Since nodes commit to store anything close to them, there needs to be a strategy to select which chunks are kept and which are discarded in the presence of storage space constraints (see  \ref{spec:strategy:garbage-collection}). 
 \end{enumerate}
 
 \subsubsection{Chunks}\label{sec:chunks}
 
-\glossupperplural{chunk} are the basic storage units used in Swarm's network layer. They are an association of an address with content. Since retrieval in Swarm (\ref{sec:retrieval}) assumes that chunks are stored with nodes close to their address,  the addresses of chunks should also be uniformly distributed in the address space and have their content limited and roughly uniform in size to achieve fair and equal \gloss{load balancing}.  
+\glossupperplural{chunk} are the basic storage units used in Swarm's network layer. They are an association of an address with content. Since retrieval in Swarm (\ref{sec:retrieval}) assumes that chunks are stored with nodes close to their address, fair and equal \gloss{load balancing} requires that the addresses of chunks should also be uniformly distributed in the address space, and have their content limited and roughly uniform in size.  
 
-When chunks are retrieved, the downloader must be able to verify the correctness of the content given the address. Such integrity translates to guaranteeing uniqueness of content associated with an address. In order to protect against frivolous network traffic, third party \glossplural{forwarding node} should be able to verify the integrity of chunks using only local information available to the node.
+When chunks are retrieved, the downloader must be able to verify the correctness of the content given the address. Such integrity translates to guaranteeing uniqueness of content associated with an address. In order to protect against frivolous network traffic, a third party \glossplural{forwarding node} should be able to verify the integrity of chunks using only local information available to the node.
 
 The deterministic and collision free nature of addressing implies that chunks are unique as a key--value association: If there exists a chunk with an address, then no other valid chunk can have the same address; this assumption is crucial as it makes the chunk store \gloss{immutable}, i.e.\ there is no replace/update operation on chunks. Immutability is beneficial in the context of relaying chunks as nodes can negotiate information about the possession of chunks simply by checking their addresses. This plays an important role in the stream protocol (see \ref{sec:pull-syncing}) and justifies the DISC resolution as \emph{distributed immutable store for chunks}.
 
@@ -303,13 +303,13 @@ The address of BMT chunks is calculated using the \gloss{binary Merkle tree hash
    \centering
    \resizebox{1\textwidth}{!}{
    \input{fig/bmthash.tex}}
-   \caption[BMT: Binary Merkle Tree hash used as chunk hash in Swarm \statusgreen]{BMT (Binary Merkle Tree) chunk hash in Swarm: the 1337 bytes of chunk data is segmented into 32 byte segments. Zero padding is used to fill up the rest up to 4 kilobytes. Pairs of segments are hashed together using Keccak256 to build up the binary tree. On level 8, the binary Merkle root is prepended with the 8 byte span and hashed to yield the BMT chunk hash.`}
+   \caption[BMT: Binary Merkle Tree hash used as chunk hash in Swarm \statusgreen]{BMT (Binary Merkle Tree) chunk hash in Swarm: the 1337 bytes of chunk data is segmented into 32 byte segments. Zero padding is used to fill up the rest up to 4 kilobytes. Pairs of segments are hashed together using Keccak256 to build up the binary tree. On level 8, the binary Merkle root is prepended with the 8 byte span and hashed to yield the BMT chunk hash.}
    \label{fig:BMT}
 \end{figure}
 
 The BMT chunk address is the hash of the 8 byte span and the root hash of a \gloss{binary Merkle tree} (\gloss{BMT}) built on the 32-byte segments of the underlying data (see figure \ref{fig:BMT}). If the chunk content is less than 4k, the hash is calculated as if the chunk was padded with all zeros up to 4096 bytes.
 
-This structure allows for compact \gloss{inclusion proofs} with a 32-byte resolution. An inclusion proof is a proof that one string is a substring of another string, for instance, that a string is included in a chunk. Inclusion proofs are defined on a data segment of a particular index, see figure \ref{fig:chunk-inclusion}. Such Merkle proofs are also used as proof of custody when storer nodes provide evidence that they possess a chunk (see \ref{sec:postage-lottery}). Together with the Swarm file hash (see \ref{sec:files} and \ref{spec:format:files}), it allows for logarithmic inclusion proofs for files, i.e.\ proof that a string is found to be part of a file.
+This structure allows for compact \gloss{inclusion proofs} with a 32-byte resolution. An inclusion proof is a proof that one string is a substring of another string, for instance, that a string is included in a chunk. Inclusion proofs are defined on a data segment of a particular index, see figure \ref{fig:chunk-inclusion}. Such Merkle proofs are also used as proof of custody when storer nodes provide evidence that they possess a chunk (see \ref{sec:postage-lottery}). Together with the Swarm file hash (see \ref{sec:files} and \ref{spec:format:files}), it allows for logarithmic inclusion proofs for files, i.e.,\ proof that a string is found to be part of a file.
 
 
 \begin{figure}[htbp]
@@ -362,7 +362,7 @@ With two types of chunk, integrity is linked to collision free hash digests, der
 
 \subsection{Chunk encryption\statusgreen}\label{sec:chunk-encryption}
 
-Chunks should be encrypted by default. Beyond client needs for confidentiality, encryption has two further important roles. (1) Obfuscation of chunk content by encryption provides a degree of \gloss{plausible deniability}; using it across the board makes this defense stronger. (2) The ability to choose arbitrary encryption keys together with the property of uniform distribution offer predictable ways of \gloss{mining chunks}, i.e.\ generating an encrypted variant of the same content so that the resulting chunk address satisfies certain constraints, e.g. is closer to or farther away from a particular address. This is an important property used in (1) price arbitrage (see \ref{sec:pricing}) and (2) efficient use of postage stamps (see \ref{sec:postage-stamps}).
+Chunks should be encrypted by default. Beyond client needs for confidentiality, encryption has two further important roles. (1) Obfuscation of chunk content by encryption provides a degree of \gloss{plausible deniability}; using it across the board makes this defense stronger. (2) The ability to choose arbitrary encryption keys together with the property of uniform distribution offer predictable ways of \gloss{mining chunks}, i.e.,\ generating an encrypted variant of the same content so that the resulting chunk address satisfies certain constraints, e.g. is closer to or farther away from a particular address. This is an important property used in (1) price arbitrage (see \ref{sec:pricing}) and (2) efficient use of postage stamps (see \ref{sec:postage-stamps}).
 
 
 \begin{figure}[htbp]
@@ -373,7 +373,7 @@ Chunks should be encrypted by default. Beyond client needs for confidentiality, 
 \end{figure}
 
 
-Chunk encryption (see figure \ref{fig:chunk-encryption}) is formally specified in \ref{spec:format:encryption}. Chunks shorter than 4 kilobytes are padded with random bytes (generated from the chunk encryption seed). The full chunk plaintext is encrypted and decrypted using a XOR-based block cipher seeded with the corresponding symmetric key. In order not to increase the attack surface by introducing additional cryptographic primitives, the block cipher of choice is using Keccak256 in counter mode, i.e. hashing together the key with a counter for each consecutive segment of 32 bytes. In order to allow selective disclosure of individual segments being part of an encrypted file, yet leak no information about the rest of the file, we add an additional step of hashing to derive the encryption key for a segment in the chunk. This scheme is easy and cheap to implement in the \gloss{EVM}, lending itself to use in smart contracts constraining the plaintext of encrypted Swarm content. 
+Chunk encryption (see figure \ref{fig:chunk-encryption}) is formally specified in \ref{spec:format:encryption}. Chunks shorter than 4 kilobytes are padded with random bytes (generated from the chunk encryption seed). The full chunk plaintext is encrypted and decrypted using a XOR-based block cipher seeded with the corresponding symmetric key. In order not to increase the attack surface by introducing additional cryptographic primitives, the block cipher of choice is using Keccak256 in counter mode, i.e. hashing together the key with a counter for each consecutive segment of 32 bytes. In order to allow selective disclosure of individual segments being part of an encrypted file, yet leak no information about the rest of the file, we add an additional step of hashing to derive the encryption key for a segment in the chunk. This scheme is easy and cheap to implement in the \gloss{EVM}, lending itself to use in smart contracts containing the plaintext of encrypted Swarm content. 
 
 The prepended metadata encoding the chunk span is also encrypted as if it was a continuation of the chunk, i.e. with counter 128. Encrypted chunk content is hashed using the \gloss{BMT hash} digest just as unencrypted ones are. The fact that a chunk is encrypted may be guessed from the \gloss{span value}, but apart from this, in the network layer, encrypted chunks behave in exactly the same way as unencrypted ones.
 
@@ -504,7 +504,7 @@ So far, we have shown that by using the retrieval protocol and maintaining Kadem
 In the previous sections, we presented how a network of nodes maintaining a Kademlia overlay topology can be used as a distributed chunk store and how Forwarding Kademlia routing can be used to define a protocol for retrieving chunks.
 When discussing retrieval, we assumed that chunks are located with the node whose address is closest to theirs. This section describes the protocol responsible for realising this assumption: ensuring delivery of the chunk to its prescribed storer after it has been uploaded to any arbitrary node.
 
-This network protocol, called \gloss{push syncing}, is analogous to chunk retrieval: First, a chunk is relayed to the node closest to the chunk address via the same route as a retrieval request would be, and then in response a \gloss{statement of custody receipt} is passed back along the same path (see figure \ref{fig:push-syncing}). The statement of custody sent back by the storer to the \gloss{uploader} indicates that the chunk has reached the neighbourhood from which it is then universally retrievable. By tracking these responses for each constituent chunk of an upload, uploaders can make sure that their upload is fully retrievable by any node in the network before sharing or publishing the address of their upload. Keeping this count of chunks push-synced and receipts received serves as the back-end for a \emph{progress bar} that can be displayed to the uploader to give positive feedback of the successful propagation of their data across the network (see \ref{sec:upload} and \ref{spec:api:tags}).
+This network protocol, called \gloss{push syncing}, is analogous to chunk retrieval: First, a chunk is relayed to the node closest to the chunk address via the same route as a retrieval request would be, and then in response a \gloss{statement of custody receipt} is passed back along the same path (see figure \ref{fig:push-syncing}). The statement of custody sent back by the storer to the \gloss{uploader} indicates that the chunk has reached the neighbourhood from which it is then universally retrievable. By tracking these responses for each constituent chunk of an upload, uploaders can make sure that their upload is fully retrievable by any node in the network before sharing or publishing the address of their upload. Keeping this count of chunks push-synced and receipts received serves as the back-end for a \emph{progress bar} that can be displayed to the uploader to give feedback of the successful propagation of their data across the network (see \ref{sec:upload} and \ref{spec:api:tags}).
 
 
 \begin{figure}[htbp]
@@ -561,11 +561,11 @@ A node is said to be light by virtue of not participating fully in the usual pro
 
 A node that has restricted bandwidth environment or in whatever way has limited capacity to maintain underlay connections is not expected to be able to forward messages conforming to the rules of Kademlia routing. This needs to be communicated to its peers so that they do not relay messages to it. 
 
-As all protocols in Swarm are modular, a node may switch on or off any protocol independently (depending on capacity and earnings requirements). To give an example: a node that has no storage space available, but has spare bandwidth, may participate as a forwarding node only. Of course, while switching off protocols is technically feasible, a node must at all times take into account the fact that his/her peers expect a certain level of service if this is advertised and may not accept that some services are switched off and choose not to interact with that node. 
+As all protocols in Swarm are modular, a node may switch on or off any protocol independently (depending on capacity and earnings requirements). To give an example: a node that has no storage space available, but has spare bandwidth, may participate as a forwarding node only. Of course, while switching off protocols is technically feasible, a node must at all times take into account the fact that his peers expect a certain level of service if this is advertised and may not accept that some services are switched off and choose not to interact with that node. 
 
 Since forwarding can earn revenue, these nodes may still be incentivised to accept retrieve requests. However, if the light node has Kademlia connectivity above proximity order bin $p$ (i.e. they  are connected to all storer nodes within their nearest neighbourhood of $r$ peers at depth $d$, and there is at least one peer in each of their proximity order bin from $p$ to $d$), they can advertise this and therefore participate in forwarding. 
 
-When they want to retrieve or push chunks, if the chunk address falls into a proximity order bin where there are no peers, they can just pick a saturated peer in another bin. Though this may result in a spurious hop (where the proximity of the message  destination to the latest peer does not increase as a result of the relaying), the Kademlia assumption that routing can be completed in logarithmic steps still holds valid.
+When they want to retrieve or push chunks, if the chunk address falls into a proximity order bin where there are no peers, they can just pick a  peer in another bin. Though this may result in a spurious hop (where the proximity of the message  destination to the latest peer does not increase as a result of the relaying), the Kademlia assumption that routing can be completed in logarithmic steps still holds valid.
 
 A node that is advertised as a storer/caching node is expected to store all chunks  above a certain value. In order to have consistency, they need to synchronise content in their area of responsibility which necessitates their running of the pull-sync protocol. This is also so with aspiring storer nodes, which come online with available storage and open up to pull-sync streams to fill their storage capacity. In the early stages of this, it does not make sense for a node to sync to other full storer nodes. However, it can still be useful for them to sync with other similar newcomer nodes, especially if storer nodes are maxing out on their bandwidth.
 
@@ -606,7 +606,7 @@ It is, however possible to make it profitable for a node to react in a way that 
 
 Retrieval of a chunk is ultimately initiated by someone accessing content and therefore, all costs related to this retrieval should be borne by them. While paid retrievals may not sound like a popular idea when today's web is "free", many of the problems with the current web stems from consumers' inability to share the costs of hosting and distribution with content publishers directly. In principle, the retrieval of a chunk can be perceived as a functional unit where the storer acts as a service provider and the requestor as consumer. As service is given by provider to consumer, compensation should be given by consumer to provider. Such a direct transaction would normally require that transactors are known to each other, so if we are to maintain the anonymity requirement on downloads, we must conceptualise compensation in a novel way. 
 
-As we use Forwarding Kademlia, chunk retrieval subsumes a series of relaying actions performed by forwarding nodes. Since these are independent actors, it is already necessary to incentivise each act of relaying independently. Importantly, if only instances of relaying are what matters, then, irrespective of the details of accounting and compensation (see \ref{sec:accounting}), transactors are restricted to connected peers. Given the set of ever connected peers is a quasi-permanent set across sessions, this allows us to frame the interaction in the context of repeated dealings. Such a setting always creates extra incentive for the parties involved to play nice. It is reasonable to exercise preference for peers showing untainted historical record. Moreover, since this quasi-permanent set is logarithmic to network size, any book-keeping or blockchain contract that the repeated interaction with a peer might necessitate is kept manageable, offering a scalable solution. Turning the argument around, we could say that keeping balances with a manageable number of peers, as well as the ambiguity of request origination are the very reasons for nodes to have limited connectivity, i.e., that they choose leaner Kademlia bins.
+As we use Forwarding Kademlia, chunk retrieval subsumes a series of relaying actions performed by forwarding nodes. Since these are independent actors, it is already necessary to incentivise each act of relaying independently. Importantly, if only instances of relaying are what matters, then, irrespective of the details of accounting and compensation (see \ref{sec:accounting}), transactors are restricted to connected peers. Given the set of ever connected peers is a quasi-permanent set across sessions, this allows us to frame the interaction in the context of repeated dealings. Such a setting always creates extra incentive for the parties involved to play nice. It is reasonable to exercise preference for peers showing untainted historical record. Moreover, since the set of connected peers is logarithmic in the network size, any book-keeping or blockchain contract that the repeated interaction with a peer might necessitate is kept manageable, offering a scalable solution. Turning the argument around, we could say that keeping balances with a manageable number of peers, as well as the ambiguity of request origination are the very reasons for nodes to have limited connectivity, i.e., that they choose leaner Kademlia bins.
 
 \subsubsection{Charging for backwarded response}
 
@@ -639,7 +639,7 @@ Practically, without this possibility, a node operator might decide to shut down
 
 Bandwidth is a service that comes with "instant gratification" and therefore immediate acknowledgement and accounting of its cost are justified. Since it is hard to conceive of any externality or non-linearity in the overall demand and supply of bandwidth, a pricing mechanism which provides for both (1) efficient and immediate signalling, as well as (2) competitive choice with minimal switching and discovery cost, is most likely to accommodate strategies that result in a globally optimal resource allocation.
 
-To facilitate this, we introduce a protocol message that can communicate these prices to upstream peers (see \ref{spec:protocol:retrieval}). We can conceptualise this message as an alternative response to a request. Nodes maintain the prices associated with each peer for each proximity distance, so when they issue a retrieve request they already know the price they commit to pay in the event that the downstream peer successfully delivers the valid chunk within the time to live period. However, there is no point in restricting the price signal just to responses: For whatever reason a peer decides to change the prices, it is in the interest of both parties to exchange this information even if there is request to respond to. In order to prevent DoS attacks by flooding upstream peers with price change messages, the rate of price messages is limited. Well behaved and competitively priced nodes are favoured by their peers; if a node's prices are set too high or their prices exhibit a much higher volatility than others in the network, then peers will be less willing to request chunks from them.%
+To facilitate this, we introduce a protocol message that can communicate these prices to upstream peers (see \ref{spec:protocol:retrieval}). We can conceptualise this message as an alternative response to a request. Nodes maintain the prices associated with each peer for each proximity order, so when they issue a retrieve request they already know the price they commit to pay as long as the downstream peer successfully delivers the valid chunk within the time to live period. However, there is no point in restricting the price signal just to responses: For whatever reason a peer decides to change the prices, it is in the interest of both parties to exchange this information even if there is request to respond to. In order to prevent DoS attacks by flooding upstream peers with price change messages, the rate of price messages is limited. Well behaved and competitively priced nodes are favoured by their peers; if a node's prices are set too high or their prices exhibit a much higher volatility than others in the network, then peers will be less willing to request chunks from them.%
 %
 \footnote{While this suggests that unreasonable pricing is taken care of by market forces, in order to prevent catastrophic connectivity changes as a result of radical price fluctuations, limiting the rate of change may need to be enforced on the protocol level. }
 
@@ -676,7 +676,7 @@ Take a node $A$ that needs to forward a request for a chunk which falls into $A$
  
 
 
-Similarly, peers of $A$ in shallower bins that have lower price than $A$ for their respective bins, e.g. $B$ in bin $n-1$ is cheaper than $A$ in bin $n$, then $A$ can always forward any request to $B$ and pocket the difference.
+Similarly, peers of $A$ in shallower bins that have lower price than $A$ for their respective bins, e.g., $B$ in bin $n-1$ is cheaper than $A$ in bin $n$, then $A$ can always forward any request to $B$ and pocket the difference.
 
 Now let's assume that all peers have price tables which are monotonically decreasing as PO decreases. Also assume that shallower bins have higher prices for bins less than $n$ and all deeper peers in bins higher than $n$ have the same prices for $n$. Let $B$, $C$, $D$ and $E$ be the peers in bin $n$ densely balanced. $A$ wants to  forward a chunk to a peer so that the PO with its target address increases by 3. If the peers $B$ and $C$ attempt to collude against $A$ and raise the price of forwarding chunks to bin $n+3$, they are still bound by $D$ and $E$'s price on PO bin $n+2$. In particular if they are lower than $B$ and $C$ for $n+3$.
 
@@ -687,7 +687,7 @@ All else being equal, this price arbitrage strategy will achieve (1) uniform pri
 
 \subsubsection{Bin density}
 
-Charging based on the downstream peer's proximity to the chunk has the important consequence that the net revenue earned from a single act of non-local delivery to a single requestor is a monotonically increasing function of the difference between the chunk's proximity to the node itself vs to the peer the request was forwarded to. In other words, the more distance we can cover in one forward request, the more we earn. 
+Charging based on the downstream peer's proximity to the chunk has the important consequence that the net revenue earned from a single act of non-local delivery to a single requestor is a monotonically increasing function of the difference between the chunk's proximity to the node itself and to the peer the request was forwarded to. In other words, the more distance we can cover in one forward request, the more we earn. 
 
 This incentive aligns with downloaders' interest to save hops in serving their requests leading to lower latency delivery and less bandwidth overhead. This scheme incentivises nodes to keep a gap-free balanced set of addresses in their Kademlia bins as deep as possible (see figure \ref{fig:bindensity}), i.e, it is better for a node to keep dense Kademlia bins than thin ones.
 
@@ -843,10 +843,10 @@ Not all peers in Swarm are expected to have the Ether needed to pay for the tran
 
 \subsection{Waivers\statusgreen}\label{sec:waiver}
 
-If the imbalance in the swap channel is the result of high variance as opposed to unequal consumption, after a period of accumulating cheques the channel balance starts tilting the other way. Normally, it is now up to the other party to issue cheques to its peer resulting in un-cashed cheques accumulating on both sides.
+If the imbalance in the swap channel is the result of high variance as opposed to unequal consumption, after a period of accumulating cheques the channel balance starts tilting the other way. Normally, it is now up to the other party to issue cheques to its peer resulting in uncashed cheques accumulating on both sides.
 To allow for further savings in transaction costs, it could be desirable to be able to "play the cheques off against each other".
 
-Such a process is possible, but it requires certain important changes within the chequebook contract. In particular, cashing cheques can no longer be immediate and must incur a security delay, a concept familiar from other payment channel implementations. 
+Such a process is possible, but it requires certain important changes within the chequebook contract. In particular, cashing cheques can no longer be immediate and must incur a security delay, a concept familiar from other payment channel implementations \cite{poon2015bitcoin, diferrante2017payment, mcdonald2017payment, tremback2015universal}. 
 
 Let us imagine a system analogous to cheques being returned to the issuer. Assume peer $A$ issued cheques to $B$ and the balance was brought back to zero. Later the balance tilts in $A$'s favour but the cheques from $A$ to $B$ have not been cashed. In the traditional financial world, user B could either simply return the last cheque back to $A$ or provably destroy it. In our case it is not so simple; we need some other mechanism by which $B$ \emph{commits not to cash} that particular cheque. Such a commitment could take several forms; it could be implemented by $B$ signing a message allowing $A$ to issue a new `last cheque` which has a lower cumulative total amount than before, or perhaps $B$ could issue some kind of `negative` cheque for A's chequebook that would have the effect as if a cheque with the same amount had been paid. 
 
@@ -896,7 +896,7 @@ service and earn money.}
 The possibility to earn small amounts of money without starting capital is crucial, as it provides a way for new users to get access to Swarm without the need to purchase the token. This benefit extends to the Ethereum ecosystem in general: using Swarm, anybody can earn small amounts of money to start paying the gas to fuel their dapps, without the need to go through a painful process of acquiring tokens prior to onboarding. 
 
 
-\subsection{Cashing out and risk of insolvency}
+\subsection{Cashing out and risk of insolvency\statusred}
 
 
 
@@ -913,7 +913,7 @@ In a peer to peer trustless setting, it is difficult to have nuanced sanctions a
 
 Both retrieval and push-sync protocols have an incentive structure where only the response incurs a source of income. Although this forms a strong incentive to play ball, it may also be necessary to take measures to ensure that nodes are not able to spam the network with frivolous requests which have no associated cost. In the case of push-syncing it is especially important not to allow chunks to expunge others at no cost. This will form the topic of a later section where we introduce postage stamps (see \ref{sec:postage-stamps}).
 
-In the case of pull-sync retreival, the attack consists of requesting non-existing chunks and causing downstream peers to initiate a lot of network traffic, as well as some memory consumption, due to requests being persisted during the time to live period.
+In the case of pull-sync retrieval, the attack consists of requesting non-existing chunks and causing downstream peers to initiate a lot of network traffic, as well as some memory consumption, due to requests being persisted during the time to live period.
 Surely, it could happen that one requests non-existing chunks and what is more, the requested chunk could be garbage collected in the network, in which case, the requestor may have acted in good faith. 
 
 To mitigate this, each node keeps a record of the number of retrieve requests from each of its peers and then updates the relative frequency of failed requests, i.e. requests that have timed out even though the node in question has forwarded it. In the case that the proportion of these failed requests relative to successful requests is too high, sanctions are imposed on the peer: it is disconnected and blacklisted.
@@ -981,7 +981,6 @@ The batches are created by a central postage smart contract when a transaction i
 
 \begin{itemize}
 \item \emph{owner address} -- The owner that is entitled to use the batches created to stamp chunks.
-\item \emph{number of batches} -- Number of batches to be created by this payment.
 \item \emph{batch depth} -- Logarithm of the number of chunks that can be stamped with each batch created.
 \end{itemize}
 
@@ -989,18 +988,15 @@ This postage payment then results in the following information being recorded:
 
 \begin{itemize}
 \item \emph{payment reference ID} -- A random ID that is generated as reference for this payment.
-\item \emph{per-chunk balance} -- The total amount, equally allocated for each chunk covered by the batches created from this payment.
+\item \emph{per-chunk balance} -- The total amount, equally allocated for each chunk covered by this payment.
 \item \emph{owner address} -- The owner that is entitled to use the batches created to stamp chunks.
-\item \emph{number of batches} -- The number of batches created by this payment.
 \item \emph{batch depth} -- Logarithm of the number of chunks that can be stamped with each batch created.
 \end{itemize}
 
 
 The owner is the address that is specified in the transaction data and recorded as the party authorised to use the batches created to stamp chunks; if not specified, it is assumed to be the transaction sender by default. 
 
-A random identifier is generated to provide a reference to the payment. 
-The payment transaction will create multiple batches the number of which is specified in the transaction. The batch depth is eventually recorded for each batch separately. New batches can be created for each payment.
-The number of chunks covered by this payment can then be calculated as the sum of the batch sizes. The initial batch depth is meant to apply to all batches created by  the payment transaction. The amount of BZZ tokens sent with the transaction is then allocated equally to all chunks covered by the payment, i.e. the total amount of tokens, divided by the number of chunks covered is assigned to the payment ID to represent the per-chunk balance of the batches. Anyone can then choose to top up this balance at a later date. 
+A random identifier is generated to provide a reference to the payment. The batch depth is recorded for each batch separately. The amount of BZZ tokens sent with the transaction is then allocated equally to all chunks covered by the payment, i.e. the total amount of tokens, divided by the number of chunks covered is assigned to the payment ID to represent the per-chunk balance of the batches. Anyone can then choose to top up this balance at a later date. 
 
 
 \begin{figure}[htbp]
@@ -1019,7 +1015,7 @@ The postage stamp attached to a chunk is a data structure comprising the followi
     \item \emph{witness} -- The owner's signature, linking the batch identifier and the owner's address.
 \end{itemize}
 
-The \emph{value} of a postage stamp is the per-chunk balance associated with the batch.
+The \emph{value} of a batch is the adjusted normalised balance associated with it.
 Similarly to stamps used for postal mail, a single chunk can have multiple postage stamps attached to it. In this case the value conferred to the chunk by multiple valid postage stamps are added up to form the total postage stamp value. 
 
 \subsubsection{Validity of postage stamp}
@@ -1078,7 +1074,7 @@ Consider the thrifty uploader that only has as many postage collision slots as c
 
 \yellow{}
 
-As discussed in \ref{sec:accounting}, the primary incentive mechanism in Swarm is providing compensation for retrieval, where nodes are rewarded for successfully having served a chunk. This reward mechanism has the added benefit of encouraging opportunistic caching. Profit-maximising storage nodes serve chunks that are often requested from them and as a result, ensure that popular content becomes widely distributed across the network and thus also the retrieval latency is decreased.
+As discussed in \ref{sec:accounting}, an important incentive mechanism in Swarm is providing compensation for retrieval, where nodes are rewarded for successfully having served a chunk. This reward mechanism has the added benefit of encouraging opportunistic caching. Profit-maximising storage nodes serve chunks that are often requested from them and as a result, ensure that popular content becomes widely distributed across the network and thus also the retrieval latency is decreased.
 
 The flipside of using only this incentive, is that chunks that are rarely retrieved may end up being lost: If a chunk is not being accessed for a long time, then as a result of limited storage capacity, it will eventually end up garbage collected to make room for new arrivals. In order for the swarm to guarantee long-term availability of data, the incentive system needs to make sure that additional revenue is generated for chunks that would otherwise be deleted. In other words, unpopular chunks that do not generate sufficient profit from retrievals should compensate the nodes that store them for their opportunities forgone. The \gloss{postage lottery} presented in this section provides such a compensation through redistributing the revenue coming from postage stamps among the storer nodes in a fair way.
 
@@ -1169,10 +1165,10 @@ After the challenge phase ended ($N$ blocks after the beginning of the raffle ro
 The lottery prize payout needs to take into account the number of winners, the number of chunks, the proportion of a nodes' storage with respect to the total volume stored in Swarm.
 The period that the payout is for is equally distributed among winners. For ease of reasoning, it is possible to calibrate blocks = winners, so that we can say a node when it wins gets paid for all chunks for a block. The winner is entitled to collect the price for each chunk whose price is not lower than the minimum required by the winner. The sum of all winners' proceeds is subtracted from the remaining balance of each batch. The postage batches whose balance is dried out after the payout are removed from the contract.%
 %
-\footnote{In practice, such a balance adjusment is unnecessary, see \ref{spec:format:postage-stamps}).
+\footnote{In practice, such a balance adjustment is unnecessary, see \ref{spec:format:postage-stamps}).
 }
 
-While winning nodes could try to benefit from a higher price for a bigger win, they are competing with each other to try to win the raffle, so they are incentivised to secure their win by offering the actual cutoff value they used for garbage collection. As a result of competitive payouts, it is expected that the unit prices will converge on the marginal cost of storing one more chunk.
+While winning nodes could try to benefit from a higher price for a bigger win, they are competing with each other to try to win the raffle, so they are incentivised to secure their win by offering the actual cutoff value they used for garbage collection. As a result of competitive payouts, it is expected that the unit prices will converge on the marginal cost of storing one more chunk plus storer/forwarder/challenger margins.
 
 
 
@@ -1516,7 +1512,7 @@ Note that all chunks in a file except for the right edge are completely filled. 
 \end{figure}
 
 
-Suppose we were to prove the inclusion of a substring in a file at a particular offset. We saw that the offset applied to the data maps to a deterministic path traversing the Swarm hash. Since a substring inclusion proof simply reduces to a series of proofs of data segment paths, the chunk addresses are a result of a BMT hash where the base segments are 32-byte long. This means that in intermediate chunks, BMT base segments align with the addresses of children. As a consequence, proving that a the child of an intermediate chunk at a particular span offset is equivalent to giving a segment inclusion proof on the child hash. Therefore, substring inclusion in files can be proved with a sequence of BMT inclusion proofs (see \ref{spec:format:bmt}) where the length of the sequence corresponds to the depth of the Swarm hash tree (see figure \ref{fig:file-inclusion}). 
+Suppose we were to prove the inclusion of a substring in a file at a particular offset. We saw that the offset applied to the data maps to a deterministic path traversing the Swarm hash. Since a substring inclusion proof simply reduces to a series of proofs of data segment paths, the chunk addresses are a result of a BMT hash where the base segments are 32-byte long. This means that in intermediate chunks, BMT base segments align with the addresses of children. As a consequence, proving that a child of an intermediate chunk at a particular span offset is equivalent to giving a segment inclusion proof on the child hash. Therefore, substring inclusion in files can be proved with a sequence of BMT inclusion proofs (see \ref{spec:format:bmt}) where the length of the sequence corresponds to the depth of the Swarm hash tree (see figure \ref{fig:file-inclusion}). 
 
 
 Note that such inclusion proofs are possible even in the case of encrypted data since the decryption key at for a segment position can be selectively disclosed without revealing any information that could compromise the encryption elsewhere in the chunk.
@@ -2275,7 +2271,7 @@ These 'chunk-in-a-soc' responses are structurally similarly to neighbourhood not
 This makes the request generic, i.e. not fixed to the identity of the prospective poster. Therefore it can be sent to any neighbourhood that requires the content. Even multiple requests can be sent simultaneously: due to the uniqueness of the valid response, multiple responses cannot hurt chunk integrity (see \ref{sec:single-owner-chunks} and \ref{sec:feed-integrity}). Targeted delivery is used in missing chunk recovery, see \ref{sec:recovery-chunks}.
 
 The difference is that neighbourhood notifications are not giving any new information while targeted chunk delivery supplies the chunk data. Also, a chunk delivery wrapped in a single owner chunk uses no message wrapping and has no topic. Neither request nor response uses encryption.
-A consequence of not using encryption is that, if there are alternative sources, mining the initial Trojan request has the constraint that the address matches any target. 
+A consequence of not using encryption is that, if there are multiple tartgets, it is sufficient that the initial Trojan request matches any one of these targets. 
 
 Table \ref{tab:notifications} summarises various properties of the three notification-like constructs.
 
@@ -2433,7 +2429,7 @@ Local pinning can be thought of as a feature which allows Swarm users to mark sp
 
 \subsection{Global pinning}\label{sec:global-pinning}
 
-If a chunk is removed as a result of garbage collection by storers in its nominated neighbourhood , local pinning in nodes elsewhere in the network will offer no way to retrieve it alone. In order for pinning to aid global network persistence, two issues must be tackled:
+If a chunk is removed as a result of garbage collection by storers in its nominated neighbourhood, local pinning in nodes elsewhere in the network will offer no way to retrieve it alone. In order for pinning to aid global network persistence, two issues must be tackled:
 
 \begin{itemize}
     \item  notify global pinners of a missing chunk belonging to the content they pin -- so they can re-upload it,

@@ -9,7 +9,7 @@
 \end{queryParameter}
 
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{200}{OK}{}
 \end{routeResponse}
 \end{apiRoute}
 
@@ -24,9 +24,9 @@
 \routeParamItem{id}{}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{200}{OK}{}
 \responseItem{400}{Bad Request}{ID not well formed}
-\responseItem{404}{Not found}{Stamp with ID does not exists.}
+\responseItem{404}{Not Found}{stamp with ID does not exists.}
 \end{routeResponse}
 \end{apiRoute}
 
@@ -48,9 +48,10 @@
 \begin{routeResponse}{application/json}
 \responseItem{200}{ok}{}
 \responseItem{400}{Bad Request}{ID not well formed}
-\responseItem{404}{Not found}{Stamp with ID does not exists.}
+\responseItem{404}{Not Found}{stamp with ID does not exists.}
 \end{routeResponse}
 \end{apiRoute}
+
 
 
 
@@ -63,14 +64,14 @@
 \routeParamItem{id}{}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{200}{OK}{}
 \responseItem{400}{Bad Request}{ID not well formed}
-\responseItem{404}{Not found}{Stamp with ID does not exists.}
+\responseItem{404}{Not Found}{stamp with ID does not exists}
 \end{routeResponse}
 \end{apiRoute}
 
 
-\begin{apiRoute}{POST}{/stamp/}{Create a new postage stamp, return ID in reponse body}
+\begin{apiRoute}{POST}{/stamp/}{Create a new postage stamp, return ID in response body}
 {
 }
 { }
@@ -78,6 +79,6 @@
 \begin{routeParameter} 
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{201}{created}{ID in response body}
+\responseItem{201}{Created}{ID in response body}
 \end{routeResponse}
 \end{apiRoute}

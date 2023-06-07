@@ -221,6 +221,24 @@ nobreak=true
 \endtabularx
 \medskip
 }
+%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newenvironment{requestBody}
+{
+\arrayrulecolor{gray!50}
+
+\begin{tabularx}{\textwidth}{X}
+\rowcolor{white}
+\textbf{Request Body} \\ \hline
+\end{tabularx}
+
+\tabularx{\textwidth}{l X}
+}
+{
+\endtabularx
+\medskip
+}
 %%%%%%%%%%%%%%%%%%%%
 \newenvironment{routeResponse}[1]
 {

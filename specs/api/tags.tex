@@ -16,13 +16,13 @@
 {
 }
 { }
+
 \begin{queryParameter} 
 \queryParamItem{offset}{integer}
 \queryParamItem{length}{integer}
 \end{queryParameter}
-
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{200}{OK}{json array of tag details struct}
 \end{routeResponse}
 \end{apiRoute}
 
@@ -35,12 +35,12 @@
 { }
 
 \begin{routeParameter} 
-\routeParamItem{id}{string}
+\routeParamItem{id}{hex string}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{200}{OK}{json struct in response body}
 \responseItem{400}{Bad Request}{ID not well formed}
-\responseItem{404}{Not found}{Tag with ID does not exists.}
+\responseItem{404}{Not Found}{tag with ID does not exists.}
 \end{routeResponse}
 \end{apiRoute}
 
@@ -52,12 +52,12 @@
 { }
 
 \begin{routeParameter} 
-\routeParamItem{id}{string}
+\routeParamItem{id}{hex string}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{204}{No content}{}
+\responseItem{204}{No Content}{successful deletion}
 \responseItem{400}{Bad Request}{ID not well formed}
-\responseItem{404}{Not found}{Tag with ID does not exists.}
+\responseItem{404}{Not Found}{tag with ID does not exists.}
 
 \end{routeResponse}
 \end{apiRoute}

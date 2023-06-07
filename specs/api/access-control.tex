@@ -9,11 +9,11 @@
 \end{routeParameter}
 \begin{routeResponse}{application/json}
 \responseItem{201}{Created}{root access manifest reference in response body}
-\responseItem{400}{Bad Request}{Encrypted content but no decryption key in reference}
-\responseItem{403}{Forbidden}{Encrypted content but no decryption key in reference}
-\responseItem{404}{Not found}{}
-\responseItem{408}{Request Timeout}{Timeout retrieving referenced manifest}
-\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out}
+\responseItem{400}{Bad Request}{encrypted content but no decryption key in reference}
+\responseItem{403}{Forbidden}{encrypted content but no decryption key in reference}
+\responseItem{404}{Not Found}{}
+\responseItem{408}{Request Timeout}{timeout retrieving referenced manifest}
+\responseItem{420}{Enhance your calm}{recovery initiated but request timed out}
 \end{routeResponse}
 \end{apiRoute}
 
@@ -28,12 +28,13 @@
 \routeParamItem{address}{hex string}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
-\responseItem{400}{Bad Request}{Address not well formed}
-\responseItem{401}{Unauthorized}{Access denied: AC unlock failed}
-\responseItem{403}{Forbidden}{Encrypted content but no decryption key in reference}
-\responseItem{408}{Request Timeout}{Timeout retrieving referenced manifest}
-\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out}\end{routeResponse}
+\responseItem{200}{OK}{}
+\responseItem{400}{Bad Request}{address not well formed}
+\responseItem{401}{Unauthorized}{access denied: AC unlock failed}
+\responseItem{403}{Forbidden}{encrypted content but no decryption key in reference}
+\responseItem{408}{Request Timeout}{timeout retrieving referenced manifest}
+\responseItem{420}{Enhance your calm}{recovery initiated but request timed out}
+\end{routeResponse}
 \end{apiRoute}
 
 
@@ -49,12 +50,12 @@
 \routeParamItem{pubkey}{hex string - public key of grantee}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{201}{Created}{Reference to new manifest root in response body}
-\responseItem{400}{Bad Request}{Address or public key not well formed}
-\responseItem{401}{Unauthorized}{Permission denied: creating session key failed}
-\responseItem{403}{Forbidden}{Encrypted content but no decryption key in reference}
-\responseItem{408}{Request Timeout}{Timeout retrieving referenced manifest}
-\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out}
+\responseItem{201}{Created}{reference to new manifest root in response body}
+\responseItem{400}{Bad Request}{address or public key not well formed}
+\responseItem{401}{Unauthorized}{access denied: creating session key failed}
+\responseItem{403}{Forbidden}{encrypted content but no decryption key in reference}
+\responseItem{408}{Request Timeout}{timeout retrieving referenced manifest}
+\responseItem{420}{Enhance your calm}{recovery initiated but request timed out}
 \end{routeResponse}
 \end{apiRoute}
 
@@ -69,11 +70,11 @@
 \routeParamItem{pubkey}{hex string - public key of grantee}
 \end{routeParameter}
 \begin{routeResponse}{application/json}
-\responseItem{201}{Created}{Reference to new manifest root in response body}
-\responseItem{400}{Bad Request}{Address or public key not well formed}
-\responseItem{401}{Unauthorized}{Permission denied: creating session key failed}
-\responseItem{403}{Forbidden}{Encrypted content but no decryption key in reference}
-\responseItem{408}{Request Timeout}{Timeout retrieving referenced manifest}
-\responseItem{420}{Enhance your calm}{Recovery initiated but request timed out}
+\responseItem{201}{Created}{reference to new manifest root in response body}
+\responseItem{400}{Bad Request}{address or public key not well formed}
+\responseItem{401}{Unauthorized}{access denied: creating session key failed}
+\responseItem{403}{Forbidden}{encrypted content but no decryption key in reference}
+\responseItem{408}{Request Timeout}{timeout retrieving referenced manifest}
+\responseItem{420}{Enhance your calm}{recovery initiated but request timed out}
 \end{routeResponse}
 \end{apiRoute}

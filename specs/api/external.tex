@@ -7,12 +7,13 @@
  {
 }
 { }
-\begin{routeParameter} \routeParamItem{id}{hex string - eth address}
+\begin{routeParameter} 
+\routeParamItem{id}{hex string - eth address}
 \routeParamItem{document}{(hex) string -  document to sign (is prefixed and hashed before signing)}
 \end{routeParameter} \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{200}{OK}{}
 \responseItem{401}{Unauthorised}{failed authentication on existing identity} 
-\responseItem{404}{Not found}{unknown identity} 
+\responseItem{404}{Not Found}{unknown identity} 
 \end{routeResponse} 
 \end{apiRoute}
 
@@ -23,8 +24,9 @@
 \begin{routeParameter} \routeParamItem{id}{hex string - eth address}
 \routeParamItem{pubkey}{hex string - represents the remote party in the shared secret arrangement}
 \end{routeParameter} \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{} \responseItem{401}{Unauthorised}{failed authentication on existing identity}
-\responseItem{404}{Not found}{unknown identity}
+\responseItem{200}{OK}{} 
+\responseItem{401}{Unauthorised}{failed authentication on existing identity}
+\responseItem{404}{Not Found}{unknown identity}
 \end{routeResponse} \end{apiRoute}
 
 
@@ -55,9 +57,9 @@
 \routeParamItem{function}{endpoint within contract}
 \routeParamItem{args}{arguments for the eth API call}
 \end{routeParameter} \begin{routeResponse}{application/json}
-\responseItem{200}{ok}{}
+\responseItem{200}{OK}{transaction data in response body}
+\responseItem{400}{Bad Request}{unknown contract or function endpoint given} 
 \responseItem{401}{Unauthorised}{failure signing transaction}
-\responseItem{400}{Bad request}{unknown contract or function endpoint given} 
 \responseItem{404}{Not Found}{unknown contract or function endpoint} 
 \responseItem{422}{Unprocessable entity}{incorrect ABI,  error by eth API}
 \end{routeResponse} \end{apiRoute}

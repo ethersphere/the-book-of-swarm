@@ -18,8 +18,10 @@ define type message
     payload [!:4030]byte    // varlength padded to 4030B
     
 // trojan chunk
+// the nonce 
 define type trojan 
     nonce   segment           // the nonce to mine 
+    key  pubkey               // compressed format 
     message [4064]byte        // encrypted msg 
 \end{lstlisting}
 \end{definition}

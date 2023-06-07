@@ -11,15 +11,9 @@ The handshake protocol defines only one stream and three messages:
 
 syntax = "proto3";
 
-package handshake;
-
 message Syn {
-    bytes ObservedUnderlay = 1;
-}
-
-message Ack {
-    BzzAddress Address = 1;
-    uint64 NetworkID = 2;
+    bytes Address = 1;
+    int32 NetworkID = 2;
     bool Light = 3;
 }
 
@@ -28,19 +22,17 @@ message SynAck {
     Ack Ack = 2;
 }
 
-message BzzAddress {
-    bytes Underlay = 1;
-    bytes Signature = 2;
-    bytes Overlay = 3;
+message Ack {
+    bytes Address = 1;
 }
 \end{lstlisting}
 \end{definition}
 
 This message sequence is inspired by the TCP three way handshake to ensure message deliverability.
 
-Upon connection, requesting peer constructs a new handshake stream and sends a \lstinline{Syn} message with the remotely observed Underlay address of the peer it is performing the handshake with. After that it waits for \lstinline{SynAck} response message from the responding peer. In  the  \lstinline{SynAck} message responder sends it own \lstinline{Syn} message as well, together with the acknowledgement message which should include it's correctly signed BzzAddress. The received observed address can be used and compared with locally known addresses in order to send the better advertisable address (Underlay) in the acknowledgement. After the requesting peer receives the \lstinline{SynAck} message from the responding peer and validates that the received \lstinline{Ack} information in it is correct, it sends an \lstinline{Ack} message itself as a confirmation to the responding peer. The stream is closed by the responding peer after it receives the \lstinline{Ack} message.
+Upon connection a requesting peer constructs a new handshake stream and sends a \lstinline{Syn} message with its Overlay address, Network ID and Lightnode capability flag, and waits for \lstinline{SynAck} response message from the responding peer. In  the  \lstinline{SynAck} message responder sends it own \lstinline{Syn} message as well as an acknowledgement with the received Overlay address. After the requesting peer receives the \lstinline{SynAck} message from the responding peer and validates that the received \lstinline{Ack} information in it is correct, it sends an \lstinline{Ack} message itself as a confirmation to the responding peer. The stream is closed by the responding peer after it receives the \lstinline{Ack} message.
 
-The connection must be terminated if network IDs are do not match or if the exact order of messages is not followed.
+The connection must be terminated if network IDs are do not match or if the  exact  order of messages is not followed.
 
 The bzz address is verified and overlay, underlay and signature are extracted.
 light is a boolean field indicating whether the node is operating as a light (as opposed to full) node.

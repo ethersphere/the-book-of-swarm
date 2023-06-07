@@ -1,0 +1,226 @@
+\documentclass[a4paper,12pt,openany,hyperfootnotes,hidelinks]{scrbook}
+\usepackage[utf8]{inputenc}
+
+\usepackage{lmodern,textcomp} % euro symbols
+\usepackage[linedheaders,parts,pdfspacing,manychapters]{classicthesis}
+\usepackage[]{fullpage}
+\usepackage[titletoc,title]{appendix}
+\usepackage[section=chapter,numberedsection, acronym, toc, nonumberlist, index]{glossaries}
+\usepackage[stylemods=bookindex, abbreviations]{glossaries-extra} % index style
+
+\usepackage{epigraph} % quotations (at start of chapter)
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{rest-api}
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\usepackage{listings}
+\usepackage{listings-buzz} % import this package after listings
+\usepackage{listings-protobuf} % import this package after listings
+% \usepackage{listings-golang} % import this package after listings
+% \usepackage[labelfont=bf]{caption} % bold captions for images
+\interfootnotelinepenalty=10000 %% Completely prevent breaking of footnotes
+\usepackage{csquotes}
+
+\lstdefinestyle{bos}{
+%   frame=lines,
+  xleftmargin=\parindent,
+  belowcaptionskip=1\baselineskip,
+  backgroundcolor=\color{proto_background},
+%   basicstyle=\color{proto_basic}\footnotesize\ttfamily,
+	keywordstyle=[1]\color{orange}\bfseries,
+	keywordstyle=[2]\color{red},
+	keywordstyle=[3]\color{black}\bfseries,
+% 	keywordstyle=[1]\color{proto_keyword},
+% 	keywordstyle=[2]\color{proto_type},
+% 	keywordstyle=[3]\color{zproto_options},
+	commentstyle=\color{gray}\itshape,
+% 		commentstyle=\color{proto_comment},
+	stringstyle=\color{purple}\bfseries,
+  numberstyle=\color{proto_number}\small,
+  identifierstyle=\color{proto_ident},
+	numbers=right,
+	numbersep=5pt,
+	breaklines=true,
+	showstringspaces=false,
+	tabsize=2,
+}
+\lstset{
+  language=protobuf3,
+  basicstyle=\fontencoding{T1}\normalsize\ttfamily\color{black},
+  style=bos,
+	numbers=right,
+	numberstyle=\small
+}
+
+
+\usepackage{verbatim}
+\usepackage{multirow}
+\usepackage{csquotes}
+\usepackage{tikz}
+\usetikzlibrary{matrix,arrows.meta,fit,positioning,shapes,automata}
+\usepackage{forest}
+
+\usepackage{breakcites} % splits long citations to several lines
+
+\makeglossaries
+\let\headheight=\baselineskip
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% centered verbatim command
+\usepackage{varwidth}
+\newenvironment{centerverbatim}{%
+  \par
+  \centering
+  \varwidth{\linewidth}%
+  \verbatim
+}{%
+  \endverbatim
+  \endvarwidth
+  \par
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% make first use \emph
+% see: https://tex.stackexchange.com/questions/449104/how-to-style-first-acronym-and-first-glossary-appearance
+\newcommand{\firstuseformat}[1]{\emph{#1}}
+
+\renewcommand{\glslinkpresetkeys}{% requires v1.26+
+  \ifglsused{\glslabel}%
+  {\letcs\glstextformat{@firstofone}}%
+  {\let\glstextformat\firstuseformat}%
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% make only the first mention of a term in a chapter hyperlinked
+% see: https://tex.stackexchange.com/questions/404051/glossaries-hyperlink-only-at-the-first-occurrence-in-every-chapter
+\GlsXtrEnableLinkCounting[section]{general,acronym,abbreviation}
+
+% disable hyperlink if link count is greater than 1:
+\renewcommand*{\glslinkpresetkeys}{%
+ \ifnum\GlsXtrLinkCounterValue{\glslabel}>1
+  \setkeys{glslink}{hyper=false}%
+ \fi
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{apalike}
+\setabbreviationstyle{short-em-nolong} % abbreviation / acronym should be just short form and emphasis = short-em-nolong
+\input{glossary.tex}
+\input{acronyms.tex}
+
+\newcommand\gloss[1]{\gls{#1}} %singular
+\newcommand\glossupper[1]{\Gls{#1}} %singular uppercase
+\newcommand\glossplural[1]{\glspl{#1}} % plural
+\newcommand\glossupperplural[1]{\Glspl{#1}} % plural uppercase
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% make condition to render text based on it
+%%% following example here: https://tex.stackexchange.com/questions/16711/minimal-option-for-cv/21642#21642
+\newif\ifdraft
+\drafttrue % Uncomment to compile whole draft document / comment to compile only finished sections.
+\ifdraft
+\else 
+\fi
+\newif\iftodo
+% \todotrue % Uncomment to compile whole draft document / comment to compile only finished sections.
+\iftodo
+\else 
+\fi
+%%%
+
+% make page number a link to jump to toc only in draft mode
+\ifdraft
+\renewcommand\pagemark{{%
+  \usekomafont{pagenumber} \hyperref[sec:toc]{\thepage}
+}}
+\fi
+% Statuses only shown in draft mode
+\newcommand\wip[1]{
+\iftodo \todo[inline,size=\Large]{work in progress: #1}\fi }
+\newcommand\orange[1]{
+\iftodo \todo[inline,size=\Large]{work in progress: #1}\fi}
+\newcommand\green[1]{
+\iftodo \todo[inline,size=\Large,backgroundcolor=green]{complete }\fi}
+\newcommand\yellow[1]{
+\iftodo \todo[inline,size=\Large,backgroundcolor=yellow]{incomplete:  #1}\fi}
+\newcommand\red[1]{
+\iftodo \todo[inline,size=\Large,backgroundcolor=red]{incomplete}\fi}
+% \newcommand\red[1]{
+% \todo[inline,size=\Large,backgroundcolor=red]{incomplete}}
+
+% statuses in section names
+% for error explanation see: https://tex.stackexchange.com/questions/64298/error-with-xcolor-package
+\usepackage{xcolor}
+\colorlet{GREEN}{green}
+\colorlet{ORANGE}{orange}
+\colorlet{RED}{red}
+% none of these work
+% \ifdraft
+% \usepackage{bbding}
+% \usepackage{pifont}
+% \newcommand{\cmark}{\ding{51}}%
+% \newcommand{\xmark}{\ding{55}}%
+% \usepackage{unicode-math}
+% \newcommand{\cmark}{\setmainfont{Linux Libertine O}\symbol{"2714}\par}
+% \newcommand{\xmark}{\setmainfont{Linux Libertine O}\symbol{"2718}\par}
+% \usepackage{fontawesome}
+% \def\cmark{\FA\symbol{"F00C}}
+% \def\xmark{\FA\symbol{"F00D}}
+% \fi
+% \newcommand{\cmark}{${\checkmark}$}
+% \newcommand{\xmark}{${\times}$}%'
+\newcommand{\cmark}{***}
+\newcommand{\xmark}{xxx}
+\newcommand\statusgreen{\ifdraft \textcolor{green}{\cmark}\fi} 
+\newcommand\statusyellow{\ifdraft \textcolor{green}{?}\fi} 
+\newcommand\statusorange{\ifdraft \textcolor{orange}{WIP}\fi} 
+\newcommand\statusred{\ifdraft \textcolor{red}{\xmark}\fi} 
+% \newcommand\statusred{ \textcolor{red}{\xmark}} 
+\newcommand\statuspriority{\ifdraft \textcolor{blue}{PRIORITY}\fi}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+ \newcommand\PO{\mathit{PO}}
+\newcommand\Keys{\mathcal{K}}
+\newcommand\nil{\varnothing}
+\newcommand\swip[1]{\url[SWIP-#1]{https://github.com/ethersphere/SWIPs/blob/master/SWIPs/swip-#1.md}}
+\newcommand\defeq{\overset{\textrm{\tiny  def}}{=}}
+\providecommand{\xor}{\veebar}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% new math environments
+\usepackage{thmtools}
+\declaretheoremstyle[
+spaceabove=6pt, spacebelow=6pt,headfont=\normalfont\bfseries,notefont=\mdseries, notebraces={}{},bodyfont=\normalfont,postheadspace=1em,qed={}]{theorem}
+\declaretheorem[style=theorem]{definition}
+\declaretheorem[style=theorem]{theorem}
+%\theoremstyle{definition}
+%\newtheorem{definition}{Definition}%[section]
+
+\makeatletter
+\def\ll@definition{%
+  \protect\numberline{\csname the\thmt@envname\endcsname}%
+  \ifx\@empty\thmt@shortoptarg
+    \thmt@thmname
+  \else
+    \thmt@shortoptarg
+  \fi}
+\def\l@thmt@definition{} 
+\makeatother
+
+% \newtheorem{theorem}{Theorem}[section]
+% \newtheorem{lemma}{Lemma}[section]
+% \newtheorem{corollary}{Corollary}[section]
+\renewcommand{\listtheoremname}{List of definitions}
+
+\makeatletter % legacy /sc command support
+%\DeclareOldFontCommand{\rm}{\normalfont\rmfamily}{\mathrm}
+%\DeclareOldFontCommand{\sf}{\normalfont\sffamily}{\mathsf}
+%\DeclareOldFontCommand{\tt}{\normalfont\ttfamily}{\mathtt}
+%\DeclareOldFontCommand{\bf}{\normalfont\bfseries}{\mathbf}
+%\DeclareOldFontCommand{\it}{\normalfont\itshape}{\mathit}
+%\DeclareOldFontCommand{\sl}{\normalfont\slshape}{\@nomath\sl}
+\DeclareOldFontCommand{\sc}{\normalfont\scshape}{\@nomath\sc}
+\makeatother
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\setcounter{tocdepth}{2}
