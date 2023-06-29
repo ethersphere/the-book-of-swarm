@@ -1,0 +1,35 @@
+% \usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\usepackage{listings}
+\usepackage{style/listings-buzz} % import this package after listings
+\usepackage{style/listings-protobuf} % import this package after listings
+% \usepackage{listings-golang} % import this package after listings
+\lstdefinestyle{bos}{
+%   frame=lines,
+  xleftmargin=\parindent,
+  belowcaptionskip=1\baselineskip,
+  backgroundcolor=\color{proto_background},
+%   basicstyle=\color{proto_basic}\footnotesize\ttfamily,
+	keywordstyle=[1]\color{orange}\bfseries,
+	keywordstyle=[2]\color{red},
+	keywordstyle=[3]\color{black}\bfseries,
+% 	keywordstyle=[1]\color{proto_keyword},
+% 	keywordstyle=[2]\color{proto_type},
+% 	keywordstyle=[3]\color{zproto_options},
+	commentstyle=\color{gray}\itshape,
+% 		commentstyle=\color{proto_comment},
+	stringstyle=\color{purple}\bfseries,
+  numberstyle=\color{proto_number}\small,
+  identifierstyle=\color{proto_ident},
+	numbers=right,
+	numbersep=5pt,
+	breaklines=true,
+	showstringspaces=false,
+	tabsize=2,
+}
+\lstset{
+  language=protobuf3,
+  basicstyle=\fontencoding{T1}\normalsize\ttfamily\color{black},
+  style=bos,
+	numbers=right,
+	numberstyle=\small
+}

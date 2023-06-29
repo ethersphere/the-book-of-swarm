@@ -28,7 +28,9 @@ message BzzAddress {
 
 During the lifetime of connection, nodes can broadcast newly received peers to their peers. This is done by sending the \lstinline{Peers} message over the \\\lstinline{/swarm/hive/1.0.0/peers} stream.
 
-Upon receiving a peers message, nodes are meant to store the peer information in their \gloss{address book}, i.e., a data structure containing info about peers known to the node. The address book is meant to be used to suggest peers  to a connectivity manager according to a connection strategy (\ref{spec:strategy:connection}) in order to bootstrap kademlia topology (\ref{sec:kademlia-connectivity}). The address book is meant to be persisted across sessions.
+Upon receiving a peers message, nodes are meant to store the peer information in their \gloss{address book}, i.e., a data structure containing info about peers known to the node. The address book is meant to be used to suggest peers  to a connectivity manager according to a connection strategy (\ref{spec:strategy:connection}) in order to bootstrap kademlia topology%
+% (\ref{sec:kademlia-connectivity})%
+. The address book is meant to be persisted across sessions.
 
 \subsubsection{Sending side}
 

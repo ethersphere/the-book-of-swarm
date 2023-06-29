@@ -1,0 +1,93 @@
+
+The \gloss{Cauchy-Reed-Solomon erasure code} (henceforth \gloss{RS}, \cite{lubyetal1995RS}, \cite{plank2006optimizing}) is a \emph{systemic} \gloss{erasure code} which, when applied to a data blob of $m$ fixed-size chunks, produces $k$ extra chunks (so called \emph{parity chunks}) of the same size in such a way that any $m$ out of $n=m+k$ fix-sized chunks are enough to reconstruct the original blob. The storage overhead is therefore given by $\frac{k}{m}$.%
+%
+\footnote{%
+There are several open source libraries that implement Reed Solomon or Cauchy-Reed-Solomon coding. See \cite{plank2009performance} for a thorough comparison.}
+
+Both the encoding and the decoding of RS codes takes $O(mk)$ time, where $m$ is the number of data chunks, $k$ is the number of additional chunks as well as the maximum number of chunks that can be lost without losing decodeability. If $k$ is defined as a given fraction of $m$ which is necessary for guaranteeing a certain probability of retrievability under the condition of a fixed probability $p$ of losing a single chunk, the time complexity of RS codes becomes $O(n^2)$, which is unacceptable for large files. 
+
+\subsection{Per-level erasure coding in the Swarm chunk tree \statusgreen}
+
+Swarm uses a hierarchical Merkle tree \cite{merkle1980protocols} to reorganise data into fixed sized chunks which are then sent off to the Swarm nodes to store.
+Let $h$ be the byte length of the hash used, and let $b$ be the branching factor. Each vertex represents the root hash of a subtree or, at the last level, the hash of a $b\cdot h$ long span (one chunk) of the document. Generically we may think of each chunk as consisting of $b$ hashes.
+
+
+\begin{figure}[htbp]
+   \centering
+   \input{fig/chunk.tex}
+   \caption[Swarm chunk \statusgreen]{A Swarm chunk consists of 4096 bytes of the file or a sequence of 128 subtree hashes.}
+   \label{fig:chunk}
+\end{figure}
+
+
+\begin{figure}[htbp]
+   \centering
+   \input{fig/Swarm-hash-basic.tex}
+   \caption[A generic node in the tree has 128 children \statusgreen]{A generic node in the tree has 128 children.}
+   \label{fig:Swarm-hash-basic}
+\end{figure}
+
+During normal Swarm lookups, a Swarm client performs a lookup for a hash value and receives a chunk in return. This chunk in turn constitutes another $b$ hashes to be looked up and retrieve another $b$ chunks and so on until the chunks received belong to the actual document (see figure \ref{fig:Swarm-hash-split}).
+
+
+\begin{figure}[htbp]
+   \centering
+   \input{fig/Swarm-hash-split.tex}
+   \caption[Swarm hash split \statusgreen]{The Swarm tree is the data structure encoding how a document is split into chunks.}
+   \label{fig:Swarm-hash-split}
+\end{figure}
+
+While off-the-shelf erasure coding could be used for documents uploaded into Swarm, this solution has immediate problems. Apart from the quadratic complexity of encoding, \gloss{chunking} the RS-encoded data blob with the BMT chunker would result in certain chunks being more vulnerable, since their retrieval is dependent on the retrieval of the chunks that encode all their ancestor nodes in the chunk tree.
+
+This prompted us to try and align the notion of Swarm chunk with the chunk used in the RS scheme which led us to encode redundancy directly into the Swarm tree. This is achieved by applying the \emph{RS scheme} to each set of chunks that are children of a node in the Swarm tree.
+
+The \emph{chunker} algorithm incorporating RS encoding works in the following way when splitting the document:
+
+\begin{enumerate}
+\item Set the input to be the data blob.
+\item Read the input one chunk (say fixed 4096 bytes) at a time. Count the chunks by incrementing a counter $i$. 
+\item Repeat step 2 until either there's no more data (note: the last chunk read may be shorter) or $i \equiv 0$ mod $m$.
+\item Use the RS scheme on the last $i \mod m$ chunks to produce $k$ parity chunks resulting in a total of $n \leq m+k$ chunks.
+\item Calculate the hashes of all these chunks and concatenate them to result in the next chunk (of size $i\mod m$ of the next level. Record this chunk as next.
+\item If there is more data repeat 2. 
+\item If there is no more data but the next level data blob has more than one chunk, set the input to this and repeat from 2.
+\item Otherwise record the blob to be the root chunk.
+\end{enumerate}
+
+% Fixing the branching factor of the Swarm hash as $n=128$ and $h=32$ as the size of the \emph{SHA3 Keccak hash} gives us a chunk size of $4096$ bytes.
+
+% We start splitting the input data into chunks, and after each $m$ chunks add $k=n-m$ parity check chunks using a Reed-Solomon code so that now any $m\text{-out-of-}n$ chunks are
+% sufficient to reconstruct the document. On the next level up the chunks are composed of the hashes of the $m$  data chunks and the $k$ hashes of the parity chunks. Let's take the first $m$
+% of these and add an additional $k$ parity chunks to those such that any $m$ of the resulting $n$
+% chunks are sufficient to reconstruct the origial $m$ chunks. And so on and on every level. In terms of
+% availability, every subtree is equally important to every other subtree at this level. The resulting
+% data structure is not a balanced tree since on every level $i$ the last $k$ chunks are parity leaf
+% chunks while the first $m$ are branching nodes encoding a subtree of depth $i-1$ redundantly.
+A typical piece of our tree would look like this (see figure \ref{fig:Swarm-hash-erasure}).
+
+
+\begin{figure}[htbp]
+   \centering
+   \resizebox{1\textwidth}{!}{
+        \input{fig/Swarm-hash-erasure.tex}
+   }
+   \caption[Swarm hash erasure \statusgreen]{The Swarm tree with extra parity chunks using $112$ out of 128 RS encoding. Chunks $p_{0}$ through $p_{15}$ are parity data for chunks $H_0 $ through $H_{111}$ on every level of intermediate chunks.}
+   \label{fig:Swarm-hash-erasure}
+\end{figure}
+
+
+This pattern repeats itself all the way down the tree. Thus hashes $H_{m+1}$ through $H_{127}$ point to parity data for chunks pointed to by $H_0$ through $H_{m}$. Parity chunks $P_i$ do not have children and so the tree structure does not have uniform depth.
+
+\subsubsection{Incomplete batches}
+
+If the number of file chunks is not divisible by $m$, we cannot proceed with the last batch in the same way as the others. We propose that we encode the remaining chunks with an erasure code that guarantees at least the same level of security as the others. Note that this is not as simple as choosing the same redundancy. For example a $50\text{-out-of-}100$ encoding is much more secure against loss than a $1\text{-out-of-}2$ encoding even though the redundancy is $100\%$ in both cases. Overcompensating, we still require the same number of parity chunks even when there are fewer than $m$ data chunks.
+
+This leaves us with only one corner case: it is not possible to use our $m\text{-out-of-}n$ scheme on a single chunk ($m=1$) because it would amount to $k+1$ copies of the same chunk. The problem is that any number of copies of the same chunk all have the same hash and therefore are automatically deduplicated. Whenever a single chunk is left over ($m=1$) (this is always the case for the root chunk itself), we replicate the chunk as the payload of one of more single owner chunk with an address that is deterministically derivable from the content owners public key and the original root hash, thus enabling us to provide an arbitrary level redundancy for storage of data of any length.
+
+\subsubsection{Upper limit of retrieval latencies}
+
+This technique can effectively shield unavailability of chunks due to occasional faults like network contention, connectivity gaps, and node churn; prohibitively overpriced neighbourhoods or even malicious attacks targeting certain localities. Given a particular fault model for churn and throughput, erasure codes can be calibrated to
+When downloading a file with erasure coding, data subsumed under an intermediate chunk can be recovered having any $m$ out of $m+k$ children. A downloader can initiate requests for all $m+k$ and will need to wait only for the first $m$ to be delivered in order to proceed.
+\emph{guarantee an upper limit on retrieval latencies}, a strong service quality proposition.
+
+

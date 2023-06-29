@@ -2,12 +2,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the book of swarm
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeglossaries
 \title{\Huge\sc the book of Swarm\\
 \Large storage and communication infrastructure for self-sovereign digital society\\
 back-end stack for the decentralised web}
 \author{Viktor Trón}
-\date{v2.0 pre-release - worked on \today}
-
+\date{v2.0 pre-release 1.4}
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 \frontmatter
@@ -19,31 +20,32 @@ Instructions for compiling and distributing.
 
 These are hidden if conditional text is not shown (when publishing a version).
 
-\begin{enumerate}
+\begin{enumerate}[noitemsep]
     \item any version being worked on should be named "Version vX - worked on";
     \item when publishing, "worked on" should be removed; 
     \item drafttrue line should be commented out removing conditional text upon compilation;
-    \item PDF should be generated, saved and pushed to Github repo \\ (https://github.com/ethersphere/publish-bookofswarm/tree/master/pdfs); \item verify that last commit was autodeployed to Swarm \\ (https://swarm-gateways.net/bzz:/latest.bookofswarm.eth/the-book-of-swarm-viktor-tron.pdf);
+    \item PDF should be generated, saved and pushed to Github repo \\ (https://github.com/ethersphere/publish-bookofswarm/tree/master/pdfs); 
+    \item verify that last commit was autodeployed to Swarm \\ (https://swarm-gateways.net/bzz:/latest.bookofswarm.eth/the-book-of-swarm-viktor-tron.pdf);
     \item PDF commit in Github repo should be named with version number;
     \item version number in Latex should be bumped up and "worked on" note added: "Version v(X+1) - worked on";
     \item Goto 1.
 \end{enumerate}
 \fi
-
-\input{quote.tex}
+%
+\input{front/00-quote.tex}
 \tableofcontents
 \listoffigures
 % \listoftables % remove if less than 5 tables?
-\input{prolegomena.tex}
+\input{front/01-prolegomena.tex}
 \label{sec:toc}
-\input{acknowledgements.tex} 
+\input{front/02-acknowledgements.tex} 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \mainmatter
 \part{Prelude} 
 \label{part:preface}
 \input{intro.tex}
 \part{Design and architecture} \label{part:designarchitecture}
-\input{body.tex}
+\input{parts.tex}
 % \part{Specifications}
 % \label{part:specifications}
 % \input{specs.tex}
@@ -52,9 +54,9 @@ These are hidden if conditional text is not shown (when publishing a version).
 \addcontentsline{toc}{chapter}{Bibliography}
 \bibliography{refs.bib}
 %%%%%%%%%%%%%%%%%%%%%
-\appendix
-\part{Appendix}\label{part:appendix}
-% \input{appendix.tex}
+% \appendix
+% \part{Appendix}\label{part:appendix}
+% \input{10-appendix.tex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \backmatter
 \part{Indexes \statusorange}
@@ -63,9 +65,11 @@ These are hidden if conditional text is not shown (when publishing a version).
 % maybe we don't need hierarchy in its current form (defined by parent)
 % although it looks good in the Index I suppose
 % \glossarystyle{listdotted} % listdotted is non-hierarchical
-\printglossary[type=main] \label{sec:glossary}
+\printglossary[type=main] 
+\label{sec:glossary}
 % index
-\printglossary[nonumberlist=false, style=bookindex, title={Index}] \label{sec:index}
+\printglossary[nonumberlist=false, style=bookindex, title={Index}]
+\label{sec:index}
 % acronyms
 \printglossary[type=\acronymtype,title={List of acronyms and abbreviations}]
 \end{document}

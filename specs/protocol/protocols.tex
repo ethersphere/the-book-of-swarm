@@ -1,17 +1,17 @@
 
 \subsection{Underlay network \statusgreen}
 
-The \lstinline{libp2p} networking stack provides all required properties for the swarm underlay network laid out in \ref{sec:underlay-transport}.
+The \lstinline{libp2p} networking stack provides all the required properties for the Swarm underlay network, as laid out in \ref{sec:underlay-transport}.
 
 \begin{enumerate}
-\item Addressing is provided in the form of so called \emph{multi address} for every node, which is referred here as the underlay address. Every node can have multiple underlay addresses depending on transports and network listening addresses that are configured.
+\item Addressing is facilitated through the use of \emph{multi addresses}, known as underlay addresses, assigned to each node. Every node can have multiple underlay addresses depending on the configured network listening addresses and transports.
 \item Dialing is provided over \lstinline{libp2p} supported network transports.
 \item Listening is provided by \lstinline{libp2p} supported network transports.
-\item Live connections are established between two peers and kept open for accepting or sending messages.
-\item Channel security is provided with \lstinline{TLS} and \lstinline{libp2p secio} stream security transport.
-\item Protocol multiplexing is provided by \lstinline{libp2p mplex} stream multiplexer protocol.
-\item Delivery guarantees are provided by using \lstinline{libp2p} bidirectional streams to validate the response from the peer on sent message.
-\item Serialization is not enforced by \lstinline{libp2p}, as it provides byte streams allowing flexibility for every protocol to choose the most appropriate serialization. The recommended serialization is \lstinline{Protobuf} with \lstinline{varint} delimited messages in streams.
+\item Live connections are established and maintained between two peers, ensuring the ability to send and receive messages.
+\item Channel security is ensured through \lstinline{TLS} and the \lstinline{libp2p secio} stream security transport.
+\item Protocol multiplexing is provided by the \lstinline{libp2p mplex} stream multiplexer protocol.
+\item Delivery guarantees are provided by using \lstinline{libp2p} bidirectional streams to validate the responses from peers upon message transmission.
+\item Serialization is not enforced by \lstinline{libp2p}, as allows for byte streams, providing flexibility for each protocol to choose the most appropriate serialization method. The recommended serialization approach is using \lstinline{Protobuf} with \lstinline{varint} delimited messages in streams.
 \end{enumerate}
 
 \subsection{Protocols and streams \statusgreen}

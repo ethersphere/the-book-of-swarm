@@ -1,0 +1,158 @@
+First, in \ref{sec:error-correcting-codes}, we introduce \glossplural{erasure code}, which we then show how to apply to files in Swarm in \ref{sec:erasure-bmt}. In \ref{sec:dispersed-replicas}, we describe a construct that enables cross-neighbourhood redundancy for singleton chunks that completes erasure coding. Finally, in \ref{sec:strategies}, we show how systematic codes allow multiple retrieval strategies of erasure coded files  while preserving random access.
+
+\subsection{Error correcting codes \statusgreen}\label{sec:error-correcting-codes}
+\enlargethispage*{\baselineskip}
+%
+
+\emph{Error correcting codes} are commonly used in the context of data storage and data transfer to guarantee  data integrity even in the face of a system fault. Error correction schemes define how to rearrange the original data adding redundancy to its representation before upload or transmission (\emph{encoding}\,) so that it can correct corrupted data or recover missing content after retrieval or reception (\emph{decoding}\,). Different schemes are evaluated by quantifying their strength (\emph{tolerance} in terms of the rate of data corruption and loss) as a function of their cost (\emph{overhead} in terms of storage and computation). 
+
+In the context of  computer hardware architecture synchronising arrays of disks is crucial to provide resilient storage in data centres.
+\emph{Erasure coding},%
+%
+%\footnote{\cite{buterin2014erasure}}
+%
+in particular, frames the problem as follows: how does one encode the stored data into shards distributed across the disks so that the data remains fully recoverable in the face of an arbitrary probability that any one disk becomes faulty.
+Similarly, in the context of Swarm's distributed immutable chunk store, this can be reformulated as follows: how does one encode the stored data into chunks distributed across neighbourhoods in the network so that the data remains fully recoverable in the face of an arbitrary probability that any one chunk is not retrievable.%
+%
+\footnote{%
+It is safe to assume that the retrieval of any one chunk will fail with equal and independent probability.}
+
+\gloss{Reed-Solomon coding} (\gloss{RS}) \cite{lubyetal1995CRS,plank2006optimizing,li2013erasure} 
+is the father of all  error correcting codes and also the most widely used and implemented.%
+%
+\footnote{%
+For a thorough comparison of an earlier generation of implementations of RS see \cite{plank2009performance}.}
+% 
+When applied to data of $m$ fixed-size blocks (message of length $m$), produces an encoding of $m+k$ \emph{codewords} (blocks of the same size) 
+in such a way that having any $m$ out of $m+k$ blocks is enough to reconstruct the original data. Conversely, $k$ puts an upper bound on the number of \emph{erasures} allowed (number of blocks unavailable) for full recoverability, i.e., it expresses (the maximum) \emph{loss tolerance}.%
+%
+\footnote{Error correcting codes that has a focus on correcting data loss are referred to as \emph{erasure codes}, a typical scheme of choice for distributed storage systems \cite{balaji2018erasure}.}
+%
+$k$ is also the count of \emph{parities}, quantifying the data blocks added in the encoding on top of the original volume, i.e., it expresses \emph{storage overhead}. While RS is, therefore, optimal for storage (since loss tolerance cannot be higher than storage overhead), 
+it has high bandwidth demands%
+%
+\footnote{Both the encoding and the decoding of RS codes takes $O(mk)$ time (with $m$ data chunks and $k$ parities). However, we found computational overhead both insignificant for a network setting as well as undifferentiating.}
+%
+for a local repair.%
+%
+\footnote{Entanglement codes \cite{estrada2018alpha, estrada2019building} require a minimal bandwidth overhead for a local repair, but at the cost of storage overhead that is in multiples of $100\%$.}
+%
+The decoder needs to retrieve $m$ chunks to recover a particular chunk unavailable. 
+Hence, ideally, RS is used on files which are supposed to be downloaded in full,%
+%
+\footnote{Or, in  fragments large enough  to include the data span over which the encoding is defined, such as videos.}% 
+%
+but are inappropriate for use-cases needing only local repairs.%
+%
+\footnote{Usecases requiring random access to small amounts of data (e.g., path lookup) benefit from simple replication to optimise on bandwidth, which is suboptimal in terms of storage \cite{weatherspoon2002erasure}.}
+
+When using RS, it is customary to use \emph{systematic} encoding, which means that the original data forms part of the encoding, i.e., the parities are actually added to it.%
+%
+%
+%\footnote{Our library of choice implementing exactly such a scheme is \url{https://github.com/klauspost/reedsolomon}.}
+% 
+%
+
+
+\subsection{Erasure coding in the Swarm hash tree \statusgreen}
+\label{sec:erasure-bmt}
+
+Swarm uses the \emph{Swarm hash tree} to represent files. This structure is a Merkle tree \cite{merkle1980protocols}, whose leaves are the consecutive segments of the input data stream. These segments are turned into chunks and are sent off to the Swarm nodes to store. The consecutive chunk references (address or address and encryption key) are written into a chunk on a higher level.
+These so called \emph{packed address chunks} (PACs) constitute the intermediate chunks of the tree.
+The branching factor $b$ is chosen so that the references to the children fill up a full chunk.
+With reference size 32 or 64 (hash size 32) and chunk size 4096 bytes, $b$ is 128 for unencrypted and 64 for encrypted content 
+(see figure \ref{fig:Swarm-hash-split}).
+
+
+\begin{figure}[!ht]
+   \centering
+   \input{fig/Swarm-hash-split.tex}
+   \caption[Swarm hash split \statusgreen]{The Swarm tree is the data structure encoding how a document is split into chunks.}
+   \label{fig:Swarm-hash-split}
+\end{figure}
+
+Note that on the right edge of the hash tree, chunks (the last chunk of each level) may be shorter than 4K: in fact, unless the file is exactly $4\cdot b^n$ kilobytes long, there is always at least one \emph{incomplete chunk}.  Importantly, it makes no sense to wrap a single chunk reference in a PAC, so it is attached to the first level where there is open chunks. Such \emph{"dangling" chunks} will appear if and only if the file has a zero digit in its $b$-ary representation. 
+
+During file retrieval, a Swarm client starts from the root hash reference and retrieves the corresponding chunk. Interpreting the metadata as encoding the span of data subsumed under the chunk, it decides that the chunk is a packed address chunk if the span is larger than the maximum chunk size. 
+In case of standard file download, all the references packed within the PAC are followed, i.e., the referenced chunk data is retrieved. 
+
+PACs offer a natural and elegant way to achieve consistent redundancy within the swarm hash tree.
+The input data for an instance of erasure coding is the chunk data of the children, the equal sized bins corresponding to chunk data of the consecutive references packed in it. The idea is that instead of having each of the $b$ references packed represent children, only $m$ would, and the rest of the $k=b-m$ would encode RS parities (see figure \ref{fig:Swarm-hash-erasure}).
+
+
+The \emph{chunker} algorithm incorporating PAC-scoped RS encoding would work as follows: 
+
+\begin{enumerate}[noitemsep]
+\item Set the input to the actual data level and produce a sequence of chunks from the consecutive 4K segments of the data stream. Choose $m$ and $k$ such that $m+k=b$ is the branching factor (128 for unencrypted, 64 for encrypted content).
+\item Read the input one chunk at a time. Count the chunks by incrementing a counter $i$. 
+\item Repeat step 2 until either $i = m$ or there's no more data left.
+\item Use the RS scheme on the last $i\leq m$ chunks to produce $k$ parity chunks resulting in a total of $n = i+k \leq b$ chunks.
+\item Concatenate the references of all these chunks to result in a packed address chunk (of size $h\cdot n$ of the next level) of the level above. If this is the first chunk on that level,  set the input to this level and spawn this same procedure from step 2. 
+\item If the input is consumed, signal end of input to the next level and quit the routine. If there is no next level, record the single chunks as the root chunk and use the reference to refer to the entire file.
+\end{enumerate}
+
+
+
+\begin{figure}[htbp]
+   \centering
+   \resizebox{1\textwidth}{!}{
+        \input{fig/Swarm-hash-erasure.tex}
+   }
+   \caption[Swarm hash erasure \statusgreen]{The Swarm tree with extra parity chunks using $m=112$ out of $n=128$ RS encoding. Chunks $p_{0}$ through $p_{15}$ are parity data for chunks $H_0 $ through $H_{111}$ on every level of intermediate chunks.}
+   \label{fig:Swarm-hash-erasure}
+\end{figure}
+
+
+This pattern repeats itself all the way down the tree. Thus hashes $H_{m+1}$ through $H_{127}$ point to parity data for chunks pointed to by $H_0$ through $H_{m}$. Parity chunks $P_i$ do not have children and so the tree structure does not have uniform depth.
+
+\subsection{Incomplete chunks and dispersed replicas}
+\label{sec:dispersed-replicas}
+
+If the number of file chunks is not a multiple of $m$, we cannot proceed with the last batch in the same way as the others. We propose that we encode the remaining chunks with an erasure code that guarantees at least the same level of security as the others.% 
+%
+\footnote{Note that this is not as simple as choosing the same redundancy. For example, a $50\text{-out-of-}100$ encoding is much more secure against loss than a $1\text{-out-of-}2$ encoding even though the redundancy is $100\%$ in both cases.} 
+%
+Overcompensating, we still require the same number of parity chunks even when there are fewer than $m$ data chunks.
+
+This leaves us with only one corner case: it is not possible to use our $m\text{-out-of-}n$ scheme on a single chunk ($m=1$) because it would amount to $k+1$ copies of the same chunk. The problem is that any number of copies of the same chunk all have the same hash and therefore are automatically deduplicated. Whenever a single chunk is left over ($m=1$) (this is always the case for the root chunk itself), we would need to replicate the chunk in such a way that (1) ideally the replicas are dispersed in the address space in a balanced way, yet (2) their address can be known by retrievers ideally only knowing the reference to the original chunk's address.%
+%
+\footnote{We could create  replicas by having the chunk data as the payload of one of more single owner chunk with an address that is deterministically derivable from the content owners public key and the original root hash. This has the disadvantage that replicas are not reuploadable by parties other than the publisher.}
+
+The solution is to reference the root hash with its BMT root hash (before it is hashed with the metadata). By making the metadata fully or partially nonsemantic, we virtually obtain the degrees of freedom to generate entropy to mine the overall chunk hash into a sufficient number of neighbourhoods. This construct is called \glossplural{dispersed replica} and the exact method for finding them is as follows:
+
+Let's now assume $h$ is the BMT roothash of the chunk.
+Given $n$ bits available to find a nonces to generate  $2^k$  perfectly balanced replicas, initialise a chunk array $\rho$ of length $2^k$ and start with $i=0$ and $C=0$.
+
+\begin{enumerate}[noitemsep]
+    \item create the metadata by copying onto the $n$ available bits the bits of the big-endian binary encoding of $i$ resulting in the metadata bytes $m$.
+    \item calculate the the chunk hash by prepending      $m$ to $h$ and use the Keccak256 base hash to hash them $a_i:=H(m\concat h)$, and record $c_i=\mathit{CAC}(d,m)$
+    \item calculate the bin this hash belongs by decoding $k$-bit prefix as big-endian binary number $j$ between $0\leq j<2^k$.
+    \item if $\rho\idx{j}$ is unassigned, then let $\rho\idx{j}:=c_i$ and increment $C$.
+    \item if $C=2^k$, then quit
+    \item increment $i$, if $i=2^n$ then quit
+    \item repeat from step 1 
+\end{enumerate}
+
+With this solution we are able to provide an arbitrary level redundancy for storage of data of any length. Note that if $n$ is small, then generating all $2^k$ balanced replicas may not be achievable, if $n<k$ this is certainly not possible.
+In general given $n, k$ at least $m$ miss has probability $\left(\frac{2^k-m}{2^k}\right)^{2^n}$.
+
+
+\subsection{Strategies of retrieval}
+\label{sec:strategies}
+
+When downloading, systemic per-level erasure codes allow for 3 strategies of use:
+\begin{itemize}[noitemsep]
+      \item[---]
+\emph{direct with no recovery}
+– For all intermediate chunks, the RS parity chunks are ignored. Retrieval is involving  only the original chunks, no recovery. This is the cho ice for random access.
+\item[---]
+\emph{selective with fallback}
+– For all intermediate chunks, first retrieve $ m$ chunks judged to be the fastest to download (e.g., the $m$ closest to the node), and then fall back to $j\leq k$ if and only if retrieval of $j$ out of $m$ chunks is unavailable. This saves
+some bandwidth and the corresponding costs at the expense of speed: if a selected chunk
+is missing, fallback to RS is delayed.
+\item[---] \emph{race} – the client initiates requests for all $m+k$ and will need to wait only for the first $m$ to be delivered in order to proceed. This is equivalent to saying that the  $k$ slowest chunk retrievals can be ignored, therefore this strategy is optimal for latency at the cost of cost.
+\end{itemize}
+
+This technique can effectively shield unavailability of chunks due to occasional faults like network contention, connectivity gaps, and node churn; prohibitively overpriced neighbourhoods or even malicious attacks targeting certain localities. Given a particular fault model for churn and throughput, erasure codes can be calibrated to
+\emph{guarantee an upper limit on retrieval latencies}, a strong service quality proposition.
+
