@@ -21,7 +21,7 @@ It is safe to assume that the retrieval of any one chunk will fail with equal an
 is the father of all  error correcting codes and also the most widely used and implemented.%
 %
 \footnote{%
-For a thorough comparison of an earlier generation of implementations of RS see \cite{plank2009performance}.}
+For a thorough comparison of an earlier generation of implementations of RS, see \cite{plank2009performance}.}
 % 
 When applied to data of $m$ fixed-size blocks (message of length $m$), produces an encoding of $m+k$ \emph{codewords} (blocks of the same size) 
 in such a way that having any $m$ out of $m+k$ blocks is enough to reconstruct the original data. Conversely, $k$ puts an upper bound on the number of \emph{erasures} allowed (number of blocks unavailable) for full recoverability, i.e., it expresses (the maximum) \emph{loss tolerance}.%
@@ -61,7 +61,7 @@ Swarm uses the \emph{Swarm hash tree} to represent files. This structure is a Me
 These so called \emph{packed address chunks} (PACs) constitute the intermediate chunks of the tree.
 The branching factor $b$ is chosen so that the references to the children fill up a full chunk.
 With reference size 32 or 64 (hash size 32) and chunk size 4096 bytes, $b$ is 128 for unencrypted and 64 for encrypted content 
-(see figure \ref{fig:Swarm-hash-split}).
+(See Figure \ref{fig:Swarm-hash-split}).
 
 
 \begin{figure}[!ht]
@@ -77,7 +77,7 @@ During file retrieval, a Swarm client starts from the root hash reference and re
 In case of standard file download, all the references packed within the PAC are followed, i.e., the referenced chunk data is retrieved. 
 
 PACs offer a natural and elegant way to achieve consistent redundancy within the swarm hash tree.
-The input data for an instance of erasure coding is the chunk data of the children, the equal sized bins corresponding to chunk data of the consecutive references packed in it. The idea is that instead of having each of the $b$ references packed represent children, only $m$ would, and the rest of the $k=b-m$ would encode RS parities (see figure \ref{fig:Swarm-hash-erasure}).
+The input data for an instance of erasure coding is the chunk data of the children, the equal sized bins corresponding to chunk data of the consecutive references packed in it. The idea is that instead of having each of the $b$ references packed represent children, only $m$ would, and the rest of the $k=b-m$ would encode RS parities (See Figure \ref{fig:Swarm-hash-erasure}).
 
 
 The \emph{chunker} algorithm incorporating PAC-scoped RS encoding would work as follows: 

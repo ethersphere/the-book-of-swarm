@@ -2,7 +2,7 @@
 
 A postage stamp is a verifiable proof of payment associated with a chunk witnessed by the signature of its owner. On the one hand, postage stamps prevent frivolous uploads by imposing an advance cost. On the other hand, by ascribing a quantity of BZZ, they signal a chunk's relative importance which storer nodes can then use to rank chunks when selecting which ones to retain and serve, and which ones to garbage collect in the event of capacity shortage.
 
-In this section we first introduce the concept of postage batch enabling the bulk purchase of stamps (\ref{sec:purchasing-upload}). In \ref{sec:limited-issuance}, we explain how limited issuance is represented and enforced. In \ref{sec:reserve}, we introduce the notion of reserve and detail the rules governing how storer nodes keep it maximally utilised. We conclude in \ref{sec:depths} with exploring the relationship between reserved capacity, effective demand and the number of nodes and their impact on the data availability.
+In this section, we first introduce the concept of postage batch enabling the bulk purchase of stamps (\ref{sec:purchasing-upload}). In \ref{sec:limited-issuance}, we explain how limited issuance is represented and enforced. In \ref{sec:reserve}, we introduce the notion of reserve and detail the rules governing how storer nodes keep it maximally utilised. We conclude in \ref{sec:depths} with exploring the relationship between reserved capacity, effective demand and the number of nodes and their impact on the data availability.
 
 \subsection{Purchasing upload capacity}\label{sec:purchasing-upload}
 
@@ -36,7 +36,7 @@ Anyone can then choose to top up the balance of a batch at a later date but only
 
 Owners issue postage stamps in order to attach them to chunks%
 % (see definition \ref{def:postage-stamp} in appendix \ref{sec:appendix-disc})%
-. A batch has a number of \glossplural{storage slot} effectively arranged over a number of equal sized buckets. Issuing a stamp means to assign a chunk to a storage slot. A stamp is a data structure comprising the following fields (see figure  \ref{fig:postage-stamp}):
+. A batch has a number of \glossplural{storage slot} effectively arranged over a number of equal sized buckets. Issuing a stamp means to assign a chunk to a storage slot. A stamp is a data structure comprising the following fields (See Figure  \ref{fig:postage-stamp}):
 
 \begin{itemize}[noitemsep]
     \item[--] \emph{chunk address} -- The address of the chunk the stamp is attached to. 
@@ -58,7 +58,7 @@ A postage stamp's validity can be checked by verifying that it scores all true o
 \item[--] \emph{aligned} -- The referenced storage slot has the bucket specified and it aligns with the chunk address stamped.
 \end{itemize}
 
-All this can be easily checked by nodes in the swarm only using information available on the public blockchain (read-only endpoints of the postage contract). When a chunk is uploaded, the validity of attached postage stamp is verified by forwarders along the push-syncing route  (see figure \ref{fig:postage-stamps}).
+All this can be easily checked by nodes in the swarm only using information available on the public blockchain (read-only endpoints of the postage contract). When a chunk is uploaded, the validity of attached postage stamp is verified by forwarders along the push-syncing route  (See Figure \ref{fig:postage-stamps}).
 
 
 \begin{figure}[!th]
@@ -81,7 +81,7 @@ Purchasing a postage batch effectively entitles the owner to issue a fixed amoun
 
 While 1) and 2) is easily verifiable by any third party, 3) is not.
 In order for index collisions to be detectable by individual storer nodes, uniformity depth must be large enough to fall within nodes' area of responsibility.
-As long as this is maintained, all chunks in the same bucket are guaranteed to land in the same neighbourhood, and, as a result, duplicate assignments can be locally detected by nodes (see figure \ref{fig:over-issuance}).
+As long as this is maintained, all chunks in the same bucket are guaranteed to land in the same neighbourhood, and, as a result, duplicate assignments can be locally detected by nodes (See Figure \ref{fig:over-issuance}).
 
 In order to keep their stamps collision-free, uploaders need to maintain counters for how many stamps they have issued for each bucket of a batch and must not issue more than the allowed bucket size. 
 
@@ -155,7 +155,7 @@ The potential demand for chunks to be stored in the DISC is quantified by the to
 The base 2 logarithm of the DISC reserve size rounded up to the nearest integer is called the \gloss{reserve depth}. The reserve depth is the shallowest PO such that disjoint neighbourhoods of this depth are collectively able to accommodate the volume of data corresponding to the total number of chunks paid for, assuming that nodes in the neighbourhood have a fixed prescribed storage capacity to store their share of the reserve. 
 
 The reserve depth is also the \emph{safe lower bound} for pull-syncing, i.e, the farthest bin a neighbourhood needs to synchronise to guarantee storing the reserve.
-Conversely, if any neighbourhood marked by reserve depth has no nodes in it, the swarm is not working correctly, i.e., chunks with valid stamps are not protected from getting lost. See figure \ref{fig:depths}.
+Conversely, if any neighbourhood marked by reserve depth has no nodes in it, the swarm is not working correctly, i.e., chunks with valid stamps are not protected from getting lost. See Figure \ref{fig:depths}.
 
 \subsubsection{Storage depth}
 
@@ -228,11 +228,11 @@ The procedure for redistribution is best conceived of as a game orchestrated by 
 The winners claim their reward by sending a transaction to the game contract. 
 
 In section \ref{sec:uniformity-pot}, we formulate the idea of redistribution in terms of probabilistic outpayments to allow an easy proof of fairness. Next, in \ref{sec:mechanics}, we introduce the mechanics of the redistribution game.
-Then, in \ref{sec:staking} and \ref{sec:por} we explain how we enforce maximum utilisation of dedicated storage for persisting  relevant content redundantly. We conclude in \ref{sec:price-oracle} by discussing how to read certain aspects of the game as price signals that render the network self-regulating through automatic price discovery. 
+Then, in \ref{sec:staking} and \ref{sec:por}, we explain how we enforce maximum utilisation of dedicated storage for persisting  relevant content redundantly. We conclude in \ref{sec:price-oracle} by discussing how to read certain aspects of the game as price signals that render the network self-regulating through automatic price discovery. 
 
 \subsection{Neighbourhoods, uniformity and probabilistic outpayments}\label{sec:uniformity-pot} 
 
-In this section we argue that the efficient use of postage batches incentivises a balanced chunk distribution which in turn gives rise to uniform storage depth across neighbourhoods. We then explain how this enables a fair system of redistribution using probabilistic outpayments.
+In this section, we argue that the efficient use of postage batches incentivises a balanced chunk distribution which in turn gives rise to uniform storage depth across neighbourhoods. We then explain how this enables a fair system of redistribution using probabilistic outpayments.
 % \subsubsection{Uniformity}
 
 
@@ -253,7 +253,7 @@ With neighbourhoods at equal depth, uniform sampling of neighbourhoods can be mo
 %
 % \footnote{one of the random nonces (see definition \ref{def:nonce-round}) from the \emph{random seed} of the round, see appendix \ref{sec:randomness}.}
 %
-) randomly dropped in the address space (see figure \ref{fig:neighbourhood-selection}).
+) randomly dropped in the address space (See Figure \ref{fig:neighbourhood-selection}).
 
 
 \begin{figure}[!ht]
@@ -270,7 +270,7 @@ With neighbourhoods at equal depth, uniform sampling of neighbourhoods can be mo
 
 The cooperation of peers to redundantly store for the network's benefit is underpinned by a \gloss{Schelling game}
 % (defined formally in appendix \ref{sec:redistribution-game}) 
-aimed at proving that the peers agree on the chunks they need to store and they do, in fact, store them. The redistribution game itself is orchestrated by the game contract, one of the building blocks of the system of 4 smart contracts which collectively drive the swarm storage incentive system (see figure \ref{fig:smart-contracts}):
+aimed at proving that the peers agree on the chunks they need to store and they do, in fact, store them. The redistribution game itself is orchestrated by the game contract, one of the building blocks of the system of 4 smart contracts which collectively drive the swarm storage incentive system (See Figure \ref{fig:smart-contracts}):
 
 \begin{itemize}
     \item[--] Postage contract -- serving as the batch store to sell postage batches to uploaders, keeping track of batch balances, batch expiry, storage rent and the reward pot itself.
@@ -296,7 +296,7 @@ The phases are named after the type of transaction the smart contract expects du
 %
 \footnote{Both commit and reveal are simple and cheap transactions. The only expensive transaction is claim but that only the winner needs to submit.}
 %
-See figure \ref{fig:phases}
+See Figure \ref{fig:phases}
 
 \begin{figure}[!ht]
   \centering
@@ -309,7 +309,7 @@ Once the reveal phase is over, the  \gloss{neighbourhood selection anchor} becom
 %
 \footnote{If storage depth is less than the anchor's proximity order relative to the overlay address.}
 %
-are  allowed to participate in the following round (see figure \ref{fig:neighbourhood-selection}).
+are  allowed to participate in the following round (See Figure \ref{fig:neighbourhood-selection}).
 
 
 
@@ -450,7 +450,7 @@ If there is no claim in a given round, the pot simply rolls over and increase th
 
 \subsubsection{The eight rules of entitlement}
 
-Here we summarise the eight rules of validating a claim (with committing and revealing a reserve commitment and then submitted evidence as proof of entitlement; see also table~\ref{tab:gr8}):%
+Here we summarise the eight rules of validating a claim (with committing and revealing a reserve commitment and then submitted evidence as proof of entitlement; see also Table~\ref{tab:gr8}):%
 %
 % \footnote{The first three criteria are part of the conditions for staking, committing, and revealing (see definitions \ref{def:chc} and \ref{def:chs} for replication, \ref{def:stakes} and \ref{def:commits} for redundancy, \ref{def:reveals} for responsibility in appendix \ref{sec:appendix-game}. Relevance, retention, recency and  retrievability are proved as part of the proof of reserve (definition \ref{def:por}) and validated as part of the claim (\ref{def:por-validation}). Finally, proof of resources involves density proofs for chunks and stamps (definitions \ref{def:chc} and \ref{def:chs}) validated as part of the claim (definitions \ref{def:chunk-density-validition} and \ref{def:stamp-density-validition}, respectively). The specific construct of proof of entitlement is defined in \ref{def:poe} and its validation in \ref{def:claim-validation} in appendix \ref{sec:appendix-game}).}
 %
@@ -505,7 +505,7 @@ The storage depth represents the proximity radius within which the neighbourhood
 
 
 If the volume of newly issued storage slots from recently purchased batches (\emph{ingress rate}\/) and the volume of expired storage slots (\emph{outgress rate}\/) balance out, the storage depth remains unchanged.
-But see what happens  if the volume of  reserved chunks increase?
+But see what happens if the volume of  reserved chunks increase?
 Now, since the client's reserve capacity is constant, after a while, nodes are able to fill up their capacity with chunks that are at most one proximity order closer to them than the farthest chunks were previously, i.e.,  their storage depth increases.
 When the volume of reserved chunks doubles,  the storage depth increases by one.  
 
