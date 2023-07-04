@@ -786,17 +786,18 @@ debt sends a \gloss{cheque} to its peer. If it reaches the \gloss{disconnect thr
 
 \subsubsection{Settling with payments}
 
-In situations where there is high variance or unequal consumption of services, the balance will eventually tilt significantly toward one peer. In such cases, the indebted party issues a payment to the creditor to restore the nominal balance to zero. This process is automatic and justifies swap as \emph{settle (the balance) with automated payments} (See Figure \ref{fig:swap}). These payments can be in the form of commitments rather than immediate transactions.
+In situations where there is high variance or unequal consumption of services, the balance will eventually tilt significantly toward one peer. In such cases, the indebted party issues a payment to the creditor to restore the nominal balance to zero. This process is automatic and justifies the concept of swap as \emph{settle (the balance) with automated payments} (See Figure \ref{fig:swap}). These payments can be in the form of commitments rather than immediate transactions.
 
 
 \subsubsection{Payment thresholds}
 
-To quantify what counts as "significant tilt", the swap protocol requires peers to advertise a \gloss{payment threshold} as part of the handshake: When their relative debt to their peer goes above this threshold, they send a message, containing a payment to their peer. It is reasonable for any node to send a message at this level, as there also exist a disconnect threshold. The disconnect threshold is set freely by any peer, but a reasonable value is such that the difference between the payment threshold and the disconnect threshold accounts for the normal variance in accounting balances of the two peers. 
+To quantify what counts as "significant tilt", the swap protocol requires peers to advertise a \gloss{payment threshold} as part of the handshake: When their relative debt to their peer goes above this threshold, they send a message containing a payment to their peer. It is reasonable for any node to send a message when the debt reaches this level, as there is also a disconnect threshold in place. The disconnect threshold can be set freely by any peer, but it is recommended to choose a value that takes into account the usual 
+variance in accounting balances between the two peers. This can be done by considering the difference between the payment threshold and the disconnect threshold.
 
 
 \subsubsection{Atomicity}
 
-Sending the \gloss{cheque} and updating the balance on the receiving side cannot be made an atomic operation without substantial added complexity. For instance, a client could crash between receiving and processing the message, so even if the sending returns with no error, the sending peer can not be sure the payment was received, this can result in discrepancies in accounting on both sides. The tolerance expressed by the difference between the two thresholds ($\mathit{DisconnectThreshold}-\mathit{PaymentThreshold}$) guards against this, i.e. if the incidence of such crashes is not high and happen with roughly equal probability for both peers, the resulting minor discrepancies are filtered out. In this way, the nodes are shielded from sanctions.
+Sending the \gloss{cheque} and updating the balance on the receiving side cannot be made an atomic operation without substantial added complexity. For instance, a client could crash between receiving and processing the message, so even if the sending returns with no error, the sending peer can not be sure the payment was received, this can result in discrepancies in accounting on both sides. The tolerance expressed by the difference between the two thresholds ($\mathit{DisconnectThreshold}-\mathit{PaymentThreshold}$) guards against this, i.e. if the occurrence of such crashes is infrequent and happens with roughly equal probability for both peers, the resulting minor discrepancies are filtered out. This mechanism protects nodes from facing sanctions.
 
 \begin{center}
 \begin{figure}[htbp]
@@ -809,18 +810,18 @@ B sends a cheque to peer A. B keeps the cheque and restores the swap balance to 
 
 \subsection{Cheques as off-chain commitments to pay\statusgreen}\label{sec:cheques}
 
-One of the major issues with direct \gloss{on-chain payment} in a blockchain network is that each transaction must be processed by each and every node participating in the network, resulting in high transaction costs. It is however, possible to create a payment without presenting this payment on-chain. Such payments are called \gloss{second-layer payment} strategies. One such strategy is to defer payments and process them in bulk. In exchange for reduced cost, the beneficiary must be willing to incur higher risk of settlement failure. We argue that this is perfectly acceptable in the case of bandwidth incentivisation in Swarm, where peers will engage in repeated dealings.
+One of the major challenges with conducting direct \glossplural{on-chain payment} in a blockchain network is the high transaction costs associated with processing each transaction by every participating node. It is, however, possible to create a payment without presenting this payment on-chain. Such payments are called \gloss{second-layer payment} strategies. One such strategy is deferring payments and processing them in bulk. In exchange for reduced cost, the beneficiary must be willing to incur a higher risk of settlement failure. We argue that this is perfectly acceptable in the case of bandwidth incentivisation in Swarm, where peers will engage in repeated dealings.
 
 
 \subsubsection{The chequebook contract}
 
-A very simple smart contract that allows the beneficiary to choose when payments are to be processed was introduced in \cite{ethersphere2016sw3}. This \gloss{chequebook contract} is a wallet that can process \glossplural{cheque} issued by its owner. These cheques are analogous to those used in traditional financial transactions: The issuer signs a \emph{cheque} specifying a \emph{beneficiary}, a \emph{date} and an \emph{amount}, gives it to the recipient as a token of promise to pay at a later date. The smart contract plays the role of the bank. When the recipient wishes to get paid, they "cash the cheque" by submitting it to the smart contract. The contract, after validating the signature, date and the amount specified on the cheque, transfers the amount to the beneficiary's account (See Figure \ref{fig:swap-chequebook}). Analogous to the person taking the cheque to the bank to cash it, anyone can send the digital cheque in a transaction to the owner's chequebook account and thus trigger the transfer. 
+A simple smart contract called the \gloss{chequebook contract}, introduced in \cite{ethersphere2016sw3}, allows the beneficiary to determine the timing of payments. This contract acts as a wallet that can process \glossplural{cheque} issued by its owner. Similar to traditional financial transactions, the issuer signs a \emph{cheque} specifying the \emph{beneficiary}, \emph{date}, and \emph{amount}, providing it to the recipient as a token of promise to pay at a later date. The smart contract plays the role of the bank. When the recipient wishes to get paid, they "cash the cheque" by submitting it to the smart contract. The contract, after validating the signature, date and the amount specified on the cheque, transfers the amount to the beneficiary's account (See Figure \ref{fig:swap-chequebook}). Analogous to the person taking the cheque to the bank to cash it, anyone can send a digital cheque in a transaction to the owner's chequebook account, initiating the transfer. 
 
-The swap protocol specifies that when the \emph{payment threshold} is exceeded, a cheque is sent over by the creditor peer. Such cheques can be cashed immediately by being sent to the issuer's chequebook contract. Alternatively, cheques can also be held. Holding a cheque is effectively lending on credit, which enables the parties to save on transaction costs. 
+The swap protocol specifies that when the \emph{payment threshold} is exceeded, a cheque is sent over by the creditor peer. Such cheques can be immediately cashed by sending them to the issuer's chequebook contract. Alternatively, cheques can also be held, which effectively serves as a form of lending on credit, enabling parties to save on transaction costs. 
 
-The amount deposited in the chequebook (\gloss{global balance}) serves as collateral for the cheques. It is pooled over the beneficiaries of all outstanding cheques. In this simplest form, the chequebook has the same guarantee as real-world cheques: None. Since funds can be freely moved out of the chequebook wallet at any time, solvency at the time of cashing can never be guaranteed: If the chequebook's balance is less than the amount sanctioned by a cheque submitted to it, the cheque will bounce. This is the trade off between transaction costs and risk of settlement failure.
+The amount deposited in the chequebook (\gloss{global balance}) serves as collateral for the cheques and is pooled over the beneficiaries of all outstanding cheques. In this simplest form, the chequebook provides the same guarantees as real-world cheques: None. Since funds can be freely moved out of the chequebook wallet at any time, solvency at the time of cashing can never be guaranteed: If the chequebook's balance is less than the amount specified in a submitted cheque, the cheque will bounce. This is the trade-off between transaction costs and risk of settlement failure.
 
-While, strictly speaking, there are no guarantees for solvency, nor is there an explicit punitive measure in the case of insolvency, a bounced cheque will affect the issuer's reputation as the chequebook contract records it. On the premise that cheques are swapped in the context of repeating dealings, peers will refrain from issuing cheques beyond their balance. In other words, a node's interest in keeping a good reputation with their peers serves as a incentive enough to maintain its solvency.
+While, strictly speaking, there are no guarantees for solvency, nor is there an explicit punitive measure in the case of insolvency, a bounced cheque can negatively impact the issuer's reputation as the chequebook contract records such incidents. On the premise that cheques are swapped in the context of repeating dealings, peers will refrain from issuing cheques beyond their balance. In other words, a node's interest in keeping a good reputation with their peers serves as a sufficient incentive to maintain its solvency.
 
 
 \begin{figure}[htbp]
@@ -833,32 +834,32 @@ While, strictly speaking, there are no guarantees for solvency, nor is there an 
 
 \subsubsection{Double cashing}
 
-Since these digital cheques are files and can therefore be copied, care must be taken that the same cheque cannot be cashed twice. Such "double cashing" can be prevented by assigning each cheque given to a particular beneficiary a serial number which the contract will store when the cheque is cashed. The chequebook contract can then rely on the serial number to make sure cheques are cashed in sequential order, thus needing to store only a single serial number per beneficiary.
+Since these digital cheques are files and can therefore be copied, it is crucial to implement measures to prevent the cashing of the same cheque multiple times. Such "double cashing" can be prevented by assigning each cheque given to a particular beneficiary a serial number which the contract will store when the cheque is cashed. The chequebook contract can then rely on the serial number to make sure cheques are cashed in sequential order, thus needing to store only a single serial number per beneficiary.
 
-An alternative strategy to prevent double cashing, when repeated payments are made to the same beneficiary, is that the cheques contain the \emph{cumulative} total amount ever credited to the beneficiary. The total amount that has been cashed out is stored in the contract for each beneficiary. When a new cheque is submitted, the contract ignores cheques with amount equal to or less than the stored total, but it will transfer the difference if it receives a cheque with a higher total.
+Alternatively, to address repeated payments to the same beneficiary, the cheques can contain the \emph{cumulative} total amount ever credited to that beneficiary. The contract maintains a record of the total amount that has been cashed out for each beneficiary, and when a new cheque is submitted, the contract compares the amount on the cheque to the stored total. Cheques with an amount equal to or less than the stored total are ignored, while cheques with a higher total will result in the transfer of the difference to the beneficiary.
 
 
-This simple trick also makes it possible to cash cheques in bulk because only the current "last cheque" need ever be processed. This achieves the reduction of transaction costs alluded to above.
+This simple trick also makes it possible to cash cheques in bulk because only the most recent "last cheque" needs to be processed, leading to a significant reduction of transaction costs.
 
 \subsubsection{Cashing without Ether}\label{sec:zero_eth}
 Not all peers in Swarm are expected to have the Ether needed to pay for the transaction costs to cash out a cheque. The chequebook allows third parties to cash cheques. The sender of the transaction is incentivised with a reward for the service performed.
 
 \subsection{Waivers\statusgreen}\label{sec:waiver}
 
-If the imbalance in the swap channel is the result of high variance as opposed to unequal consumption, after a period of accumulating cheques the channel balance starts tilting the other way. Normally, it is now up to the other party to issue cheques to its peer resulting in uncashed cheques accumulating on both sides.
-To allow for further savings in transaction costs, it could be desirable to be able to "play the cheques off against each other".
+If the imbalance in the swap channel is due to high variance rather than unequal consumption, after a period of accumulating cheques, the channel balance starts tilting in the opposite direction. Normally, it is now up to the other party to issue cheques to its peer, resulting in uncashed cheques accumulating on both sides.
+To allow for further savings in transaction costs, it might be desirable to be able to offset these cheques against each other.
 
 Such a process is possible, but it requires certain important changes within the chequebook contract. In particular, cashing cheques can no longer be immediate and must incur a security delay, a concept familiar from other payment channel implementations \cite{poon2015bitcoin, diferrante2017payment, mcdonald2017payment, tremback2015universal}. 
 
-Let us imagine a system analogous to cheques being returned to the issuer. Assume peer $A$ issued cheques to $B$ and the balance was brought back to zero. Later the balance tilts in $A$'s favour but the cheques from $A$ to $B$ have not been cashed. In the traditional financial world, user B could either simply return the last cheque back to $A$ or provably destroy it. In our case it is not so simple; we need some other mechanism by which $B$ \emph{commits not to cash} that particular cheque. Such a commitment could take several forms; it could be implemented by $B$ signing a message allowing $A$ to issue a new `last cheque` which has a lower cumulative total amount than before, or perhaps $B$ could issue some kind of `negative` cheque for A's chequebook that would have the effect as if a cheque with the same amount had been paid. 
+Let us imagine a system analogous to cheques being returned to the issuer. Assume peer $A$ issued cheques to $B$ and the balance was brought back to zero. Later, the balance tilts in $A$'s favour, but the cheques from $A$ to $B$ have not been cashed. In the traditional financial world, $B$ could either simply return the last cheque to $A$ or provably destroy it. In our case, it is not so simple; we need some other mechanism by which $B$ \emph{commits not to cash} that particular cheque. Such a commitment could take several forms; it could be implemented by $B$ signing a message allowing $A$ to issue a new `last cheque` with a lower cumulative total amount than before, or perhaps $B$ could issue a form of `negative` cheque for A's chequebook, effectively offsetting the amount as if a cheque with the same amount had been paid. 
 
-What all these implementations have in common, is that the chequebook can no longer allow instantaneous cashing of cheques. Upon receiving a cheque cashing request, the contract must wait to allow the other party in question to submit potentially missing information about cancelled cheques or reduced totals. To accommodate (semi-)bidirectional payments using a single chequebook we make the following modifications:
+These implementations share the characteristics of not allowing the instantaneous cashing of cheques in the chequebook. Upon receiving a cheque-cashing request, the contract must wait to allow the other party to submit potentially missing information about cancelled cheques or reduced totals. To accommodate (semi-)bidirectional payments using a single chequebook, we introduce the following modifications:
 
 \begin{enumerate}[noitemsep]
     \item All cheques from user A to user B must contain a serial number.
-    \item Each new cheque issued by A to B must increase the serial number.
+    \item Each new cheque issued by A to B must have a serial number higher than the previous one.
     \item A's chequebook contract records the serial number of the last cheque that B cashed.
-    \item During the cashing delay, valid cheques with higher serial number supersede any previously submitted cheques regardless of their face value.
+    \item During the cashing delay, any valid cheque with a higher serial number supersedes any previously submitted cheques, regardless of their face value.
     \item Any submitted cheque which decreases the payout of the previously submitted cheque is only valid if it is signed by the beneficiary.
 \end{enumerate}
 
@@ -870,11 +871,11 @@ What all these implementations have in common, is that the chequebook can no lon
 \label{fig:waivers-diagram}
 \end{figure}
 
-With these rules in place it is easy to see how cheque cancellation would work. Suppose user $A$ has issued cheques $c_0 \ldots c_n$ with cumulative totals $t_0 \ldots t_n$ to user $B$. Suppose that the last cheque $B$ cashed was $c_i$. The chequebook contract has recorded that $B$ has received a payout of $t_i$ and that the last cheque cashed had serial number $i$.
+With these rules in place, it is easy to see how cheque cancellation would work. Let's consider the scenario where user $A$ has issued cheques $c_0 \ldots c_n$ with cumulative totals $t_0 \ldots t_n$ to user $B$. Suppose that the last cheque $B$ cashed was $c_i$. The chequebook contract has recorded that $B$ has received a payout of $t_i$ and that the last cheque cashed had serial number $i$.
 
-Let us further suppose that the balance starts tilting in $A$'s favour by some amount $x$. If $B$ had already cashed cheque $c_n$, then $B$ would now have to issue a cheque of her own using $B$'s chequebook as the source and naming $A$ as the beneficiary. However, since cheques $c_{i+1} \ldots c_n$  are un-cashed, $B$ can instead send to $A$ a cheque with $A$'s chequebook as the source, $B$ as the beneficiary, with serial number $n+1$ and cumulative total $t_{n+1} = t_n - x$. Due to the rules enumerated above, A will accept this as equivalent to a payment of amount $x$ by $B$.  In this scenario, instead of sending a cheque to $A$, $B$ waives part of their earlier entitlement. This justifies SWAP as \emph{send waiver as payment}.
+Let us further suppose that the balance starts tilting in $A$'s favour by some amount $x$. If $B$ had already cashed cheque $c_n$, then $B$ would be required to issue a cheque of her own using $B$'s chequebook as the source and naming $A$ as the beneficiary. However, since cheques $c_{i+1} \ldots c_n$  are still uncashed, $B$ can instead send to $A$ a cheque with $A$'s chequebook as the source, $B$ as the beneficiary, with serial number $n+1$ and cumulative total $t_{n+1} = t_n - x$. Due to the rules enumerated above, $A$ will accept this as an equivalent payment of amount $x$ from $B$.  In this scenario, instead of sending a cheque to $A$, $B$ waives part of their earlier entitlement. This justifies the concept of SWAP as \emph{send waiver as payment}.
 
-This process can be repeated multiple times until the cumulative total is brought back to $t_i$. At this point all outstanding debt has effectively been cancelled and any further payments must be made in the form of a proper cheque from $B$'s chequebook to $A$ (See Figure \ref{fig:waivers-diagram}).
+This process can be repeated multiple times until the cumulative total is brought back to $t_i$. At this point, all outstanding debt has effectively been cancelled, and any further payments must be made in the form of a proper cheque from $B$'s chequebook to $A$ (See Figure \ref{fig:waivers-diagram}).
 
 % \subsection{Best effort settlement strategy}
 
@@ -883,9 +884,9 @@ This process can be repeated multiple times until the cumulative total is brough
 \subsection{Zero cash entry\statusgreen}\label{sec:zero-cash-entry}
 
 
-Swap accounting can also work in one direction only. If a party enters the system with zero liquid capital (a \gloss{newcomer}), but connects to a peer with funds (an \gloss{insider}), the newcomer can begin to provide a service (and not use any) in order to earn a positive Swap balance. 
+Swap accounting can also work in a one-directional manner. When a party enters the system with zero liquid capital (a \gloss{newcomer}) but connects to a peer with funds (an \gloss{insider}), the newcomer can begin to provide a service (and not use any) in order to earn a positive swap balance. 
 
-If the insider has a chequebook they are able to simply pay the newcomer with a cheque. However, this has a caveat: The newcomer will be able to earn cheques for services provided, but will not have the means to cash them. Cashing cheques requires sending a transaction to the blockchain, and therefore requires gas, unless the node can convince one of its peers to send the transaction for them. To facilitate this, nodes are able to sign off on a structure that they want to be sent, and then extend the Swap contract with a preprocessing step, which triggers payment to the newcomer covering the transaction’s gas cost plus a service fee for the transaction's sender. The newcomer's cheque may be cashed by any insider (See Figure \ref{fig:zero-cash-entry}). This feature justifies SWAP as \emph{start without a penny, send with a peer}.
+If the insider has a chequebook, they are able to simply pay the newcomer with a cheque. However, this has a caveat: The newcomer will be able to earn cheques for the services provided but will not have the means to cash them. Cashing cheques requires sending a transaction to the blockchain, and therefore requires gas, unless the node can convince one of its peers to execute the transaction on its behalf. To facilitate this, nodes are able to sign off on a structure that they want to be sent, and then extend the Swap contract with a preprocessing step that triggers payment to the newcomer, covering the transaction’s gas cost plus a service fee for the sender of the transaction. The newcomer's cheque may be cashed by any insider (See Figure \ref{fig:zero-cash-entry}). This feature justifies the concept of SWAP as \emph{start without a penny, send with a peer}.
 
 \begin{figure}[htbp]
 \centering
@@ -909,16 +910,16 @@ This section complements the SWAP scheme with additional incentives and protecti
 
 \subsubsection{Protocol breach}
 
-In a peer to peer trustless setting, it is difficult to have nuanced sanctions against undesired peer behaviour, however, when the basic rules of interaction are violated, the node that detects it can simply disconnect from that peer. In order to avoid deadlocks due to attempted reconnection, the sanctions imposed on transgressive nodes also include recording the peer's address into a blacklist. This simple measure is enough to provide a clear disincentive to nodes seeking to exploit the protocol. 
+In a peer-to-peer trustless setting, implementing nuanced sanctions against undesired peer behaviour can be challenging. However, when the basic rules of interaction are violated, the node that detects it can simply disconnect from that peer. In order to avoid deadlocks due to attempted reconnection, the sanctions imposed on transgressive nodes also include recording the peer's address into a blacklist. This simple measure is enough to provide a clear disincentive to nodes seeking to exploit the protocol. 
 
 \subsubsection{Excessive frivolity}
 
-Both retrieval and push-sync protocols have an incentive structure where only the response incurs a source of income. Although this forms a strong incentive to play ball, it may also be necessary to take measures to ensure that nodes are not able to spam the network with frivolous requests which have no associated cost. In the case of push-syncing it is especially important not to allow chunks to expunge others at no cost. This will form the topic of a later section where we introduce postage stamps (see \ref{sec:postage-stamps}).
+Both retrieval and push-sync protocols have an incentive structure where only the response to a request generates income. Although this creates a strong incentive to play ball, it may also be necessary to take measures to ensure that nodes are not able to spam the network with frivolous requests that have no associated cost. In the case of push-syncing, it is especially important not to allow chunks to expunge others at no cost. This will form the topic of a later section where we introduce postage stamps (See \ref{sec:postage-stamps}).
 
-In the case of pull-sync retrieval, the attack consists of requesting non-existing chunks and causing downstream peers to initiate a lot of network traffic, as well as some memory consumption, due to requests being persisted during the time to live period.
-Surely, it could happen that one requests non-existing chunks and what is more, the requested chunk could be garbage collected in the network, in which case, the requestor may have acted in good faith. 
+In the case of pull-sync retrieval, the potential attack consists of requesting non-existing chunks and causing downstream peers to initiate a lot of network traffic, as well as some memory consumption, due to requests being persisted during the time-to-live period.
+Surely, there is a possibility that a requestor may unknowingly request non-existing chunks, and what is more, the requested chunk could have been be garbage-collected in the network, in which case, the requestor may have acted in good faith. 
 
-To mitigate this, each node keeps a record of the number of retrieve requests from each of its peers and then updates the relative frequency of failed requests, i.e. requests that have timed out even though the node in question has forwarded it. In the case that the proportion of these failed requests relative to successful requests is too high, sanctions are imposed on the peer: it is disconnected and blacklisted.
+To mitigate this, each node maintains a record of the number of retrieve requests from each of its peers and then updates the relative frequency of failed requests, i.e. requests that have timed out even though the node in question had forwarded it. If the proportion of failed requests to successful requests exceeds a certain threshold, sanctions are imposed on the peer: it is disconnected and blacklisted.
 
 % 
 % \footnote{Note that policing frivolous requestors is much easier than policing forwarders, since the latter requires positive evidence from other nodes while the former only requires forwarding.}
@@ -926,18 +927,18 @@ To mitigate this, each node keeps a record of the number of retrieve requests fr
 
 By remembering the requests they have forwarded, nodes can distinguish legitimate responses from a potential DoS attack: for retrieval, if the chunk delivered does not fulfil an open request, it is considered unsolicited; for push-sync, if a statement of custody response does not match an existing entry for forwarded chunk, it is considered unsolicited.
 
-Timeouts are crucial here. After the time to live period for a request has passed, the record of the open request can be removed and any subsequent response will therefore be treated as unsolicited, as it is indistinguishable from messages that were never requested. 
+Timeouts are crucial here. After the time-to-live period for a request has passed, the record of the open request can be removed. Any response received after this point is considered unsolicited, as it is indistinguishable from messages that were never requested. 
 
-To allow for some tolerance in time measurement discrepancies, once again a small percentage of illegitimate messages are allowed from a peer before they are disconnected and blacklisted.
+To account for slight discrepancies in time measurement, once again a small percentage of illegitimate messages are tolerated from a peer before they are disconnected and blacklisted.
 
 \subsubsection{Quality of service}
 
-Beyond the rate of unsolicited messages, nodes can cause grievances on other ways, such as by having high prices, low network throughput or long response latencies. Similarly to excessively frivolous requests, there is no need for a distinction between malicious attacks or sub-optimal (poor quality, overpriced) service provided in good faith. As a result mitigating quality of service issues is discussed in the context of peer selection strategies in forwarding and connectivity.
+Beyond the rate of unsolicited messages, nodes can cause grievances on other ways, such as by setting high prices, having low network throughput, or long response latencies. Similarly to excessively frivolous requests, there is no need for a distinction between malicious attacks or sub-optimal (poor quality, overpriced) service provided in good faith. As a result, mitigating quality of service issues is discussed in the context of peer selection strategies in forwarding and connectivity.
 
 \subsubsection{Blacklisting}
 
 Blacklisting is a strategy that complements disconnection as a measure against peers. It is supposed to extend our judgment expressed in the act of disconnection that the peer is unfit for business.
-In particular blacklists should be consulted when accepting incoming connections as well as in the peer suggestion strategy of the connectivity driver. On the one hand blacklisting can save the node from being deadlocked in a cycle of malicious peers trying to reconnect. On the other hand, care must be taken not to blacklist peers acting in good faith and hurt network connectivity.
+Blacklists serve as a reference when accepting incoming connections as well as in the peer suggestion strategy of the connectivity driver. On the one hand, blacklisting can save the node from being deadlocked in a cycle of malicious peers trying to reconnect. On the other hand, care must be taken not to blacklist peers acting in good faith, as this could negatively impact network connectivity.
 
 
 \input{storage-incentives}

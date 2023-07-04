@@ -1,7 +1,7 @@
 First, in \ref{sec:error-correcting-codes}, we introduce \glossplural{erasure code}, which we then show how to apply to files in Swarm in \ref{sec:erasure-bmt}. In \ref{sec:dispersed-replicas}, we describe a construct that enables cross-neighbourhood redundancy for singleton chunks that completes erasure coding. Finally, in \ref{sec:strategies}, we show how systematic codes allow multiple retrieval strategies of erasure coded files  while preserving random access.
 
 \subsection{Error correcting codes \statusgreen}\label{sec:error-correcting-codes}
-\enlargethispage*{\baselineskip}
+% \enlargethispage*{\baselineskip}
 %
 
 \emph{Error correcting codes} are commonly used in the context of data storage and data transfer to guarantee  data integrity even in the face of a system fault. Error correction schemes define how to rearrange the original data adding redundancy to its representation before upload or transmission (\emph{encoding}\,) so that it can correct corrupted data or recover missing content after retrieval or reception (\emph{decoding}\,). Different schemes are evaluated by quantifying their strength (\emph{tolerance} in terms of the rate of data corruption and loss) as a function of their cost (\emph{overhead} in terms of storage and computation). 
