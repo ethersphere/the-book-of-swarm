@@ -61,7 +61,7 @@ Swarm uses the \emph{Swarm hash tree} to represent files. This structure is a Me
 These so called \emph{packed address chunks} (PACs) constitute the intermediate chunks of the tree.
 The branching factor $b$ is chosen so that the references to the children fill up a full chunk.
 With reference size 32 or 64 (hash size 32) and chunk size 4096 bytes, $b$ is 128 for unencrypted and 64 for encrypted content 
-(See Figure \ref{fig:Swarm-hash-split}).
+(see Figure \ref{fig:Swarm-hash-split}).
 
 
 \begin{figure}[!ht]
@@ -77,7 +77,7 @@ During file retrieval, a Swarm client starts from the root hash reference and re
 In case of standard file download, all the references packed within the PAC are followed, i.e., the referenced chunk data is retrieved. 
 
 PACs offer a natural and elegant way to achieve consistent redundancy within the swarm hash tree.
-The input data for an instance of erasure coding is the chunk data of the children, the equal sized bins corresponding to chunk data of the consecutive references packed in it. The idea is that instead of having each of the $b$ references packed represent children, only $m$ would, and the rest of the $k=b-m$ would encode RS parities (See Figure \ref{fig:Swarm-hash-erasure}).
+The input data for an instance of erasure coding is the chunk data of the children, the equal sized bins corresponding to chunk data of the consecutive references packed in it. The idea is that instead of having each of the $b$ references packed represent children, only $m$ would, and the rest of the $k=b-m$ would encode RS parities (see Figure \ref{fig:Swarm-hash-erasure}).
 
 
 The \emph{chunker} algorithm incorporating PAC-scoped RS encoding would work as follows: 

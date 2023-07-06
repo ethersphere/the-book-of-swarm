@@ -36,7 +36,7 @@ While anyone can choose to top up the balance of a batch at a later date, only t
 
 Owners issue postage stamps in order to attach them to chunks%
 % (see definition \ref{def:postage-stamp} in appendix \ref{sec:appendix-disc})%
-. Each batch has a number of \glossplural{storage slot} effectively arranged into a number of equal-sized buckets. Issuing a stamp means to assign a chunk to a storage slot. A stamp is a data structure comprising the following fields (See Figure  \ref{fig:postage-stamp}):
+. Each batch has a number of \glossplural{storage slot} effectively arranged into a number of equal-sized buckets. Issuing a stamp means to assign a chunk to a storage slot. A stamp is a data structure comprising the following fields (see Figure  \ref{fig:postage-stamp}):
 
 \begin{itemize}[noitemsep]
     \item[--] \emph{chunk address} -- The address of the chunk the stamp is attached to. 
@@ -58,7 +58,7 @@ A postage stamp's validity can be checked by verifying that it scores all true o
 \item[--] \emph{aligned} -- The referenced storage slot has the bucket specified and it aligns with the chunk address stamped.
 \end{itemize}
 
-All this can be easily checked by nodes in Swarm only using information available on the public blockchain (read-only endpoints of the postage contract). When a chunk is uploaded, the validity of the attached postage stamp is verified by forwarders along the push-syncing route  (See Figure \ref{fig:postage-stamps}).
+All this can be easily checked by nodes in Swarm only using information available on the public blockchain (read-only endpoints of the postage contract). When a chunk is uploaded, the validity of the attached postage stamp is verified by forwarders along the push-syncing route  (see Figure \ref{fig:postage-stamps}).
 
 
 \begin{figure}[!th]
@@ -86,7 +86,7 @@ Purchasing a postage batch effectively entitles the owner to issue a fixed amoun
 \end{itemize}
 
 While the first two criteria are easily verifiable by any third party, the last one is not. In order for index collisions to be detectable by individual storer nodes, the uniformity depth must be large enough to fall within the nodes' area of responsibility.
-As long as this condition is maintained, all chunks in the same bucket are guaranteed to land in the same neighbourhood, and, as a result, duplicate assignments can be locally detected by nodes (See Figure \ref{fig:over-issuance}).
+As long as this condition is maintained, all chunks in the same bucket are guaranteed to land in the same neighbourhood, and, as a result, duplicate assignments can be locally detected by nodes (see Figure \ref{fig:over-issuance}).
 
 In order to keep their stamps collision-free, uploaders need to maintain counters for how many stamps they have issued for each bucket within a batch and ensure that the number does not exceed the maximum bucket size. 
 
@@ -256,7 +256,7 @@ With neighbourhoods at equal depth, uniform sampling of neighbourhoods can be mo
 %
 % \footnote{one of the random nonces (see definition \ref{def:nonce-round}) from the \emph{random seed} of the round, see appendix \ref{sec:randomness}.}
 %
-) randomly dropped in the address space (See Figure \ref{fig:neighbourhood-selection}).
+) randomly dropped in the address space (see Figure \ref{fig:neighbourhood-selection}).
 
 
 \begin{figure}[!ht]
@@ -273,7 +273,7 @@ With neighbourhoods at equal depth, uniform sampling of neighbourhoods can be mo
 
 The collaborative effort among peers to store data redundantly for the network's benefit is underpinned by a \gloss{Schelling game}
 % (defined formally in appendix \ref{sec:redistribution-game}) 
-aimed at proving that the peers agree on the chunks they need to store and they do, in fact, store them. The redistribution game is orchestrated by the game contract, one of the building blocks of the system of 4 smart contracts which collectively drive the swarm storage incentive system (See Figure \ref{fig:smart-contracts}):
+aimed at proving that the peers agree on the chunks they need to store and they do, in fact, store them. The redistribution game is orchestrated by the game contract, one of the building blocks of the system of 4 smart contracts which collectively drive the swarm storage incentive system (see Figure \ref{fig:smart-contracts}):
 
 \begin{itemize}
     \item[--] Postage contract -- serving as the batch store to sell postage batches to uploaders, keeping track of batch balances, batch expiry, storage rent, and the reward pot itself.
@@ -312,7 +312,7 @@ Once the reveal phase is over, the  \gloss{neighbourhood selection anchor} becom
 %
 \footnote{If storage depth is less than the anchor's proximity order relative to the overlay address.}
 %
-are  eligible to participate in the following round (See Figure \ref{fig:neighbourhood-selection}).
+are  eligible to participate in the following round (see Figure \ref{fig:neighbourhood-selection}).
 
 
 
@@ -461,17 +461,17 @@ Here we summarise the eight rules of validating a claim, which involve committin
 %
 \item[\hbox to 2em{\textsc{redundancy}}] \hspace{1cm}\\ The stake serves as weights in determining the probability of a node within a neighbourhood being selected as winner%
 % (see \ref{def:winner-selection})%
-. This implies no advantage in submitting multiple claims. Operators running multiple nodes in one neighbourhood (sharing storage) do not gain any advantage compared to running a single node with the same total stake. Assuming that this disincentive to proliferate is effective, staking can be regarded as guarantee for true redundancy.
+. As a result, there is no advantage in submitting multiple claims. Operators running multiple nodes in one neighbourhood (sharing storage) do not gain any advantage compared to running a single node with the same total stake. Assuming that this disincentive to proliferate is effective, staking can be considered a guarantee for true redundancy.
 %
-\item[\hbox to 2em{\textsc{responsibility}}] \hspace{1cm}\\  At the time of revealing, it is verified if the neighbourhood selection anchor falls within the node's radius of responsibility, i.e., if it belongs to the range of addresses covered by the node, where the proximity of those addresses to the node's overlay address is not less than their reported storage depth. 
+\item[\hbox to 2em{\textsc{responsibility}}] \hspace{1cm}\\  At the time of revealing, it is verified whether the neighbourhood selection anchor falls within the node's radius of responsibility, i.e., if it belongs to the range of addresses covered by the node, where the proximity of those addresses to the node's overlay address is not less than their reported storage depth. 
 %
 \item[\hbox to 2em{\textsc{relevance}}] \hspace{1cm}\\ Using a witness proof with the reserve commitment hash as the root, we provide evidence that an arbitrarily chosen segment in the reserve sample packed address chunk corresponds to the address of a witness chunk. 
 A valid postage stamp signed off on this witness chunk address is presented, indicating that storing this chunk in the reserve is relevant to someone (and has been paid for). 
-\item[\hbox to 2em{\textsc{retention}}] \hspace{1cm}\\ A segment inclusion proof is provided as evidence that the chunk data has been retained in full integrity. 
-\item[\hbox to 2em{\textsc{recency}}] \hspace{1cm}\\ The salt used for the transformed reserve sample is derived from the current round's random nonce proving that the RS must have been compiled recently. The witness and segment indexes are derived from the next game's random seed ensuring that at the time of compilation and commitment, no compressed or partial retention of chunk data would have been
-sufficient.
-\item[\hbox to 2em{\textsc{retrievability}}] \hspace{1cm}\\  The chunk is shown to be retrievable by proximity based routing, i.e. its address belongs to the range of addresses covered by the neighbourhood: the chunk's proximity order to the node's overlay address is not less than their reported storage depth. 
-\item[\hbox to 2em{\textsc{resources}}] \hspace{1cm}\\ Resource retention checks the volume of resources constituting the reserve by estimating the sampled set size via chunks density and stamps density. 
+\item[\hbox to 2em{\textsc{retention}}] \hspace{1cm}\\ A segment inclusion proof is provided as evidence that the chunk data has been preserved with complete integrity. 
+\item[\hbox to 2em{\textsc{recency}}] \hspace{1cm}\\ The salt used for the transformed reserve sample is derived from the random noncs of the current round, proving that the RS must have been compiled recently. The witness and segment indexes are derived from the next game's random seed, ensuring that no compressed or partial retention of chunk data would have been
+sufficient at the time of compilation and commitment.
+\item[\hbox to 2em{\textsc{retrievability}}] \hspace{1cm}\\  The chunk's retrievability is demonstrated through proximity-based routing, indicating that its address belongs to the range of addresses covered by the neighbourhood. The chunk's proximity order to the node's overlay address is not less than its reported storage depth. 
+\item[\hbox to 2em{\textsc{resources}}] \hspace{1cm}\\ Resource retention verifies the volume of resources constituting the reserve by estimating the sampled set size using the density of chunks and postage stamps. 
 \end{itemize}
 
 
@@ -494,9 +494,9 @@ sufficient.
 
 \subsection{Pricing and network dynamics}\label{sec:price-oracle}
 
-In this section, we first put the redistribution scheme in the context of self-sustainability, and provide a simple solution for price discovery.
+In this section, we first contextualise the redistribution scheme within the framework of self-sustainability and offer a simple solution for price discovery.
 
-For Swarm to be a truly self-sustaining system, the unit price of storage rent must be set in a way that is responsive to demand and supply. Ideally, the price is automatically adjusted based on reliable signals resulting in dynamic self-regulation. The guiding insight here is that the information storer nodes provide when  they apply for the redistribution game, also serves as a price signal. In other words, the redistribution game serves as a decentralised price oracle.
+For Swarm to be a truly self-sustaining system, the unit price of storage rent needs to be set in a way that is responsive to supply and demand. Ideally, the price is automatically adjusted based on reliable signals, resulting in dynamic self-regulation. The guiding insight here is that the information provided by storer nodes during the redistribution game also serves as a price signal. In other words, the redistribution game serves as a decentralised price oracle.
 
 
 
@@ -505,18 +505,18 @@ For Swarm to be a truly self-sustaining system, the unit price of storage rent m
 The storage depth represents the proximity radius within which the neighbourhood's storer nodes keep all chunks with valid postage stamps and fill their reserve. 
 
 
-If the volume of newly issued storage slots from recently purchased batches (\emph{ingress rate}\/) and the volume of expired storage slots (\emph{outgress rate}\/) balance out, the storage depth remains unchanged.
-But see what happens if the volume of  reserved chunks increase?
-Now, since the client's reserve capacity is constant, after a while, nodes are able to fill up their capacity with chunks that are at most one proximity order closer to them than the farthest chunks were previously, i.e.,  their storage depth increases.
-When the volume of reserved chunks doubles,  the storage depth increases by one.  
+If the volume of newly issued storage slots from recently purchased batches (\emph{ingress rate}\/) and the volume of expired storage slots (\emph{outgress rate}\/) balance out, the storage depth remains constant.
+However, let's consider what happens when the volume of reserved chunks increases.
+As the client's reserve capacity is fixed, over time, nodes are able to fill their capacity with chunks that are closer to them by at most one proximity order compared to the previously farthest chunks. This results in an increase in their storage depth.
+Specifically, when the volume of reserved chunks doubles,  the storage depth increases by one.  
 
-In order to store this excess data under the same redundancy constraints the network requires double the number of nodes. If all else is equal, double the network-wide reserve, double the postage revenue and therefore double the overall pot that gets redistributed. When neighbourhoods split as they are absorbing the new volume, they simultaneously release the chunks in the PO bin of their old depth, i.e., the chunks now stored by their \gloss{sister nodes}. 
+In order to store this excess data under the same redundancy constraints, the network needs double the number of nodes. If all else is equal, double the network-wide reserve, double the postage revenue and therefore double the overall pot that gets redistributed. When neighbourhoods split as they are absorbing the new volume, they simultaneously release the chunks in the PO bin of their old depth, i.e., the chunks now stored by their \gloss{sister nodes}. 
 
-Utilisation rate is an organic way to  introduce pressure against fully maxing out a node's reserve with critical content, and thereby enable early detection of capacity pressure. This provides  sufficient safety buffer for the triggered incentives to take effect. For instance,  if utilisation rate is $1/8$, the storage depth is up to 3 PO-s shallower than the reserve depth.%
+Utilisation rate is an organic way to introduce pressure against fully maximising a node's reserve with critical content and allows for early detection of capacity pressure. This provides a sufficient safety buffer for the triggered incentives to take effect. For instance, if utilisation rate is $1/8$, the storage depth is up to 3 POs shallower than the reserve depth.%
 %
 \footnote{The narrative of this scenario is that uploaders with underutilised batches subsidise extra redundancy for everyone.}
 %
-Now the ingress can be really high and bring the reserve depth down to storage depth. When the tendency of a closing gap between the potential (reserved) and actual (observed) utilisation of the DISC is detected, any incentive change will have the buffer to take effect without target redundancy being threatened. 
+Now the ingress can be really high and bring the reserve depth down to the storage depth. When a narrowing gap between the potential (reserved) and actual (observed) utilisation of the DISC is detected, any changes in incentives will have the buffer to take effect without the target redundancy being threatened. 
 
 % See figure \ref{fig:pricing-demand}.
 
@@ -533,10 +533,10 @@ Now the ingress can be really high and bring the reserve depth down to storage d
 
 Since the storage capacity is maxed out, the ratio of supply and demand is directly seen in the number of honest nodes playing the Schelling game. 
 
-We assume that if nodes are staying in the network for a longer period, their doing so testifies to their profitability. For a stable swarm, neighbourhoods need only 4 (balanced) nodes within as neighbourhood. Assuming equal stake (or more precisely, assuming that relative stake equalises profitability of node operators) if there are $n$ nodes in a neighbourhood, their long term profit is equally shared, this amount is optimised if there are exactly four nodes ($n=4$). This number can be more, since opportunistic operators may start their nodes in a complete neighbourhood in anticipation of a neighbourhood split due to capacity demand. As these nodes stay in, the same long term winnings of the neighbourhood gets distributed among more nodes than optimal.
+We make the assumption that nodes staying in the network for a longer period indicate their profitability. For a stable swarm, neighbourhoods  only need a minimum of 4 (balanced) nodes. Assuming equal stake (or more precisely, assuming that relative stake equalises the profitability of node operators) if there are $n$ nodes in a neighbourhood, their long-term profit is equally shared, this amount is optimised if there are exactly four nodes ($n=4$). However, there can be more nodes in a neighbourhood, as opportunistic operators may anticipate a neighbourhood split due to capacity demand and start their nodes accordingly. As these nodes stay in, the same long-term winnings of the neighbourhood get distributed among more nodes than optimal.
 However, the fact that nodes tolerate this implies that the reward is too much (the price is too high), and the network can tolerate a decreasing price.
 
-On the other hand, if the number of honest revealers is less than the neighbourhood redundancy requirement, it signals capacity shortage and therefore requires the storage rent to increase. 
+On the other hand, if the number of honest revealers is lower than the neighbourhood redundancy requirement, it signals a capacity shortage and therefore requires an increase in storage rent. 
 
 % See figure \ref{fig:pricing-supply}.
 
@@ -552,16 +552,16 @@ On the other hand, if the number of honest revealers is less than the neighbourh
 
 The rule for updating the price from one round to the next is that the current price is multiplied by a value $m$ which depends on the number of honest revealers in the round%
 % (formally defined in appendix \ref{sec:appendix-price-oracle})%
-. Mathematically, $p_{t+1} = m p_t$, where $p_t$ is the price in round $t$ (and $p_{t+1}$ is then the price in the following round). We define the multiplier $m$ in terms of the number of honest revealers $r$ and a stability parameter $\sigma$ governing how quickly the price should increase or decrease, all other things equal. 
+. Mathematically, $p_{t+1} = m p_t$, where $p_t$ is the price in round $t$ (and $p_{t+1}$ is then the price in the following round). We define the multiplier $m$ in terms of the number of honest revealers $r$ and a stability parameter $\sigma$ that governs how quickly the price should increase or decrease, all other things equal. 
 
 \begin{figure}[!ht]
   \centering
   \includegraphics[width=.7\textwidth]{fig/adaptive-pricing.pdf}
-  \caption[Adaptive pricing]{Adaptive pricing. The relative change in price (y-axis), mathematically expressed as the price in the next round divided by the price this round minus one ($p_{t+1} / p_t - 1$), is displayed against the number of honest revealers $r$ in the current round (x-axis). This is done so for three different values of the stability parameter $\sigma$ (colours). The points are the actual price change values; the connecting dashed lines are for visual aid only. The dotted horizontal line highlights the point at which no price change happens. Price change is exactly zero for any $\sigma$ when the number of honest revealers is four. Otherwise, larger values of $\sigma$ lead to larger relative price changes as the number of honest revealers is varied.}
+  \caption[Adaptive pricing]{Adaptive pricing. The relative change in price (y-axis), mathematically expressed as the price in the next round divided by the price this round minus one ($p_{t+1} / p_t - 1$), is displayed against the number of honest revealers $r$ in the current round (x-axis). This is done so for three different values of the stability parameter $\sigma$ (colours). The points are the actual price change values; the connecting dashed lines are for visual aid only. The dotted horizontal line marks the point where no price change occurs. Price change is exactly zero for any $\sigma$ when the number of honest revealers is four. Otherwise, larger values of $\sigma$ lead to larger relative price changes as the number of honest revealers is varied.}
   \label{fig:adaptive-pricing}
 \end{figure}
 
-In particular, we choose $m = 2^{\sigma(4 - r)}$, and therefore we have $p_{t+1} = 2^{\sigma(4 - r)} p_t$. This expresses how the deviation $4 - r$ of the number of revealers from the optimal value of 4 maps to an exponential change in price. The stability parameter $\sigma$ determines the generic smoothness of price changes across rounds, i.e., how many rounds it takes for the price of rent to double in case of a consistent signal of the lowest degree of undersupply (or halve in case of a consistent oversupply). Figure \ref{fig:adaptive-pricing} illustrates how the price model works.
+In particular, we choose $m = 2^{\sigma(4 - r)}$, and therefore we have $p_{t+1} = 2^{\sigma(4 - r)} p_t$. This expresses how the deviation $4 - r$ of the number of revealers from the optimal value of 4 maps to an exponential change in price. The stability parameter $\sigma$ determines the generic smoothness of price changes across rounds, indicating how many rounds it takes for the rent price to double in case of a consistent signal of the lowest degree of undersupply (or halve in case of a consistent oversupply). Figure \ref{fig:adaptive-pricing} illustrates how the price model works.
 
-Two minor adjustments are applied to this simple model. First, $r$ is capped at some value $r_{\text{max}}$ (chosen to be 8 in our case). That is, $r$ should actually be interpreted as the minimum of the number of honest revealers and $r_{\text{max}}$. Second, the price is never allowed to drop below some predetermined minimum $p_{\text{min}}$. That is, in case the price drop from one round to the next would bring the price below $p_{\text{min}}$, it will instead be kept at $p_{\text{min}}$. 
+Two minor adjustments are applied to this simple model. First, $r$ is capped at a maximum value $r_{\text{max}}$ (chosen to be 8 in our case). That is, $r$ should actually be interpreted as the minimum of the number of honest revealers and $r_{\text{max}}$. Second, the price is never allowed to drop below a predetermined minimum $p_{\text{min}}$. That is, if the price were to drop from one round to the next and reach a value below the predetermined minimum $p_{\text{min}}$, the price will be held steady at $p_{\text{min}}$ instead. 
 

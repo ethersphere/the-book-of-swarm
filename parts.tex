@@ -10,7 +10,7 @@ The Swarm project is set out to build permissionless storage and communication i
 \label{fig:Swarm-layered-design}
 \end{figure}
 
-This part details the design and architecture of the system. In accordance with the principles laid out in \ref{sec:design-principles}, we put an emphasis on modular design, and conceive of Swarm as having clearly separable layers, each dependent on the previous one (See Figure \ref{fig:Swarm-layered-design}):
+This part details the design and architecture of the system. In accordance with the principles laid out in \ref{sec:design-principles}, we put an emphasis on modular design, and conceive of Swarm as having clearly separable layers, each dependent on the previous one (see Figure \ref{fig:Swarm-layered-design}):
 
 \begin{itemize}[noitemsep]
 \item (1) \emph{a peer-to-peer network protocol to serve as underlay transport,}
@@ -94,11 +94,11 @@ In what follows, we show the two common flavours of routing: \emph{iterative/zoo
 Let $R$ be an arbitrary binary relation over nodes in a network. Nodes that are in relation $R$ with a particular node $x$ are called \glossplural{peer} of $x$. Peers of $x$ can be indexed by their \gloss{proximity order} (\gloss{PO}) relative to $x$%
 % (see \ref{sec:proximity})%
 .
-The equivalence classes of peers are called \glossplural{proximity order bin}, or just bins for short. Once arranged in bins, these groups of peers form the \gloss{Kademlia table} of the node $x$ (See Figure \ref{fig:kademlia-table}). 
+The equivalence classes of peers are called \glossplural{proximity order bin}, or just bins for short. Once arranged in bins, these groups of peers form the \gloss{Kademlia table} of the node $x$ (see Figure \ref{fig:kademlia-table}). 
 
 
 
-\begin{figure}[!ht]
+\begin{figure}[htbp]
    \centering
     \includegraphics[width=.8\textwidth]{fig/kademlia-35.pdf}
    \caption[From overlay address space to Kademlia table \statusgreen]{From overlay address space to Kademlia table. \textbf{Top}: the overlay address space is represented with a binary tree, colored leaves are actual nodes. The path of the pivot node (+) is shown with thicker lines. \textbf{Centre}: peers of the pivot nodes are shown keyed by the bits of their xor distance measured from the pivot. Here, $0$s represent a matching bit with the pivot, and $1$s show a differing bit. The leaf nodes are ordered by their xor distance from the pivot (leftmost node). \textbf{Bottom}: the Kademlia table of the pivot: the subtrees branching off from the pivot path on the left are displayed as the rows of the table representing proximity order bins in increasing order.}
@@ -115,7 +115,7 @@ Node $x$ has a \gloss{saturated Kademlia table} if there is a $0\leq d_x\leq \ma
 \end{figure}
 
 Let $R$ be the "is known to" relation:  $y$ "is known to" $x$ if $x$ has both overlay and underlay addressing information for $y$. 
-In iterative Kademlia routing, the \gloss{requestor node} iteratively extends the graph of peers that are known to it. Using their \gloss{underlay address}, the requestor node will contact the peers that they know are nearest the destination address for peers that are further away (commonly using UDP). On each successive iteration, the peers become at least one order closer to the destination (See Figure \ref{fig:iterative-forwarding-kademlia}). Because of the Kademlia criteria, the requestor will eventually discover the destination node's underlay address and can then establish direct communication with it. This iterative strategy%
+In iterative Kademlia routing, the \gloss{requestor node} iteratively extends the graph of peers that are known to it. Using their \gloss{underlay address}, the requestor node will contact the peers that they know are nearest the destination address for peers that are further away (commonly using UDP). On each successive iteration, the peers become at least one order closer to the destination (see Figure \ref{fig:iterative-forwarding-kademlia}). Because of the Kademlia criteria, the requestor will eventually discover the destination node's underlay address and can then establish direct communication with it. This iterative strategy%
 %
 \footnote{The iterative protocol is equivalent to the original Kademlia routing that is described in \cite{maymounkov2002kademlia}.
 }
@@ -141,7 +141,7 @@ In this way, Swarm's underlay transport offers quasi-stable peer connections ove
 
 In a \gloss{forwarding Kademlia} network, a message is said to be \emph{routable} if there exists a path from sender to destination through which the message can be relayed. In a mature subnetwork with \gloss{Kademlia topology} every message is routable. 
 
-If all peer connections are stably online, a \gloss{thin Kademlia table}, i.e.\ a single \gloss{peer} for each bin up to $d$, is sufficient to guarantee routing between nodes. In reality, however, networks are subject to \gloss{churn}, i.e.\ nodes are expected to go offline regularly. In order to ensure \gloss{routability} in the face of churn, the network needs to maintain \gloss{Kademlia topology}. This means that each individual node needs to have a \gloss{saturated Kademlia table} at all times. By keeping several connected peers in each \gloss{proximity order bin}, a node can ensure that node dropouts do not damage the saturation of their Kademlia table. Given a model of node dropouts, we can calculate the minimum number of peers needed per bin to guarantee that nodes are saturated with a probability that is arbitrarily close to 1. The more peers a node keeps in a particular proximity order bin, the more likely that the message destination address and the peer will have a longer matching prefix. As a consequence of forwarding the message to that peer, the \gloss{proximity order} increases more quickly, and the message ends up closer to the destination than it would with less peers in each bin (See also Figure \ref{fig:bindensity}).
+If all peer connections are stably online, a \gloss{thin Kademlia table}, i.e.\ a single \gloss{peer} for each bin up to $d$, is sufficient to guarantee routing between nodes. In reality, however, networks are subject to \gloss{churn}, i.e.\ nodes are expected to go offline regularly. In order to ensure \gloss{routability} in the face of churn, the network needs to maintain \gloss{Kademlia topology}. This means that each individual node needs to have a \gloss{saturated Kademlia table} at all times. By keeping several connected peers in each \gloss{proximity order bin}, a node can ensure that node dropouts do not damage the saturation of their Kademlia table. Given a model of node dropouts, we can calculate the minimum number of peers needed per bin to guarantee that nodes are saturated with a probability that is arbitrarily close to 1. The more peers a node keeps in a particular proximity order bin, the more likely that the message destination address and the peer will have a longer matching prefix. As a consequence of forwarding the message to that peer, the \gloss{proximity order} increases more quickly, and the message ends up closer to the destination than it would with less peers in each bin (see also Figure \ref{fig:bindensity}).
 
 
 
@@ -160,7 +160,7 @@ The above rigid formulation of Kademlia routing would suggest that if a node rec
 \subsubsection{Bin density and multi-order hops} \label{sec:bindensity}
 
 As a consequence of logarithmic distance and uniform node distribution, the population of peers exponentially increases as we move further away from a particular node.
-This means that unless the number of required connections in a bin doubles as bins increase in distance from the node, shallower bins will always allow more choice of nodes for potential connection. In particular, nodes have a chance to increase the number of connections per bin in such a way that peer addresses maximise density (i.e., in proximity order bin $b$, the subsequent bits of peer addresses form a \gloss{balanced binary tree}). Such an arrangement is optimal in the sense that for a bin depth of $d$, nodes are able to relay all messages so that in one hop the proximity order of the destination address will increase by $d$ (See Figure \ref{fig:bindensity}). 
+This means that unless the number of required connections in a bin doubles as bins increase in distance from the node, shallower bins will always allow more choice of nodes for potential connection. In particular, nodes have a chance to increase the number of connections per bin in such a way that peer addresses maximise density (i.e., in proximity order bin $b$, the subsequent bits of peer addresses form a \gloss{balanced binary tree}). Such an arrangement is optimal in the sense that for a bin depth of $d$, nodes are able to relay all messages so that in one hop the proximity order of the destination address will increase by $d$ (see Figure \ref{fig:bindensity}). 
 
 
 \begin{figure}[htbp]
@@ -237,7 +237,7 @@ As is customary in Swarm, we provide a few resolutions of this acronym, which su
 Swarm's \gloss{DISC} shares many similarities with widely known \glossplural{distributed hash table}. The most important difference is that Swarm does not keep track of \emph{where} files are to be found, instead it actually \emph{stores pieces of the file itself} directly with the closest node(s). 
 In what follows, we review DHTs, as well as dive into the similarities and differences with DISC in more detail. 
  
-\glossupperplural{distributed hash table} use an overlay network to implement a key--value container distributed over the nodes (See Figure \ref{fig:DHT}). The basic idea is that the keyspace is mapped onto the overlay address space, and the value for a key in the container is to be found with nodes whose addresses are in the proximity of the key. In the simplest case, let us say that this is the single closest node to the key that stores the value. In a network with Kademlia connectivity, any node can route to a node whose address is closest to the key, therefore a \emph{lookup} (i.e.\ looking up the value belonging to a key) is reduced simply to routing a request. 
+\glossupperplural{distributed hash table} use an overlay network to implement a key--value container distributed over the nodes (see Figure \ref{fig:DHT}). The basic idea is that the keyspace is mapped onto the overlay address space, and the value for a key in the container is to be found with nodes whose addresses are in the proximity of the key. In the simplest case, let us say that this is the single closest node to the key that stores the value. In a network with Kademlia connectivity, any node can route to a node whose address is closest to the key, therefore a \emph{lookup} (i.e.\ looking up the value belonging to a key) is reduced simply to routing a request. 
 
 \begin{figure}[htbp]
    \centering
@@ -246,7 +246,7 @@ In what follows, we review DHTs, as well as dive into the similarities and diffe
    \label{fig:DHT}
 \end{figure}
 
-DHTs used for \gloss{distributed storage} typically associate content identifiers (as keys/addresses) with a changing list of seeders (as values) that can serve that content \cite{ipfs2014, crosby2007analysis}. However, the same structure can be used directly: in Swarm, it is not information about the location of content that is stored at the node closest to the address, but the content itself (See Figure \ref{fig:disc}). 
+DHTs used for \gloss{distributed storage} typically associate content identifiers (as keys/addresses) with a changing list of seeders (as values) that can serve that content \cite{ipfs2014, crosby2007analysis}. However, the same structure can be used directly: in Swarm, it is not information about the location of content that is stored at the node closest to the address, but the content itself (see Figure \ref{fig:disc}). 
 
 
 \begin{figure}[htbp]
@@ -309,9 +309,9 @@ The address of BMT chunks is calculated using the \gloss{binary Merkle tree hash
    \label{fig:BMT}
 \end{figure}
 
-The BMT chunk address is the hash of the 8-byte span and the root hash of a \gloss{binary Merkle tree} (\gloss{BMT}) built on the 32-byte segments of the underlying data (See Figure \ref{fig:BMT}). If the chunk content is less than 4k, the hash is calculated as if the chunk was padded with all zeros up to 4096 bytes.
+The BMT chunk address is the hash of the 8-byte span and the root hash of a \gloss{binary Merkle tree} (\gloss{BMT}) built on the 32-byte segments of the underlying data (see Figure \ref{fig:BMT}). If the chunk content is less than 4k, the hash is calculated as if the chunk was padded with all zeros up to 4096 bytes.
 
-This structure allows for compact \gloss{inclusion proofs} with a 32-byte resolution. An inclusion proof is a proof that one string is a substring of another string, for instance, that a string is included in a chunk. Inclusion proofs are defined on a data segment of a particular index, see Figure \ref{fig:chunk-inclusion}. Such Merkle proofs are also used as proof of custody when storer nodes provide evidence that they possess a chunk (See \ref{sec:redistribution}). Together with the Swarm file hash (See \ref{sec:files}), they allow for logarithmic inclusion proofs for files, i.e.,\ proof that a string is found to be part of a file.
+This structure allows for compact \gloss{inclusion proofs} with a 32-byte resolution. An inclusion proof is a proof that one string is a substring of another string, for instance, that a string is included in a chunk. Inclusion proofs are defined on a data segment of a particular index, see Figure \ref{fig:chunk-inclusion}. Such Merkle proofs are also used as proof of custody when storer nodes provide evidence that they possess a chunk (see \ref{sec:redistribution}). Together with the Swarm file hash (see \ref{sec:files}), they allow for logarithmic inclusion proofs for files, i.e.,\ proof that a string is found to be part of a file.
 
 
 \begin{figure}[htbp]
@@ -322,9 +322,9 @@ This structure allows for compact \gloss{inclusion proofs} with a 32-byte resolu
 \end{figure}
 
 
-\subsection{Single-owner chunks\statusgreen}\label{sec:single-owner-chunks}
+\subsection{Single owner chunks\statusgreen}\label{sec:single-owner-chunks}
 
-With \glossplural{single owner chunk}, a user can assign arbitrary data to an address and attest chunk integrity with their digital signature. The address is calculated as the hash of an \gloss{identifier} and an \gloss{owner}. The chunk content is presented in a  structure composed of the identifier, the \gloss{payload}, and a signature attesting to the association of identifier and payload (See Figure \ref{fig:single-owner-chunks}).
+With \glossplural{single owner chunk}, a user can assign arbitrary data to an address and attest chunk integrity with their digital signature. The address is calculated as the hash of an \gloss{identifier} and an \gloss{owner}. The chunk content is presented in a  structure composed of the identifier, the \gloss{payload}, and a signature attesting to the association of identifier and payload (see Figure \ref{fig:single-owner-chunks}).
 
 \begin{itemize}
     \item \emph{content}: 
@@ -340,7 +340,7 @@ With \glossplural{single owner chunk}, a user can assign arbitrary data to an ad
 \begin{figure}[htbp]
    \centering
    \includegraphics[width=\textwidth]{fig/single-owner-chunk.pdf}
-   \caption[Single-owner chunk\statusgreen]{Single-owner chunk. The chunk content is composed of headers followed by an at most 4KB payload. The last header field is the 8-byte span prepended just like in content addressed chunks. The first two header fields provide single-owner attestation of integrity: an identifier and a signature signing off on the identifier and the BMT hash of span and payload. The address is the hash of the ID and the signer account.}
+   \caption[Single owner chunk\statusgreen]{Single owner chunk. The chunk content is composed of headers followed by an at most 4KB payload. The last header field is the 8-byte span prepended just like in content addressed chunks. The first two header fields provide single-owner attestation of integrity: an identifier and a signature signing off on the identifier and the BMT hash of span and payload. The address is the hash of the ID and the signer account.}
    \label{fig:single-owner-chunks}
 \end{figure}
 
@@ -355,7 +355,7 @@ The validity of a \gloss{single owner chunk} is checked with the following proce
 
 Single owner chunks offer a virtual partitioning of part of the address space into subspaces associated with the single owner. Checking their validity is actually an authentication verifying that the owner has write access to the address with the correct identifier.
 
-As suggested by the span and the length of the payload, a single owner chunk can encapsulate a regular content addressed chunk. Anyone can simply reassign a regular chunk to an address in their subspace designated by the identifier (See also \ref{sec:notification-requests}).
+As suggested by the span and the length of the payload, a single owner chunk can encapsulate a regular content addressed chunk. Anyone can simply reassign a regular chunk to an address in their subspace designated by the identifier (see also \ref{sec:notification-requests}).
 
 
 It should be noted that the notion of integrity is somewhat weaker for single owner chunks than in the case of content addressed chunks: After all, it is, in principle, possible to assign and sign any payload to an identifier. Nonetheless, given the fact that the chunk can only be created by a single owner (of the private key that the signature requires), it is reasonable to expect uniqueness guarantees because we hope the node will want to comply with application protocols to get the desired result. However, if the owner of the private key signs two different payloads with the same identifier and uploads both chunks to Swarm, the behaviour of the network is unpredictable. Measures can be taken to mitigate this in layer (3) and are discussed later in detail in \ref{sec:feed-integrity}.
@@ -364,7 +364,7 @@ With two types of chunks, integrity is linked to collision-free hash digests, de
 
 \subsection{Chunk encryption\statusgreen}\label{sec:chunk-encryption}
 
-Chunks should be encrypted by default. Beyond client needs for confidentiality, encryption has two further important roles. (1) Obfuscation of chunk content by encryption provides a degree of \gloss{plausible deniability}; using it across the board makes this defense stronger. (2) The ability to choose arbitrary encryption keys together with the property of uniform distribution offer predictable ways of \gloss{mining chunks}, i.e.,\ generating an encrypted variant of the same content so that the resulting chunk address satisfies certain constraints, e.g. is closer to or farther away from a particular address. This is an important property used in (1) price arbitrage (See \ref{sec:pricing}) and (2) efficient utilisation of postage stamps (See \ref{sec:postage-stamps}).
+Chunks should be encrypted by default. Beyond client needs for confidentiality, encryption has two further important roles. (1) Obfuscation of chunk content by encryption provides a degree of \gloss{plausible deniability}; using it across the board makes this defense stronger. (2) The ability to choose arbitrary encryption keys together with the property of uniform distribution offer predictable ways of \gloss{mining chunks}, i.e.,\ generating an encrypted variant of the same content so that the resulting chunk address satisfies certain constraints, e.g. is closer to or farther away from a particular address. This is an important property used in (1) price arbitrage (see \ref{sec:pricing}) and (2) efficient utilisation of postage stamps (see \ref{sec:postage-stamps}).
 
 
 \begin{figure}[htbp]
@@ -411,17 +411,17 @@ It is already instructive at this point to show neighbourhoods and how they are 
 
 \subsubsection{Redundant retrievability}
 
-A chunk is said to have \gloss{redundant retrievability} with degree $r$ if it is retrievable and would remain so even after any $r$ nodes responsible for it leave the network. The naive approach presented so far requiring the single closest node to keep the content can be interpreted as degree zero retrievability. If nodes in their area of responsibility fully replicate their content (See \ref{sec:pull-syncing}), then every chunk in the Swarm DISC is redundantly retrievable with degree $r$. Let us take the node $x$ that is closest to a chunk $c$. Since it has Kademlia connectivity with redundancy $r$, there are $r+1$ nodes responsible for the chunk in a neighbourhood fully connected and replicating content. After $r$ responsible nodes drop out, there is just one node remaining which still has the chunk. However, if Kademlia connectivity is maintained as the $r$ nodes leave, this node will continue to be accessible by any other node in the network, and therefore the chunk is still retrievable. Now, for the network to ensure that all chunks remain redundantly retrievable with degree $r$, the nodes comprising the new neighbourhood formed due to the reorganising of the network must respond by re-syncing their content to satisfy the protocol's replication criteria. This is called the guarantee of \gloss{eventual consistency}.
+A chunk is said to have \gloss{redundant retrievability} with degree $r$ if it is retrievable and would remain so even after any $r$ nodes responsible for it leave the network. The naive approach presented so far requiring the single closest node to keep the content can be interpreted as degree zero retrievability. If nodes in their area of responsibility fully replicate their content (see \ref{sec:pull-syncing}), then every chunk in the Swarm DISC is redundantly retrievable with degree $r$. Let us take the node $x$ that is closest to a chunk $c$. Since it has Kademlia connectivity with redundancy $r$, there are $r+1$ nodes responsible for the chunk in a neighbourhood fully connected and replicating content. After $r$ responsible nodes drop out, there is just one node remaining which still has the chunk. However, if Kademlia connectivity is maintained as the $r$ nodes leave, this node will continue to be accessible by any other node in the network, and therefore the chunk is still retrievable. Now, for the network to ensure that all chunks remain redundantly retrievable with degree $r$, the nodes comprising the new neighbourhood formed due to the reorganising of the network must respond by re-syncing their content to satisfy the protocol's replication criteria. This is called the guarantee of \gloss{eventual consistency}.
 
 \subsubsection{Resource constraints}
 
 Let us assume then that (1) the forwarding strategy that relays requests along \glossplural{stable node} and (2) the storage strategy that each node in the nearest neighbourhood (of $r$ storer nodes) stores all chunks whose addresses fall within their radius of responsibility. As long as these assumptions hold, each chunk is retrievable even if $r$ storer nodes drop offline simultaneously. As for (2), we still need to assume that every node in the nearest neighbour set can store each chunk. Realistically, however, all nodes have resource limitations. With time, the overall amount of distinct chunks ever uploaded to Swarm will increase indefinitely. Unless the total storage capacity steadily increases, we should expect that the nodes in Swarm are able to store only a subset of chunks. Some nodes will reach the limit of their storage capacity and therefore face the decision whether to stop accepting new chunks via syncing or to make space by deleting some of their existing chunks. 
 
-The process that purges chunks from their local storage is called \gloss{garbage collection}. The process that dictates which chunks are chosen for garbage collection is called the \gloss{garbage collection strategy}. For a profit-maximizing node, it holds that it is always best to garbage-collect the chunks that are predicted to be the least profitable in the future and, in order to maximize profit, it is desired for a node to get this prediction right (See \ref{sec:postage-stamps}). So, in order to factor in these capacity constraints, we will introduce the notion of \gloss{chunk value} and modify our definitions using the minimum value constraint:
+The process that purges chunks from their local storage is called \gloss{garbage collection}. The process that dictates which chunks are chosen for garbage collection is called the \gloss{garbage collection strategy}. For a profit-maximizing node, it holds that it is always best to garbage-collect the chunks that are predicted to be the least profitable in the future and, in order to maximize profit, it is desired for a node to get this prediction right (see \ref{sec:postage-stamps}). So, in order to factor in these capacity constraints, we will introduce the notion of \gloss{chunk value} and modify our definitions using the minimum value constraint:
 
 In Swarm's DISC, at all times, there is a chunk value $v$ such that every chunk with a value greater than $v$ is both retrievable and eventually (after syncing) redundantly retrievable with degree $r$. 
 
-This value ideally corresponds to the relative importance of preserving the chunk that uploaders need to indicate. In order for storer nodes to respect it, the value should also align with the profitability of a chunk and is therefore expressed in the pricing of uploads (See \ref{sec:depths}).
+This value ideally corresponds to the relative importance of preserving the chunk that uploaders need to indicate. In order for storer nodes to respect it, the value should also align with the profitability of a chunk and is therefore expressed in the pricing of uploads (see \ref{sec:depths}).
 
 % \subsection{}\label{sec:}
 
@@ -435,7 +435,7 @@ In a distributed chunk store, we say that a chunk is an \gloss{accessible chunk}
 
 \subsubsection{Chunk delivery}
 
-For retrieval, accessibility needs to be complemented with a process to have the content delivered back to the requesting node, preferably using only the chunk address. There are at least three alternative ways to achieve this (See Figure \ref{fig:chunk-delivery}):
+For retrieval, accessibility needs to be complemented with a process to have the content delivered back to the requesting node, preferably using only the chunk address. There are at least three alternative ways to achieve this (see Figure \ref{fig:chunk-delivery}):
 
 \begin{enumerate}
     \item \gloss{direct delivery} -- The chunk delivery is sent via a direct underlay connection. 
@@ -455,7 +455,7 @@ Firstly, using the obvious direct delivery, the chunk is delivered in one step v
 %
 \footnote{Beeline delivery has some merit, i.e. bandwidth saving and better latency, so we do not completely rule out the possibility of implementing it. 
 }
-Secondly, using routed delivery, a chunk is delivered back to its requestor using ad-hoc routing as determined from the storer's perspective at the time of sending it. Whether direct or routed, allowing deliveries routed independently of the request route presupposes that the requestor's address is (at least partially) known by the storer and routing nodes. Consequently, these methods disclose information that can identify the requestor. However, with forwarding--backwarding Kademlia this is not necessary: The storer node responds back to their requesting peer with the delivery, while intermediate \glossplural{forwarding node} remember which of their peers requested what chunk. When the chunk is delivered, they pass it on back to their immediate requestor, and so on until it eventually arrives at the node that originally requested it. In other words, the chunk delivery response simply follows the request route back to the originator (See Figure \ref{fig:request-response}).  Since it is the reverse of the forwarding, we can playfully call this \gloss{backwarding}. Swarm uses this option, which makes it possible to disclose no requestor identification in any form, and thus Swarm implements completely \gloss{anonymous retrieval}. 
+Secondly, using routed delivery, a chunk is delivered back to its requestor using ad-hoc routing as determined from the storer's perspective at the time of sending it. Whether direct or routed, allowing deliveries routed independently of the request route presupposes that the requestor's address is (at least partially) known by the storer and routing nodes. Consequently, these methods disclose information that can identify the requestor. However, with forwarding--backwarding Kademlia this is not necessary: The storer node responds back to their requesting peer with the delivery, while intermediate \glossplural{forwarding node} remember which of their peers requested what chunk. When the chunk is delivered, they pass it on back to their immediate requestor, and so on until it eventually arrives at the node that originally requested it. In other words, the chunk delivery response simply follows the request route back to the originator (see Figure \ref{fig:request-response}).  Since it is the reverse of the forwarding, we can playfully call this \gloss{backwarding}. Swarm uses this option, which makes it possible to disclose no requestor identification in any form, and thus Swarm implements completely \gloss{anonymous retrieval}. 
 
 \begin{figure}[htbp]
    \centering
@@ -479,7 +479,7 @@ The generic solution of implementing retrieval by backwarding as depicted in Fig
 
 In order to remember requests, the \gloss{forwarding node} needs to allocate resources that come with a certain cost (they occupy space in memory). The requests that are not followed by a corresponding delivery should eventually be garbage collected, so there needs to be a defined time period during which they are active. Downstream peers also need to be informed about the timeout of this request. This makes sense, since the originator of the request will want to attach a time-to-live duration to the request to indicate how long it will wait for a response.  
 
-Sending unsolicited chunks is an offence as it can lead to \gloss{denial of service (DoS)}. By remembering a request, nodes are able to recognise unsolicited chunk deliveries and penalise the peers sending them. Chunks that are delivered after the request expires will be treated as unsolicited. Since there may be some discrepancy assessing the expiry time between nodes, there needs to be some tolerance for unsolicited chunk deliveries, but if they go above a particular (but still small) percentage of requests forwarded, the offending peer is disconnected and blacklisted. Such local sanctions are the easiest and simplest way to incentivise adherence to the protocol (See \ref{sec:sanctions}). 
+Sending unsolicited chunks is an offence as it can lead to \gloss{denial of service (DoS)}. By remembering a request, nodes are able to recognise unsolicited chunk deliveries and penalise the peers sending them. Chunks that are delivered after the request expires will be treated as unsolicited. Since there may be some discrepancy assessing the expiry time between nodes, there needs to be some tolerance for unsolicited chunk deliveries, but if they go above a particular (but still small) percentage of requests forwarded, the offending peer is disconnected and blacklisted. Such local sanctions are the easiest and simplest way to incentivise adherence to the protocol (see \ref{sec:sanctions}). 
 
 \subsubsection{Re-requesting}
 
@@ -490,7 +490,7 @@ There is the potential for a large proportion of Swarm nodes to not be always st
 
 Note that in Swarm there is no explicit negative response for chunks not being found. In principle, the node that is closest to the retrieved address can determine the absence of a chunk at that address and could issue a "not found" response. However, this is not desirable for the following reason: While the closest node to a chunk can verify its absence from its expected location in the network, nodes further away from the chunk cannot reliably conclude the same. They lack first-hand verification, and any positive evidence regarding the chunk's retrievability obtained later can be retrospectively plausibly deniable. 
 
-All in all, as long as delivery has the potential to create earnings for the storer, the best strategy is to keep a pending request open until it times out and be prepared in case the chunk should appear. There are several ways the chunk could arrive after the request: (1) syncing from existing peers (2) appearance of a new node or (3) if a request precedes upload, e.g. the requestor has already "subscribed" to a single owner address (See \ref{sec:messaging}) to decrease latency of retrieval. This is conceptually different from the usual server-client based architectures where it makes sense to expect a resource to be either on the host server or not. 
+All in all, as long as delivery has the potential to create earnings for the storer, the best strategy is to keep a pending request open until it times out and be prepared in case the chunk should appear. There are several ways the chunk could arrive after the request: (1) syncing from existing peers (2) appearance of a new node or (3) if a request precedes upload, e.g. the requestor has already "subscribed" to a single owner address (see \ref{sec:messaging}) to decrease latency of retrieval. This is conceptually different from the usual server-client based architectures where it makes sense to expect a resource to be either on the host server or not. 
  
 
 \subsubsection{Opportunistic caching}
@@ -506,7 +506,7 @@ So far, we have shown that by using the retrieval protocol and maintaining Kadem
 In the previous sections, we presented how a network of nodes maintaining a Kademlia overlay topology can be used as a distributed chunk store and how Forwarding Kademlia routing can be used to define a protocol for retrieving chunks.
 When discussing retrieval, we assumed that chunks are located with the node whose address is closest to theirs. This section describes the protocol responsible for realising this assumption: ensuring delivery of the chunk to its prescribed storer after it has been uploaded to any arbitrary node.
 
-This network protocol, called \gloss{push syncing}, is analogous to chunk retrieval: First, a chunk is relayed to the node closest to the chunk address via the same route as a retrieval request would be, and then in response a \gloss{statement of custody receipt} is passed back along the same path (See Figure \ref{fig:push-syncing}). The statement of custody sent back by the storer to the \gloss{uploader} indicates that the chunk has reached the neighbourhood from which it is universally retrievable. By tracking these responses for each constituent chunk of an upload, uploaders can make sure that their upload is fully retrievable by any node in the network before sharing or publishing the address of their upload. Keeping this count of chunks push-synced and receipts received serves as the back-end for a \emph{progress bar} that can be displayed to the uploader to give feedback of the successful propagation of their data across the network (See \ref{sec:upload}).
+This network protocol, called \gloss{push syncing}, is analogous to chunk retrieval: First, a chunk is relayed to the node closest to the chunk address via the same route as a retrieval request would be, and then in response a \gloss{statement of custody receipt} is passed back along the same path (see Figure \ref{fig:push-syncing}). The statement of custody sent back by the storer to the \gloss{uploader} indicates that the chunk has reached the neighbourhood from which it is universally retrievable. By tracking these responses for each constituent chunk of an upload, uploaders can make sure that their upload is fully retrievable by any node in the network before sharing or publishing the address of their upload. Keeping this count of chunks push-synced and receipts received serves as the back-end for a \emph{progress bar} that can be displayed to the uploader to give feedback of the successful propagation of their data across the network (see \ref{sec:upload}).
 
 
 \begin{figure}[htbp]
@@ -519,7 +519,7 @@ This network protocol, called \gloss{push syncing}, is analogous to chunk retrie
 Statements of custody are signed by the nodes that claim to be the closest to the address. 
 Similarly to downloaders in the retrieval protocol, the identity of uploaders can also remain hidden, hence forwarding Kademlia can implement \gloss{anonymous uploads}.
 
-Another similarity is that in order to allow backwarding for responses, nodes should remember which peer sent a particular chunk. This record should persist for a short period while the statement of custody responses are expected. When this period ends, the record is removed. A statement of custody not matching a record is considered unsolicited and is allowed only up to a small percentage of all push-sync traffic with a peer. Going above this tolerance threshold is sanctioned with disconnection and blacklisting (See \ref{sec:sanctions}).
+Another similarity is that in order to allow backwarding for responses, nodes should remember which peer sent a particular chunk. This record should persist for a short period while the statement of custody responses are expected. When this period ends, the record is removed. A statement of custody not matching a record is considered unsolicited and is allowed only up to a small percentage of all push-sync traffic with a peer. Going above this tolerance threshold is sanctioned with disconnection and blacklisting (see \ref{sec:sanctions}).
 
 In this section, we described how the logistics of chunk uploads can be organised with a network protocol using Forwarding Kademlia routing with response backwarding. However, this solution is not complete until it is secured with aligned incentives: The strategy to follow this protocol should be incentivised and DoS abuse should be disincentivised. These are discussed later in detail in \ref{sec:postage-stamps} and \ref{sec:push-sync-incentives}).
 
@@ -538,7 +538,7 @@ Pull syncing is node-centric as opposed to chunk-centric, i.e. it makes sure tha
 
 When two nodes connect and engage in \gloss{chunk synchronisation}, the upstream peer offers all the chunks it stores locally in a data stream per proximity order bin. To receive chunks closer to the downstream peer than to the upstream peer, a downstream peer can subscribe to the chunk stream of the proximity order bin that the upstream peer belongs to in their Kademlia table. If the peer connection is within the nearest neighbour depth $d$, the client subscribes to all streams with proximity order bin $d$ or greater. As a result, peers eventually replicate all chunks belonging to their area of responsibility.
 
-A pull syncing server's behaviour is referred to as being that of a \gloss{stream provider} in the stream protocol. Nodes maintain a record of the time when they stored a chunk locally by indexing them with an ascending storage count known as the \gloss{bin ID}. For each proximity order bin, upstream peers offer to stream chunks in descending order of storage timestamp. As a result of syncing streams on each peer connection, a chunk can be synced to a downstream peer from multiple upstream peers. In order to save bandwidth by not sending data chunks to peers that already have them, the stream protocol implements a round-trip: Before sending chunks, the upstream peer presents a batch of chunks identified by their address. The downstream peer then responds with indicating which chunks from the offered batch they actually need (See Figure \ref{fig:pull-syncing}). Note that the downstream peer determines whether they have the chunk based on the chunk address. Thus, this method critically relies on the chunk integrity assumption discussed in \ref{sec:chunks}.
+A pull syncing server's behaviour is referred to as being that of a \gloss{stream provider} in the stream protocol. Nodes maintain a record of the time when they stored a chunk locally by indexing them with an ascending storage count known as the \gloss{bin ID}. For each proximity order bin, upstream peers offer to stream chunks in descending order of storage timestamp. As a result of syncing streams on each peer connection, a chunk can be synced to a downstream peer from multiple upstream peers. In order to save bandwidth by not sending data chunks to peers that already have them, the stream protocol implements a round-trip: Before sending chunks, the upstream peer presents a batch of chunks identified by their address. The downstream peer then responds with indicating which chunks from the offered batch they actually need (see Figure \ref{fig:pull-syncing}). Note that the downstream peer determines whether they have the chunk based on the chunk address. Thus, this method critically relies on the chunk integrity assumption discussed in \ref{sec:chunks}.
 
 
 \begin{figure}[htbp]
@@ -608,7 +608,7 @@ It is, however possible to make it profitable for a node to react in a way that 
 
 The retrieval of a chunk is ultimately initiated by someone accessing content, and therefore all costs related to this retrieval should be borne by them. While paid retrievals may not sound like a popular idea when today's web is "free", many of the problems with the current web stems from consumers' inability to share the costs of hosting and distribution with content publishers directly. In principle, the retrieval of a chunk can be perceived as a functional unit where the storer acts as a service provider and the requestor as consumer. The provider renders a service to the consumer, and in return, the consumer should provide compensation. Such a direct transaction would normally require that transactors are known to each other, so if we are to maintain the anonymity requirement on downloads, we must conceptualise compensation in a novel way. 
 
-As we use forwarding Kademlia, chunk retrieval subsumes a series of relaying actions performed by forwarding nodes. Since these are independent actors, it is already necessary to incentivise each act of relaying independently. Importantly, if only instances of relaying matter, then transactors are restricted to connected peers, regardless of the specifics of accounting and compensation (See \ref{sec:accounting}). Given that the set of ever connected peers forms a quasi-permanent set across sessions, we are able to frame the interaction within the context of repeated dealings. Such a setting always creates extra incentive for the parties involved to play nice. It is reasonable to exercise preference for peers showing an untainted historical record. Moreover, since the set of connected peers is logarithmic in the network size, any book-keeping or blockchain contract that the repeated interaction with a peer might necessitate is kept manageable, offering a scalable solution. Turning the argument around, we could say that keeping balances with a manageable number of peers, as well as the ambiguity of request origination are the very reasons for nodes to have limited connectivity, i.e., that they choose leaner Kademlia bins.
+As we use forwarding Kademlia, chunk retrieval subsumes a series of relaying actions performed by forwarding nodes. Since these are independent actors, it is already necessary to incentivise each act of relaying independently. Importantly, if only instances of relaying matter, then transactors are restricted to connected peers, regardless of the specifics of accounting and compensation (see \ref{sec:accounting}). Given that the set of ever connected peers forms a quasi-permanent set across sessions, we are able to frame the interaction within the context of repeated dealings. Such a setting always creates extra incentive for the parties involved to play nice. It is reasonable to exercise preference for peers showing an untainted historical record. Moreover, since the set of connected peers is logarithmic in the network size, any book-keeping or blockchain contract that the repeated interaction with a peer might necessitate is kept manageable, offering a scalable solution. Turning the argument around, we could say that keeping balances with a manageable number of peers, as well as the ambiguity of request origination are the very reasons for nodes to have limited connectivity, i.e., that they choose leaner Kademlia bins.
 
 \subsubsection{Charging for backwarded response}
 
@@ -622,7 +622,7 @@ If accepting a retrieve request already constitutes revenue for forwarding nodes
    \label{fig:retrieval-payment}
 \end{figure}
 
-If, however, there is no cost to a request, then sending many illegitimate requests for non-existing chunks (random addresses) becomes possible. This is easily mitigated by imposing sanctions on peers that send too many requests for chunks that do not exist (See \ref{sec:sanctions}).
+If, however, there is no cost to a request, then sending many illegitimate requests for non-existing chunks (random addresses) becomes possible. This is easily mitigated by imposing sanctions on peers that send too many requests for chunks that do not exist (see \ref{sec:sanctions}).
 
 Once a node initiates (starts or forwards) a request, it commits to pay for that chunk if it is delivered within the defined \gloss{time to live} (\gloss{TTL}), therefore there is never an incentive to block timely deliveries when the chunk is passed back.  This commitment also dissuades nodes from frivolously asking too many peers for a chunk, since, if multiple peers respond with delivery, each must be paid.
 
@@ -649,7 +649,7 @@ For simplicity of reasoning, we posit that the default price is zero, correspond
 
 \subsubsection{Differential pricing of proximities}\label{sec:diff-pricing-prox}
 
-If the price of a chunk is the same at all proximities, then there is no real incentive for nodes to forward requests other than the potential to cache the chunk and earn revenue by reselling it. This option is hard to justify for new chunks, especially if they are in the shallow proximity orders of a node where they are unlikely to be requested. More importantly, if the pricing of chunks is uniform across proximity orders, colluding nodes can generate chunk traffic and pocket exactly as much as they send, virtually a free DoS attack (See Figure \ref{fig:ddos-uniform-price}).
+If the price of a chunk is the same at all proximities, then there is no real incentive for nodes to forward requests other than the potential to cache the chunk and earn revenue by reselling it. This option is hard to justify for new chunks, especially if they are in the shallow proximity orders of a node where they are unlikely to be requested. More importantly, if the pricing of chunks is uniform across proximity orders, colluding nodes can generate chunk traffic and pocket exactly as much as they send, virtually a free DoS attack (see Figure \ref{fig:ddos-uniform-price}).
 
 \begin{figure}[htbp]
    \centering
@@ -691,7 +691,7 @@ All else being equal, this price arbitrage strategy will achieve (1) uniform pri
 
 Charging based on the downstream peer's proximity to the chunk has the important consequence that the net revenue earned from a single act of non-local delivery to a single requestor is a monotonically increasing function of the difference between the chunk's proximity to the node itself and to the peer the request was forwarded to. In other words, the more distance we can cover in one forward request, the more we earn. 
 
-This incentive aligns with downloaders' interest to save hops in serving their requests, leading to lower-latency delivery and reduced bandwidth overhead. This scheme incentivises nodes to keep a gap-free balanced set of addresses in their Kademlia bins as deep as possible (See Figure \ref{fig:bindensity}), i.e, it is better for a node to keep dense Kademlia bins than thin ones.
+This incentive aligns with downloaders' interest to save hops in serving their requests, leading to lower-latency delivery and reduced bandwidth overhead. This scheme incentivises nodes to keep a gap-free balanced set of addresses in their Kademlia bins as deep as possible (see Figure \ref{fig:bindensity}), i.e, it is better for a node to keep dense Kademlia bins than thin ones.
 
 
 Nodes that are able to maintain denser bins actually have the same cost as thinner ones, but saving hops will improve latency and make the peer more efficient. This will lead to the peer being preferred over other peers that have the same prices. Increased traffic essentially can also lead to bandwidth contention, which eventually allows the raising of prices. 
@@ -709,13 +709,13 @@ good predictor for this is the age of last request. In order to maximise the set
 
 \subsubsection{Non-caching nodes}
 
-Any scheme that ensures \glossplural{relaying node} make a profit creates a positive incentive for forwarding-only non-caching nodes to enter the network. Such nodes are not inherently beneficial to the network as they are creating unnecessary bandwidth overhead. On the one hand, their presence could, in principle, unburden storer nodes from relaying traffic, so using them in shallow bins may not be detrimental. On the other hand, closer to neighbourhood depth, their peers will favour a caching/storing node to them because of their disadvantage at least for chunks in their hypothetical area of responsibility. Non-caching nodes can also contribute to increase anonymity (See \ref{sec:retrieval}).
+Any scheme that ensures \glossplural{relaying node} make a profit creates a positive incentive for forwarding-only non-caching nodes to enter the network. Such nodes are not inherently beneficial to the network as they are creating unnecessary bandwidth overhead. On the one hand, their presence could, in principle, unburden storer nodes from relaying traffic, so using them in shallow bins may not be detrimental. On the other hand, closer to neighbourhood depth, their peers will favour a caching/storing node to them because of their disadvantage at least for chunks in their hypothetical area of responsibility. Non-caching nodes can also contribute to increase anonymity (see \ref{sec:retrieval}).
 
 \subsection{Incentivising push-syncing\statusgreen}\label{sec:push-sync-incentives}
 
 \green{}
 
-The push-sync (See \ref{sec:push-syncing}) protocol ensures that chunks uploaded into the network arrive at their designated address. In what follows, we will explain how forwarding is incentivised.
+The push-sync (see \ref{sec:push-syncing}) protocol ensures that chunks uploaded into the network arrive at their designated address. In what follows, we will explain how forwarding is incentivised.
 %
 %
 \footnote{To complement our solution for bandwidth compensation, further measures are needed for spam protection and storage incentivisation which are discussed later in \ref{sec:postage-stamps} and \ref{sec:redistribution}, respectively.}
@@ -727,7 +727,7 @@ The delivery of the chunk in the push-sync protocol is analogous to a retrieval 
 
 In principle, push-syncing could be left without explicit forwarding incentives. Due to the retrieval protocol, as nodes expect chunks to be found in the neighbourhood of their address, participants in Swarm are at least weakly incentivised to help deliver uploaded chunks to their destination. However, we  need to provide the possibility that chunks are uploaded via nodes further from it than the requestor (light  nodes or retries). Thus, if push-syncing was free, nodes could generate wasteful amounts of bandwidth. 
 
-Requiring payment only for push-sync delivery by downstream peers would put the forwarder in a position to bargain with a storer node regarding the delivery of the chunk. The possession of a chunk is valuable for the prospective storer node because there is also a system of rewards for storage (See \ref{sec:redistribution}). Based on this, the forwarder node could, in theory, hold onto the chunk unless the storer node pays marginally more than the value of possessing that chunk, factoring in the profit potential due to storage incentives. In particular, since forwarders on the route from the uploader are not numerous, any profits generated from a storage reward mechanism might be captured by these forwarding nodes.
+Requiring payment only for push-sync delivery by downstream peers would put the forwarder in a position to bargain with a storer node regarding the delivery of the chunk. The possession of a chunk is valuable for the prospective storer node because there is also a system of rewards for storage (see \ref{sec:redistribution}). Based on this, the forwarder node could, in theory, hold onto the chunk unless the storer node pays marginally more than the value of possessing that chunk, factoring in the profit potential due to storage incentives. In particular, since forwarders on the route from the uploader are not numerous, any profits generated from a storage reward mechanism might be captured by these forwarding nodes.
 
 Instead, in push-sync, by making the statement of custody receipt a paid message, the roles switch. The forwarder node is no longer in the position to bargain. To understand why, let's consider a scenario where a forwarding node tries to hold on to a chunk to negotiate a price for pushing it to a storer node. In this case, the uploader will not get a statement of custody receipt within the expected time frame. As a result, the uploader will assume that the attempt has failed and re-upload the chunk via a different route. Now, suddenly the original forwarding node is forced to compete with another forwarding node in getting compensation for their bandwidth costs. Since all forwarding nodes are aware of this dynamic, emergent behavior will produce a series of peers that are willing to forward the chunk to the storer node for a relatively small compensation and the bandwidth costs incurred. This eliminates the need for the original forwarding node to try and bargain with the storer node in the first place: Instead, they can generate a small profit immediately by simply returning the statement of custody receipt. 
 
@@ -743,7 +743,7 @@ This scheme highlights why the incentivisation of the two protocols relies on th
 
 In this way, we can make sure that (1) storers actually respond with receipts, and (2) have a way to detect timed out or unsolicited receipt responses to protect against DoS, see Figure \ref{fig:syncing-swap}.
 
-Similar to the retrieval protocol, the pricing in this scheme is expected to vary based on different proximities (See \ref{sec:diff-pricing-prox}). Additionally, as the costs of the nodes in the network fluctuate (depending on capacity utilization and node efficiency), the pricing will also be subject to change over time. Given that the compensation is calculated for one chunk and one shorter message (retrieve request and custody receipt) during the accounting process, we can safely conclude that the price structure for forwarding for both protocols is identical. Consequently, a unified pricing scheme for forwarding can be applied to both protocols, as discussed in \ref{sec:retrieval-price-discovery}. 
+Similar to the retrieval protocol, the pricing in this scheme is expected to vary based on different proximities (see \ref{sec:diff-pricing-prox}). Additionally, as the costs of the nodes in the network fluctuate (depending on capacity utilization and node efficiency), the pricing will also be subject to change over time. Given that the compensation is calculated for one chunk and one shorter message (retrieve request and custody receipt) during the accounting process, we can safely conclude that the price structure for forwarding for both protocols is identical. Consequently, a unified pricing scheme for forwarding can be applied to both protocols, as discussed in \ref{sec:retrieval-price-discovery}. 
 What distinguishes push-sync from the retrieval protocol is that, unlike in retrieval where the chunk is delivered back and its integrity can be validated, the accounting event in push-sync is a statement of custody which can be spoofed. Due to the forwarding incentive, nodes may be motivated to withhold forwarding and impersonate a storer node by issuing the statement of  custody. This makes it advisable to query (retrieve) a chunk via alternative routes. If  such  retrieval attempts fail, it may be necessary to try push-syncing chunks through alternative routes. 
  
 
@@ -786,7 +786,7 @@ debt sends a \gloss{cheque} to its peer. If it reaches the \gloss{disconnect thr
 
 \subsubsection{Settling with payments}
 
-In situations where there is high variance or unequal consumption of services, the balance will eventually tilt significantly toward one peer. In such cases, the indebted party issues a payment to the creditor to restore the nominal balance to zero. This process is automatic and justifies the concept of swap as \emph{settle (the balance) with automated payments} (See Figure \ref{fig:swap}). These payments can be in the form of commitments rather than immediate transactions.
+In situations where there is high variance or unequal consumption of services, the balance will eventually tilt significantly toward one peer. In such cases, the indebted party issues a payment to the creditor to restore the nominal balance to zero. This process is automatic and justifies the concept of swap as \emph{settle (the balance) with automated payments} (see Figure \ref{fig:swap}). These payments can be in the form of commitments rather than immediate transactions.
 
 
 \subsubsection{Payment thresholds}
@@ -815,7 +815,7 @@ One of the major challenges with conducting direct \glossplural{on-chain payment
 
 \subsubsection{The chequebook contract}
 
-A simple smart contract called the \gloss{chequebook contract}, introduced in \cite{ethersphere2016sw3}, allows the beneficiary to determine the timing of payments. This contract acts as a wallet that can process \glossplural{cheque} issued by its owner. Similar to traditional financial transactions, the issuer signs a \emph{cheque} specifying the \emph{beneficiary}, \emph{date}, and \emph{amount}, providing it to the recipient as a token of promise to pay at a later date. The smart contract plays the role of the bank. When the recipient wishes to get paid, they "cash the cheque" by submitting it to the smart contract. The contract, after validating the signature, date and the amount specified on the cheque, transfers the amount to the beneficiary's account (See Figure \ref{fig:swap-chequebook}). Analogous to the person taking the cheque to the bank to cash it, anyone can send a digital cheque in a transaction to the owner's chequebook account, initiating the transfer. 
+A simple smart contract called the \gloss{chequebook contract}, introduced in \cite{ethersphere2016sw3}, allows the beneficiary to determine the timing of payments. This contract acts as a wallet that can process \glossplural{cheque} issued by its owner. Similar to traditional financial transactions, the issuer signs a \emph{cheque} specifying the \emph{beneficiary}, \emph{date}, and \emph{amount}, providing it to the recipient as a token of promise to pay at a later date. The smart contract plays the role of the bank. When the recipient wishes to get paid, they "cash the cheque" by submitting it to the smart contract. The contract, after validating the signature, date and the amount specified on the cheque, transfers the amount to the beneficiary's account (see Figure \ref{fig:swap-chequebook}). Analogous to the person taking the cheque to the bank to cash it, anyone can send a digital cheque in a transaction to the owner's chequebook account, initiating the transfer. 
 
 The swap protocol specifies that when the \emph{payment threshold} is exceeded, a cheque is sent over by the creditor peer. Such cheques can be immediately cashed by sending them to the issuer's chequebook contract. Alternatively, cheques can also be held, which effectively serves as a form of lending on credit, enabling parties to save on transaction costs. 
 
@@ -875,7 +875,7 @@ With these rules in place, it is easy to see how cheque cancellation would work.
 
 Let us further suppose that the balance starts tilting in $A$'s favour by some amount $x$. If $B$ had already cashed cheque $c_n$, then $B$ would be required to issue a cheque of her own using $B$'s chequebook as the source and naming $A$ as the beneficiary. However, since cheques $c_{i+1} \ldots c_n$  are still uncashed, $B$ can instead send to $A$ a cheque with $A$'s chequebook as the source, $B$ as the beneficiary, with serial number $n+1$ and cumulative total $t_{n+1} = t_n - x$. Due to the rules enumerated above, $A$ will accept this as an equivalent payment of amount $x$ from $B$.  In this scenario, instead of sending a cheque to $A$, $B$ waives part of their earlier entitlement. This justifies the concept of SWAP as \emph{send waiver as payment}.
 
-This process can be repeated multiple times until the cumulative total is brought back to $t_i$. At this point, all outstanding debt has effectively been cancelled, and any further payments must be made in the form of a proper cheque from $B$'s chequebook to $A$ (See Figure \ref{fig:waivers-diagram}).
+This process can be repeated multiple times until the cumulative total is brought back to $t_i$. At this point, all outstanding debt has effectively been cancelled, and any further payments must be made in the form of a proper cheque from $B$'s chequebook to $A$ (see Figure \ref{fig:waivers-diagram}).
 
 % \subsection{Best effort settlement strategy}
 
@@ -886,7 +886,7 @@ This process can be repeated multiple times until the cumulative total is brough
 
 Swap accounting can also work in a one-directional manner. When a party enters the system with zero liquid capital (a \gloss{newcomer}) but connects to a peer with funds (an \gloss{insider}), the newcomer can begin to provide a service (and not use any) in order to earn a positive swap balance. 
 
-If the insider has a chequebook, they are able to simply pay the newcomer with a cheque. However, this has a caveat: The newcomer will be able to earn cheques for the services provided but will not have the means to cash them. Cashing cheques requires sending a transaction to the blockchain, and therefore requires gas, unless the node can convince one of its peers to execute the transaction on its behalf. To facilitate this, nodes are able to sign off on a structure that they want to be sent, and then extend the Swap contract with a preprocessing step that triggers payment to the newcomer, covering the transaction’s gas cost plus a service fee for the sender of the transaction. The newcomer's cheque may be cashed by any insider (See Figure \ref{fig:zero-cash-entry}). This feature justifies the concept of SWAP as \emph{start without a penny, send with a peer}.
+If the insider has a chequebook, they are able to simply pay the newcomer with a cheque. However, this has a caveat: The newcomer will be able to earn cheques for the services provided but will not have the means to cash them. Cashing cheques requires sending a transaction to the blockchain, and therefore requires gas, unless the node can convince one of its peers to execute the transaction on its behalf. To facilitate this, nodes are able to sign off on a structure that they want to be sent, and then extend the Swap contract with a preprocessing step that triggers payment to the newcomer, covering the transaction’s gas cost plus a service fee for the sender of the transaction. The newcomer's cheque may be cashed by any insider (see Figure \ref{fig:zero-cash-entry}). This feature justifies the concept of SWAP as \emph{start without a penny, send with a peer}.
 
 \begin{figure}[htbp]
 \centering
@@ -914,7 +914,7 @@ In a peer-to-peer trustless setting, implementing nuanced sanctions against unde
 
 \subsubsection{Excessive frivolity}
 
-Both retrieval and push-sync protocols have an incentive structure where only the response to a request generates income. Although this creates a strong incentive to play ball, it may also be necessary to take measures to ensure that nodes are not able to spam the network with frivolous requests that have no associated cost. In the case of push-syncing, it is especially important not to allow chunks to expunge others at no cost. This will form the topic of a later section where we introduce postage stamps (See \ref{sec:postage-stamps}).
+Both retrieval and push-sync protocols have an incentive structure where only the response to a request generates income. Although this creates a strong incentive to play ball, it may also be necessary to take measures to ensure that nodes are not able to spam the network with frivolous requests that have no associated cost. In the case of push-syncing, it is especially important not to allow chunks to expunge others at no cost. This will form the topic of a later section where we introduce postage stamps (see \ref{sec:postage-stamps}).
 
 In the case of pull-sync retrieval, the potential attack consists of requesting non-existing chunks and causing downstream peers to initiate a lot of network traffic, as well as some memory consumption, due to requests being persisted during the time-to-live period.
 Surely, there is a possibility that a requestor may unknowingly request non-existing chunks, and what is more, the requested chunk could have been be garbage-collected in the network, in which case, the requestor may have acted in good faith. 
@@ -947,18 +947,18 @@ Blacklists serve as a reference when accepting incoming connections as well as i
 \section{Summary}
 
 
-In the first two chapters of the architecture part of the book we introduced the core of swarm: the peer to peer network layer described in Chapter \ref{sec:network} implements a distributed immutable storage for chunks which is complemented by the incentive system described in the following chapter. The resulting base layer system provides:
+In the first two chapters of the architecture part of the book, we introduced the core of Swarm: the peer-to peer-network layer described in Chapter \ref{sec:network} implements a distributed immutable storage for chunks, which is complemented by the incentive system described in the following chapter. The resulting base layer system provides:
 
 \begin{enumerate}[noitemsep]
     \item permissionless participation and access,
-    \item zero cash entry for node operators,
+    \item zero-cash entry for node operators,
     \item maximum resource utilisation, 
     \item load-balanced distribution of data,
     \item scalability, 
-    \item censorship resistance and privacy for storage and retrieval,
+    \item censorship-resistance and privacy for storage and retrieval,
     \item auto-scaling popular content,
     \item basic plausible deniability and confidentiality,
-    \item churn resistance and eventual consistency in a dynamic network with node dropouts,
+    \item churn-resistance and eventual consistency in a dynamic network with node dropouts,
     \item sustainability without intervention due to built-in economic incentives,
     \item robust private peer-to-peer accounting, 
     \item incentivised bandwidth sharing,
@@ -972,19 +972,19 @@ In the first two chapters of the architecture part of the book we introduced the
 \chapter{High-level functionality}\label{sec:high-level-functionality}
 
 
-This chapter is building on the distributed chunk store and introduces data structures and processes enabling higher level functionality to offer a rich experience handling data. In particular we show how chunks can be organised to represent files (\ref{sec:files}), how files can be organised to represent collections (\ref{sec:collections}), introduce key--value maps (\ref{sec:maps}) and then briefly discuss the possibility of arbitrary functional data structures. We then turn to giving our solution to providing confidentiality and access control (\ref{sec:access-control}). 
+This chapter builds on the distributed chunk store and introduces data structures and processes that enable higher-level functionality, offering a rich experience handling data. In particular, we show how chunks can be organised to represent files (\ref{sec:files}) and how files can be organised to represent collections (\ref{sec:collections}). We also introduce key--value maps (\ref{sec:maps}) and briefly discuss the potential of arbitrary functional data structures. We then shift our attention to presenting our solution for providing confidentiality and access control (\ref{sec:access-control}). 
 
-In \ref{sec:feeds}, we introduce Swarm feeds, which are suitable for representing a wide variety of sequential data, such as versioning updates of a mutable resource or indexing messages for real-time data exchange: offering a system of persisted pull messaging. To implement push-notifications of all kinds, \ref{sec:pss} introduces the novel concept of \glossplural{Trojan chunk} that allows messages to be disguised as chunks be directed to their desired recipient in the swarm. We explain how trojan chunks and feeds can be used together to form a fully fledged communication system with very strong privacy features.                                                       
+In \ref{sec:feeds}, we introduce Swarm feeds, which are designed to represent a wide variety of sequential data, such as versioning updates of mutable resources or indexing messages for real-time data exchange: offering a system of persisted pull messaging. To implement push notifications of all kinds, \ref{sec:pss} introduces the novel concept of \glossplural{Trojan chunk} that allow messages to be disguised as chunks and directed to their intended recipient in the swarm. We explain how Trojan chunks and feeds can be combined to form a fully-fledged communication system with robust privacy features.                                                       
 
 \section{Data structures\statusgreen}\label{sec:datastructures}
 
 \green{}
 
-In the first two chapters, we assumed that data is in the form of chunks, i.e. fixed size data blobs. We now present the algorithms and structures which make it possible to represent data of arbitrary length. We then introduce \glossplural{Swarm manifest} which form the basis of representing collections, indexes, and routing tables allowing Swarm to host websites and offer URL-based addressing.
+In the first two chapters, we made the assumption that data is structured in the form of chunks, i.e. fixed-size data blobs. However, in this section, we will present the algorithms and structures that enable the representation of data of arbitrary length. We will introduce \glossplural{Swarm manifest}, which form the basis of representing collections, indexes, and routing tables, allowing Swarm to host websites and offer URL-based addressing.
 
 \subsection{Files and the Swarm hash\statusgreen}\label{sec:files}
 
-In this section, we introduce the \emph{Swarm hash} which is a means to combine chunks to represent larger sets of structured data such as files. The idea behind the Swarm hashing algorithm is that chunks can be arranged in a Merkle tree such that leaf nodes correspond to chunks from consecutive segments of input data, while intermediate nodes correspond to chunks which are composed of the chunk references of their children,  packaged together to form another chunk (see \ref{fig:Swarm-hash}). 
+In this section, we introduce the concept of the \emph{Swarm hash}, which provides a mechanism for combining chunks to represent larger sets of structured data, such as files. The idea behind the Swarm hashing algorithm is that chunks can be arranged in a Merkle tree. In this structure, leaf nodes correspond to chunks from consecutive segments of input data, while intermediate nodes correspond to chunks that are composed of the chunk references of their children. These combined chunks are packaged together to form another chunk, as illustrated in Figure \ref{fig:Swarm-hash}. 
 
 
 
@@ -999,7 +999,7 @@ In this section, we introduce the \emph{Swarm hash} which is a means to combine 
 
 \subsubsection{Branching factor and reference size}
 
-The branching factor of the tree is calculated as the chunk size divided by the reference size. In the case of unencrypted content, the chunk reference is simply the \gloss{BMT hash} of the chunk which is 32 bytes, so the branching factor is just 4096/32 =  128. A group of chunks referenced under an intermediate node is referred to as a \gloss{batch}. If the content is encrypted, the chunk reference becomes the concatenation of the chunk hash and the decryption key. Both are 32 bytes long so an encrypted chunk reference will be 64 bytes, and therefore the branching factor is 64. 
+The branching factor of the tree is calculated as the chunk size divided by the reference size. For unencrypted content, the chunk reference is simply the \gloss{BMT hash} of the chunk, which is 32 bytes, so the branching factor is just 4096/32 =  128. A group of chunks referenced under an intermediate node is referred to as a \gloss{batch}. If the content is encrypted, the chunk reference consists of the concatenation of the chunk hash and the decryption key. Both are 32 bytes long, so an encrypted chunk reference will be 64 bytes, and therefore the branching factor is 64. 
 
 
 \begin{figure}[htbp]
@@ -1009,21 +1009,21 @@ The branching factor of the tree is calculated as the chunk size divided by the 
 \label{fig:intermediate-chunk}
 \end{figure}
 
-Thus, a single chunk can represent an intermediate node in the Swarm hash tree, in which case, its content can be segmented to references allowing retrieval of their children which themselves may be intermediate chunks, see Figure \ref{fig:intermediate-chunk}. By recursively unpacking these from the root chunk down, we can arrive at a sequence of data chunks. 
+As a result, a single chunk can represent an intermediate node in the Swarm hash tree, in which case its content can be segmented to references, allowing retrieval of their children. These child nodes themselves may be intermediate chunks, as illustrated in Figure \ref{fig:intermediate-chunk}. By recursively unpacking these from the root chunk downwards, we can eventually obtain a sequence of data chunks. 
 
  \subsubsection{Chunk span and integrity of depth}
 
-The length of data subsumed under an intermediate chunk is called \gloss{chunk span}. In order to be able to tell if a chunk is a data chunk or not, the chunk span, in a 64-bit little-endian binary representation is prepended to the chunk data.  When calculating the BMT hash of a chunk, this span constitutes the metadata that needs to be prepended to the BMT root and hashed together to give us the chunk address. When assembling a file starting from a hash, one can tell if a chunk is a data chunk or an intermediate chunk simply by looking at the span: if the span is larger than 4K, the chunk is an intermediate chunk and its content needs to be interpreted as a series of hashes of its children; otherwise it is a data chunk.
+The length of data subsumed under an intermediate chunk is called the \gloss{chunk span}. In order to be able to tell if a chunk is a data chunk or not, the chunk span is prepended to the chunk data in a 64-bit little-endian binary representation. When calculating the BMT hash of a chunk, this span constitutes the metadata that needs to be added to the BMT root and hashed together, resulting in the chunk address. When assembling a file starting from a hash, it is possible to tell if a chunk is a data chunk or an intermediate chunk simply by looking at the span. If the span is larger than 4K, the chunk is an intermediate chunk and its content needs to be interpreted as a series of hashes of its children; otherwise it is a data chunk.
 
-In theory, if the length of the file is already known, spans of intermediate chunks are unnecessary since we could calculate the number of intermediate levels needed for the tree. However, using spans disallows reinstating the intermediate levels as data layerers. In this way, we impose \emph{integrity of the depth}. 
+In theory, if the length of the file is already known, spans of intermediate chunks are unnecessary since we could calculate the number of intermediate levels required for the tree. However, using spans disallows reinstating the intermediate levels as data layers. In this way, we impose \emph{integrity of the depth}. 
 
 \subsubsection{Appending and resuming aborted uploads}
 
-The Swarm hash has the interesting property that any data span corresponding to an intermediate chunk is also a file and can therefore be referenced as if the intermediate chunk was its root hash. This has significance because it allows for appending to a file while retaining historical reference to the earlier state and without duplicating chunks, apart from on the incomplete right edge of the Merkle tree. Appending is also relevant for resuming uploads upon crashing in the middle of uploading big files.
+The Swarm hash has the interesting property that any data span corresponding to an intermediate chunk is also a file and can therefore be referenced as if the intermediate chunk was its root hash. This property is significant because it enables appending to a file while retaining a historical reference to the earlier state, without duplicating chunks, except for the incomplete right edge of the Merkle tree. Appending data to a file is particularly useful for scenarios such as resuming uploads after a crash partway through uploading big files.
 
 \subsubsection{Random access}
 
-Note that all chunks in a file except for the right edge are completely filled. Since chunks are of fixed size, for any arbitrary data offset one can calculate  the path to reach the chunk, including the offset to search within that chunk, in advance. Because of this, \emph{random access to files} is supported right away (See Figure \ref{fig:random-access}).
+Note that all chunks in a file, except for the right edge, are completely filled. Given that chunks have a fixed size, it is possible to calculate the path to a specific chunk and the offset to search within that chunk for any arbitrary data offset ahead of time. Because of this, \emph{random access to files} is supported right away (see Figure \ref{fig:random-access}).
 
 
 \begin{figure}[htbp]
@@ -1044,17 +1044,17 @@ Note that all chunks in a file except for the right edge are completely filled. 
 \end{figure}
 
 
-Suppose we were to prove the inclusion of a substring in a file at a particular offset. We saw that the offset applied to the data maps to a deterministic path traversing the Swarm hash. Since a substring inclusion proof simply reduces to a series of proofs of data segment paths, the chunk addresses are a result of a BMT hash where the base segments are 32-byte long. This means that in intermediate chunks, BMT base segments align with the addresses of children. As a consequence, proving that a child of an intermediate chunk at a particular span offset is equivalent to giving a segment inclusion proof on the child hash. Therefore, substring inclusion in files can be proved with a sequence of BMT inclusion proofs where the length of the sequence corresponds to the depth of the Swarm hash tree (See Figure \ref{fig:file-inclusion}). 
+Suppose we were to prove the inclusion of a substring in a file at a particular offset. We have observed that the offset, when applied to the data, follows a deterministic path traversing the Swarm hash. Since a substring inclusion proof simply reduces to a series of proofs of data segment paths, the chunk addresses are a result of a BMT hash, where the base segments are 32 bytes long. This means that in intermediate chunks, BMT base segments align with the addresses of their children. As a consequence, proving that a child of an intermediate chunk at a particular span offset is equivalent to giving a segment inclusion proof on the child hash. Therefore, substring inclusion in files can be proved with a sequence of BMT inclusion proofs where the length of the sequence corresponds to the depth of the Swarm hash tree (see Figure \ref{fig:file-inclusion}). 
 
 
-Note that such inclusion proofs are possible even in the case of encrypted data since the decryption key at for a segment position can be selectively disclosed without revealing any information that could compromise the encryption elsewhere in the chunk.
+Note that such inclusion proofs are possible even in the case of encrypted data. This is because the decryption key for a segment position can be selectively disclosed without revealing any information that could compromise the encryption of other parts in the chunk.
 
-In this section, we presented Swarm hash, a data structure over chunks that represents files, which supports the following functionalities:
+In this section, we have presented the Swarm hash, a data structure over chunks that represents files, which supports the following functionalities:
 
 \begin{itemize}[noitemsep]
     \item \emph{random access} -- The file can be read from any arbitrary offset with no extra cost.
-    \item \emph{append} -- Supports append without duplication. 
-    \item \emph{length preserving edits} -- Supports length preserving edits without duplication of unmodified parts.
+    \item \emph{append} -- Supports appending without duplication. 
+    \item \emph{length-preserving edits} -- Supports length-preserving edits without the duplication of unmodified parts.
     \item \emph{compact inclusion proofs} -- Allow inclusion proofs with resolution of 32 bytes in space logarithmic in file size.
 \end{itemize}
 
@@ -1062,104 +1062,110 @@ In this section, we presented Swarm hash, a data structure over chunks that repr
 
 \subsection{Collections and manifests\statusgreen}\label{sec:collections}
 
-The \gloss{Swarm manifest} is a structure that defines a mapping between arbitrary paths and files to represent collections. It also contains metadata associated with the collection and its objects (files). A \gloss{manifest entry} contains a reference to a file, more precisely a reference to the Swarm root chunk of the representation of file (see \ref{sec:files}) and also specifies the media mime type of file so that browsers will know how to handle it. You can think of a manifest as (1) a routing table, (2) a directory tree, or  (3) an index, which makes it possible for Swarm to implement (1) web sites, (2) file-system directories, or (3) key--value stores (see \ref{sec:maps}), respectively. Manifests provide the main mechanism to enable URL based addressing in Swarm (see \ref{sec:urls}). 
+The \gloss{Swarm manifest} serves as a framework that defines a mapping between arbitrary paths and files to represent collections. It includes metadata associated with the collection and its objects (files). A \gloss{manifest entry} contains a reference to a file or, more precisely, a reference to the Swarm root chunk of the representation of file (see \ref{sec:files}) and also specifies the media mime type of the file to ensure that browsers can appropriately handle it. A manifest can be thought of as (1) a routing table, (2) a directory tree, or  (3) an index, which makes it possible for Swarm to implement (1) web sites, (2) file-system directories, or (3) key--value stores (see \ref{sec:maps}), respectively. The use of manifests is essential for URL-based addressing within Swarm (see \ref{sec:urls}). 
 
 Manifests are represented as a compacted trie%
 %
 \footnote{See \url{https://en.wikipedia.org/wiki/Trie}}
 %
-in which individual trie nodes are serialised as chunks. The paths are associated with a \gloss{manifest entry} that specifies at least the \emph{reference}. The reference may then point to an embedded manifest if the path is a common prefix of more than one path in the collection, thereby implementing branching in the trie, see Figure \ref{fig:manifest-structure}. 
+in which individual trie nodes are serialised as chunks. The paths are associated with a \gloss{manifest entry} that specifies at least the \emph{reference}. The reference may point to an embedded manifest if the path is a common prefix of more than one path in the collection, thereby implementing branching in the trie, as depicted in Figure \ref{fig:manifest-structure}. 
 
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.7\textwidth]{fig/manifest-structure.pdf}
-\caption[Manifest structure \statusgreen]{Manifest structure. Nodes represent a generic trie node: it contains the forks which describe continuations sharing a prefix. Forks are indexed by the next byte of the key, the value of which contains the Swarm reference to the child node as well as the longest prefix (compaction).}
+\caption[Manifest structure \statusgreen]{Manifest structure. Nodes represent a generic trie node: it contains the forks which describe continuations sharing a prefix. Forks are indexed by the next byte of the key, whose value contains the Swarm reference to the child node as well as the longest prefix (compaction).}
 \label{fig:manifest-structure}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{fig/manifest-entry.pdf}
-\caption[Manifest entry \statusgreen]{Manifest entry is a data  structure that contains the reference to a file including metadata about a file or directory  pertaining to the assembler, access control and http headers.}
+\caption[Manifest entry \statusgreen]{Manifest entry is a data  structure that contains the reference to a file including metadata about a file or directory  pertaining to the assembler, access control, and http headers.}
 \label{fig:manifest-entry}
 \end{figure}
 
-A manifest entry is a data  structure that encapsulates all metadata about a file or directory.
-The information minimally includes a swarm reference to the file, complemented with file information
-relevant either as a (1) parameter for the downloader component which assembles chunks into a byte stream or (2) for the client side rendering handled by the browser or (3) for the mapping of manifests to file system directory tree. (1) is exemplified by access control information and erasure coding parameters but also the publisher needed for doing chunk recovery. (2) includes content type headers, or generically HTTP headers that the local swarm client will pick them up by the API and set in the response header when the file is retrieved. 
-and (3) file info mapped to file system when downloading such as file permissions.
+A manifest entry is essentially a reference that provides information about a file or directory.
+The metadata pertains to the following areas of concern: 
 
-The high level API to the manifests provides functionality to upload and download files and directories. It also provides an interface to add documents to a collection on a path and to delete a document from a collection. Note that deletion here only means that a new manifest is created in which the path in question is missing. There is no other notion of deletion in the Swarm, i.e. the value that was referenced in the deleted manifest entry remains in Swarm. Swarm exposes the manifest API via the \emph{bzz URL scheme}.
+\begin{itemize}
+  \item Parameters for the downloader component, responsible for assembling chunks into a byte stream. This includes access control information, erasure coding parameters, and the publisher needed for chunk recovery.
+  
+  \item Information relevant to client-side rendering, handled by the browser. This may include content type headers, or generically HTTP headers, that are picked up by the local swarm client's API and set in the response header when the file is retrieved.
+  
+  \item File information mapped to the file system during downloading, such as file permissions.
+\end{itemize}
+
+The high-level API for manifests offers functionality for uploading and downloading files and directories. It also provides an interface for adding documents to a collection on a path and deleting a document from a collection. Note that deletion here only means that a new manifest is created in which the path in question is omitted. There is no other notion of deletion in Swarm, i.e. the referenced value in the deleted manifest entry still remains in Swarm. Swarm exposes the manifest API via the \emph{bzz URL scheme}.
 
 \subsection{URL-based addressing and name resolution\statusgreen}\label{sec:urls}
 
-Earlier we introduced the low level network component of Swarm as a distributed immutable store of chunks (DISC, see \ref{sec:disc}). In the previous two sections, we presented ways in which files (\ref{sec:files}) and collections (\ref{sec:collections}) can be represented in Swarm and referenced using chunk references. Manifests provide a way to index individual documents in a collection and this allows them to be considered a representation of web sites hosted in Swarm. The root manifests serve as the entry-point to virtually hosted sites on Swarm and are therefore analogous to hosting servers. In the current web, domain names resolve to the IP address of the host server, and the URL paths (of static sites) map to entries in the directory tree based on their path relative to the document root set for the host.
-Analogously, in Swarm, domain names resolve to a reference to the root manifest and the URL paths map to manifest entries based on their path.  
+Earlier, we introduced the low-level network component of Swarm as a distributed immutable store of chunks (DISC, see \ref{sec:disc}). In the previous two sections, we discussed how files (\ref{sec:files}) and collections (\ref{sec:collections}) can be represented in Swarm and identified using chunk references. Manifests provide a way to index individual documents in a collection, enabling them to serve as representations of websites hosted in Swarm. The root manifests serve as the entry-points to virtually hosted sites on Swarm and are therefore analogous to hosting servers. In the current web, domain names resolve to the IP addresses of host servers, and URL paths (of static sites) are mapped to entries in the directory tree based on their path relative to the document root set for the host.
+Analogously, in Swarm, domain names resolve to references to the root manifests, and URL paths are mapped to manifest entries based on their path.  
 
 When the HTTP API serves a URL, the following steps are performed:
 
 \begin{enumerate}
     \item \emph{domain name resolution} -- Swarm resolves the host part to a reference to a root manifest,
     \item \emph{manifest traversal} -- recursively traverse embedded manifests along the path matching the URL path to arrive at a manifest entry,
-    \item \emph{serving the file} -- the file referenced in the manifest entry is retrieved and rendered in the browser with headers (notably content type) taken from  the metadata of manifest entry.
+    \item \emph{serving the file} -- the file referenced in the manifest entry is retrieved and rendered in the browser with headers (notably content type) obtained from  the metadata of manifest entry.
 \end{enumerate}
 
-Swarm supports domain name resolution using the \gloss{Ethereum Name Service} (\gloss{ENS}). \gloss{ENS} is the system that, analogously to the DNS of the old web, translates human-readable names into system-specific identifiers, i.e., a reference in the case of Swarm.
+Swarm supports domain name resolution using the \gloss{Ethereum Name Service} (\gloss{ENS}). \gloss{ENS} is the system that, analogously to the DNS of the old web, translates human-readable names into system-specific identifiers, i.e., references in the case of Swarm.
 %
-In order to use ENS, the Swarm node needs to be connected to an EVM-based blockchain supporting the Ethereum API (ETH mainnet, Ropsten, ETC, etc). 
-Users of ENS can register a domain name on the blockchain and set it to resolve to a reference. This reference is most commonly the content hash of a public (unencrypted) manifest root. In the case that this manifest represents a directory containing the assets of a website, the default path for the hash may be set to be the desired root html page. When an ENS name is navigated to using a Swarm enabled browser or gateway, Swarm will simply render the root html page and Swarm will provide the rest of the assets provided in the relative path. In this way, users are able to very easily host websites, and Swarm provides an interface to older pre-existing browsers, as well as implementing a decentralised improvement over DNS.
+In order to use ENS, a Swarm node needs to be connected to an EVM-based blockchain that supports the Ethereum API (ETH mainnet, Ropsten, ETC, etc). 
+Users of ENS can register a domain name on the blockchain and set it to resolve to a reference, most commonly the content hash of a public (unencrypted) manifest root. In the case that this manifest represents a directory containing the assets of a website, the default path for the hash may be set to be the desired root HTML page. When an ENS name is navigated to using a Swarm-enabled browser or gateway, Swarm will simply render the root HTML page and serve the rest of the assets provided in the relative path. Swarm facilitates easy website hosting, while also providing an interface to older pre-existing browsers and offering a decentralised improvement over the traditional DNS system.
 
 
 \subsection{Maps and key--value stores\statusgreen}\label{sec:maps}
 
-This section describes two ways of implementing a simple distributed key--value store in Swarm. Both rely solely on tools and APIs which have been already introduced.
+This section describes two methods for implementing a simple distributed key--value store in Swarm. Both rely solely on tools and APIs which have been already introduced.
 
-One technique is by using manifests: Paths represent keys and the reference in the manifest entry with the particular path point to the value. This approach benefits from a full API enabling insert, update and remove through the bzz manifest API. Since manifests are structured as a compacted trie, this key--value store is scalable. Index metadata requires storage logarithmic to the number of key--value pairs. Lookup requires logarithmic bandwidth. The data structure allows for iteration that respects key order. 
+The first technique involves using manifests: Paths represent keys and the reference in the manifest entry with the particular path point to the value. This approach benefits from a full API enabling insert, update and remove through the bzz manifest API. Since manifests are structured as a compacted trie, this key--value store is scalable. Index metadata requires storage logarithmic to the number of key--value pairs. Lookup requires logarithmic bandwidth. The data structure allows for iteration that respects key order. 
 
-Single-owner chunks also provide a way to define a key--value store.
+Single owner chunks also provide a way to define a key--value store.
 
-This other technique simply posits that the index of the single owner chunk be constructed as a concatenation of the hash of the database name and the key. This structure only provides insert, no update or remove. Both insert and lookup are constant space and bandwidth. However, lookup is not safe against false negatives, i.e., if the chunk representing the key--value pair is not found, this does not mean it has never been created (e.g. it could have been garbage collected). Thus, the single owner chunk based key--value store is best used as (1) a bounded cache of recomputable values, (2) mapping between representations such as a translation between a Swarm hash and a Keccak256 hash as used in the Ethereum blockchain state trie nodes, or (3) conventional relational links, such as likes, upvotes and comments on a social media post. 
+The second technique simply posits that the index of the single owner chunk be constructed as a concatenation of the hash of the database name and the key. This structure only provides insert, without update or remove. Both insert and lookup are constant space and bandwidth. However, lookup is not safe against false negatives, i.e., if the chunk that represents the key--value pair is not found, this does not mean it has never been created (e.g. it may have been garbage collected). Thus, the single owner chunk based key--value store is best used as (1) a bounded cache of recomputable values, (2) mapping between representations such as a translation between a Swarm hash and a Keccak256 hash as used in the Ethereum blockchain state trie nodes, or (3) conventional relational links, such as likes, upvotes, and comments on social media posts. 
 
 
 \section{Access control\statusgreen}\label{sec:access-control}
 
 \green{}
 
-This section first addresses the confidentiality of content using encryption. Encryption becomes especially useful once users are provided ways to manage other's access to restricted content. Use cases include managing private shared content as well as authorising access to a member's area of a web application. In this way we provide a robust and simple API to manage access control, something that is traditionally handled through centralised gate-keeping which is subject to frequent and disastrous security breaches.
+This section first addresses the confidentiality of content using encryption. Encryption becomes especially useful once users are granted the ability to manage others' access to restricted content. This encompasses scenarios such as managing private shared content and granting authorisation for members to access specific areas of a web application. In this way, we provide a robust and simple API to manage access control, something that is traditionally handled through centralised gate-keeping which is subject to frequent and disastrous security breaches.
 
 \subsection{Encryption\statusgreen}\label{sec:encryption}
 
-This section describes how to achieve confidentiality in a distributed public data storage. In this way, we show how to fulfill the natural requirement for many use cases to store private information and ensure that this is accessible only to specific authorised parties using Swarm. 
+This section focuses on achieving confidentiality in a distributed public data storage. We explore how to fulfill the natural requirement for many use cases to store private information while ensuring that it remains accessible only to specific authorised parties using Swarm. 
 
-It is clear that the pseudo-confidentiality provided by the server-based access control predominantly used in current web applications is inadequate. In Swarm, nodes are expected to share the chunks with other nodes, in fact, storers of chunks are incentivised to serve them to anyone who requests them and therefore it is infeasible for nodes to act as the gatekeepers trusted with controlling access. Moreover, since every node could potentially be a storer, the confidentiality solution must leak nothing that allows third party storers to distinguish a private chunk from random data. As a consequence of this, the only way to prevent unauthorized parties from accessing private chunks is by using encryption. In Swarm, if a requestor is authorized to access a chunk, they must be in possession of a decryption key that can be used to decrypt the chunk, while unauthorized parties must not. Incidentally, this also serves as the basis for \gloss{plausible deniability}.
+It is clear that the pseudo-confidentiality provided by the server-based access control predominantly used in current web applications is inadequate. In Swarm, nodes are expected to share the chunks with other nodes, in fact, storers of chunks are incentivised to serve them to anyone who requests them. This decentralised architecture makes it infeasible for nodes to act as the gatekeepers trusted with controlling access to the data. Moreover, since any node in the network could potentially be a storer, the confidentiality solution must not reveal any information that could distinguish a private chunk from random data. As a consequence of this, the only way to prevent unauthorized parties from accessing private chunks is through encryption. In Swarm, if a requestor is authorized to access a chunk, they must possess a decryption key that allows them to decrypt the chunk. Unauthorized parties, on the other hand, must not have access to the decryption key. Incidentally, this mechanism also serves as the basis for \gloss{plausible deniability}.
 
 Encryption at the chunk level is described in \ref{sec:chunk-encryption}. It 
-has the desirable property that it is virtually independent of the chunk store layer, with the exact same underlying infrastructure for storing and retrieving chunks as the case of unencrypted content.
+has the desirable property of being virtually independent of the chunk store layer, using the exact same underlying infrastructure for storing and retrieving chunks as unencrypted content.
 The only difference between accessing private and public data is the presence of a decryption/encryption key in the chunk references and the associated minor cryptographic computational overhead.
 
 %, a constant or linear factor.
 
 The storage API's raw \lstinline{GET} endpoint allows both encrypted and unencrypted chunk references. 
-Decryption is triggered if the chunk reference is double size; consisting of the address of the encrypted chunk and a decryption key. Using the address, the encrypted chunk is retrieved, stored and decrypted using the supplied decryption key. The API responds with the resulting plaintext.
+Decryption is triggered if the chunk reference is double size; consisting of the address of the encrypted chunk and a decryption key. Using the address, the encrypted chunk is retrieved, stored, and decrypted using the supplied decryption key. The API responds with the resulting plaintext.
 
-The storage API's \lstinline{POST} endpoint expects users to indicate if they want to have encryption on the upload or not. In both cases the chunk will be stored and push-synced to the network, but if encryption is desired, the encrypted chunk needs to be created first. If no further context is given, a random encryption key is generated which is used as a seed to generate random padding to fill the chunk up to a complete 4096 bytes if needed, and finally this plaintext is encrypted with the key. In the case of encryption, the API \lstinline{POST} call returns the Swarm reference consisting of the Swarm hash as chunk address and the encryption key. 
+The storage API's \lstinline{POST} endpoint expects users to indicate if they want to have encryption on the upload or not. In both cases, the chunk will be stored and push-synced to the network, but if encryption is desired, the encrypted chunk needs to be created first. If no further context is given, a random encryption key is generated which is used as a seed to generate random padding to fill the chunk up to a complete 4096 bytes if needed, and finally this plaintext is encrypted with the key. In the case of encryption, the API \lstinline{POST} call returns the Swarm reference, which consists of the Swarm hash as the chunk address and the encryption key. 
 
 In order to guarantee the uniqueness of encryption keys as well as to ease the load on the OS's entropy pool, it is recommended (but not required) to generate the key as the \gloss{MAC} of the plaintext using a (semi-) permanent random key stored in memory. 
 This key can be permanent and generated using \lstinline{scrypt} \cite{percival2009stronger}
-with a password supplied upon startup. Instead of the plaintext, a namespace and path of the manifest entry can be used as context.
-This use of a \gloss{key derivation function} has the consequence that chunk encryption will be deterministic as long as the context is the same: If we exchange one byte of a file and encrypt it with the same context, all data chunks of the file except the one that was modified will end up being encrypted exactly as the original. Encryption is therefore deduplication friendly. 
+with a password provided upon startup. Instead of the plaintext, a namespace and path of the manifest entry can be used as context.
+Using a \gloss{key derivation function} in this way has the consequence that chunk encryption will be deterministic as long as the context is the same: If we exchange one byte of a file and encrypt it with the same context, all data chunks of the file except the one that was modified will end up being encrypted exactly as the original. Encryption is therefore deduplication-friendly. 
 
 
 \subsection{Managing access\statusgreen}\label{sec:managing-access}
 
-This section describes the process the client needs to follow in order to obtain the full reference to the encrypted content. This protocol needs basic meta-information which is simply encoded as plaintext metadata and explicitly included in the root manifest entry for a document. This non-privileged access is called \gloss{root access}.
+This section describes the process the client needs to follow in order to obtain the full reference to the encrypted content. This protocol relies on basic meta-information, which is simply encoded as plaintext metadata and explicitly included in the root manifest entry for a document. This level of access, known as \gloss{root access}, does not require special privileges.
 
-In contrast, \gloss{granted access} is a type of selective access requiring root access as well as access credentials: an authorised private key or passphrase. Granted access gives differentiated privileges for accessing the content by multiple parties sharing the same root access. This allows for updating the content without changing access credentials. Granted access is implemented using an additional layer of encryption on references.
+In contrast, \gloss{granted access} is a type of selective access that necessitates both root access and access credentials, i.e. an authorised private key or passphrase. Granted access allows different levels of privileges for accessing the content by multiple parties sharing the same root access. This approach allows for updating the content without changing access credentials. Granted access is implemented using an additional layer of encryption on references.
 
-The symmetric encryption of the reference is called the \gloss{encrypted reference}, the symmetric key used in this layer is called the \gloss{access key}.
+The symmetric encryption of the reference is called the \gloss{encrypted reference}, and the symmetric key used in this layer is called the \gloss{access key}.
 
-In the case of granted access, the root access meta-information contains both the encrypted reference and the additional information required for obtaining the access key using the access credentials. Once the access key is obtained, the reference to the content is obtained by decrypting the encrypted reference with the access key, resulting in the full reference composed of the address root chunk and the decryption key for the root chunk. The requested data can then be retrieved and decrypted using the normal method.
+In the case of granted access, the root access meta-information contains both the encrypted reference and the additional information required for obtaining the access key using the access credentials. Once the access key is obtained, the reference to the content is obtained by decrypting the encrypted reference with the access key. The resulting full reference consists of the address root chunk and the decryption key for the root chunk. The requested data can then be retrieved and decrypted using the standard method.
 
 The access key can be obtained from a variety of sources, three of which we will define.
 
@@ -1170,7 +1176,7 @@ The access key can be obtained from a variety of sources, three of which we will
 \label{fig:access-control-single-party}
 \end{figure}
 
-First, a \gloss{session key} is derived from the provided credentials. In the case of granting access to a single party, the session key is used directly as the access key, see Figure \ref{fig:access-control-single-party}. In the case of multiple parties, an additional mechanism is used for turning the session key into the access key.
+First, a \gloss{session key} is derived from the provided credentials. In the case of granting access to a single party, the session key is used directly as the access key, see Figure \ref{fig:access-control-single-party}. However, in the case of multiple parties, an additional mechanism is used to transform the session key into the access key.
 
 \subsubsection{Passphrase}
 The simplest credential is a \emph{passphrase}. The session key is derived from a passphrase using \lstinline{scrypt} with parameters that are specified within the root access meta-information. The output of scrypt is a 32-byte key that may be directly used for Swarm encryption and decryption algorithms.
@@ -1179,8 +1185,8 @@ In typical use cases, the passphrase is distributed by an off-band means with ad
 
 \subsubsection{Asymmetric derivation}
 
-A more sophisticated credential is a \emph{private key}, identical to those used throughout Ethereum for accessing accounts, i.e. an  elliptic curve using secp256k1. In order to obtain the session key, an \gloss{elliptic curve Diffie-Hellman} (\gloss{ECDH}) key agreement must be performed between the content publisher and the grantee. The resulting shared secret is hashed together with a salt. The content publisher's public key as well as the salt are included among metadata in the \gloss{root access manifest}. It follows from the standard assumptions of ECDH, that this session key can only be computed by the publisher and the grantee and no-one else. 
-Once again, if access is granted to a single public key, the session key derived this way can be directly used as the access key which allows for the decryption of the encrypted reference. 
+A more sophisticated credential is a \emph{private key}, identical to those used throughout Ethereum for accessing accounts, i.e. an  elliptic curve using secp256k1. In order to obtain the session key, an \gloss{elliptic curve Diffie-Hellman} (\gloss{ECDH}) key agreement must be performed between the content publisher and the grantee. The resulting shared secret is hashed together with a salt. The content publisher's public key as well as the salt are included among metadata in the \gloss{root access manifest}. Based on the standard assumptions of ECDH, this session key can only be computed by the publisher and the grantee and no-one else. 
+Once again, when access is granted to a single public key, the session key derived this way can be directly used as the access key for the decryption of the encrypted reference. 
 Figure \ref{fig:credentials-to-derive-session-key} summarises the use of credentials to derive the session key.
 
 \begin{figure}[htbp]
@@ -1194,37 +1200,37 @@ Figure \ref{fig:credentials-to-derive-session-key} summarises the use of credent
 \subsection{Selective access to multiple parties\statusgreen}
 
 In order to manage access by multiple parties to the same content, an additional layer is introduced to obtain the access key from the session key. In this variant, grantees can be authenticated using either type of credentials, however, the session key derived as
-described above is not used directly as the access key to decrypt the reference. Instead, two keys: a \gloss{lookup key} and an \gloss{access key decryption key}, are derived from it by hashing it with two different constants ($0$ and $1$, respectively).
+described above is not used directly as the access key for decrypting the reference. Instead, two keys are derived from the session key: a \gloss{lookup key} and an \gloss{access key decryption key}. These keys are obtained by hashing the session key with two different constants ($0$ and $1$, respectively).
 
-When granting access, the publisher needs to generate a global access key to encrypt the full reference and then encrypt it with the
-access key decryption keys for each grantee. Thereafter, a lookup table is created, mapping each grantees lookup key to their encrypted access key. Then, for each lookup key, the access key is encrypted with the corresponding access key decryption key.
+When granting access, the publisher needs to generate a global access key to encrypt the full reference, and then encrypts it with the
+access key decryption keys for each grantee. Thereafter, a lookup table is created, mapping each grantee's lookup key to their encrypted access key. Then, for each lookup key, the access key is encrypted with the corresponding access key decryption key.
 
-This lookup table is implemented as an \gloss{access control trie} (\gloss{ACT}) in Swarm manifest format with paths corresponding to lookup keys and manifest entries containing the ciphertext of the encrypted access keys as metadata attribute values. The ACT manifest is an independent resource referenced by a URL which is included among the root access metadata so that users know whether or not an ACT is to be used.
+This lookup table is implemented as an \gloss{access control trie} (\gloss{ACT}) in Swarm manifest format with paths corresponding to lookup keys and manifest entries containing the ciphertext of the encrypted access keys as metadata attribute values. The ACT manifest is an independent resource referenced by a URL, which is included among the root access metadata to indicate whether or not an ACT is to be used.
 
-When accessing content, the user retrieves the root access meta data, identifies the ACT resource and then calculates their session key using either their passphrase and the scrypt parameters or the publisher public key and their private key and a salt. From the session key they can derive the lookup key by hashing it with $0$ and then retrieve the manifest entry from ACT. For this they will need to know the root of the ACT manifest and then use the lookup key as the URL path. If the entry exists, the user takes the value of the access key attribute in the form of a ciphertext that is decrypted with a key derived by hashing the session key with the constant $1$. The resulting access key can then be used to decrypt the encrypted reference included in the root access manifest, see Figure \ref{fig:access-control-multiple-party}. Once we unlock the manifest root, all references contain the decryption key.
+When accessing content, the user follows these steps: they retrieve the root access meta data, identify the ACT resource, and then calculate their session key using either their passphrase and the scrypt parameters or the publisher public key, their private key, and a salt. From the session key, they can derive the lookup key by hashing it with $0$ and then retrieve the manifest entry from the ACT. For this, they will need to know the root of the ACT manifest and then use the lookup key as the URL path. If the entry exists, the user obtains the value of the access key attribute in the form of a ciphertext that is decrypted with a key derived by hashing the session key with the constant $1$. The resulting access key can then be used to decrypt the encrypted reference included in the root access manifest, see Figure \ref{fig:access-control-multiple-party}. Once the manifest root is unlocked, all references contain the decryption key.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{fig/access-control-multiple-party.pdf}
-\caption[Access control for multiple grantees \statusyellow]{Access control for multiple grantees involves an additional layer to get from the session key to the access key. Each user must lookup the global access key specifically encrypted to them. Both the key to look up and the key to decrypt the access key are derived from the session key which in turn requires their credentials.} 
+\caption[Access control for multiple grantees \statusyellow]{Access control for multiple grantees involves an additional layer to get from the session key to the access key. Each user must lookup the global access key specifically encrypted to them. Both the key to look up and the key for decrypting the access key are derived from the session key, which, in turn, requires their credentials.} 
 \label{fig:access-control-multiple-party}
 \end{figure}
 
 
-This access control scheme has a number of desirable properties:
+This access control scheme offers several desirable properties:
 \begin{itemize}
 \item Checking and looking up one's own access is logarithmic in the size of the ACT.
-\item The size of the ACT merely provides an upper bound on the number of grantees, but does not disclose any information beyond this upper bound about the set of grantees to third parties. Even those included in the ACT can only learn that they are grantees, but obtain no information about other grantees beyond an upper bound on their number.
+\item The size of the ACT merely provides an upper bound on the number of grantees, without disclosing any information beyond this upper bound about the set of grantees to third parties. Even those included in the ACT can only learn that they are grantees, but obtain no information about other grantees beyond an upper bound on their number.
 \item Granting access to an additional key requires extending the ACT by a single entry, which is logarithmic in the size of the ACT. 
-\item Withdrawing access requires a change in the access key and therefore the rebuilding of the ACT. Note that this also requires that the publisher retain a record of the public keys of the grantees after the initial ACT is created.
+\item Revoking access requires changing the access key and therefore the rebuilding of the ACT. Note that this also requires that the publisher retain a record of the public keys of grantees after the initial creation of the ACT.
 \end{itemize}
 
 \subsection{Access hierarchy\statusgreen}
 
-In the simplest case, the access key is a symmetric key. However, this is just a special case of the more flexible solution, where
-the access key consists of a symmetric key and a key derivation path by which it is derived from a root key. In this case, in addition to the encrypted reference, a derivation path may also be included. Any party with an access key whose derivation is a prefix to the derivation path of the reference can decrypt the reference by deriving its key using their own key and the rest of the derivation path of the reference.
+In the simplest case, the access key is a symmetric key. However, this represents a special case within a more flexible solution, where
+the access key consists of both a symmetric key and a key derivation path derived from a root key. In this case, a derivation path may also be included in addition to the encrypted reference. Any party with an access key whose derivation is a prefix to the derivation path of the reference can decrypt the reference by deriving its key using their own key and the rest of the reference's derivation path.
 
-This allows for a tree-like hierarchy of roles, possibly reflecting an organizational structure. As long as role changes are "promotions", i.e. result in increase of privileges, it is sufficient to change a single ACT entry for each role change.
+This allows for a tree-like hierarchy of roles, possibly reflecting an organizational structure. As long as role changes are "promotions", i.e. they result in increased privileges, modifying a single ACT entry for each role change is sufficient.
 
 
 
@@ -1233,13 +1239,14 @@ This allows for a tree-like hierarchy of roles, possibly reflecting an organizat
 
 \green{}
 
-Feeds are a unique feature of Swarm. They constitute the primary use case for single owner chunks. Feeds can be used for versioning revisions of a mutable resource, indexing sequential updates to a topic, publish the parts to streams, or post consecutive messages in a communication channel to name but a few. Feeds implement persisted pull-messaging and can also be interpreted as a pub-sub system.
-First, in \ref{sec:feed-chunks}, we introduce how feeds are composed of single owner chunks with an indexing scheme, the choice of which we discuss in \ref{sec:indexing-schemes}. In \ref{sec:feed-integrity}, we analyse why feed integrity is relevant and how it can be verified and enforced. \ref{sec:epoch-based-feeds} describe \gloss{epoch-based feeds} which provide feeds subject to receiving sporadic updates a way to be searched. Finally, in \ref{sec:feed-as-channel}, we show how feeds can be used as an outbox to send and receive subsequent messages in a communication channel.
+Feeds are a unique feature of Swarm that constitute the primary use case for single owner chunks. Feeds can be used for versioning revisions of a mutable resource, indexing sequential updates to a topic, publish parts to streams, or posting consecutive messages in a communication channel, to name but a few. Feeds implement persisted pull-messaging and can also be interpreted as a pub-sub system.
+
+In Section \ref{sec:feed-chunks}, we introduce how feeds are composed of single owner chunks with an indexing scheme, the choice of which we discuss in \ref{sec:indexing-schemes}. We then delve into the importance of feed integrity and methods for verifying and enforcing it in \ref{sec:feed-integrity}. Section \ref{sec:epoch-based-feeds} describes \gloss{epoch-based feeds} which provide feeds that receive sporadic updates a way to be searched. Finally, in \ref{sec:feed-as-channel}, we demonstrate how feeds can be used as an outbox for sending and receiving subsequent messages within a communication channel.
 
 
 \subsection{Feed chunks \statusyellow}\label{sec:feed-chunks}
 
-A feed chunk is a single owner chunk with the associated constraint that the identifier is composed of the hash of a \gloss{feed topic} and a \gloss{feed index}. The topic is a 32-byte arbitrary byte array, this is typically the Keccak256 hash of one or more human readable strings specifying the topic and optionally the subtopic of the feed, see Figure \ref{fig:feed-chunk}. 
+A feed chunk is a single owner chunk with the associated constraint that the identifier is composed of the hash of a \gloss{feed topic} and a \gloss{feed index}. The topic is a 32-byte arbitrary byte array, this is typically the Keccak256 hash of one or more human-readable strings specifying the topic and optionally the subtopic of the feed, see Figure \ref{fig:feed-chunk}. 
 
 
 \begin{figure}[htbp]
@@ -1249,106 +1256,104 @@ A feed chunk is a single owner chunk with the associated constraint that the ide
 \label{fig:feed-chunk}
 \end{figure}
 
-The index can take various forms defining some of the potentials types of feeds. The ones discussed in this section are: (1) simple feeds which use incremental integers as their index (\ref{sec:indexing-schemes}); (2)  \gloss{epoch-based feeds} which use an epoch ID (\ref{sec:epoch-based-feeds}); and (3) private channel feeds which use the nonces generated using a \gloss{double ratchet} key chain.  (\ref{sec:feed-as-channel}).
-The unifying property of all these feed types is that both the publisher (owner) and the consumer must be aware of the \gloss{indexing scheme}. 
+The index of a feed can take various forms defining some of the potential types of feeds. The ones discussed in this section are: (1) simple feeds that use incremental integers as their index (\ref{sec:indexing-schemes}); (2)  \gloss{epoch-based feeds} that use an epoch ID (\ref{sec:epoch-based-feeds}); and (3) private channel feeds that use nonces generated through a \gloss{double ratchet} key chain.  (\ref{sec:feed-as-channel}).
+The common characteristics among all these feed types is that both the publisher (owner) and the consumer must be aware of the \gloss{indexing scheme}. 
 
-Publishers are the single owners of feed chunks and are the only ones able to post updates to their feed. Posting an update requires (1) constructing the identifier from the topic and the correct index and (2) signing it concatenated together with the hash of the arbitrary content of the update. Since the identifier designates an address in the owner's subspace of addresses, this signature effectively assigns the payload to this address (see \ref{sec:single-owner-chunks}). In this way, all items published on a particular feed are proven to have been created only by the owner of the associated private key.
+Publishers have exclusive ownership of the feed chunks and are the only ones authorised to post updates to their feed. Posting an update requires (1) constructing the identifier from the topic and the correct index, and (2) signing the identifier concatenated with the hash of the arbitrary content of the update. Since the identifier designates an address in the owner's subspace of addresses, this signature effectively assigns the payload to this address (see \ref{sec:single-owner-chunks}). In this way, all items published on a particular feed can be verified to have been created solely by the owner of the corresponding private key.
 
-Conversely, users can consume a feed by retrieving the chunk by its address. Retrieving an update requires the consumer to construct the address from the owner's public key and the identifier. To calculate the identifier they need the topic and the appropriate index. For this they need to know the indexing scheme. 
+On the consumer side, users can retrieve a feed by specifying the chunk address. Retrieving a specific update requires the consumer to construct the address using the owner's public key and the identifier. To calculate the identifier, the user needs two pieces of information: the topic and the appropriate index, for which they need to know the indexing scheme. 
 
-Feeds enable Swarm users to represent a sequence of content updates. The content of the update is the payload that the feed owner signs against the identifier. The payload can be a swarm reference from which the user can retrieve the associated data.
+Feeds enable Swarm users to represent a sequence of content updates. The content of each update serves as the payload, which the feed owner signs against the identifier. The payload can be a swarm reference, allowing users to retrieve the associated data.
 
 \subsection{Indexing schemes \statusyellow}\label{sec:indexing-schemes}
 
-Different types of feeds require different \glossplural{indexing scheme} and different lookup strategies. In what follows, we introduce a few largely independent dimensions in which feeds can be categorised and which appear relevant in making a choice.
+Different types of feeds require different \glossplural{indexing scheme} and different lookup strategies. In the following sections, we introduce a few largely independent dimensions in which feeds can be categorised and which appear relevant in making a choice.
 
 
-The actual indexing scheme used or even whether there is one (i.e. if the single owner chunk is a feed chunk at all) is left unrevealed in the structure of a feed chunk. As this information is not needed for the validation of a chunk by forwarding nodes, having the subtype explicit in the structure would leak  information unnecessarily. 
+The actual indexing scheme used, or even the presence of one (i.e. if the single owner chunk is a feed chunk at all), is left unrevealed in the structure of a feed chunk. As this information is not needed for the validation of a chunk by forwarding nodes, there is no need to include the subtype explicit in the structure. Doing so would only result in unnecessary information leakage. 
 
 \subsubsection{Update semantics}
 
-Updates of a feed can have three distinct semantics defining three subtypes of feeds. 
-Revisions or mutable resource updates are \emph{substitutive}, series updates are \emph{alternative}, while partition updates are \emph{accumulative}. 
+Updates of a feed can be categorised into three subtypes, each with distinct semantics. 
+Revisions, or mutable resource updates are \emph{substitutive}, series updates are \emph{alternative}, while partition updates are \emph{accumulative}. 
 
 Feeds that represent revisions of the same semantic entity are called \gloss{mutable
-resource updates}. These resources mutate because the underlying semantic entity changes such as versions of your CV or the resource description becomes more elaborate like the Wikipedia entry about a Roman emperor. Users will typically be interested in the latest update of such resources, past versions having only historical significance. 
+resource updates}. These resources mutate because the underlying semantic entity changes such as versions of your CV or the resource description becomes more elaborate like the Wikipedia entry about a Roman emperor. Users will typically be interested in the latest update of such resources, with past versions having only historical significance. 
 
-A series of content connected by a common thread, theme or author such as status updates on social media, a person's blog posts or blocks of a blockchain can also be represented with feeds called \gloss{series}.
-The updates in a series are interpreted as alternative and independent instantiations or episodes manifesting in temporal sequence. 
+The second subtype, \gloss{series} updates, represents a series of content that is connected by a common thread, theme, or author. Updates in a series are interpreted as alternative and independent instantiations or episodes manifesting in temporal sequence. Examples include social media status updates, a person's blog posts, or blocks of a blockchain.
 
-Finally, there are \gloss{partitions} expressed as feeds, updates of which are meant to be accumulated or added to earlier ones, for instance parts of a video stream. These mainly differ from series in that the feed updates are not interpretable on their own and the temporal sequence may represent a processing order corresponding to some serialisation of the structure of the resource rather than temporal succession. When such a feed is accessed, accumulation of all the parts may be necessary even for the integrity of the represented resource.
+Finally, there are \gloss{partitions} expressed as feeds, where updates are meant to be accumulated or added to earlier ones. A common example is a video stream consisting of multiple parts. These mainly differ from series in that the individual feed updates are not interpretable on their own, and the temporal sequence may represent a processing order corresponding to some serialisation of the structure of the resource rather than temporal succession. When such a feed is accessed, it may be necessary to accumulate all the parts in order to ensure the integrity of the represented resource.
 
-If subsequent updates of a feed include a reference to a data structure indexing the previous updates (e.g. a key--value store using the timestamp for the update or simply the root hash of the concatenation of update content), then the \gloss{lookup strategy} in all three cases reduces to looking up the latest update.
+If subsequent updates of a feed include a reference to a data structure that indexes the previous updates (e.g. a key--value store using the timestamp for the update or simply the root hash of the concatenation of update content), then the \gloss{lookup strategy} in all three cases reduces to retrieving the latest update.
 
 \subsubsection{Update frequency}
 
-Within feeds which are updated over time may be several types, there are \gloss{sporadic feeds} with irregular asynchronicities, i.e. updates that can have unpredictable gaps and also \gloss{periodic feeds} with updates published at regularly recurring intervals.
+Feeds that are updated over time may be categorised into several types. Some are \gloss{sporadic feeds} with irregular asynchronicities, i.e. updates that can have unpredictable gaps. Another type is \gloss{periodic feeds}, where updates are published at regularly recurring intervals.
 
-We will also talk about \gloss{real-time feeds}, where the update frequencies may not be regular but do show variance within the temporal span of real-time human interaction, i.e. they are punctuated by intervals in the second to minute range.
+Additionally, we will discuss \gloss{real-time feeds}, where the update frequencies may not follow a regular pattern but instead vary within the temporal span of real-time human interaction, i.e. they are punctuated by intervals in the second to minute range.
 
 \subsubsection{Subscriptions}
 
-Feeds can be interpreted as \gloss{pub-sub systems} with persistence enabling asynchronous pulls. In what follows we analyse how the implementation of subscriptions to feeds as pub/sub is affected by the choice of \gloss{indexing scheme}.
+Feeds can be interpreted as \gloss{pub-sub systems} that offer persistence, enabling asynchronous pulls. In what follows, we analyse how the choice of \gloss{indexing scheme} affects the implementation of subscriptions to feeds as pub/sub.
 
-In order to cater for subscribers to a feed, updates need to be tracked. If we know the latest update, periodic polling needs to be used to fetch the subsequent update. 
-If the feed is periodic one can start polling after a known period. Alternatively, if the feed updates are frequent enough (at most a 1-digit integer orders of magnitude rarer than the desired polling frequency), then polling is also feasible.
-However, if the feed is sporadic, polling may not be practical and we better resort to push notifications (see \ref{sec:trojan} and \ref{sec:notification-requests}).
+In order to cater for subscribers of a feed, the updates need to be tracked. If we know the latest update, periodic polling needs to be used to fetch subsequent updates. 
+If the feed is periodic, one can start polling after a known period. Alternatively, if the feed updates are frequent enough (at most a 1-digit integer orders of magnitude rarer than the desired polling frequency), then polling is also feasible.
+However, if the feed is sporadic and updates occur unpredictably, polling may not be practical, and alternative methods such as push notifications (see \ref{sec:trojan} and \ref{sec:notification-requests}) are preferable.
 
-If we missed out on polling for a period of time due to being offline, or just created the subscription, we can also rely on push notifications or use a \gloss{lookup strategy}. 
+If we have missed out on polling for a period of time due to being offline, or just created the subscription, we can also rely on push notifications or use a \gloss{lookup strategy}. 
 
-To look up partitions is not a problem since we need to fetch and accumulate each update, so in this case the strategy of just iterating over the successive indexes cannot be improved.
+Looking up partitions poses no difficulty as each update needs to be fetched and accumulated. In this case, the strategy of just iterating over the successive indexes cannot be improved.
 For periodic feeds, we can just calculate the index for a given time, hence asynchronous access is efficient and trivial. 
-Looking up the latest version of a sporadically updated feed, however, necessitates some search and hence 
-will benefit from \gloss{epoch-based indexing}.
+Looking up the latest version of a sporadically updated feed, however, necessitates some search and hence benefits from \gloss{epoch-based indexing}.
 
 
 
 \subsubsection{Aggregate indexing}
 
-A set of sporadic feeds can be turned into a periodic one using \gloss{feed aggregation}. Imagine a multi-user forum like Reddit where each registered participant would publish comments on a post using sporadic feeds. In this scenario it is not practical for each user to monitor the comment feed of every other user and search through their sporadic feeds for updates in order to retrieve all the comments on the thread. It is much more efficient to just do it once though for all users. Indexers do exactly that and aggregate everyone's comments into an index, a data structure the root of which can now be published as a periodic feed, see Figure \ref{fig:feed-aggregation}. The period can be chosen to give a real-time feed experience; even if the rate of change does not justify it, i.e. some updates will be redundant, the cost amortises over all users that use the aggregate feed and therefore is economically sustainable. 
+A set of sporadic feeds can be turned into a periodic one using \gloss{feed aggregation}. Imagine, for example, a multi-user forum like Reddit, where each registered participant would publish comments on a post using sporadic feeds. In this scenario, it is not practical for each user to monitor the comment feed of every other user and search through their sporadic feeds for updates in order to retrieve all the comments on the thread. It is far more efficient to just do it once though for all users. Indexers do exactly that: aggregate everyone's comments into an index, a data structure whose root can then be published as a periodic feed, see Figure \ref{fig:feed-aggregation}. The period can be chosen to provide a real-time feed experience; even if the rate of change does not justify it, i.e. some updates will be redundant, the cost amortises over all users who use the aggregate feed, making it economically sustainable. 
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{fig/feed-aggregation-2.pdf}
-\caption[Feed aggregation \statusyellow]{Feed aggregation serves to merge information from several source feeds in order to save consumers from duplicate work. \textbf{Left:} 6 nodes involved in group communication (discussing a post, having real time chat, or asynchronous email thread). Each node publishes their contribution as outbox feed updates (small coloured circles). Each participant polls the other's epoch based feeds duplicating work with the lookup. \textbf{Right:} the 6 nodes now register  as sources  with an aggregator which polls the nodes' feed and creates indices that aggregate the sources into one data structure which each participant can then pull.}
+\caption[Feed aggregation \statusyellow]{Feed aggregation serves to merge information from several source feeds in order to save consumers from duplicate work. \textbf{Left:} 6 nodes involved in group communication (discussing a post, having real time chat, or asynchronous email thread). Each node publishes their contributions as outbox feed updates (small coloured circles). Each participant polls the other's epoch-based feeds, duplicating work with the lookup. \textbf{Right:} the 6 nodes now register  as sources  with an aggregator which polls the nodes' feed and creates indices that aggregate the sources into one data structure which each participant can then pull.}
 \label{fig:feed-aggregation}
 \end{figure}
 
-Such a service can be provided with arbitrary levels of security, yet trustlessly without resorting to reputation. Using consensual data structures for the aggregation, incorrect indexes can be proved using cheap and compact inclusion proofs (see \ref{sec:files}) and therefore any challenge relating to correctness can be evaluated on chain. The threat of losing their deposit in case of an unrefuted challenge acts as a strong incentive for providers to maintain a good quality of service.
+A service of this kind can be provided with arbitrary levels of security, yet trustlessly, without relying on reputation. Using consensual data structures for the aggregation, incorrect indexes can be proven using inexpensive and compact inclusion proofs (see \ref{sec:files}) and therefore any challenges related to correctness can be evaluated on chain. Providers face the risk of losing their deposit if a challenge remains unrefuted, which acts as a strong incentive for them to maintain a high quality of service.
 
 \subsection{Integrity \statusyellow}\label{sec:feed-integrity}
 
-We say that a feed has \emph{integrity} if each of its updates has integrity, i.e. the update is unambiguous. Formally this means that for each index, the respective feed identifier is only ever assigned to a single payload. Incidentally, this also implies that the corresponding feed chunk has integrity. As discussed in \ref{sec:single-owner-chunks}, this is a prerequisite for consistent retrieval. 
-If the payloads of the successive updates are imagined as blocks of a blockchain, then the criterion of integrity demands that feed owners must not fork their chain. 
+We consider a feed to have \emph{integrity} when each of its updates is unambiguous. Formally, this means that for each index, the respective feed identifier is only ever assigned to a single payload. Incidentally, this also implies that the corresponding feed chunk has integrity. As discussed in \ref{sec:single-owner-chunks}, this is a prerequisite for consistent retrieval. 
+If the payloads of the successive updates are imagined as blocks of a blockchain, then the criterion of integrity requires feed owners to avoid creating forks in their chain. 
 
-In fact, the integrity of a feed can only be guaranteed by the owner. But can it be checked or enforced? Owners can commit to the integrity of their feeds by staking a deposit on the blockchain which they stand to lose if they are found to double sign on an update. Even though this may give a strong disincentive to fork a feed for long-term benefits, by itself, it is still unable to give sufficient guarantees to consumers of the feed with respect to integrity. Because of this, we must design indexing schemes which work to enforce this integrity.
+In fact, the integrity of a feed can only be guaranteed by the owner. However, it is important to consider whether the integrity can be effectively checked or enforced. Owners can commit to the integrity of their feeds by staking a deposit on the blockchain, which they stand to lose if they are found to double sign on an update. While this may provide a strong disincentive to fork a feed in the long run, by itself, it does not offer sufficient guarantees to consumers of the feed with respect to integrity. Because of this, we must design indexing schemes that actively enforce this integrity.
 
 \subsubsection{Authoritative version history}
 
 Mutable resource update feeds track versions pretty much the same way as the Ethereum Name Service does.  
-When the owner consolidates a version (say of a   website), they want to register the content address of the current version. In order to guarantee that there is no dispute over history, the payload needs to incorporate the previous payload's hash. This imposes the requirement that the payload must be a composite structure. If we want the payload to just be a manifest or manifest entry, so that it can be rooted to a path matching a URL, or directly displayed, this is not possible. Also, if the feed content is not a payload hash, then ENS registers a payload hash but the chunk may not exist on Swarm, so then the semantics of ENS are violated.
+When a version is consolidated, for example, of a website, the owner wants to register the content address of the current version. In order to guarantee that there is no dispute over history, the payload needs to incorporate the hash of the previous payload. This imposes the requirement that the payload must be a composite structure. However, if we want the payload to just be a manifest or manifest entry, so that it can be rooted to a URL path or directly displayed, this is not possible. Additionally, if the feed content is not a payload hash, ENS registers a payload hash even though the chunk may not exist on Swarm, thus violating the semantics of ENS.
 
-An indexing scheme which incorporates the previous payload hash into the subsequent index behaves like a blockchain in that it expresses the owner's unambiguous commitment to a particular history and that any consumer reading and using it expresses their acceptance of such a history. 
-Looking up such feeds is only possible by retrieving each update since the last known one. The address is that of the update chunk, so registering the update address both guarantees historic integrity and preserves ENS semantics so that the registered address is just a Swarm reference to a chunk.
-Such feeds implement an \gloss{authoritative version history}, i.e. a secure audit trail of the revisions of a mutable resource. 
+An indexing scheme which incorporates the previous payload hash into the subsequent index operates in a similar manner to a blockchain. It expresses the owner's unambiguous commitment to a particular history and that any consumer who reads and uses it acknowledges their acceptance of that history. 
+Looking up such feeds is only possible by retrieving each update since the last known one. The address refers to the update chunk, so registering the update address both guarantees historic integrity and preserves ENS semantics so that the registered address is just a Swarm reference to a chunk.
+Such feeds implement an \gloss{authoritative version history}, i.e. a secure audit trail of the revisions made to a mutable resource. 
 
 \subsubsection{Real-time integrity check}
 
-A deterministically indexed feed enables a \gloss{real-time integrity check}. In the context of feeds that represent blockchains (ledgers/side-chains), integrity translates to a non-forking and unique chain commitment. The ability to enforce this in real-time allows fast and secure definitions of transaction finality. 
+A deterministically indexed feed provides the ability to perform a \gloss{real-time integrity check}. In the context of feeds that represent blockchains (ledgers/side-chains), integrity refers to having a non-forking and unique chain commitment. The ability to enforce this in real-time allows fast and secure definitions of transaction finality. 
 
-We illustrate this with an example of an off-chain p2p payment network where each node's locked up funds are allocated to a fixed set of creditors (see more detail in \cite{ethersphere2019swap}). Creditors of the node need to check the correctness of reallocations, i.e. that the total increases are  covered by countersigned decreases. 
-If a debitor keeps publishing a deposit allocation table for an exhaustive list of creditors, by issuing two alternatives to targeted creditors, the debitors will be able to orchestrate a double spend. Conversely, certainty in the uniqueness of this allocation table allows the creditor to conclude finality.
+We illustrate this with an example of an off-chain p2p payment network where each node's locked-up funds are allocated to a fixed set of creditors (see more detail in \cite{ethersphere2019swap}). Creditors of the node need to verify the accuracy of the reallocations, i.e. that the total increases are covered by countersigned decreases. 
+If a debitor keeps publishing a deposit allocation table for an exhaustive list of creditors, by issuing two alternatives to targeted creditors, the debitors will be able to orchestrate a double spend. Conversely, if there is certainty in the uniqueness of this allocation table, the creditor can confidently conclude finality.
 
-We claim that using Swarm feeds, this uniqueness constraint can be checked real time.
+We claim that using Swarm feeds, this uniqueness constraint can be verified in real-time.
 
-The insight here is that it is impossible to meaningfully control the responses to a single owner chunk request: There is no systematic way to respond with particular versions to particular requestors even if the attacker controls the entire neighbourhood of the chunk address.%
+The key insight is that meaningfully controlling the responses to a single owner chunk request is impossible: Even if an attacker has control over the entire neighbourhood of the chunk address, there is no systematic way to respond with particular versions to particular requestors.%
 %
 \footnote{If the chunks are uploaded using the same route, the chunk that comes later will be rejected as already known. If the two chunks originate from different addresses in the network, they might both end up in their local neighbourhood. This scenario will result in inconsistent retrievals depending on which node the request ends up with.}
 %
-This is the result of the ambiguity of the originator of the request due to the nature of forwarding Kademlia. Let us imagine that the attacker, with some sophisticated traffic analysis, has the chance of $1/n$ (asymptotic ceiling) to identify the originator and give a differential response. Sending multiple requests from random addresses, however, one can test integrity and consider a consistent response a requirement to conclude finality. The chance that the attacker can give a consistent differential response to a creditor testing with $k$ independent requests is $1/n^k$. With linear bandwidth cost in $k$, we can achieve exponential degrees of certainty about the uniqueness of an update. If a creditor finds consistency, it can conclude that there is no alternative allocation table.
+This is due to the inherent ambiguity of the originator of the request in the forwarding Kademlia protocol. Let us imagine that the attacker, with some sophisticated traffic analysis, has the chance of $1/n$ (asymptotic ceiling) to identify the originator and give a differential response. By sending multiple requests from random addresses, however, one can test integrity and consider a consistent response a requirement to conclude finality. The chance that the attacker can give a consistent differential response to a creditor testing with $k$ independent requests is $1/n^k$. With linear bandwidth cost in $k$, we can achieve exponential degrees of certainty about the uniqueness of an update. If a creditor observes consistency in the responses, it can conclude that there is no alternative allocation table.
 
 
-By requiring the allocation tables to be disseminated as feed updates, we can leverage permissionlessness, availability and anonymity to enforce feed integrity. If the feed is a blockchain-like ledger, a real-time integrity check translates to fork finality. 
+By requiring the allocation tables to be disseminated as feed updates, we can leverage permissionlessness, availability, and anonymity to enforce feed integrity. If the feed is a blockchain-like ledger, a real-time integrity check translates to fork finality. 
 
 
 \subsection{Epoch-based 
@@ -1558,7 +1563,7 @@ As mentioned in \ref{sec:indexing-schemes}, aggregate indexing services help nod
 \subsection{Initial contact for key exchange\statusgreen}\label{sec:pss-key-exchange}
 
 
-Encrypted communication requires a handshake to agree on the initial parameters that are used as inputs to a symmetric key generation scheme. The \gloss{extended triple Diffie--Hellmann key exchange} (\gloss{X3DH}) is one such protocol \cite{marlinspike2016x3dh}, and is used to establish the initial parameters for a post-handshake communication protocol such as the \emph{double-ratchet scheme} discussed earlier in the section on feeds (See \ref{sec:feed-as-channel}). 
+Encrypted communication requires a handshake to agree on the initial parameters that are used as inputs to a symmetric key generation scheme. The \gloss{extended triple Diffie--Hellmann key exchange} (\gloss{X3DH}) is one such protocol \cite{marlinspike2016x3dh}, and is used to establish the initial parameters for a post-handshake communication protocol such as the \emph{double-ratchet scheme} discussed earlier in the section on feeds (see \ref{sec:feed-as-channel}). 
 In what follows, we describe how the X3DH protocol can be implemented with pss in a serverless setting. 
 
 Swarm's X3DH uses the same primitives as are customary in Ethereum, i.e. secp256k elliptic curve, Keccak256 hash, and a 64-byte encoding for EC public keys. 
@@ -1597,7 +1602,7 @@ A \gloss{pre-key bundle} consists of all information the initiator needs to know
 \end{figure}
 
 
-In order to invite a responder to an outbox-feed based private communication channel, the initiator first looks up the responder's public pre-key bundle feed and sends an initial message to the responder (See Figure \ref{fig:x3dh-initial-message}) in which the intent to communicate is indicated. She then shares the parameters required to initiate the encrypted conversation. This consists of the public key of its long-term identity, as well as the public key of the ephemeral key-pair which has been generated just for that conversation. These details are delivered to the potential responder by sending a Trojan pss message addressed to the responder's current address of residence which is also being advertised in their pre-key bundle feed. 
+In order to invite a responder to an outbox-feed based private communication channel, the initiator first looks up the responder's public pre-key bundle feed and sends an initial message to the responder (see Figure \ref{fig:x3dh-initial-message}) in which the intent to communicate is indicated. She then shares the parameters required to initiate the encrypted conversation. This consists of the public key of its long-term identity, as well as the public key of the ephemeral key-pair which has been generated just for that conversation. These details are delivered to the potential responder by sending a Trojan pss message addressed to the responder's current address of residence which is also being advertised in their pre-key bundle feed. 
 
 \begin{figure}[htbp]
    \centering
@@ -1796,7 +1801,7 @@ Normally, in Swarm's DISC model, chunks are requested with retrieve requests, wh
 
 
 These 'chunk-in-a-soc' responses are structurally similarly to neighbourhood notifications in that the payload's hash is already known (the content address of the chunk requested). The requestor can then sign off on its association with the identifier which, along with the signature, is sent as part of the request, see Figure \ref{fig:targeted-chunk-delivery-events}. A node that got the request only needs to have the requested chunk stored and they can construct the response as a valid single owner chunk addressed to the recipient's neighbourhood.
-This makes the request generic, i.e. not fixed to the identity of the prospective poster. Therefore it can be sent to any neighbourhood that requires the content. Even multiple requests can be sent simultaneously: due to the uniqueness of the valid response, multiple responses cannot hurt chunk integrity (See \ref{sec:single-owner-chunks} and \ref{sec:feed-integrity}). Targeted delivery is used in missing chunk recovery, see \ref{sec:recovery-chunks}.
+This makes the request generic, i.e. not fixed to the identity of the prospective poster. Therefore it can be sent to any neighbourhood that requires the content. Even multiple requests can be sent simultaneously: due to the uniqueness of the valid response, multiple responses cannot hurt chunk integrity (see \ref{sec:single-owner-chunks} and \ref{sec:feed-integrity}). Targeted delivery is used in missing chunk recovery, see \ref{sec:recovery-chunks}.
 
 The difference is that neighbourhood notifications are not giving any new information while targeted chunk delivery supplies the chunk data. Also, a chunk delivery wrapped in a single owner chunk uses no message wrapping and has no topic. Neither request nor response uses encryption.
 A consequence of not using encryption is that, if there are multiple tartgets, it is sufficient that the initial Trojan request matches any one of these targets. 
@@ -2195,7 +2200,7 @@ Swarm core offers the lowest level entry-points for communication-related functi
 
 \begin{itemize}[noitemsep]
     \item pss offers an API for sending and receiving trojan chunks
-    \item bzz offers a way to upload single owner chunks. Single-owner chunk retrieval requires nothing beyond what is provided by the storage APIs
+    \item bzz offers a way to upload single owner chunks. single owner chunk retrieval requires nothing beyond what is provided by the storage APIs
 \end{itemize}
 
 
