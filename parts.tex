@@ -1227,8 +1227,8 @@ This access control scheme offers several desirable properties:
 
 \subsection{Access hierarchy\statusgreen}
 
-In the simplest case, the access key is a symmetric key. However, this represents a special case within a more flexible solution, where
-the access key consists of both a symmetric key and a key derivation path derived from a root key. In this case, a derivation path may also be included in addition to the encrypted reference. Any party with an access key whose derivation is a prefix to the derivation path of the reference can decrypt the reference by deriving its key using their own key and the rest of the reference's derivation path.
+In the simplest case, the access key is a symmetric key. However, this is just a special case of the more flexible solution, where
+the access key consists of a symmetric key and a key derivation path by which it is derived from a root key. In this case, a derivation path may also be included in addition to the encrypted reference. Any party with an access key whose derivation is a prefix to the derivation path of the reference can decrypt the reference by deriving its key using their own key and the rest of the reference's derivation path.
 
 This allows for a tree-like hierarchy of roles, possibly reflecting an organizational structure. As long as role changes are "promotions", i.e. they result in increased privileges, modifying a single ACT entry for each role change is sufficient.
 
@@ -1270,19 +1270,19 @@ Feeds enable Swarm users to represent a sequence of content updates. The content
 Different types of feeds require different \glossplural{indexing scheme} and different lookup strategies. In the following sections, we introduce a few largely independent dimensions in which feeds can be categorised and which appear relevant in making a choice.
 
 
-The actual indexing scheme used, or even the presence of one (i.e. if the single owner chunk is a feed chunk at all), is left unrevealed in the structure of a feed chunk. As this information is not needed for the validation of a chunk by forwarding nodes, there is no need to include the subtype explicit in the structure. Doing so would only result in unnecessary information leakage. 
+The actual indexing scheme used, or even the presence of one (i.e. if the single-owner chunk is a feed chunk at all), is left unrevealed in the structure of a feed chunk. As this information is not needed for the validation of a chunk by forwarding nodes, there is no need to include the subtype explicit in the structure. Doing so would only result in unnecessary information leakage. 
 
 \subsubsection{Update semantics}
 
 Updates of a feed can be categorised into three subtypes, each with distinct semantics. 
-Revisions, or mutable resource updates are \emph{substitutive}, series updates are \emph{alternative}, while partition updates are \emph{accumulative}. 
 
-Feeds that represent revisions of the same semantic entity are called \gloss{mutable
-resource updates}. These resources mutate because the underlying semantic entity changes such as versions of your CV or the resource description becomes more elaborate like the Wikipedia entry about a Roman emperor. Users will typically be interested in the latest update of such resources, with past versions having only historical significance. 
+Feeds that represent \emph{revisions} of the same semantic entity are called \gloss{mutable
+resource updates}. These resources mutate because the underlying semantic entity changes such as versions of your CV or the resource description becomes more elaborate like the Wikipedia entry about a Roman emperor. Users will typically be interested in the latest update of such resources, with past versions having only historical significance. As the name 'revision' suggests, the interpretation of an update in the case of mutable resources is \emph{substitutive}. 
 
-The second subtype, \gloss{series} updates, represents a series of content that is connected by a common thread, theme, or author. Updates in a series are interpreted as alternative and independent instantiations or episodes manifesting in temporal sequence. Examples include social media status updates, a person's blog posts, or blocks of a blockchain.
 
-Finally, there are \gloss{partitions} expressed as feeds, where updates are meant to be accumulated or added to earlier ones. A common example is a video stream consisting of multiple parts. These mainly differ from series in that the individual feed updates are not interpretable on their own, and the temporal sequence may represent a processing order corresponding to some serialisation of the structure of the resource rather than temporal succession. When such a feed is accessed, it may be necessary to accumulate all the parts in order to ensure the integrity of the represented resource.
+The second subtype, \gloss{series} updates, represents a series of content that is connected by a common thread, theme, or author. Updates in a series are interpreted as \emph{alternative} and independent instantiations or episodes manifesting in temporal sequence. Examples include social media status updates, a person's blog posts, or blocks of a blockchain.
+
+Finally, there are \gloss{partitions} expressed as feeds, where updates are meant to be \emph{accumulative}: subsequent updates are sequentially added to earlier ones. A common example is a video stream consisting of multiple parts. These mainly differ from series in that the individual feed updates are not interpretable on their own, and the temporal sequence may represent a processing order corresponding to some serialisation of the structure of the resource rather than temporal succession. When such a feed is accessed, it may be necessary to accumulate all the parts in order to ensure the integrity of the represented resource.
 
 If subsequent updates of a feed include a reference to a data structure that indexes the previous updates (e.g. a key--value store using the timestamp for the update or simply the root hash of the concatenation of update content), then the \gloss{lookup strategy} in all three cases reduces to retrieving the latest update.
 
@@ -1361,7 +1361,7 @@ indexing \statusyellow}\label{sec:epoch-based-feeds}
 
 \yellow{}
 
-In order to use single owner chunks to implement feeds with flexible update frequency, we introduce \gloss{epoch-based feeds}, an indexing scheme where the single owner chunk's identifier incorporates anchors related to the time of publishing. In order to be able to find the latest update, we introduce
+In order to use single owner chunks to implement sporadic feeds with flexible update frequency, we introduce \gloss{epoch-based feeds}, an indexing scheme where the single owner chunk's identifier incorporates anchors related to the time of publishing. In order to be able to find the latest update, we introduce
 an adaptive lookup algorithm. 
 
 \subsubsection{Epoch grid}
