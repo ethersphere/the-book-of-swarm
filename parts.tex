@@ -1138,7 +1138,7 @@ This section first addresses the confidentiality of content using encryption. En
 
 This section focuses on achieving confidentiality in a distributed public data storage. We explore how to fulfill the natural requirement for many use cases to store private information while ensuring that it remains accessible only to specific authorised parties using Swarm. 
 
-It is clear that the pseudo-confidentiality provided by the server-based access control predominantly used in current web applications is inadequate. In Swarm, nodes are expected to share the chunks with other nodes, in fact, storers of chunks are incentivised to serve them to anyone who requests them. This decentralised architecture makes it infeasible for nodes to act as the gatekeepers trusted with controlling access to the data. Moreover, since any node in the network could potentially be a storer, the confidentiality solution must not reveal any information that could distinguish a private chunk from random data. As a consequence of this, the only way to prevent unauthorized parties from accessing private chunks is through encryption. In Swarm, if a requestor is authorized to access a chunk, they must possess a decryption key that allows them to decrypt the chunk. Unauthorized parties, on the other hand, must not have access to the decryption key. Incidentally, this mechanism also serves as the basis for \gloss{plausible deniability}.
+It is clear that the pseudo-confidentiality provided by the server-based access control predominantly used in current web applications is inadequate. In Swarm, nodes are expected to share the chunks with each other, in fact, storers of chunks are incentivised to serve them to anyone who requests them. This decentralised architecture makes it infeasible for nodes to act as the gatekeepers trusted with controlling access to the data. Moreover, since any node in the network could potentially be a storer, the confidentiality solution must not reveal any information that could distinguish a private chunk from random data. As a consequence of this, the only way to prevent unauthorized parties from accessing private chunks is through encryption. In Swarm, if a requestor is authorized to access a chunk, they must possess a decryption key that allows them to decrypt the chunk. Unauthorized parties, on the other hand, must not have access to the decryption key. Incidentally, this mechanism also serves as the basis for \gloss{plausible deniability}.
 
 Encryption at the chunk level is described in \ref{sec:chunk-encryption}. It 
 has the desirable property of being virtually independent of the chunk store layer, using the exact same underlying infrastructure for storing and retrieving chunks as unencrypted content.
@@ -1165,7 +1165,7 @@ In contrast, \gloss{granted access} is a type of selective access that necessita
 
 The symmetric encryption of the reference is called the \gloss{encrypted reference}, and the symmetric key used in this layer is called the \gloss{access key}.
 
-In the case of granted access, the root access meta-information contains both the encrypted reference and the additional information required for obtaining the access key using the access credentials. Once the access key is obtained, the reference to the content is obtained by decrypting the encrypted reference with the access key. The resulting full reference consists of the address root chunk and the decryption key for the root chunk. The requested data can then be retrieved and decrypted using the standard method.
+In the case of granted access, the root access meta-information contains both the encrypted reference and the additional information required for obtaining the access key using the access credentials. Once the access key is acquired, the reference to the content is obtained by decrypting the encrypted reference with the access key. The resulting full reference consists of the address root chunk and the decryption key for the root chunk. The requested data can then be retrieved and decrypted using the standard method.
 
 The access key can be obtained from a variety of sources, three of which we will define.
 
@@ -1176,10 +1176,10 @@ The access key can be obtained from a variety of sources, three of which we will
 \label{fig:access-control-single-party}
 \end{figure}
 
-First, a \gloss{session key} is derived from the provided credentials. In the case of granting access to a single party, the session key is used directly as the access key, see Figure \ref{fig:access-control-single-party}. However, in the case of multiple parties, an additional mechanism is used to transform the session key into the access key.
+First, a \gloss{session key} is derived from the provided credentials. In the case of granting access to a single party, the session key is used directly as the access key, as depicted in Figure \ref{fig:access-control-single-party}. However, in the case of multiple parties, an additional mechanism is used to transform the session key into the access key.
 
 \subsubsection{Passphrase}
-The simplest credential is a \emph{passphrase}. The session key is derived from a passphrase using \lstinline{scrypt} with parameters that are specified within the root access meta-information. The output of scrypt is a 32-byte key that may be directly used for Swarm encryption and decryption algorithms.
+The simplest credential for deriving a session key is a \emph{passphrase}. The session key is obtained from a passphrase using \lstinline{scrypt} with parameters that are specified within the root access meta-information. The output of scrypt is a 32-byte key that may be directly used for Swarm encryption and decryption algorithms.
 
 In typical use cases, the passphrase is distributed by an off-band means with adequate security measures, or exchanged in person. Any user knowing the passphrase from which the key was derived will be able to access the content.
 
@@ -1200,14 +1200,14 @@ Figure \ref{fig:credentials-to-derive-session-key} summarises the use of credent
 \subsection{Selective access to multiple parties\statusgreen}
 
 In order to manage access by multiple parties to the same content, an additional layer is introduced to obtain the access key from the session key. In this variant, grantees can be authenticated using either type of credentials, however, the session key derived as
-described above is not used directly as the access key for decrypting the reference. Instead, two keys are derived from the session key: a \gloss{lookup key} and an \gloss{access key decryption key}. These keys are obtained by hashing the session key with two different constants ($0$ and $1$, respectively).
+described above is not directly used as the access key for decrypting the reference. Instead, two keys are derived from the session key: a \gloss{lookup key} and an \gloss{access key decryption key}. These keys are obtained by hashing the session key with two different constants ($0$ and $1$, respectively).
 
 When granting access, the publisher needs to generate a global access key to encrypt the full reference, and then encrypts it with the
 access key decryption keys for each grantee. Thereafter, a lookup table is created, mapping each grantee's lookup key to their encrypted access key. Then, for each lookup key, the access key is encrypted with the corresponding access key decryption key.
 
-This lookup table is implemented as an \gloss{access control trie} (\gloss{ACT}) in Swarm manifest format with paths corresponding to lookup keys and manifest entries containing the ciphertext of the encrypted access keys as metadata attribute values. The ACT manifest is an independent resource referenced by a URL, which is included among the root access metadata to indicate whether or not an ACT is to be used.
+This lookup table is implemented as an \gloss{access control trie} (\gloss{ACT}) in Swarm manifest format. The paths in the ACT correspond to the lookup keys and manifest entries containing the ciphertext of the encrypted access keys as metadata attribute values. The ACT manifest is an independent resource referenced by a URL, which is included among the root access metadata to indicate whether or not an ACT is to be used.
 
-When accessing content, the user follows these steps: they retrieve the root access meta data, identify the ACT resource, and then calculate their session key using either their passphrase and the scrypt parameters or the publisher public key, their private key, and a salt. From the session key, they can derive the lookup key by hashing it with $0$ and then retrieve the manifest entry from the ACT. For this, they will need to know the root of the ACT manifest and then use the lookup key as the URL path. If the entry exists, the user obtains the value of the access key attribute in the form of a ciphertext that is decrypted with a key derived by hashing the session key with the constant $1$. The resulting access key can then be used to decrypt the encrypted reference included in the root access manifest, see Figure \ref{fig:access-control-multiple-party}. Once the manifest root is unlocked, all references contain the decryption key.
+When accessing content, the user follows these steps: they retrieve the root access meta data, identify the ACT resource, and then calculate their session key using either their passphrase and the scrypt parameters or the publisher public key, their private key, and a salt. From the session key, they can derive the lookup key by hashing it with $0$, and then retrieve the manifest entry from the ACT. For this, they will need to know the root of the ACT manifest and then use the lookup key as the URL path. If the entry exists, the user obtains the value of the access key attribute in the form of a ciphertext that is decrypted with a key derived by hashing the session key with the constant $1$. The resulting access key can then be used to decrypt the encrypted reference included in the root access manifest, as seen in Figure \ref{fig:access-control-multiple-party}. Once the manifest root is unlocked, all references contain the decryption key.
 
 \begin{figure}[htbp]
 \centering
@@ -1239,14 +1239,14 @@ This allows for a tree-like hierarchy of roles, possibly reflecting an organizat
 
 \green{}
 
-Feeds are a unique feature of Swarm that constitute the primary use case for single owner chunks. Feeds can be used for versioning revisions of a mutable resource, indexing sequential updates to a topic, publish parts to streams, or posting consecutive messages in a communication channel, to name but a few. Feeds implement persisted pull-messaging and can also be interpreted as a pub-sub system.
+Feeds are a unique feature of Swarm that constitute the primary use case for single owner chunks. They have a wide range of applications, including versioning revisions of a mutable resource, indexing sequential updates to a topic, publishing parts to streams, or posting consecutive messages in communication channels. Feeds implement persisted pull-messaging and can also be interpreted as a pub-sub system.
 
-In Section \ref{sec:feed-chunks}, we introduce how feeds are composed of single owner chunks with an indexing scheme, the choice of which we discuss in \ref{sec:indexing-schemes}. We then delve into the importance of feed integrity and methods for verifying and enforcing it in \ref{sec:feed-integrity}. Section \ref{sec:epoch-based-feeds} describes \gloss{epoch-based feeds} which provide feeds that receive sporadic updates a way to be searched. Finally, in \ref{sec:feed-as-channel}, we demonstrate how feeds can be used as an outbox for sending and receiving subsequent messages within a communication channel.
+In Section \ref{sec:feed-chunks}, we introduce how feeds are composed of single owner chunks with an indexing scheme, the choice of which we discuss in \ref{sec:indexing-schemes}. We then delve into the importance of feed integrity and methods for verifying and enforcing it in \ref{sec:feed-integrity}. Section \ref{sec:epoch-based-feeds} describes \gloss{epoch-based feeds} which provide a search mechanism for feeds that receive sporadic updates. Finally, in \ref{sec:feed-as-channel}, we demonstrate how feeds can be used as an outbox for sending and receiving subsequent messages within a communication channel.
 
 
 \subsection{Feed chunks \statusyellow}\label{sec:feed-chunks}
 
-A feed chunk is a single owner chunk with the associated constraint that the identifier is composed of the hash of a \gloss{feed topic} and a \gloss{feed index}. The topic is a 32-byte arbitrary byte array, this is typically the Keccak256 hash of one or more human-readable strings specifying the topic and optionally the subtopic of the feed, see Figure \ref{fig:feed-chunk}. 
+A feed chunk is a single owner chunk with the associated constraint that the identifier is composed of the hash of a \gloss{feed topic} and a \gloss{feed index}. The topic is a 32-byte arbitrary byte array, typically the Keccak256 hash of one or more human-readable strings specifying the topic and optionally the subtopic of the feed (see Figure \ref{fig:feed-chunk} for a visual representation). 
 
 
 \begin{figure}[htbp]
@@ -1256,12 +1256,12 @@ A feed chunk is a single owner chunk with the associated constraint that the ide
 \label{fig:feed-chunk}
 \end{figure}
 
-The index of a feed can take various forms defining some of the potential types of feeds. The ones discussed in this section are: (1) simple feeds that use incremental integers as their index (\ref{sec:indexing-schemes}); (2)  \gloss{epoch-based feeds} that use an epoch ID (\ref{sec:epoch-based-feeds}); and (3) private channel feeds that use nonces generated through a \gloss{double ratchet} key chain.  (\ref{sec:feed-as-channel}).
-The common characteristics among all these feed types is that both the publisher (owner) and the consumer must be aware of the \gloss{indexing scheme}. 
+The index of a feed can take various forms, defining some of the potential types of feeds. The ones discussed in this section are: (1) simple feeds that use incremental integers as their index (\ref{sec:indexing-schemes}); (2)  \gloss{epoch-based feeds} that use an epoch ID (\ref{sec:epoch-based-feeds}); and (3) private channel feeds that use nonces generated through a \gloss{double ratchet} key chain.  (\ref{sec:feed-as-channel}).
+The common characteristic among all these feed types is that both the publisher (owner) and the consumer must be aware of the \gloss{indexing scheme} in order to interact with the feed effectively. 
 
 Publishers have exclusive ownership of the feed chunks and are the only ones authorised to post updates to their feed. Posting an update requires (1) constructing the identifier from the topic and the correct index, and (2) signing the identifier concatenated with the hash of the arbitrary content of the update. Since the identifier designates an address in the owner's subspace of addresses, this signature effectively assigns the payload to this address (see \ref{sec:single-owner-chunks}). In this way, all items published on a particular feed can be verified to have been created solely by the owner of the corresponding private key.
 
-On the consumer side, users can retrieve a feed by specifying the chunk address. Retrieving a specific update requires the consumer to construct the address using the owner's public key and the identifier. To calculate the identifier, the user needs two pieces of information: the topic and the appropriate index, for which they need to know the indexing scheme. 
+On the consumer side, users can retrieve a feed by specifying the chunk address. Retrieving a specific update requires the consumer to construct the address from the owner's public key and the identifier. To calculate the identifier, the user needs two pieces of information: the topic and the appropriate index, for which they need to know the indexing scheme. 
 
 Feeds enable Swarm users to represent a sequence of content updates. The content of each update serves as the payload, which the feed owner signs against the identifier. The payload can be a swarm reference, allowing users to retrieve the associated data.
 
@@ -1270,21 +1270,21 @@ Feeds enable Swarm users to represent a sequence of content updates. The content
 Different types of feeds require different \glossplural{indexing scheme} and different lookup strategies. In the following sections, we introduce a few largely independent dimensions in which feeds can be categorised and which appear relevant in making a choice.
 
 
-The actual indexing scheme used, or even the presence of one (i.e. if the single-owner chunk is a feed chunk at all), is left unrevealed in the structure of a feed chunk. As this information is not needed for the validation of a chunk by forwarding nodes, there is no need to include the subtype explicit in the structure. Doing so would only result in unnecessary information leakage. 
+The actual indexing scheme used, or even the presence of one (i.e. if the single-owner chunk is a feed chunk at all), is left unrevealed in the structure of a feed chunk, as this information is not needed for the validation of a chunk by forwarding nodes. Including the subtype explicitly in the structure would only result in unnecessary information leakage. 
 
 \subsubsection{Update semantics}
 
 Updates of a feed can be categorised into three subtypes, each with distinct semantics. 
 
 Feeds that represent \emph{revisions} of the same semantic entity are called \gloss{mutable
-resource updates}. These resources mutate because the underlying semantic entity changes such as versions of your CV or the resource description becomes more elaborate like the Wikipedia entry about a Roman emperor. Users will typically be interested in the latest update of such resources, with past versions having only historical significance. As the name 'revision' suggests, the interpretation of an update in the case of mutable resources is \emph{substitutive}. 
+resource updates}. These resources mutate because the underlying semantic entity undergoes changes, such as updates to your CV or the expansion of a resource description, like the Wikipedia entry about a Roman emperor. Users will typically be interested in the latest update of such resources, with past versions having only historical significance. As the term 'revision' suggests, the interpretation of an update in the case of mutable resources is \emph{substitutive}. 
 
 
-The second subtype, \gloss{series} updates, represents a series of content that is connected by a common thread, theme, or author. Updates in a series are interpreted as \emph{alternative} and independent instantiations or episodes manifesting in temporal sequence. Examples include social media status updates, a person's blog posts, or blocks of a blockchain.
+The second subtype of feeds, known as \gloss{series} updates, represents a series of content linked by a common thread, theme, or author. In a series, each update is considered as an \emph{alternative} and independent instantiation or episode that unfolds in a chronological order, such as include social media status updates, a person's blog posts, or blocks of a blockchain. Series updates present a cohesive narrative or progression of information, allowing users to engage with the content in a sequential and interconnected manner.
 
-Finally, there are \gloss{partitions} expressed as feeds, where updates are meant to be \emph{accumulative}: subsequent updates are sequentially added to earlier ones. A common example is a video stream consisting of multiple parts. These mainly differ from series in that the individual feed updates are not interpretable on their own, and the temporal sequence may represent a processing order corresponding to some serialisation of the structure of the resource rather than temporal succession. When such a feed is accessed, it may be necessary to accumulate all the parts in order to ensure the integrity of the represented resource.
+Finally, there are \gloss{partitions} expressed as feeds, where updates are meant to be \emph{accumulative}: subsequent updates are sequentially added to earlier ones. A common example is a video stream that consists of multiple parts. Partition feeds mainly differ from series in that the individual feed updates are not meaningful or interpretable on their own. Instead, the temporal sequence of updates may represent a processing order that corresponds to some serialisation of the structure of the resource rather than reflecting temporal succession. When accessing a partition feed, it may be necessary to accumulate all the parts in order to ensure the integrity of the represented resource. This means that each update builds on the previous ones, resulting in a comprehensive representation of the entire resource.
 
-If subsequent updates of a feed include a reference to a data structure that indexes the previous updates (e.g. a key--value store using the timestamp for the update or simply the root hash of the concatenation of update content), then the \gloss{lookup strategy} in all three cases reduces to retrieving the latest update.
+If subsequent updates of a feed include a reference to a data structure that indexes the previous updates (e.g. a key--value store using the timestamp for the update or simply the root hash of the concatenation of update content), then the \gloss{lookup strategy} in for all three feed types reduces to retrieving the latest update.
 
 \subsubsection{Update frequency}
 
@@ -1296,21 +1296,21 @@ Additionally, we will discuss \gloss{real-time feeds}, where the update frequenc
 
 Feeds can be interpreted as \gloss{pub-sub systems} that offer persistence, enabling asynchronous pulls. In what follows, we analyse how the choice of \gloss{indexing scheme} affects the implementation of subscriptions to feeds as pub/sub.
 
-In order to cater for subscribers of a feed, the updates need to be tracked. If we know the latest update, periodic polling needs to be used to fetch subsequent updates. 
+In order to cater for subscribers of a feed, the updates need to be tracked. When we have knowledge of the latest update, we can employ periodic polling to fetch subsequent updates. 
 If the feed is periodic, one can start polling after a known period. Alternatively, if the feed updates are frequent enough (at most a 1-digit integer orders of magnitude rarer than the desired polling frequency), then polling is also feasible.
-However, if the feed is sporadic and updates occur unpredictably, polling may not be practical, and alternative methods such as push notifications (see \ref{sec:trojan} and \ref{sec:notification-requests}) are preferable.
+However, if the feed is sporadic and updates occur unpredictably, polling may not be practical. In such scenarios, alternative methods like push notifications (see \ref{sec:trojan} and \ref{sec:notification-requests}) become preferable for ensuring timely updates.
 
-If we have missed out on polling for a period of time due to being offline, or just created the subscription, we can also rely on push notifications or use a \gloss{lookup strategy}. 
+If we have missed out on polling for a period of time due to being offline, or just created the subscription, we can also rely on push notifications or use a \gloss{lookup strategy} to retrieve the necessary updates. 
 
 Looking up partitions poses no difficulty as each update needs to be fetched and accumulated. In this case, the strategy of just iterating over the successive indexes cannot be improved.
 For periodic feeds, we can just calculate the index for a given time, hence asynchronous access is efficient and trivial. 
-Looking up the latest version of a sporadically updated feed, however, necessitates some search and hence benefits from \gloss{epoch-based indexing}.
+However, looking up the latest version of a sporadically updated feed requires some search and hence benefits from \gloss{epoch-based indexing}.
 
 
 
 \subsubsection{Aggregate indexing}
 
-A set of sporadic feeds can be turned into a periodic one using \gloss{feed aggregation}. Imagine, for example, a multi-user forum like Reddit, where each registered participant would publish comments on a post using sporadic feeds. In this scenario, it is not practical for each user to monitor the comment feed of every other user and search through their sporadic feeds for updates in order to retrieve all the comments on the thread. It is far more efficient to just do it once though for all users. Indexers do exactly that: aggregate everyone's comments into an index, a data structure whose root can then be published as a periodic feed, see Figure \ref{fig:feed-aggregation}. The period can be chosen to provide a real-time feed experience; even if the rate of change does not justify it, i.e. some updates will be redundant, the cost amortises over all users who use the aggregate feed, making it economically sustainable. 
+A set of sporadic feeds can be turned into a periodic one using \gloss{feed aggregation}. Imagine, for example, a multi-user forum like Reddit, where each registered participant would publish comments on a post using sporadic feeds. In this scenario, would be impractical for each user to monitor the comment feed of every other user and search through their sporadic feeds for updates in order to retrieve all the comments on the thread. A more efficient approach is to just do it once though for all users. Indexers do exactly that: they aggregate everyone's comments into an index, a data structure whose root can then be published as a periodic feed, see Figure \ref{fig:feed-aggregation}. The frequency of updates can be chosen to provide a real-time feed experience; even if the rate of change does not justify it, i.e. some updates may be redundant, the cost amortises over all users who use the aggregate feed, making it economically sustainable. 
 
 \begin{figure}[htbp]
 \centering
@@ -1319,41 +1319,41 @@ A set of sporadic feeds can be turned into a periodic one using \gloss{feed aggr
 \label{fig:feed-aggregation}
 \end{figure}
 
-A service of this kind can be provided with arbitrary levels of security, yet trustlessly, without relying on reputation. Using consensual data structures for the aggregation, incorrect indexes can be proven using inexpensive and compact inclusion proofs (see \ref{sec:files}) and therefore any challenges related to correctness can be evaluated on chain. Providers face the risk of losing their deposit if a challenge remains unrefuted, which acts as a strong incentive for them to maintain a high quality of service.
+A service of this kind can be offered with arbitrary levels of security, yet trustlessly, without relying on reputation. Using consensual data structures for the aggregation, incorrect indexes can be proven using affordable and concise inclusion proofs (see \ref{sec:files}) and therefore any challenges related to correctness can be evaluated on chain. Providers face the risk of losing their deposit if a challenge remains unrefuted, which acts as a strong incentive for them to uphold a high standard of service quality.
 
 \subsection{Integrity \statusyellow}\label{sec:feed-integrity}
 
 We consider a feed to have \emph{integrity} when each of its updates is unambiguous. Formally, this means that for each index, the respective feed identifier is only ever assigned to a single payload. Incidentally, this also implies that the corresponding feed chunk has integrity. As discussed in \ref{sec:single-owner-chunks}, this is a prerequisite for consistent retrieval. 
 If the payloads of the successive updates are imagined as blocks of a blockchain, then the criterion of integrity requires feed owners to avoid creating forks in their chain. 
 
-In fact, the integrity of a feed can only be guaranteed by the owner. However, it is important to consider whether the integrity can be effectively checked or enforced. Owners can commit to the integrity of their feeds by staking a deposit on the blockchain, which they stand to lose if they are found to double sign on an update. While this may provide a strong disincentive to fork a feed in the long run, by itself, it does not offer sufficient guarantees to consumers of the feed with respect to integrity. Because of this, we must design indexing schemes that actively enforce this integrity.
+In fact, the integrity of a feed can only be guaranteed by the owner. However, it is important to consider whether the integrity can be effectively checked or enforced. Owners can commit to the integrity of their feeds by staking a deposit on the blockchain, which they stand to lose if they are found to double sign on an update. While this may provide a strong disincentive to fork a feed in the long run, it alone does not offer sufficient guarantees to consumers of the feed with respect to integrity. Because of this, we must design indexing schemes that actively enforce the desired integrity standards.
 
 \subsubsection{Authoritative version history}
 
 Mutable resource update feeds track versions pretty much the same way as the Ethereum Name Service does.  
-When a version is consolidated, for example, of a website, the owner wants to register the content address of the current version. In order to guarantee that there is no dispute over history, the payload needs to incorporate the hash of the previous payload. This imposes the requirement that the payload must be a composite structure. However, if we want the payload to just be a manifest or manifest entry, so that it can be rooted to a URL path or directly displayed, this is not possible. Additionally, if the feed content is not a payload hash, ENS registers a payload hash even though the chunk may not exist on Swarm, thus violating the semantics of ENS.
+When a version is consolidated, such as a website update, the owner wants to register the content address of the current version. In order to guarantee that there is no dispute over history, the payload needs to incorporate the hash of the previous payload. This requirement implies that the payload must be a composite structure. However, if the goal is to have a payload consisting of solely a manifest or manifest entry so that it can be rooted to a URL path or directly displayed, this is not possible. Additionally, if in cases where the feed content is not a payload hash, ENS registers a payload hash despite the abscence of the corresponding chunk in Swarm, thus violating the semantics of ENS.
 
-An indexing scheme which incorporates the previous payload hash into the subsequent index operates in a similar manner to a blockchain. It expresses the owner's unambiguous commitment to a particular history and that any consumer who reads and uses it acknowledges their acceptance of that history. 
+An indexing scheme that incorporates the previous payload hash into the subsequent index operates in a similar manner to a blockchain. It expresses the owner's unambiguous commitment to a particular history and requires any consumer who reads and uses it to acknowledge and accept that history. 
 Looking up such feeds is only possible by retrieving each update since the last known one. The address refers to the update chunk, so registering the update address both guarantees historic integrity and preserves ENS semantics so that the registered address is just a Swarm reference to a chunk.
-Such feeds implement an \gloss{authoritative version history}, i.e. a secure audit trail of the revisions made to a mutable resource. 
+Such feeds establish an \gloss{authoritative version history}, i.e. they provide a secure audit trail of the revisions made to a mutable resource. 
 
 \subsubsection{Real-time integrity check}
 
 A deterministically indexed feed provides the ability to perform a \gloss{real-time integrity check}. In the context of feeds that represent blockchains (ledgers/side-chains), integrity refers to having a non-forking and unique chain commitment. The ability to enforce this in real-time allows fast and secure definitions of transaction finality. 
 
-We illustrate this with an example of an off-chain p2p payment network where each node's locked-up funds are allocated to a fixed set of creditors (see more detail in \cite{ethersphere2019swap}). Creditors of the node need to verify the accuracy of the reallocations, i.e. that the total increases are covered by countersigned decreases. 
+We illustrate this with an example of an off-chain p2p payment network where each node's locked-up funds are allocated to a fixed set of creditors (see more detail in \cite{ethersphere2019swap}). The creditors of a node need to verify the accuracy of the reallocations, i.e. that the total increases are covered by countersigned decreases. 
 If a debitor keeps publishing a deposit allocation table for an exhaustive list of creditors, by issuing two alternatives to targeted creditors, the debitors will be able to orchestrate a double spend. Conversely, if there is certainty in the uniqueness of this allocation table, the creditor can confidently conclude finality.
 
 We claim that using Swarm feeds, this uniqueness constraint can be verified in real-time.
 
-The key insight is that meaningfully controlling the responses to a single owner chunk request is impossible: Even if an attacker has control over the entire neighbourhood of the chunk address, there is no systematic way to respond with particular versions to particular requestors.%
+The key insight is that it is impossible to meaningfully control the responses to a single owner chunk request: Even if an attacker has control over the entire neighbourhood of the chunk address, there is no systematic way to respond with particular versions to particular requestors.%
 %
 \footnote{If the chunks are uploaded using the same route, the chunk that comes later will be rejected as already known. If the two chunks originate from different addresses in the network, they might both end up in their local neighbourhood. This scenario will result in inconsistent retrievals depending on which node the request ends up with.}
 %
-This is due to the inherent ambiguity of the originator of the request in the forwarding Kademlia protocol. Let us imagine that the attacker, with some sophisticated traffic analysis, has the chance of $1/n$ (asymptotic ceiling) to identify the originator and give a differential response. By sending multiple requests from random addresses, however, one can test integrity and consider a consistent response a requirement to conclude finality. The chance that the attacker can give a consistent differential response to a creditor testing with $k$ independent requests is $1/n^k$. With linear bandwidth cost in $k$, we can achieve exponential degrees of certainty about the uniqueness of an update. If a creditor observes consistency in the responses, it can conclude that there is no alternative allocation table.
+This is due to the inherent ambiguity of the originator of the request in the forwarding Kademlia protocol. Let us imagine that the attacker, using some sophisticated traffic analysis, has the chance of $1/n$ (asymptotic ceiling) to identify the originator and give a differential response. By sending multiple requests from random addresses, however, one can test integrity and consider a consistent response a requirement for concluding finality. The probability that the attacker can give a consistent differential response to a creditor testing with $k$ independent requests is $1/n^k$. With linear bandwidth cost in $k$, we can achieve exponential degrees of certainty about the uniqueness of an update. If a creditor observes consistency in the responses, it can conclude that there is no alternative allocation table.
 
 
-By requiring the allocation tables to be disseminated as feed updates, we can leverage permissionlessness, availability, and anonymity to enforce feed integrity. If the feed is a blockchain-like ledger, a real-time integrity check translates to fork finality. 
+By requiring the allocation tables to be disseminated as feed updates, we can leverage the advantages of permissionlessness, availability, and anonymity to enforce feed integrity. If the feed is a blockchain-like ledger, a real-time integrity check translates to fork finality. 
 
 
 \subsection{Epoch-based 
@@ -1361,15 +1361,14 @@ indexing \statusyellow}\label{sec:epoch-based-feeds}
 
 \yellow{}
 
-In order to use single owner chunks to implement sporadic feeds with flexible update frequency, we introduce \gloss{epoch-based feeds}, an indexing scheme where the single owner chunk's identifier incorporates anchors related to the time of publishing. In order to be able to find the latest update, we introduce
-an adaptive lookup algorithm. 
+In order to use single owner chunks to implement sporadic feeds with flexible update frequency, we introduce \gloss{epoch-based feeds} as an indexing scheme. In this scheme, the identifier of a single owner chunk incorporates anchors related to the time of publishing. In order to be able to find the latest update, we introduce an adaptive lookup algorithm. 
 
 \subsubsection{Epoch grid}
 
-An \gloss{epoch} represents a concrete time period starting at a specific point in time, called the \gloss{epoch base time} and has a specific length.  
-Period lengths are expressed as powers of 2 in seconds. The shortest period is $2^0 = 1$ second, the longest is $2^{31}$ seconds. 
+An \gloss{epoch} is a defined time period starting at a specific point in time, known as the \gloss{epoch base time}, and lasts for a specific duration.  
+The lengths of these periods are expressed as powers of 2 in seconds, ranging from the shortest period of $2^0 = 1$ second to the longest period of $2^{31}$ seconds. 
 
-An \gloss{epoch grid} is the arrangement of epochs where rows (referred to as levels) represent alternative partitioning of time into various disjoint epochs with the same length. Levels are indexed by the logarithm of the epoch length putting level 0 with 1 second epoch length at the bottom by convention, see Figure \ref{fig:epoch-grid}.
+An \gloss{epoch grid} is the arrangement of epochs, where each row represents an alternative partitioning of time into various disjoint epochs of the same length. Rows, also known as levels, are indexed by the logarithm of the epoch length putting level 0 with 1 second epoch length at the bottom by convention, see Figure \ref{fig:epoch-grid}.
 
 \begin{figure}[htbp]
 \centering
@@ -1378,32 +1377,32 @@ An \gloss{epoch grid} is the arrangement of epochs where rows (referred to as le
 \label{fig:epoch-grid}
 \end{figure}
 
-When representing a epoch-based feed in an epoch grid, each update is assigned to a different epoch in the grid based on their timestamp. In particular, an update is mapped to the longest free epoch that includes the timestamp. This structure gives the series of updates a contiguous structure which allows for easy search. The contiguity requirement implies that by knowing the epoch of the previous update, a subsequent update can be mapped to an epoch unambiguously.
+When representing a epoch-based feed in an epoch grid, each update is assigned to a specific epoch within the grid based on its timestamp. In particular, an update is mapped to the longest free epoch that includes the timestamp. This structure gives the series of updates a contiguous structure, which allows for easy search. The contiguity requirement implies that by knowing the epoch of the previous update, the subsequent update can be mapped to a specific epoch without ambiguity.
 
 
-To identify a specific epoch, we need to know both the epoch base time and the level. This pair is called the  \gloss{epoch reference}. To calculate the epoch base time of any given instant in time $t$ at a particular level $l$, we are dropping the $l$ least significant bits of $t$. 
-The level requires one byte, and the epoch base time (using linux seconds) 4 bytes so the epoch reference can be serialised in 5 bytes. 
-The epoch reference of the very first update of any epoch-based feed is always the same.
+To identify a specific epoch within the epoch grid, we need to know both the epoch base time and the level. This pair is called the  \gloss{epoch reference}. To calculate the epoch base time for any given instant in time $t$ at a particular level $l$, the $l$ least significant bits of $t$ are dropped. 
+The level requires one byte, and the epoch base time (using Linux seconds) 4 bytes, so the epoch reference can be serialised in 5 bytes. 
+It is worth noting that the epoch reference of the initial update of any epoch-based feed is always the same.
 
 \subsubsection{Mapping epochs to feed update chunks}
 
-Feed updates can then be mapped to feed chunks using the serialised epoch reference as the \gloss{feed index}. The topic of the feed hashed together with the index results in the feed identifier used in constructing the single owner chunk that expresses the feed chunk. 
+The serialised epoch reference serves as the \gloss{feed index} for mapping feed updates to feed chunks. The topic of the feed hashed together with the index results in the feed identifier used in constructing the single owner chunk that expresses the feed chunk. 
 
-To determine the epoch in which to store a subsequent update, the publisher needs to know where they stored the previous update. If the publisher does not keep track of this, they can use the lookup algorithm to find their last update.
+To determine the appropriate epoch for storing a subsequent update, the publisher needs to know the location of the previous update. If the publisher does not keep track of this information, they can use the lookup algorithm to find their most recent update.
 
 
 
 \subsubsection{Lookup algorithm}
 
-When consumers retrieve feeds, they typically will either want to look up the state of the feed at a particular time (historical lookup) or to find the latest update.
+When consumers retrieve feeds, their objectives typically revolve around looking up the state of the feed at a particular time (historical lookup) or to retrieving the latest update.
 
-If historical lookups based on a \emph{target} time are required, the update can incorporate a data structure mapping timestamps to states. In such cases, finding any update later than the target can be used to deterministically look up the state at an earlier time. 
+If historical lookups based on a \emph{target} time are required, the update can incorporate a data structure that maps timestamps to corresponding states. In such cases, finding any update later than the target can be used to deterministically look up the state at an earlier time. 
 
 If no such index is available, historical lookups need to find the shortest filled epoch whose timestamp is earlier than the target. 
 
-To select the best starting epoch from which to walk our grid, we have to assume the worst case scenario, which is that the resource was never again updated after we last saw it. If we don't know when the resource was last updated, we assume 0 as the "last time" it was updated.
+To select the best starting epoch from which to walk our grid, we have to assume the worst case scenario, which is that the resource has never been updated since the last time we saw it. If we don't know when the resource was last updated, we assume it to be 0.
 
-We can guess a start level as the position of the first nonzero bit of $\mathit{lastUpdate}\xor \mathit{NOW}$ counting from the left. The bigger the difference among the two times (last update time and now), the higher the level will be.
+We can guess a start level as the position of the first non-zero bit of $\mathit{lastUpdate}\xor \mathit{NOW}$ counting from the left. The bigger the time difference between the last update time and the current time, the higher the level will be.
 
 % In \ref{sec:epoch-based-feeds-appendix}, we walk the reader through an example.
 
