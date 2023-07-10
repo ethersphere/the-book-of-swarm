@@ -161,9 +161,9 @@ $U$ calculates the "ciphertext" $C'=C \xor k$ and uploads it to swarm obtaining 
 %
 \footnote{So far, references to swarm content included an address (\emph{Swarm hash} for unencrypted content) or an address with a decryption key (for encrypted content). The dream reference now defines a third type of reference, serialised in four segments comprising the parity address, the batch id, the initial generator and a decryption key.}
 
-\subsection{Analysis}
+\subsection{Correctness, Security and Privacy}
 
-% \subsection{Retrieval}
+\subsubsection{Retrieval}
 % \label{def:retrieval}
 $D$ in possession of a dream chunk reference as 
 $\langle r,b,g\rangle $ calculated by $U$  as $\mathit{ref}(C)$ constructs $p=\mathcal{G}\idx{4K}(g)$ and wraps it as a dream chunk and sends it to swarm. When it receives the dream chunk for $b$, it extracts payload $k$.
@@ -176,6 +176,7 @@ The retrieval process is trivially correct as long as
 \item[---] The batch bucket bottom has not changed for the neighbourhoods that are on the dream path. 
 \end{enumerate}
 
+\subsubsection{Deletion}
 We are now turning to access revocation. Deletion of content is equivalent to revoking all access.
 
 
@@ -185,13 +186,15 @@ As long as there is a single honest neighbourhood walked by the protocol, such t
 
 To prove this, first let us assume that there is a bucket designated by some $p_i$ on the dream path such that the $\overline{\Huge\chi}$ for the bucket changed since uploader constructed the dream. When the participating node in the neighbourhood designated by $p_i$ calculates the OTP update function, the result will be completely different and the dream chain will not terminate. 
 
-\subsection{Security}
+\subsubsection{Privacy}
 
 
 The reference does not leak either the step-count or any other information about the neighbourhoods touched. Neither do the participants in the protocol know which position they are at in the chain or anything  about the other neighbourhoods except for the following one to which they are push-syncing their chunk.
 
 The construction is deniable.
 Beside our sensitive content $C$, take $A$, any uncontroversial content chunk. When producing $C'$, the owner also produces  $A'=A\xor k$ and upload it. When asked about $k$, producing $A$ makes the denial of other content including $C$ more plausible. 
+
+\subsubsection{Resolution of attacks}
 
 
 A powerful adversary can infiltrate every neighborhood of Swarm and archive all information that has ever been uploaded (without being able to decipher it surely) and keep logs of what has been uploaded in what order, which would allow it to serve up deleted content on demand. But there is a huge price on such indiscriminate archiving of all Swarm's content and that is the only way to reliably defeat the dream construction.
@@ -205,12 +208,12 @@ However, if even  a single neighbourhood on the dream path is honest they respec
 
 Thus for  a breach of access to happen, all neighbourhoods must be malicious.
 In our security model a neighbourhood is malicious with  uniform and independent probability.  For an overall infiltration rate of 1 out of $k$, the chance of all neighbourhoods on a given random dream path being malicious is $k^{-n}$. For a security requirement of success rate of $\sigma$ "nines", i.e error rate less than $10^{-\sigma}$,  we can formulate the requirement as
-
+%
 \begin{equation}
     \frac{1}{k^n}< \frac{1}{10^{-\sigma}}
 \end{equation}
 Now, expressing $k$ as $10^\kappa$, taking the logarithm of both sides and multiply by $-1$, we get
-
+%
 \begin{equation}
     n > \frac{\sigma}{\kappa}
 \end{equation}

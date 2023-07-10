@@ -1,7 +1,7 @@
 \subsection{Crypto \statusgreen}\label{spec:format:crypto}
 
 This section describes the crypto primitives used throughout the specification. They  are exposed as  buzz built-in  functions.
-The modules are hashing, random number generation, key derivation, symmetric and asymmetric encryption (ECIES), mining (i.e., finding a nonce), elliptic curve key generation, digital signature (ECDSA), Diffie--Hellman shared secret (ECDH) and Cauchy-Reed-Solomon  (CRS) erasure coding.
+The modules are hashing, random number generation, key derivation, symmetric and asymmetric encryption (ECIES), mining (i.e., finding a nonce), elliptic curve key generation, digital signature (ECDSA), Diffie--Hellman shared secret (ECDH) and Reed-Solomon  (RS) erasure coding.
 
 Some of the built-in crypto primitives (notably, sha3 hash, and ECDSA ecrecover) are replicating crypto functionality of the Ethereum VM. These are defined here with the help of ethereum api calls to a smart contract. This smart contract just implements the primitives of "buzz" and only has read methods.
 
@@ -139,7 +139,7 @@ as
         from 12
 
 define function generate 
-p    ?using entropy
+    ?using entropy
 as
     @entropy = random segment if no @entropy
     http/get "signer/generate?entropy=" append @entropy 

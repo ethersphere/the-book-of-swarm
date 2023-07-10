@@ -1408,14 +1408,14 @@ We can guess a start level as the position of the first non-zero bit of $\mathit
 
 \subsection{Real-time data exchange \statusyellow}\label{sec:feed-as-channel}
 
-Feeds can be used to represent a communication channel, i.e. the outgoing messages of a persona. Such a feed, called an \gloss{outbox feed} can be created to provide email-like communication or instant messaging, or even the two combined. For email-like asynchronicities, \gloss{epoch-based indexing} can be used while for instant messaging, it is best to use deterministic sequence indexing. 
-In group chat or group email, confidentiality is handled using an access control trie over the data structure, indexing each party's contribution to the thread. Communication clients can retrieve each group member's feed relating to a thread and merge their timelines for rendering. 
+Feeds can be used to represent a communication channel, i.e. the outgoing messages of a persona. This type of feed, called an \gloss{outbox feed} can be created to provide email-like communication or instant messaging, or even the two combined. For email-like asynchronicities, \gloss{epoch-based indexing} can be used, while deterministic sequence indexing is more suitable for instant messaging. 
+In group chat or group email, confidentiality is managed through an access control trie over the data structure, which indexes each party's contribution to the thread. Communication clients can retrieve the feeds of each group member relating to a particular thread and merge their timelines for rendering. 
 
-Even forums could be implemented with such an outbox mechanism, however, above a certain number of registered participants, aggregating all outboxes on the client side may become impractical and require index aggregators or other schemes to crowdsource combination of the data.
+Even forums could be implemented with such an outbox mechanism described above. However, as the number of registered participants increases, aggregating all outboxes on the client side may become impractical. In such cases, index aggregators or other schemes may be necessary to crowdsource the combination of the data.
 
 \subsubsection{Two-way private channels}
  
-Private two-party communication can also be implemented using outbox feeds, see Figure \ref{fig:feeds-as-channel}. The parameters of such feeds are set as part of an initial key exchange or registration protocol (see \ref{sec:pss-key-exchange}) which ensures that the parties consent on the indexing scheme as well as the encryption used. 
+Private two-party communication can also be implemented using outbox feeds, see Figure \ref{fig:feeds-as-channel}. The parameters of such feeds are established during the initial key exchange or registration protocol (see \ref{sec:pss-key-exchange}), ensuring that the parties consent on the indexing scheme as well as the encryption used. 
 
 
 \begin{figure}[htbp]
@@ -1426,17 +1426,17 @@ Private two-party communication can also be implemented using outbox feeds, see 
 \end{figure}
 
 
-The real-time series feed used for instant messaging ought to have an indexing scheme with deterministic continuations for at least a few updates ahead. This enables sending retrieve requests for future updates ahead of time, i.e. during or even prior to processing the previous messages. When such retrieve requests arrive at the nodes whose address is closest to the requested update address, the chunk will obviously not be able to be found as the other party will not have sent them yet. However, even these storer nodes are incentivised to keep retrieve requests alive until they expire (see the argument in \ref{sec:retrieval}). This means that up until the end of their time-to-live setting (30 seconds), requests will behave as subscriptions: the arrival of the update chunk triggers the delivery response to the open request as if it was the notification sent to the subscriber. This reduces the expected message latency down to less than twice the average time of one-way forwarding paths, see Figure \ref{fig:outbox-feed-latency}. 
+For real-time instant messaging using a series feed, it is important to have an indexing scheme that supports deterministic continuations for at least a few updates ahead. This enables sending retrieve requests for upcoming updates in advance, i.e. during or even prior to processing the previous messages. When these retrieve requests arrive at the nodes closest to the requested update address, it is expected that the chunk will not be available since the other party will not have sent them yet. However, even these storer nodes are incentivised to keep retrieve requests alive until they expire (as discussed in \ref{sec:retrieval}). This means that up until the end of their time-to-live setting (30 seconds), the requests will function as subscriptions: the arrival of the update chunk triggers the delivery response to the open request as if it was the notification sent to the subscriber. This reduces the expected message latency to less than twice the average time of one-way forwarding paths, see Figure \ref{fig:outbox-feed-latency}. 
 
 
 \begin{figure}[htbp]
 \includegraphics[width=\textwidth]{fig/outbox-feed-latency.pdf}  
 \centering
-\caption[Advance requests for future updates \statusgreen]{Advance requests for future updates. The diagram shows the time of a series of events during instant messaging between two parties A and B using outbox feeds. The columns designate the neighbourhood locations of the feed update addresses. Circles show the time of protocol messages arriving: colors indicate the origin of data, empty circles are retrieve requests, full circles are push sync deliveries arriving at the respective neighbourhood. Note that the outbox addresses are deterministic 3 messages ahead so retrieve requests can be sent before the update arrives.
+\caption[Advance requests for future updates \statusgreen]{Advance requests for future updates. The diagram shows the timeline of events during instant messaging between two parties A and B, using outbox feeds. The columns represent the neighbourhood locations of the feed update addresses. The circles show the time of protocol messages arriving: colors indicate the origin of data, empty circles are retrieve requests, and full circles are push-sync deliveries arriving at the respective neighbourhood. Note that the outbox addresses are deterministic 3 messages ahead, allowing retrieve requests to be sent before the corresponding updates arrive.
 
-Importantly, latency between one party sending a message $m$ and the other receiving it is shown as $\delta(m)$. Messages $A_3$ and $A_4$ arrive before $A_2$ which can be reported and repaired. If address predictability was only possible for 1 message ahead, both $B_2$ and $B_3$ would have much longer latencies.
+Importantly, the latency between one party sending a message $m$ and the other receiving it is shown as $\delta(m)$. Messages $A_3$ and $A_4$ arrive before $A_2$ which can be reported and repaired. If address predictability was only limited to 1 message ahead, both $B_2$ and $B_3$ would have much longer latencies.
 
-Also note that the latency of $B_2$ and $B_3$ are helped by advance requests:  the retrieve requests for $B_4$ and $B_5$ are sent upon receipt of $B_1$ and $B_2$ and arrive at their neighbourhood the same time as the messages $B_2$ and $B_3$ arrive at theirs, respectively. If address predictability was only 1 message ahead, this would also cause both $B_2$ and $B_3$ to have much longer latencies.}
+Also note that the latencies of $B_2$ and $B_3$ are helped by advance requests:  the retrieve requests for $B_4$ and $B_5$ are sent upon receipt of $B_1$ and $B_2$ and arrive at their neighbourhood at the same time as the messages $B_2$ and $B_3$ arrive at theirs, respectively. If address predictability was limited to 1 message ahead, this would negatively impact the latencies of $B_2$ and $B_3$.}
 \label{fig:outbox-feed-latency}
 \end{figure}
 
@@ -1446,7 +1446,7 @@ Also note that the latency of $B_2$ and $B_3$ are helped by advance requests:  t
 A key management solution called \gloss{double ratchet} is the de-facto industry standard used for encryption in instant messaging.
 It is customary to use the \gloss{extended triple Diffie--Hellmann key exchange} (\gloss{X3DH}) to establish the initial parameters for the double-ratchet key chains (see \ref{sec:pss-key-exchange}).
 
-Double-ratchet combines a ratchet based on a continuous key-agreement protocol with a ratchet based on key-derivation function \cite{perrin2016double}. This scheme can be generalised \cite{alwen2019double} and understood as a combination of well-understood primitives and shown to provide  (1) forward secrecy, (2) backward secrecy,%
+The double-ratchet approach combines a ratchet based on a continuous key-agreement protocol with a ratchet based on a key-derivation function \cite{perrin2016double}. This scheme can be generalised \cite{alwen2019double} and understood as a combination of well-understood primitives. It has been demonstrated to provide  (1) forward secrecy, (2) backward secrecy,%
 %
 \footnote{Also known as future secrecy or post-compromise security.}
 %
@@ -1460,10 +1460,10 @@ and (3) immediate decryption and message loss resilience.
 \label{fig:double-ratchet-for-feeds}
 \end{figure}
 
-On top of the confidentiality due end-to-end encryption, Swarm offers further resistance to attacks. Due to forwarding Kademlia, the sender is ambiguous and deniable. Due to normal push-sync and pull-sync traffic, messages are also obfuscated. To make it really hard for an attacker, the sequence of indexes can also provide \gloss{future secrecy} if we add more key chains to the double-ratchet machinery. Beside root, sending and receiving encryption key chains, we would need to introduce two more: outgoing and incoming \gloss{outbox index key chains}, see Figure \ref{fig:double-ratchet-for-feeds}. As a result of this measure the underlying communication channel is obfuscated, i.e. intercepting an outbox update chunk and knowing its index, reveals nothing about previous or subsequent outbox update indexes. This makes subsequent messages prohibitively difficult and costly to monitor or intercept.
+In addition to the confidentiality due end-to-end encryption, Swarm offers further resistance against attacks. Due to the forwarding Kademlia protocol, the sender can remain ambiguous and deniable. Furthermore, the normal push-sync and pull-sync traffic helps to obfuscate messages. To make it really hard for an attacker, the sequence of indexes can also provide \gloss{future secrecy} if we add more key chains to the double-ratchet machinery. Beside root, sending, and receiving encryption key chains, two additional keys are introduced: outgoing and incoming \gloss{outbox index key chains}, see Figure \ref{fig:double-ratchet-for-feeds}. As a result of this measure, the underlying communication channel is obfuscated, i.e. intercepting an outbox update chunk and knowing its index reveals nothing about previous or subsequent outbox update indexes. This makes subsequent messages prohibitively difficult and costly to monitor or intercept.
 
-In \ref{sec:feed-integrity}, we used factoring in the payload hash into the indexing scheme to achieve non-mergeability of chains (unambiguous history). Inspired by this, we propose also to factor in the payload hash into the subsequent feed update index. This results in the additional property called \gloss{recover security},  which, intuitively, ensures that once an adversary manages to forge a message from A to B, then no future message from A to B will be accepted by B.
-This is guaranteed if the authenticity of A's  messages to B affects the subsequent \gloss{feed index}. If there is a mismatch (one of the messages was forged), messages will be looked up at the wrong address and therefore the communication channel will be abandoned and a new one is initiated. Such a communication channel represents a completely confidential zero-leak solution for real-time messaging.
+In \ref{sec:feed-integrity}, we used factoring in the payload hash into the indexing scheme to achieve non-mergeability of chains (unambiguous history). Inspired by this, we propose to also factor in the payload hash into the subsequent feed update index. This introduces an additional property called \gloss{recover security},  which, intuitively, ensures that once an adversary manages to forge a message from A to B, then no future message from A to B will be accepted by B.
+This is guaranteed if the authenticity of A's  messages to B affects the subsequent \gloss{feed index}. If there is a mismatch (indicating a forged message), the messages will be looked up at the wrong address, leading to the abandonment of the communication channel and the initiation of a new one. By implementing this approach, the communication channel achieves complete confidentiality and becomes a zero-leak solution for real-time messaging.
 
 
 
@@ -1481,28 +1481,28 @@ Functionalities of and motivation for its existence are playfully captured by al
 %
 \footnote{Whisper is a gossip-based dark messaging system, which is no longer developed. It never saw wide adoption due to its (obvious) lack of scalability. Whisper, alongside Swarm and the Ethereum blockchain, was the communication component of the holy trinity, the basis for Ethereum's original vision of web3.}
 %
-Pss piggy-backs on Swarm's \gloss{distributed storage} for chunks and hence inherits their full incentivisation for relaying and persistence. At the same time it borrows from Whisper's crypto, envelope structure and API.
-\item \emph{pss! instruction to hush/whisper} -- Evokes an effort to not disclose information to 3rd parties, which is found exactly in the tagline for pss: truly zero-leak messaging where beside anonymity and confidentiality, the very act of messaging is also undetectable.
-\item  \emph{pub/sub system} -- API allows publishing and subscription to a topic.
+Pss piggybacks on Swarm's \gloss{distributed storage} for chunks and hence inherits their full incentivisation for relaying and persistence. At the same time it borrows from Whisper's crypto, envelope structure and API.
+\item \emph{pss! instruction to hush/whisper} -- Evokes an effort to not disclose information to third parties, which is found exactly in the tagline for pss: truly zero-leak messaging where beside anonymity and confidentiality, the very act of messaging is also undetectable.
+\item  \emph{pub/sub system} -- The API allows publishing and subscription to a topic.
 \end{itemize}
 
-First, in \ref{sec:trojan}, we introduce Trojan Chunks, i.e. messages to storers that masquerade as chunks whose content address happens to fall in the proximity of their intended recipient. 
-\ref{sec:pss-key-exchange} discusses the use of pss to send a contact message to open a real time communication channel.
-In \ref{sec:addressed-envelopes}, we explore the mining of feed identifiers to target a neighbourhood with the address of a single owner chunk and present the construct of an addressed envelope. Finally, building on Trojan chunks and addressed envelopes, \ref{sec:notification-requests} introduces update notification requests.
+First, in \ref{sec:trojan}, we introduce Trojan Chunks, which are messages sent to storers that masquerade as chunks whose content address happens to fall in the proximity of their intended recipient. 
+Section \ref{sec:pss-key-exchange} discusses the use of pss to send contact messages to establish real-time communication channels.
+In \ref{sec:addressed-envelopes}, we explore the mining of feed identifiers to target a specific neighbourhood with the address of a single owner chunk and present the construct of an addressed envelope. Finally, building on Trojan chunks and addressed envelopes, \ref{sec:notification-requests} introduces update notification requests.
 
 \subsection{Trojan chunks\statusgreen}\label{sec:trojan}
 
-Cutting edge systems promising private messaging often struggle to offer truly zero-leak communication \cite{kwon2016riffle}. While linking the sender and recipient is cryptographically proven to be impossible, resistance to traffic analysis is harder to achieve. Having sufficiently large anonymity sets requires high volumes available at all times. In the absence of mass adoption, guaranteeing high message rate in dedicated messaging networks necessitates constant fake traffic. With Swarm, the opportunity arises to disguise messages as chunk traffic and thereby obfuscate even the act of messaging itself. 
+Cutting-edge systems that promise private messaging often struggle to offer truly zero-leak communication \cite{kwon2016riffle}. While linking the sender and recipient is cryptographically proven to be impossible, resistance to traffic analysis is harder to achieve. Maintaining sufficiently large anonymity sets requires high volumes available at all times. In the absence of mass adoption, guaranteeing high message rate in dedicated messaging networks necessitates constant fake traffic. However, with Swarm, there is an opportunity to disguise messages as chunk traffic, effectively obfuscating the act of messaging itself. 
 
-We define a \gloss{Trojan chunk} as a content addressed chunk the content of which has a fixed internal structure, see Figure \ref{fig:trojan-chunk}:
+We define a \gloss{Trojan chunk} as a content-addressed chunk with a fixed internal content structure (see Figure \ref{fig:trojan-chunk}):
 
 \begin{enumerate}
-    \item \emph{span} -- 8 byte little-endian uint64 representation of the length of the message  
-    \item \emph{nonce} -- 32 byte arbitrary nonce 
-    \item \emph{Trojan message} -- 4064 byte asymmetrically encrypted message ciphertext with underlying plaintext composed of
+    \item \emph{span} -- 8-byte little-endian uint64 representation of the length of the message  
+    \item \emph{nonce} -- 32-byte arbitrary nonce 
+    \item \emph{Trojan message} -- 4064-byte asymmetrically encrypted message ciphertext with underlying plaintext composed of
     \begin{enumerate}
-        \item \emph{length} -- 2 byte little-endian encoding of the length of the message in bytes $0\leq l\leq 4030$,
-        \item \emph{topic} -- $32$ byte obfuscated topic id   
+        \item \emph{length} -- 2-byte little-endian encoding of the length of the message in bytes $0\leq l\leq 4030$,
+        \item \emph{topic} -- $32$ byte obfuscated topic ID   
         \item \emph{payload} -- $m$ bytes of a message 
         \item \emph{padding} -- $4030-m$ random bytes.
     \end{enumerate}
@@ -1522,52 +1522,48 @@ We define a \gloss{Trojan chunk} as a content addressed chunk the content of whi
 \label{fig:trojan-chunk}
 \end{figure}
 
-Knowing the public key of the recipient, the sender wraps the message in a trojan message (i.e. prefixing it with length, then padding it to 4030 bytes) then encrypts it using the recipient's public key to obtain the ciphertext payload of the trojan chunk by asymmetric encryption. Then the sender finds a random nonce such that when it is prepended to the payload, the chunk hashes to an address that starts with a \gloss{destination target} prefix. The destination target is a bit sequence that represents a specific neighbourhood in the address space. If the target is a partial address derived as a prefix of the recipient overlay address, matching the target means that the chunk falls in the neighbourhood of the recipient. If only the public key is known, it is assumed that it is the bzz account of the recipient, i.e. their overlay address can be calculated from it%
+Knowing the public key of the recipient, the sender follows a specific process to send a trojan message. First, the message is wrapped in a trojan message format by prefixing it with length information and padding it to 4030 bytes. Then, the sender encrypts it using the recipient's public key to obtain the ciphertext payload of the trojan chunk by asymmetric encryption. The sender then generates a random nonce such that when it is prepended to the payload, the chunk hashes to an address that starts with a \gloss{destination target} prefix. The destination target is a bit sequence that represents a specific neighbourhood in the address space. If the target is a partial address derived as a prefix of the recipient's overlay address, matching the target means that the chunk falls in the neighbourhood of the recipient. If only the public key is known, it is assumed that it is the bzz account of the recipient, i.e. their overlay address can be calculated from it%
 %
 \footnote{Alternative overlays can be associated with a public key, and several public keys can be listened on by a node at a particular address.}
 %
-(see \ref{sec:overlay-addressing}). The sender then uploads the resulting chunk to Swarm with postage stamps of their choice which then ends up being synced to the recipient address' neighbourhood. If the recipient node is online they receive the chunk for certain provided the bit length of the matching target is greater than the recipient's neighbourhood depth. In practice, targets should be $n+c$ bits long where $n$ is the estimated average depth in swarm and $c$ is a small integer. 
+(see \ref{sec:overlay-addressing}). The sender then uploads the resulting chunk to Swarm with postage stamps of their choice which then ends up being synced to the recipient address' neighbourhood. If the recipient node is online and the bit length of the matching target is greater than the recipient's neighbourhood depth, they will receive the chunk. In practice, targets should be $n+c$ bits long, where $n$ is the estimated average depth in Swarm and $c$ is a small integer. 
 
 \subsubsection{Receiving Trojan messages}
 
-The recipient only knows that a chunk is a pss message if and when they successfully opened the Trojan message with the private key corresponding to the public key that they advertise as their resident key (see \ref{sec:pss-key-exchange}) and do an integrity check/topic matching. Nodes that want to receive such Trojan Messages will keep trying to open all messages that they are closest to. Forwarding nodes (or anyone else apart from sender and recipient) have no way to distinguish between a random encrypted chunk and a trojan message, which means that communication is perfectly obfuscated as generic chunk traffic.
+The recipient only knows that a chunk is a pss message once they have successfully opened the Trojan message with the private key corresponding to the public key that they advertise as their resident key (see \ref{sec:pss-key-exchange}) and perform an integrity check/topic matching. Nodes that want to receive such Trojan Messages will continue attempting to decrypt all messages that they are closest to. Forwarding nodes (or anyone else apart from sender and recipient) have no way to distinguish between a random encrypted chunk and a Trojan message, which means that communication is perfectly obfuscated as generic chunk traffic.
 
-After the recipient has opened the envelope using asymmetric decryption, there is a combined step of integrity check and topic matching. Knowing the length of the payload (from the first 2 bytes of the message), the recipient takes the payload slice and calculates the Keccak256 hash of it. Now for each topic the client has a subscription to, it then hashes the payload hash together with the topic. If the resulting segment xor-ed with the topic matches the obfuscated topic id in the message then the message is indeed meant as a message with the said topic and the registered handler is called with the payload as argument.
+After the recipient has opened the envelope using asymmetric decryption, they proceed with a combined step of integrity check and topic matching step. Knowing the length of the payload (from the first 2 bytes of the message), the recipient takes the payload slice and calculates the Keccak256 hash of it. For each topic the client is subscribed to, the recipient then hashes the payload hash together with the topic. If the resulting segment xor-ed with the topic matches the obfuscated topic ID in the message, then the message is indeed meant as a message with the said topic and the registered handler is called with the payload as argument.
 
 \subsubsection{Mailboxing for asynchronous delivery}
 
-If the recipient is not online the chunk will prevail as any other chunk would, depending on the postage stamp it has. Whenever the recipient node comes online, it pull-syncs the chunks from the neighbourhood closest to it, amongst them all the Trojan chunks, and amongst them their own as yet unreceived messages. In other words, through Trojan messages pss automatically provides asynchronous \emph{mailboxing} functionality, i.e. 
-without any further action needed from the sender, even if they are offline at the time that their correspondent has sent them, undelivered messages are preserved and available to the recipient whenever they come online. The duration of mailboxing is controlled with postage stamps in exactly the same way as the storage of chunks, in fact, it is totally indistinguishable.
+If the recipient is not online, the Trojan chunk will prevail as any other chunk would, depending on the postage stamp it has. Whenever the recipient node comes online, it pull-syncs the chunks from the closest neighbourhood, including all Trojan chunks and their own unreceived messages. In other words, through Trojan messages, pss automatically provides asynchronous \emph{mailboxing} functionality, allowing undelivered messages to be preserved and accessible to the recipient when they come online without any additional action needed from the sender. The duration of mailboxing is controlled with postage stamps, just like the storage of chunks, in fact, it is indistinguishable from regular chuck storage.
 
 \subsubsection{Mining for proximity}
 
-The process of finding a hash close to the recipient address is analogous to mining blocks on the blockchain. The nonce segment in a Trojan chunk also plays exactly the same role as a block nonce: it provides sufficient entropy to guarantee a solution. The difficulty of mining corresponds to the length of the destination target: The minimum proximity order required to ensure that the recipient will receive the message needs to be higher than the neighbourhood depth of the recipient%
+The process of finding a hash close to the recipient address is analogous to mining blocks on the blockchain. The nonce segment in a Trojan chunk also serves exactly the same purpose as a block nonce: it provides sufficient entropy to guarantee a solution. The difficulty of mining corresponds to the length of the destination target: The minimum proximity order required to ensure that the recipient will receive the message needs to be higher than the neighbourhood depth of the recipient%
 %
 \footnote{It makes sense to use the postage batch uniformity depth (see \ref{sec:postage-stamps}) as a heuristic for the target proximity order when mining a Trojan chunk. This is available as a read-only call to the postage stamp smart contract.}
 %
-when it comes online, so it is logarithmic in the number of nodes in the network. The expected number of nonces that need to be tried per Trojan message before an appropriate content address is found is exponential in the difficulty, and therefore equal to the number of nodes in the network. As the expected number of computational cycles needed to find the nonce equals the network size, in practice, mining a Trojan will never be prohibitively expensive or slow even for a single node. A small delay in the second range is expected only in a network of a billion nodes and even that is acceptable given that Trojan messages are meant to be used only for one-off instances such as initiations of a channel. All subsequent real-time exchange will happen using the previously described bidirectional outbox model using single owner chunks.
+when it comes online, so it is logarithmic in the number of nodes in the network. The expected number of nonces that need to be tried per Trojan message before an appropriate content address is found is exponential in the difficulty, and therefore equal to the number of nodes in the network. In practice, mining a Trojan chunk will never be prohibitively expensive or slow even for a single node, as the expected number of computational cycles needed to find the nonce is equal to the network size. Only a small delay in the second range may occur in a network of a billion nodes, and even that is acceptable given that Trojan messages are meant to be used only for one-off instances such as initiations of a channel. Subsequent real-time exchanges will happen using the previously described bidirectional outbox model using single owner chunks.
 
 
 \subsubsection{Anonymous mailbox}
 
-Asynchronous access to pss messages is guaranteed if the postage stamp has not yet expired. The receiver only needs to create a node with an overlay address corresponding to the destination target advertised to be the recipient's resident address.    
-
-One can simply create an anonymous mailbox. An anonymous mailbox can receive pss messages on behalf of a client and then publish those on a separate, private feed so that the intended recipient can read them whenever they come back online.
+Asynchronous access to pss messages is guaranteed as long as the postage stamp has not expired. The receiver only needs to create a node with an overlay address corresponding to the destination target advertised to be the recipient's resident address. This allows for the creation of an anonymous mailbox, which can receive pss messages on behalf of a client and then publish them on a separate, private feed. The intended recipient can then read the messages whenever they come back online.
 
 \subsubsection{Register for aggregate indexing}
 
-As mentioned in \ref{sec:indexing-schemes}, aggregate indexing services help nodes in monitoring sporadic feeds. For instance, a forum indexer aggregates the contribution feeds of registered members. For public forums, off-chain registration is also possible and can be achieved by simply sending a pss message to the aggregator. 
+As discussed in \ref{sec:indexing-schemes}, aggregate indexing services help nodes in monitoring sporadic feeds. For instance, a forum indexer can aggregate the contribution feeds of registered members, enabling the efficient tracking and access to forum updates. In the case of public forums, off-chain registration is a viable option that allows users to register without directly interacting with the blockchain. This can be achieved by simply sending a pss message to the aggregator. 
 
 
 \subsection{Initial contact for key exchange\statusgreen}\label{sec:pss-key-exchange}
 
 
-Encrypted communication requires a handshake to agree on the initial parameters that are used as inputs to a symmetric key generation scheme. The \gloss{extended triple Diffie--Hellmann key exchange} (\gloss{X3DH}) is one such protocol \cite{marlinspike2016x3dh}, and is used to establish the initial parameters for a post-handshake communication protocol such as the \emph{double-ratchet scheme} discussed earlier in the section on feeds (see \ref{sec:feed-as-channel}). 
-In what follows, we describe how the X3DH protocol can be implemented with pss in a serverless setting. 
+Encrypted communication requires a handshake protocol to establish the initial parameters that are used as inputs to a symmetric key generation scheme. One such protocol is the \gloss{extended triple Diffie--Hellmann key exchange} (\gloss{X3DH}) is one such protocol \cite{marlinspike2016x3dh}.  X3DH is used to establish the initial parameters for a post-handshake communication protocol, like the \emph{double-ratchet scheme} discussed earlier in the section on feeds (see \ref{sec:feed-as-channel}). 
 
-Swarm's X3DH uses the same primitives as are customary in Ethereum, i.e. secp256k elliptic curve, Keccak256 hash, and a 64-byte encoding for EC public keys. 
+To implement the X3DH protocol with pss in a serverless setting. Swarm utilises the same primitives as are customary in Ethereum, i.e. secp256k elliptic curve, Keccak256 hash, and a 64-byte encoding for EC public keys. 
 
-The Swarm X3DH protocol is set out to allow two parties to establish a shared secret that forms the input used to determine the encryption keys which will be used during post-handshake two-way messaging. The \emph{initiator} is the party that initiates a two-way communication with the \emph{responder}. The responder is supposed to advertise the information necessary for parties not previously known to the responder to be able to initiate contact. Zero leak communication can be achieved by first performing an X3DH to establish the seed keys used by the double-ratchet protocol for the encryption of data, as well as the feed indexing methodology used. This will enable the responder to retrieve the updates of the outbox feed.
+The Swarm X3DH protocol facilitates the establishment of a shared secret betweej two parties, which serves as the input used to determine the encryption keys used during two-way messaging after the handshake. The \emph{initiator} is the party that initiates a two-way communication with the \emph{responder}. The responder is supposed to advertise the information necessary to allow parties previously unknown to the responder to initiate contact. Zero-leak communication can be achieved by first performing an X3DH. This protocol is used to establish the seed keys used by the double-ratchet protocol for the encrypting data, as well as the feed indexing methodology used. This will enable the responder to retrieve the updates of the outbox feed.
 
 X3DH uses the following keys:%
 %
@@ -1590,7 +1586,7 @@ X3DH uses the following keys:%
 \end{figure}
 
 
-A \gloss{pre-key bundle} consists of all information the initiator needs to know about responder. However, instead of being stored on (usually 3rd-party) servers, this information is instead stored in Swarm. For human-friendly identity management, ENS can be optionally used to provide familiar username based identities. The owner of the ENS resolver represents the long-term public identity key of this persona and is considered authenticated. The long-term identity address can be used to construct an epoch-based feed with a topic id indicating it provides the pre-key bundle for would be correspondents. When communication is initiated with a new identity, the latest update from the feed is retrieved by the initiator, containing the current \emph{resident key} (aka \emph{signed pre-key}) and current \emph{addresses of residence}, i.e. (potentially multiple) overlay destination targets where the persona is expecting she may receive pss messages. The signature in the feed update chunk signs both the resident key (cf. signed pre-key) and the destination targets. The public key that is recovered from this signature gives the long-term identity public key, see Figure \ref{fig:prekey-bundle-feed-update}.
+A \gloss{pre-key bundle} consists of all information the initiator needs to know about responder. However, rather than storing this information on external servers, it is instead stored in Swarm. For human-friendly identity management, ENS can be optionally used to provide familiar username-based identities. The owner of the ENS resolver represents the authenticated long-term public identity key for the persona. By utilising the long-term identity address, an epoch-based feed with a topic ID can be created, indicating that it provides the pre-key bundle for potential correspondents. When initiating communication with a new identity, the initiator retrieves the latest update from the feed, which contains the current \emph{resident key} (aka \emph{signed pre-key}) and current \emph{addresses of residence}, i.e. the (potentially multiple) overlay destination targets where the persona expects to receive pss messages. The signature within the feed update chunk signs both the resident key (cf. signed pre-key) and the destination targets. The public key that is recovered from this signature gives the long-term identity public key, see Figure \ref{fig:prekey-bundle-feed-update}.
 
 
 \begin{figure}[htbp]
@@ -1601,7 +1597,7 @@ A \gloss{pre-key bundle} consists of all information the initiator needs to know
 \end{figure}
 
 
-In order to invite a responder to an outbox-feed based private communication channel, the initiator first looks up the responder's public pre-key bundle feed and sends an initial message to the responder (see Figure \ref{fig:x3dh-initial-message}) in which the intent to communicate is indicated. She then shares the parameters required to initiate the encrypted conversation. This consists of the public key of its long-term identity, as well as the public key of the ephemeral key-pair which has been generated just for that conversation. These details are delivered to the potential responder by sending a Trojan pss message addressed to the responder's current address of residence which is also being advertised in their pre-key bundle feed. 
+In order to invite a responder to an outbox-feed based private communication channel, the initiator first looks up the responder's public pre-key bundle feed and sends an initial message to the responder (see Figure \ref{fig:x3dh-initial-message}), indicating their intent to communicate. She then shares the parameters required to initiate the encrypted conversation, including the public key of her long-term identity and the public key of the ephemeral key-pair generated specifically for that conversation. These details are delivered to the potential responder by sending a Trojan pss message addressed to the responder's current address of residence, which is also advertised in their pre-key bundle feed. 
 
 \begin{figure}[htbp]
    \centering
@@ -1610,18 +1606,18 @@ In order to invite a responder to an outbox-feed based private communication cha
    \label{fig:x3dh}
 \end{figure}
 
-After the responder receives this information, both parties have all the ingredients needed to generate the triple Diffie-Hellmann shared secret, see Figure \ref{fig:x3dh}.%
+After the responder receives this information, both parties have all the ingredients needed to generate the triple Diffie-Hellmann shared secret (see Figure \ref{fig:x3dh}).%
 %
 \footnote{If the X3DH does not use one-time pre-keys, the initial message can in theory be re-sent by a third party and lead the responder to assume genuine repeated requests. Protocol replay attacks like this are eliminated if the post-handshake protocol adds random key material coming from the responder. 
-But the initial Trojan message can also be required to contain a unique identifier, e.g. the nonce used for mining the chunk. Reusing the id is not possible since it leads to the same chunk.}
+But the initial Trojan message can also be required to contain a unique identifier, e.g. the nonce used for mining the chunk. Reusing the ID is not possible since it leads to the same chunk.}
 %
-This shared secret constitutes the seed key for the double-ratchet continuous key agreement protocol as used in the signal protocol. The double-ratchet scheme provides forward secrecy and post-compromise security to the end-to-end encryption. By applying separate key-chains for the outbox feed's indexing scheme, additional \gloss{recover security}, i.e. resilience to message insertion attack, can be achieved. Most importantly, however, by adding forward and backward secrecy to outbox addresses, the communication channel is obfuscated, which renders sequential message interception contingent on the same security assumptions as encryption and therefore eliminates the only known attack surface for double-ratchet encryption. The obfuscation and deniability of the channel based on outbox feeds, together with the initial X3DH message being disguised indistingushable as a chunk warrants designating this as  zero-leak communication.
+This shared secret constitutes the seed key for the double-ratchet continuous key agreement protocol as used in the signal protocol. The double-ratchet scheme ensures forward secrecy and post-compromise security to the end-to-end encryption. By applying separate key-chains for the outbox feed's indexing scheme, additional \gloss{recover security}, i.e. resilience to message insertion attack, can be achieved. Most importantly, however, adding forward and backward secrecy to outbox addresses, obfuscates the communication channel, which renders sequential message interception contingent on the same security assumptions as encryption. This eliminates the only known attack surface for double-ratchet encryption. The obfuscation and deniability of the channel based on outbox feeds, together with the initial X3DH message being disguised, indistinguishable from a regular chunk, warrants classifying this communication approach as zero-leak communication.
 
 \subsection{Addressed envelopes\statusgreen}\label{sec:addressed-envelopes}
 
 \subsubsection{Mining single owner chunk addresses}
 
-The question immediately arises whether it makes sense to somehow mine single owner chunks. Since the address in this case is the hash of a 32 byte identifier and a 20 byte account address, the id provides sufficient entropy to mine addresses even if the owner account is fixed. So for a particular account, if we find an id such that the resulting single owner chunk address is close to a target overlay address, the chunk can be used as a message in a similar way to Trojan chunks. Importantly, however, since the address can be mined before the chunk content is associated with it, this construct can serve as an \gloss{addressed envelope}.
+The question immediately arises whether it is feasible to mine single owner chunks. Since the address in this case is the hash of a 32-byte identifier and a 20-byte account address, the ID provides sufficient entropy to mine addresses even if the owner account is fixed. So for a particular account, if we discover an ID such that the resulting single owner chunk address is close to a target overlay address, the chunk can be used as a message, similar to Trojan chunks. Importantly, however, since the address can be mined before the chunk content is associated with it, this construct can serve as an \gloss{addressed envelope}.
 
 Let us make explicit the roles relevant to this construct:
 
@@ -1630,32 +1626,32 @@ Let us make explicit the roles relevant to this construct:
 \item \emph{poster} ($P$) - puts the content into the envelope and posts it as a valid single owner chunk to Swarm.
 \item \emph{owner} ($O$) - possesses the private key to the account part of the address and can thus sign off on the association of the payload to the identifier. This effectively decides on the contents of the envelope.
 \item \emph{target} ($T$) - the constraint for mining: a bit sequence that must form the prefix of the mined address. It represents a neighbourhood in the overlay address space where the envelope will be sent. The length of the target sequence corresponds to the difficulty for mining. The longer this target is, the smaller the neighbourhood that the envelope will be able to reach.
-\item \emph{recipient} ($R$) - the party whose overlay address has the target sequence as its prefix and therefore the destination of the message
+\item \emph{recipient} ($R$) - the party whose overlay address has the target sequence as its prefix and therefore the destination of the message.
 \end{itemize}
 
-The envelope can be perceived as open: since the poster is also the owner of the response single owner chunk, they are able to control what content is put into the chunk. By constructing such an envelope, the issuer effectively allows the poster to send an arbitrary message to the target without the computation requirement needed to mine the chunk. See Figure \ref{fig:addressed-envelope-events}. 
+The envelope can be perceived as open: since the poster is also the owner of the response single owner chunk, they are able to control what content is placed into the chunk. By constructing such an envelope, the issuer effectively allows the poster to send an arbitrary message to the target without the need for computational resources to mine the chunk. See Figure \ref{fig:addressed-envelope-events}. 
 
 
 \begin{figure}[htbp]
    \centering
    \includegraphics[width=0.75\textwidth]{fig/prepaid-addressed-envelopes-events.pdf}
-   \caption[Stamped addressed envelopes timeline of events \statusgreen]{Stamped addressed envelopes timeline of events. Issuer $I$ creates the envelope encrypted for $P$ with an identifier such that $P$ as the single owner of the chunk, produces an address that falls in the recipient $R$'s neighbourhood. As a result (only) $P$ can fill the envelope with arbitrary content and then use simple push-syncing to post it to $R$.}
+   \caption[Stamped addressed envelope's timeline of events \statusgreen]{Stamped addressed envelopes timeline of events. Issuer $I$ creates the envelope encrypted for $P$ with an identifier such that $P$ as the single owner of the chunk, produces an address that falls in the recipient $R$'s neighbourhood. As a result, (only) $P$ can fill the envelope with arbitrary content and then use simple push-syncing to post it to $R$.}
    \label{fig:addressed-envelope-events}
 \end{figure}
 
-All the poster needs to do when they wish to send a message to the recipient is to create a Trojan message and sign it against the identifier using the private key of the same account the issuer used as an input when they mined the address. If they do this, the chunk will be valid. See Figure \ref{fig:addressed-envelope}.
+When the poster wants to send a message to the recipient, they simply need to create a Trojan message and sign it against the identifier using the private key of the same account that the issuer used during the address mining process. By doing so, the resulting chunk will be valid. See Figure \ref{fig:addressed-envelope}.
 
 
 \begin{figure}[htbp]
    \centering
    \includegraphics[width=\textwidth]{fig/addressed-envelope.pdf}
-   \caption[Stamped addressed envelopes \statusgreen]{A stamped addressed envelope issued for $P$ and addressed to $R$ consists of an identifier which is mined so that when used to create a single owner chunk owned by $P$, it produces an address which falls within $R$'s neighbourhood. This allows $P$ to construct a message, sign it against the identifier and using the postage stamp, post it using the network's normal push-syncing to $R$ for free. }
+   \caption[Stamped addressed envelope's \statusgreen]{A stamped addressed envelope issued for $P$ and addressed to $R$ consists of an identifier which is mined so that when used to create a single owner chunk owned by $P$, it produces an address which falls within $R$'s neighbourhood. This allows $P$ to construct a message, sign it against the identifier and using the postage stamp, post it using the network's normal push-syncing to $R$ for free. }
    \label{fig:addressed-envelope}
 \end{figure}
 
 \subsubsection{Pre-paid postage}
 
-These chunks behave in the same way as normal Trojan messages, with their privacy properties being the same if not somewhat better since the issuer/recipient can associate a random public key with which the message is encrypted, or even use symmetric encryption. If a postage stamp is pre-paid for an address and given to someone to post later, they can use push-sync to send the chunk to the target without the poster needing to pay anything, the cost of this having already been covered by the \gloss{stamped addressed envelope}. Such a construct effectively implements \emph{addressed envelopes with pre-paid postage} and serves as a base layer solution for various high-level communication needs: 1) push notifications about an update to subscribers without any computational or financial postage burden on the sender 2) free contact vouchers 3) zero-delay direct message response.  
+These chunks exhibit the same behaviour as normal Trojan messages, maintaining their privacy properties, and in some cases, even improving them. The issuer/recipient can associate a random public key for encrypting the message or use symmetric encryption. If a postage stamp is pre-paid for an address and given to someone to post later, they can use push-sync to send the chunk to the target without the poster incurring any additional cost, as the postage has already been covered by the \gloss{stamped addressed envelope}. This construct effectively implements \emph{addressed envelopes with pre-paid postage} and serves as a base layer solution for various high-level communication needs, such as (1) push notifications to subscribers without any computational or financial postage burden on the sender, (2) free contact vouchers, and (3) zero-delay direct message response.  
 
 
 \subsubsection{Issuing a stamped addressed envelope}
@@ -1663,11 +1659,11 @@ These chunks behave in the same way as normal Trojan messages, with their privac
 Issuing a stamped addressed envelope involves the following process:
 
 \begin{enumerate}[noitemsep]
-\item \emph{assume} issuer $I$, prospective poster $P$, and prospective recipient $R$ with public keys $K_I, K_P, K_R$ and overlay addresses $A_I, A_P, A_R$.
-\item \emph{mine} -- $I$ finds a nonce $N_R$ such that when used as an identifier to create a \gloss{single owner chunk}, the  address of the chunk hashes to $H_R$ which is in the nearest neighbourhood of $A_R$.
+\item \emph{assume} -- issuer $I$, prospective poster $P$, and prospective recipient $R$ with public keys $K_I, K_P, K_R$ and overlay addresses $A_I, A_P, A_R$.
+\item \emph{mine} -- $I$ finds a nonce $N_R$ such that when used as an identifier to create a \gloss{single owner chunk}, the  address of the chunk hashes to $H_R$, which is in the nearest neighbourhood of $A_R$.
 \item \emph{pay postage} -- $I$ signs $H_R$ to produce a witness for an appropriate postage payment to produce stamp $PS_R$.
-\item \emph{encapsulate} -- package $N_R$ and $PS_R$ which represent the pre-paid envelope pre-addressed to recipient address and encrypt it with $K_P$ then wrap it as a Trojan chunk.
-\item \emph{mine} -- find a nonce $N_P$ such that the Trojan chunk hashes to $H_P$ which is in the nearest neighbourhood of $A_P$. 
+\item \emph{encapsulate} -- package $N_R$ and $PS_R$, which represent the pre-paid envelope pre-addressed to recipient address, and encrypt it with $K_P$ then wrap it as a Trojan chunk.
+\item \emph{mine} -- find a nonce $N_P$ such that the Trojan chunk hashes to $H_P$, which is in the nearest neighbourhood of $A_P$. 
 \end{enumerate}
 
 
@@ -1675,7 +1671,7 @@ Issuing a stamped addressed envelope involves the following process:
 
 \subsubsection{Receiving a stamped addressed envelope}
 
-A prospective poster $P$ is assumed to receive a a Trojan message consisting of pre-paid envelope $E$. In order to open it, she carries out the following steps:
+A prospective poster $P$ is assumed to receive a Trojan message that consists of pre-paid envelope $E$. In order to open it, she carries out the following steps:
 
 \begin{enumerate}[noitemsep]
     \item \emph{decrypt} message with the private key belonging to $K_P$
@@ -1691,8 +1687,8 @@ When the poster wants to use the envelope to send an arbitrary message $M$ to $R
 \begin{enumerate}[noitemsep]
 \item \emph{encrypt} the message content $M$ with $K_R$ to create a payload and wrap it in Trojan message $T$
 \item \emph{hash} the encrypted Trojan message resulting in $H_T$
-\item \emph{sign} $H_T$ against the identifier $N_R$ using the private key belonging to $K_P$ producing signature $W$
-\item \emph{encapsulate} nonce $N_R$ as id, the signature $W$ and the Trojan message $T$ as the payload of a valid single owner chunk with address $H_R$
+\item \emph{sign} $H_T$ against the identifier $N_R$ using the private key that belongs to $K_P$, producing signature $W$
+\item \emph{encapsulate} nonce $N_R$ as ID, the signature $W$ and the Trojan message $T$ as the payload of a valid single owner chunk with address $H_R$
 \item \emph{post} the chunk with the valid stamp $PS_R$
 \end{enumerate}
 
@@ -1715,40 +1711,40 @@ This section elaborates on the concept of addressed envelopes and presents three
 
 \subsubsection{Direct notification from publisher}
 
-If an issuer wants a recipient to be notified of the next activity on a feed, she must construct a stamped addressed envelope embedded in a regular Trojan message and send it to the publisher, see Figure \ref{fig:direct-notification}. If the issuer is also the recipient, then the account that is used in the request and the one in the response envelope may be one and the same. 
+If an issuer wants to notify a recipient of the next activity on a feed, she must construct a stamped addressed envelope embedded in a regular Trojan message and send it to the publisher, as depicted in Figure \ref{fig:direct-notification}. If the issuer is also the recipient, the same account can be used in both the request and the response envelope. 
 
 
-When the feed owner publishes an update to her feed, the reference to the update chunk is put into the envelope and is sent to the recipient. More formally, the publisher creates a single owner chunk from the identifier representing the pre-addressed envelope and therefore, as the owner, signs off on the identifier associated with the feed update content as the payload of the single owner chunk. Right after this, the same publisher acting as the poster, push-syncs the chunk to the swarm. This construct is called \gloss{direct notification from publisher}. 
+When the feed owner publishes an update to her feed, the reference to the update chunk is put into the envelope and is sent to the recipient. More formally, the publisher creates a single owner chunk using the identifier of the pre-addressed envelope and signs off on the identifier associated with the feed update content as the payload of the single owner chunk. Subsequently, the publisher, now acting as the poster, push-syncs the chunk to the swarm. This process is known as \gloss{direct notification from publisher}. 
 
 \begin{figure}[htbp]
    \centering
    \includegraphics[width=\textwidth]{fig/direct-notification.pdf}
-   \caption[Direct notification request and response \statusgreen]{A direct notification request contains a reference to a feed and wraps a pre-paid envelope mined for $P$ (the publisher or a known distributor of the feed) and addressed to recipient $R$. The response is identical to the process used for generic stamped addressed envelopes and only differs in that the message is supposed to be the feed update or a reference to its content.}
+   \caption[Direct notification request and response \statusgreen]{A direct notification request contains a reference to a feed and wraps a pre-paid envelope that is mined for $P$ (the publisher or a known distributor of the feed) and addressed to recipient $R$. The response follows the same process as generic stamped addressed envelopes, with the only difference being that the message is expected to be the feed update or a reference to its content.}
    \label{fig:direct-notification}
 \end{figure}
 
-The Trojan message specifies in its topic that it is a notification and is encrypted using the public key. As the address is mined to match the recipient overlay address on a sufficiently long prefix, the message ends up push-synced to the recipient's neighbourhood. Whenever the recipient comes online and receives the chunk by push-sync it detects that it is intended as a message. It can be identified as such either by decrypting the chunk content successfully with the key for the address they had advertised, or in case that the recipient has issued the pre-addressed envelope themselves, simply by looking it up the against the record of the address they saved when it was issued.  See Figure \ref{fig:direct-notification-events} for the timeline of events.
+The Trojan message is encrypted using the public key and specifies in its topic that it is a notification. As the address is mined to match the recipient overlay address on a sufficiently long prefix, the message ends up push-synced to the recipient's neighbourhood. When the recipient comes online and receives the chunk by push-sync, she detects that it is intended as a message. This can be done either by successfully decrypting the chunk content using the key for the address they had advertised, or by looking it up against the record of the address they saved when it was issued, in the case where the recipient has issued the pre-addressed envelope themselves. See Figure \ref{fig:direct-notification-events} for the timeline of events.
 
 
 \begin{figure}[htbp]
    \centering
     \includegraphics[width=0.8\textwidth]{fig/direct-notification-events.pdf}
-   \caption[Direct notification from publisher timeline of events \statusgreen]{Direct notification from publisher timeline of events. Issuer $I$ constructs a prepaid envelope for the publisher or a known distributor of the feed $P/F$ and addressed to recipient $R$. Together with a feed topic $I$, it is sent to $P/F$ wrapped in a pss trojan message. $P/F$ receives it and stores the request. When they publish the update, they wrap it in the envelope, i.e. sign the identifier received from $I$ against the feed update notification message and post it as a chunk, which $R$ will receive and hence, be notified of the feed update. }
+   \caption[Direct notification from publisher timeline of events \statusgreen]{Direct notification from publisher timeline of events. Issuer $I$ constructs a prepaid envelope for the publisher or a known distributor of the feed $P/F$ and addressed to recipient $R$. Together with a feed topic $I$, it is sent to $P/F$ wrapped in a pss Trojan message. $P/F$ receives it and stores the request. When they publish the update, they wrap it in the envelope, i.e. sign the identifier received from $I$ against the feed update notification message and post it as a chunk, which $R$ will receive and hence, be notified of the feed update. }
    \label{fig:direct-notification-events}
 \end{figure}
 
 
-Notifications coming from publishers directly enable the poster to put arbitrary content into the envelope. The poster is at the same time the owner so that they can sign off on any content against the identifier when posting the envelope. In order for the issuer to be able to create the notification chunk address in advance, the prospective poster's account must be known. However, the feed update address need not be fixed, so this scheme remains applicable to (sporadic) epoch-based feeds.
+Notifications coming directly from publishers allow the poster to include arbitrary content within the envelope. The poster, who is also the owner of the envelope, has the authority to sign off on any content against the identifier when posting the envelope. To create the notification chunk address in advance, the issuer needs to know the account of the prospective poster. However, it is not necessary for the feed update address to be fixed, making this scheme applicable to (sporadic) epoch-based feeds.
 
 \subsubsection{Notification from neighbourhood}
 
-Assume there is a feed whose owner has not revealed their overlay (destination target) or refuses to handle notifications.  The feed is updated sporadically using simple sequential indexing and therefore polling is not feasible when it comes to looking up the latest update, especially as the consumer can go offline any time.
-Is there a way for consumers to still get notified? 
+Consider a scenario where the owner of a feed has chosen not to reveal their overlay (destination target) or has declined to implement notifications. In this case, the feed is updated sporadically using simple sequential indexing, making it impractical to rely on polling for checking the latest update. Furthermore, the consumer may also go offline at any given time.
+Is there a method to ensure that consumers are still notified? 
 
-We introduce another construct, a \gloss{neighbourhood notification} which works without the issuer of the notification knowing the identity of prospective posters. It presupposes, however, that the content or at least the hash of the content is known in advance so that it can be signed by the issuer themselves.
+We introduce another construct, a \gloss{neighbourhood notification}, which works without the issuer of the notification knowing the identity of prospective posters. However, it requires the content or its hash to be known in advance so that it can be signed by the issuer themselves.
 
 
-An issuer wants a recipient to be notified of the next update. The issuer can create a \gloss{neighbourhood notification} request, simply a Trojan chunk wrapping a message. This message contains an addressed envelope (identifier, signature and postage stamp) that the poster can use to construct the single owner chunk serving as the notification. Note that the notification message need not contain any new information, merely the fact of receiving it is sufficiently informative to the recipient. In order to indicate what it is a notification of, the notifications payload contains the feed update address. Upon receiving the notification, the receiver can then simply send a regular retrieve request to fetch the actual feed update chunk containing or pointing to the content of the message. See Figure \ref{fig:notification-from-neighbourhood} for the structure of neighbourhood notifications and notification requests.
+To ensure that a recipient is notified of the next update, the issuer can create a \gloss{neighbourhood notification} request by wrapping  a message in a Trojan chunk. This message contains an addressed envelope (identifier, signature, and postage stamp) that the poster can use to construct the single owner chunk that serves as the notification. Note that the notification message need not contain any new information; simply receiving it is sufficient for the recipient. The payload of the notification contains the feed update address to indicate what it is a notification of. Upon receiving the notification, the receiver can simply send a regular retrieve request to fetch the actual feed update chunk that contains or points to the content of the message. See Figure \ref{fig:notification-from-neighbourhood} for the structure of neighbourhood notifications and notification requests.
                                 
 
 \begin{figure}[htbp]
@@ -2155,11 +2151,12 @@ The domain part of the URL can be a human readable domain or subdomain with a \g
 \subsubsection{Authentication for access control}
 
 If the domain resolved referenced a \gloss{root access manifest}, the URL retrieved is under \gloss{access control} (see \ref{sec:access-control}). 
-Depending on the credentials used, the user is prompted for a password and possibly a key-pair. 
-The Diffie--Hellmann shared secret is hashed with a constant to derive the lookup key and another one to derive the access key decryption key. The Swarm address of the ACT manifest root chunk is taken from the root access manifest. 
-Next the lookup key is appended the ACT address and the resulting URL is used to retrieve the manifest entry. The reference on this entry is then decrypted with the access key decryption key, and the resulting access key is used to decrypt the original encrypted reference found in the root access manifest.
+Depending on the credentials used, the user is prompted for a password or possibly a pair of keys (key 1 for lookup, key 2 for decrypting the access key). 
+The Diffie--Hellmann shared secret is hashed with $0x00$ to derive \emph{the lookup key} and with $0x01$ to derive the \emph{access key decryption key}. The Swarm address of the ACT manifest root chunk is taken from the root access manifest. 
+Next the lookup key is appended to the ACT address. The resulting URL is used to retrieve the manifest entry. The reference on this entry is then decrypted with the access key decryption key, and the resulting access key is used to decrypt the original encrypted reference found in the root access manifest.
 
 Next the manifest entry matching the path of the URL is retrieved. The following attributes are taken into account:
+
 
 \begin{itemize}[noitemsep]
     \item \lstinline{rs} -- {
@@ -2168,9 +2165,8 @@ Next the manifest entry matching the path of the URL is retrieved. The following
 \end{itemize}
 
 
-\subsubsection{Erasure coded files}
+If the \lstinline{rs} attribute is given, there are three strategies to follow: 
 
-If the \lstinline{rs} attribute is given, there are two strategies to follow: 
 
 \begin{itemize}[noitemsep]
 \item \emph{fallback} -- For all intermediate chunks, the RS parity chunks are ignored first and only if there is a missing non-parity chunk will they be used. This saves some bandwidth and the corresponding costs at the expense of speed: if a chunk is missing, fallback to RS is delayed.
@@ -2193,7 +2189,7 @@ When a chunk request times out, the client can start creating the recovery messa
 
 \red{yet to cover}
 
-Somewhat surprisingly, Swarm's network layer can serve as  an efficient  communication platform with exceptionally strong privacy properties. This chapter aims to define a comprehensive set of primitives that serve as the building blocks for a foundational communication infrastructure, covering the full range of communication modalities including real-time anonymous chat, sending and receiving messages from previously  unconnected and potentially anonymous senders, mailboxing for asynchronous delivery, long-term notifications, and  publish/subscribe interfaces. 
+Somewhat surprisingly, Swarm's network layer can serve as  an efficient  communication platform with exceptionally strong privacy properties. This section aims to demonstrate that a small set of primitives can serve as the building blocks for a foundational communication infrastructure. The areas cover the full range of communication modalities including real-time anonymous chat, sending and receiving messages from previously  unconnected and potentially anonymous senders, mailboxing for asynchronous delivery, long-term notifications, and  publish/subscribe interfaces. 
 
 Swarm core offers the lowest level entry-points for communication-related functionality:
 
