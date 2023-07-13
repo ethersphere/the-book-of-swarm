@@ -291,7 +291,7 @@ A \gloss{content addressed chunk} is not assumed to be a meaningful storage unit
 \begin{figure}[htbp]
    \centering
    \includegraphics[width=\textwidth]{fig/content-addressed-chunk-3.pdf}
-   \caption[Content addressed chunk\statusgreen]{Content addressed chunk. An at most 4KB payload with a 64-bit little-endian encoded span prepended to it constitutes the chunk content. The BMT hash of the payload concatenated with the span then yields the content address.}
+   \caption[Content addressed chunk\statusgreen]{Content addressed chunk. An at most 4KB payload with a 64-bit little-endian encoded span prepended to it constitutes the chunk content used in transport. The content address of the chunk is the hash of the byte slice that is the span and the BMT root of the payload concatenated.}
    \label{fig:content-addressed-chunk}
 \end{figure}
 
@@ -1563,7 +1563,7 @@ Encrypted communication requires a handshake protocol to establish the initial p
 
 To implement the X3DH protocol with pss in a serverless setting. Swarm utilises the same primitives as are customary in Ethereum, i.e. secp256k elliptic curve, Keccak256 hash, and a 64-byte encoding for EC public keys. 
 
-The Swarm X3DH protocol facilitates the establishment of a shared secret betweej two parties, which serves as the input used to determine the encryption keys used during two-way messaging after the handshake. The \emph{initiator} is the party that initiates a two-way communication with the \emph{responder}. The responder is supposed to advertise the information necessary to allow parties previously unknown to the responder to initiate contact. Zero-leak communication can be achieved by first performing an X3DH. This protocol is used to establish the seed keys used by the double-ratchet protocol for the encrypting data, as well as the feed indexing methodology used. This will enable the responder to retrieve the updates of the outbox feed.
+The Swarm X3DH protocol facilitates the establishment of a shared secret between two parties, which serves as the input used to determine the encryption keys used during two-way messaging after the handshake. The \emph{initiator} is the party that initiates a two-way communication with the \emph{responder}. The responder is supposed to advertise the information necessary to allow parties previously unknown to the responder to initiate contact. Zero-leak communication can be achieved by first performing an X3DH. This protocol is used to establish the seed keys used by the double-ratchet protocol for the encrypting data, as well as the feed indexing methodology used. This will enable the responder to retrieve the updates of the outbox feed.
 
 X3DH uses the following keys:%
 %
@@ -1711,10 +1711,10 @@ This section elaborates on the concept of addressed envelopes and presents three
 
 \subsubsection{Direct notification from publisher}
 
-If an issuer wants to notify a recipient of the next activity on a feed, she must construct a stamped addressed envelope embedded in a regular Trojan message and send it to the publisher, as depicted in Figure \ref{fig:direct-notification}. If the issuer is also the recipient, the same account can be used in both the request and the response envelope. 
+If an issuer wants to notify a recipient of the next activity on a feed, she needs to construct a stamped addressed envelope embedded in a regular Trojan message and send it to the publisher, as depicted in Figure \ref{fig:direct-notification}. If the issuer is also the recipient, the same account can be used in both the request and the response envelope. 
 
 
-When the feed owner publishes an update to her feed, the reference to the update chunk is put into the envelope and is sent to the recipient. More formally, the publisher creates a single owner chunk using the identifier of the pre-addressed envelope and signs off on the identifier associated with the feed update content as the payload of the single owner chunk. Subsequently, the publisher, now acting as the poster, push-syncs the chunk to the swarm. This process is known as \gloss{direct notification from publisher}. 
+When the owner of a feed publishes an update, they include a reference to the update chunk in the envelope and send it to the recipient. More formally, the publisher creates a single owner chunk using the identifier of the pre-addressed envelope and signs off on the identifier associated with the feed update content as the payload of the single owner chunk. Subsequently, the publisher, now acting as the poster, push-syncs the chunk to the swarm. This process is known as \gloss{direct notification from publisher}. 
 
 \begin{figure}[htbp]
    \centering
@@ -1723,13 +1723,13 @@ When the feed owner publishes an update to her feed, the reference to the update
    \label{fig:direct-notification}
 \end{figure}
 
-The Trojan message is encrypted using the public key and specifies in its topic that it is a notification. As the address is mined to match the recipient overlay address on a sufficiently long prefix, the message ends up push-synced to the recipient's neighbourhood. When the recipient comes online and receives the chunk by push-sync, she detects that it is intended as a message. This can be done either by successfully decrypting the chunk content using the key for the address they had advertised, or by looking it up against the record of the address they saved when it was issued, in the case where the recipient has issued the pre-addressed envelope themselves. See Figure \ref{fig:direct-notification-events} for the timeline of events.
+The Trojan message is encrypted using the public key and specifies in its topic that it is a notification. As the address is mined to match the recipient overlay address on a sufficiently long prefix, the message ends up push-synced to the recipient's neighbourhood. When the recipient comes online and receives the chunk, she detects that it is intended as a message. This can be done either by successfully decrypting the chunk content using the key for the address they had advertised, or by looking it up against the record of the address they saved when it was issued, in the case where the recipient has issued the pre-addressed envelope themselves. See Figure \ref{fig:direct-notification-events} for the timeline of events.
 
 
 \begin{figure}[htbp]
    \centering
     \includegraphics[width=0.8\textwidth]{fig/direct-notification-events.pdf}
-   \caption[Direct notification from publisher timeline of events \statusgreen]{Direct notification from publisher timeline of events. Issuer $I$ constructs a prepaid envelope for the publisher or a known distributor of the feed $P/F$ and addressed to recipient $R$. Together with a feed topic $I$, it is sent to $P/F$ wrapped in a pss Trojan message. $P/F$ receives it and stores the request. When they publish the update, they wrap it in the envelope, i.e. sign the identifier received from $I$ against the feed update notification message and post it as a chunk, which $R$ will receive and hence, be notified of the feed update. }
+   \caption[Direct notification from publisher timeline of events \statusgreen]{Direct notification from publisher timeline of events. Issuer $I$ constructs a prepaid envelope for the publisher or a known distributor of the feed $P/F$ and addresses to recipient $R$. Together with a feed topic $I$, it is sent to $P/F$ wrapped in a pss Trojan message. $P/F$ receives it and stores the request. When they publish the update, they wrap it in the envelope, i.e. sign the identifier received from $I$ against the feed update notification message and post it as a chunk, which $R$ will receive and hence, be notified of the feed update. }
    \label{fig:direct-notification-events}
 \end{figure}
 
@@ -1744,62 +1744,62 @@ Is there a method to ensure that consumers are still notified?
 We introduce another construct, a \gloss{neighbourhood notification}, which works without the issuer of the notification knowing the identity of prospective posters. However, it requires the content or its hash to be known in advance so that it can be signed by the issuer themselves.
 
 
-To ensure that a recipient is notified of the next update, the issuer can create a \gloss{neighbourhood notification} request by wrapping  a message in a Trojan chunk. This message contains an addressed envelope (identifier, signature, and postage stamp) that the poster can use to construct the single owner chunk that serves as the notification. Note that the notification message need not contain any new information; simply receiving it is sufficient for the recipient. The payload of the notification contains the feed update address to indicate what it is a notification of. Upon receiving the notification, the receiver can simply send a regular retrieve request to fetch the actual feed update chunk that contains or points to the content of the message. See Figure \ref{fig:notification-from-neighbourhood} for the structure of neighbourhood notifications and notification requests.
+To ensure that a recipient is notified of the next update, the issuer can create a \gloss{neighbourhood notification} request by wrapping  a message in a Trojan chunk. This message contains an addressed envelope (identifier, signature, and postage stamp) that the poster can use to construct the single owner chunk that serves as the notification. Note that the notification message need not contain any new information; simply receiving it is sufficient for the recipient. The payload of the notification contains the feed update address to indicate what it is a notification of. Upon receiving the notification, the receiver can simply send a regular retrieve request to fetch the actual feed update chunk that contains (or points to) the content of the message. See Figure \ref{fig:notification-from-neighbourhood} for the structure of neighbourhood notifications and notification requests.
                                 
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{fig/notification-from-neighbourhood.pdf}
-\caption[Neighbourhood notifications \statusgreen]{Neighbourhood notification requests are not only including identifier and postage stamp but also a notification message together with the signature attesting it against the address. Thus $P$ needs to construct the actual notification and when publisher $F$ posts their update to $P$-s neighbour, $P$ can post the notification to recipient $R$.}
+\caption[Neighbourhood notifications \statusgreen]{Neighbourhood notification requests include not only the identifier and postage stamp but also a notification message and its signature, attesting it against the address. Thus, $P$ needs to construct the actual notification and when publisher $F$ posts their update to $P$'s neighbour, $P$ can post the notification to recipient $R$.}
 \label{fig:notification-from-neighbourhood}
 \end{figure}
 
-If the notification needs only to contain the feed update address as its payload then associating it with the identifier can be signed off by the issuers themselves. This signature together with the identifier should be considered a necessary component of the envelope and must be sent as part of the notification request.
-Unlike the \emph{open} envelopes used with publishers directly, neighbourhood notifications can be viewed as \emph{closed} envelopes, where the content is sanctioned by the issuer in advance. 
+If the notification only needs to contain the feed update address as its payload, the association with the identifier can be signed off by the issuers themselves. This signature, along with the identifier, should be considered a necessary component of the envelope and must be included in the notification request.
+Unlike \emph{open} envelopes used with publishers directly, neighbourhood notifications can be viewed as \emph{closed} envelopes, where the content is pre-approved by the issuer. 
 
-Now the issuer and not the poster becomes the owner of the chunk and the signature is already available to the poster when they create and post the notification. As a consequence no public key or account address information is needed from the poster. In fact, the identity of the poster does not need to be fixed, any peer could qualify as a candidate poster. Issuers therefore can send the notification request to the neighbourhood of the feed update chunk. The nearest neighbours will keep holding the request chunk as dictated by the attached postage stamps until they receive the appropriate feed update chunk that indicates the receipt of the notification. See Figure \ref{fig:neighbourhood-notification-events} for the timeline of events when using neighbourhood notifications.
+In this case, the issuer, not the poster, becomes the owner of the chunk, and the signature is already available to the poster when they create and post the notification. As a consequence, no public key or account address information is required from the poster. In fact, the identity of the poster does not need to be fixed, as any peer could qualify as a candidate poster. Issuers can send the notification request to the neighbourhood of the feed update chunk. The nearest neighbours will keep holding the request chunk as specified by the attached postage stamps until they receive the appropriate feed update chunk, which confirms the receipt of the notification. See Figure \ref{fig:neighbourhood-notification-events} for the timeline of events when using neighbourhood notifications.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.8\textwidth]{fig/neighbourhood-notification-events.pdf}
-\caption[Neighbourhood notification timeline of events \statusgreen]{Neighbourhood notification timeline of events. Issuer $I$ mines an identifier for a single owner chunk with themselves as owner such that the chunk address falls in recipient $R$'s neighbourhood. The issuer, being the owner also must sign the identifier against a prefabricated reminder and remember which node should be notified. When $P$ syncs the feed update the notification is sent to $R$, delivered by the usual push-syncing.}
+\caption[Neighbourhood notification timeline of events \statusgreen]{Neighbourhood notification timeline of events. Issuer $I$ mines an identifier for a single owner chunk, with themselves as the owner, such that the chunk address falls within recipient $R$'s neighbourhood. The issuer, being the owner, also must sign the identifier against a prefabricated reminder and remember which node should be notified. When $P$ syncs the feed update, the notification is sent to $R$ through the usual push-sync mechanism.}
 \label{fig:neighbourhood-notification-events}
 \end{figure}
   
 
-But how can we make sure that notifications are not sent too early or too late? While the integrity of notification chunks is guaranteed by the issuer as their single owner, measures must also be taken to prevent nodes that manage the notifications from sending them before the update should actually arrive. It would be ideal if the notification could not be posted before the arrival of the update, otherwise false alarms could be generated by malicious nodes that service the request.
+But how can we make sure that notifications are not sent too early or too late? While the integrity of notification chunks is guaranteed by the issuer as their single owner, additional measures are required to prevent nodes that manage the notifications from sending them prematurely. It would be ideal if the notification could not be posted before the arrival of the update, otherwise false alarms could be generated by malicious nodes that service the request.
 
-A simple measure is to encrypt the message in the request  message symmetrically with a key that is only revealed to the prospective poster when they receive the feed update, for instance, the hash of the feed update identifier.
+A simple measure is to symmetrically encrypt the message in the request using a key that is only revealed to the prospective poster upon receiving the feed update. For instance, the hash of the feed update identifier can serve as that key.
 In order to reveal that the notification request needs to be matched on arrival of the feed update, the topic must be left unencrypted, so here we do not encrypt the pss envelope asymmetrically but only the message and symmetrically.
 
 Note that the feed update address as well as identifier can be known if the feed is public, so neighbourhood notifications are to be used with feeds whose subsequent identifiers are not publicly known.
 
 \subsubsection{Targeted chunk delivery}
 
-Normally, in Swarm's DISC model, chunks are requested with retrieve requests, which are forwarded towards the neighbourhood designated by the requested chunk address (see \ref{sec:retrieval}). The first node on the route that has the chunk will respond with it and the chunk is delivered as a backwarded response travelling back along the same route that the request has taken. In certain cases, however, it may be useful to have a mechanism to request a chunk from an arbitrary neighbourhood where it is known to be stored and send it to an arbitrary neighbourhood where it is known to be needed. A construct called \gloss{targeted chunk delivery} is meant for such a use case: the request is a Trojan pss message while the response, the delivery, must be a single owner chunk wrapping the requested chunk, with an address mined to fall into the neighbourhood of the recipient.  
+Normally, in Swarm's DISC model, chunks are obtained using retrieve requests, which are forwarded towards the designated neighbourhood designated based on the requested chunk address (see \ref{sec:retrieval}). The first node on the route that has the chunk will respond and deliver the chunk as a backwarded response travelling back along the same route. In certain cases, however, it may be beneficial to have a mechanism to request a chunk from a specific neighbourhood where it is known to be stored and send it to a different neighbourhood where it is known to be needed. A construct called \gloss{targeted chunk delivery} is meant for such a use case: the request is a Trojan pss message, while the response, the delivery, must be a single owner chunk that wraps the requested chunk. The address of this delivery chunk is mined to fall into the recipient's neighbourhood.  
 
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{fig/targeted-chunk-delivery.pdf}      
-\caption[Targeted chunk deliveries \statusgreen]{Targeted chunk deliveries are similar to neighbourhood notifications in that they are not only pre-addressed and pre-paid but also pre-signed. Similarly, the identifier is mined so that given issuer $I$ as the owner, it produces an chunk address that falls in recipient $R$'s neighbourhood. Here the issuer signs the identifier against the hash of a content addressed chunk that they want to see posted to $R$. If the targeted chunk delivery request lands with any node that has the chunk in question, they can use the envelope and the content of the chunk to produce a valid response which is a single owner chunk wrapping a content addressed chunk.}
+\caption[Targeted chunk deliveries \statusgreen]{Targeted chunk deliveries are similar to neighbourhood notifications in that they are pre-addressed, pre-paid, and pre-signed. Similarly, the identifier is mined so that given issuer $I$ as the owner, it produces an chunk address that falls in recipient $R$'s neighbourhood. Here, the issuer signs the identifier against the hash of a content addressed chunk that they want to see posted to $R$. If the targeted chunk delivery request lands with any node that has the requested chunk, they can use the envelope and the chunk's content to produce a valid response, which is a single owner chunk wrapping a content addressed chunk.}
 \label{fig:targeted-chunk-delivery}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=.8\textwidth]{fig/targeted-chunk-delivery-events.pdf}
-\caption[Targeted chunk delivery timeline of events\statusgreen]{Targeted chunk delivery timeline of events. Uploader $U$ uploads a chunk to Swarm and it lands with a storer node $S$. Nodes within $P$ replicate (and pin) this chunk. Now, if issuer $I$ wants this chunk delivered to $R$, it will take the prepaid envelope addressed to $R$ and sends it to the neighbourhood of a known host unencrypted so that anyone who has the chunk can construct the notification and send or store it for later.}
+\caption[Targeted chunk delivery timeline of events\statusgreen]{Targeted chunk delivery timeline of events. Uploader $U$ uploads a chunk to Swarm, and it lands with a storer node $S$. Nodes within $P$ replicate and pin this chunk. Now, if issuer $I$ wants this chunk delivered to $R$, they take the prepaid envelope addressed to $R$ and send it unencrypted to the neighbourhood of a known host. This way, anyone who has the chunk can construct the notification and send or store it for later.}
 \label{fig:targeted-chunk-delivery-events}
 \end{figure}
 
 
 
-These 'chunk-in-a-soc' responses are structurally similarly to neighbourhood notifications in that the payload's hash is already known (the content address of the chunk requested). The requestor can then sign off on its association with the identifier which, along with the signature, is sent as part of the request, see Figure \ref{fig:targeted-chunk-delivery-events}. A node that got the request only needs to have the requested chunk stored and they can construct the response as a valid single owner chunk addressed to the recipient's neighbourhood.
-This makes the request generic, i.e. not fixed to the identity of the prospective poster. Therefore it can be sent to any neighbourhood that requires the content. Even multiple requests can be sent simultaneously: due to the uniqueness of the valid response, multiple responses cannot hurt chunk integrity (see \ref{sec:single-owner-chunks} and \ref{sec:feed-integrity}). Targeted delivery is used in missing chunk recovery, see \ref{sec:recovery-chunks}.
+These 'chunk-in-a-soc' responses are structurally similar to neighbourhood notifications in that the payload's hash is already known (the content address of the chunk requested). The requestor can then sign off on its association with the identifier and include it, along with the signature, in the request message (see Figure \ref{fig:targeted-chunk-delivery-events}). When a node receives such a request and has the requested chunk stored, it can construct a valid single owner chunk addressed to the recipient's neighbourhood as a response.
+This makes the request generic, i.e. not tied to the identity of the prospective poster, therefore it can be sent to any neighbourhood that requires the content. Even multiple requests can be sent simultaneously, as the uniqueness of the valid response ensures the integrity of chunks (see \ref{sec:single-owner-chunks} and \ref{sec:feed-integrity}). Targeted delivery is used in missing chunk recovery, see \ref{sec:recovery-chunks}.
 
-The difference is that neighbourhood notifications are not giving any new information while targeted chunk delivery supplies the chunk data. Also, a chunk delivery wrapped in a single owner chunk uses no message wrapping and has no topic. Neither request nor response uses encryption.
-A consequence of not using encryption is that, if there are multiple tartgets, it is sufficient that the initial Trojan request matches any one of these targets. 
+The difference is that neighbourhood notifications do not provide any new information, while targeted chunk delivery supplies the chunk data. Additionally, a chunk delivery wrapped in a single owner chunk does not involve message wrapping and does not have a topic. Encryption is not used in either the request or response.
+A consequence of not using encryption is that if there are multiple targets, it is sufficient for the initial Trojan request to match any one of these targets. 
 
 Table \ref{tab:notifications} summarises various properties of the three notification-like constructs.
 
@@ -1818,12 +1818,12 @@ Table \ref{tab:notifications} summarises various properties of the three notific
 \chapter{Persistence \statusgreen}\label{sec:persistence}
 
 
-In this chapter, we focus on data persistence, i.e. the ways of making sure that content stays available on Swarm. 
-We introduce error coding schemes, which can provide cross-neighbourhood redundancy to secure availability against churn at a cost of the storage overhead. 
-In particular \glossplural{erasure code} (\ref{sec:erasure}) and \glossplural{entanglement code}  %(\ref{sec:entanglements}) 
+In this chapter, we focus on data persistence, i.e. the ways of ensuring that content remains available on Swarm. 
+We introduce error coding schemes that can provide cross-neighbourhood redundancy to secure availability against churn, albeit at the cost of increased storage overhead. 
+In particular, \glossplural{erasure code} (\ref{sec:erasure}) and \glossplural{entanglement code}  %(\ref{sec:entanglements}) 
 provide redundancy optimised for documents with different access patterns.
 % First we discuss how popular content stays alive due to opportunistic caching (\ref{sec:caching}).  
-After introducing the notion of local pinning in \ref{sec:reupload}, i.e. the ability to mark content as sticky in your Swarm local storage, we will present ways in which this can help achieve global persistence across the network through \emph{stewardship}. We define a \gloss{missing chunk notification protocol}, which allows content maintainers to make sure their published content is restored in the event of some chunks being garbage collected, by proxying retrieval through select \glossplural{pinner} of the content.
+Additionally, we introduce the notion of local pinning in \ref{sec:reupload}, allowing users to mark specific content as "sticky" in their Swarm local storage. We will discuss how this local pinning can help achieve global persistence across the network through the concept of \emph{stewardship}. We define a \gloss{missing chunk notification protocol}, which allows content maintainers to ensure that their published content is restored in case some chunks are garbage collected. This restoration is facilitated by proxying retrieval through selected content \glossplural{pinner}.
 
 In Section \ref{sec:dream}, we discuss how an immutable chunk store can support user-controlled deletion of content.
 % Finally, in \ref{sec:insurance}, we present the holy grail, that is, decentralised file insurance: combining the concepts of the postage lottery and missing chunk notifications, Swarm offers a protocol that enables users to pay other nodes to keep their content available. While ordinary storer nodes are rewarded for storing chunks via the postage lottery, for a higher premium, staked nodes will promise to take responsibility for storing and responding to requests for chunks, accepting the risk of punitive measures that will be imposed on them in the event that the insured data does not remain available to the network.
@@ -1841,95 +1841,95 @@ In Section \ref{sec:dream}, we discuss how an immutable chunk store can support 
 
 \section{Data stewardship: pinning, reupload and recovery \statusyellow}\label{sec:reupload}
 
-This section introduces the notion of pinning, i.e. locally sticky content protected from the garbage collection routines of its storage nodes (\ref{sec:pinning}). In \ref{sec:global-pinning}, we discuss how pinners of content can play together to pin content for the entire network globally. \ref{sec:erasure} defines a recovery protocol that downloaders can use to notify storers of missing chunks belonging to content they are responsible for pinning globally. With such on-demand repair and the uninterrupted download experience it enables, recovery implements a poor man's persistence measure which can ensure network wide availability of specific chunks without requiring the financial outlay of insurance.
+This section introduces the notion of pinning, i.e. a method to protect locally sticky content from being removed through the garbage collection routines of its storage nodes (\ref{sec:pinning}). In \ref{sec:global-pinning}, we discuss how content pinners can play together to pin content for the entire network globally. Section \ref{sec:erasure} defines a recovery protocol that downloaders can use to notify storers of missing chunks belonging to content they are responsible for pinning globally. With such on-demand repair and the uninterrupted download experience it enables, recovery implements a poor man's persistence measure that can ensure the network-wide availability of specific chunks without requiring the financial outlay of insurance.
 
 \subsection{Local pinning \statusgreen}\label{sec:pinning}
 
-Local \gloss{pinning} is the mechanism that makes content sticky and prevents it from being garbage collected. It pins the content only in the node's local storage to enable local persistence of data and speedy retrieval. Pinning is applied at the chunk level in the local database of the client and exposes an API for users to pin and unpin files and collections in their local node (see \ref{sec:features}).
+Local \gloss{pinning} is the mechanism that makes content sticky and prevents it from being garbage collected. It anchors the content only in the node's local storage to enable local persistence of data and speedy retrieval. The pinning process operates at the level of individual chunks within the client's local database and exposes an API for users to pin and unpin files and collections in their local node (see \ref{sec:features}).
 
-In order to pin all the chunks comprising files, the clients need to keep a \gloss{reference count} for each chunk which incremented and decremented when the chunk is pinned and unpinned respectively. As long as the reference count is non-zero, the chunk is considered to be part of at least one document that is pinned and therefore immune to garbage collection. Once a chunk is pinned, only when the reference count returns to zero, after it has been respectively unpinned for every time it has been pinned, is the chunk once again considered for garbage collection.
+In order to pin all the chunks comprising files, clients need to maintain a \gloss{reference count} for each chunk. This count is incremented when a chunk is pinned and decremented when the chunk is unpinned. As long as the reference count remains non-zero, the chunk is considered to be part of at least one pinned document and is therefore immune to garbage collection. Only when the reference count returns to zero---meaning the chunk has been unpinned for every time it was previously pinned---does it become eligible for garbage collection again.
 
-Local pinning can be thought of as a feature which allows Swarm users to mark specific files and collections as important, and therefore not removable. Pinning a file in local storage will also make it always accessible for the local node even without an internet connection. As a result using pinned content for storage of local application data enables an offline-first application paradigm, with Swarm automatically handling network activity on re-connection. However, since if the chunk is not in the node's area of responsibility, local pinning by itself is not enough to ensure the chunk generally retrievable to other nodes, since the pinner is not in the Kademlia neighbourhood where the chunk is meant to be stored and hence where it will be searched for when the chunk is requested using the pull-sync protocol. In order to provide this functionality, we must implement a second half of the pinning protocol.
+Local pinning can be thought of as a feature that allows Swarm users to mark specific files and collections as important, and therefore not removable. Pinning a file in local storage will also make it perpetually accessible for the local node, even without an internet connection. As a result, using pinned content for the storage of local application data enables an offline-first application paradigm, with Swarm seamlessly managing network activity upon re-connection. However, if a chunk is not within the node's area of responsibility, local pinning alone is not enough to ensure the chunk's availability to other nodes, in a general sense. This limitation arises due to the pinner not being in the Kademlia neighbourhood where the chunk is meant to be stored and subsequently searched for when requested using the pull-sync protocol. In order to provide this functionality, we must implement a second half of the pinning protocol.
 
 \subsection{Global pinning}\label{sec:global-pinning}
 
-If a chunk is removed as a result of garbage collection by storers in its nominated neighbourhood, local pinning in nodes elsewhere in the network will offer no way to retrieve it alone. In order for pinning to aid global network persistence, two issues must be tackled:
+If a chunk is removed due to garbage collection by storers in its designated neighbourhood, local pinning in nodes elsewhere in the network cannot independently retrieve it. In order for pinning to aid global network persistence, two challenges must be addressed:
 
 \begin{itemize}[noitemsep]
-    \item  notify global pinners of a missing chunk belonging to the content they pin -- so they can re-upload it,
-    \item  maintain retrievability of chunks that are garbage collected but globally pinned -- so that downloaders experience no interruption. 
+    \item  global pinners need to be notified when a chunk belonging to the content they have pinned is missing, so they can re-upload it,
+    \item  chunks that are garbage collected but globally pinned must remain retrievable, ensuring uninterrupted downloads for users. 
 \end{itemize}
 
-One naive way to achieve this is to periodically check for a pinned chunk in the network and re-upload the contents if it is not found. This involves a lot of superfluous retrieval attempts, has immense bandwidth overhead and ultimately provides no reduction in latency.
+One naive way to achieve this is to periodically check for pinned chunks in the network and re-upload the contents if they are not found. However, this method involves a lot of superfluous retrieval attempts, has immense bandwidth overhead, and ultimately provides no reduction in latency.
 
-An alternative, reactive way is to organise notifications to the pinner which are somehow triggered when a user accesses the pinned content and finds a chunk to be unavailable. Ideally, the downloader notifies the pinner with a message that triggers (1) the re-upload of the missing chunk, and (2) the delivery of the chunk in response to the request of the downloader.  
+An alternative, reactive way is to organise notifications to the pinner which are somehow triggered when a user attempts to access the pinned content but encounters an unavailable chunk. Ideally, the downloader would send a message to the pinner that triggers two actions: (1) the re-upload of the missing chunk, and (2) the delivery of the chunk in response to the downloader's request.  
 
 \subsubsection{Fallback to a gateway}
 
-Let us assume that a set of pinner nodes have the content locally pinned and our task is to allow fallback to these nodes. In the simplest scenario, we can set up the node as a gateway (potentially load-balancing to a set of multiple pinner nodes): Users learn of this gateway if it is included in the manifest entry for the file or collection. If the user is unable to download the file or collection from the Swarm due to a missing chunk, they can simply resort to the gateway and find all chunks locally.
-This solution benefits from simplicity and therefore likely the first global persistence milestone to be implemented.  
+Let us assume that a set of pinner nodes have locally pinned the content and our task is to allow fallback to these nodes. In the simplest scenario, we can set up the node as a gateway (potentially load-balancing to a set of multiple pinner nodes): Users learn of this gateway if it is included in the manifest entry for the file or collection. If the user is unable to download the file or collection from the Swarm due to a missing chunk, they can simply resort to the gateway and find all chunks locally.
+This solution benefits from simplicity and therefore is likely to be the first milestone towards achieving global persistence.  
 
 \subsubsection{Mining chunks to pinners' neighbourhoods}
 
-The second, brute force solution is more sophisticated in that the publisher can construct the chunks of a file in such a way that they all fall within the neighbourhood of the pinner (or of any pinner node in the set). In order to do this, the publisher needs to find an encryption key for each chunk of the file so that the encrypted chunk's address matches one of the pinners on at least their first $d$ bits, where $d$ is chosen to be comfortably larger than that pinner's likely neighbourhood depth.%
+A more sophisticated solution, albeit with more complexity, involves the publisher organising the chunks of a file in a way that they all fall within the neighbourhood of the pinner (or of any pinner node in the set). In order to do this, the publisher needs to find an encryption key for each chunk of the file so that the encrypted chunk's address matches one of the pinners on at least their first $d$ bits, where $d$ is chosen to be comfortably larger than that pinner's likely neighbourhood depth.%
 %
-\footnote{Note that in case that the pinner nodes do not share infrastructure and the mined chunks need to be sent to pinners with the push-sync protocol, then each postage batch used will be used at most $n$ times. Although this non-uniformity implies a higher unit price, if pinners pin out of altruism (i.e. not for compensation), only a minimum postage price needs to be paid.
+\footnote{It is important to note that if the pinner nodes do not share infrastructure and the mined chunks need to be sent to pinners with the push-sync protocol, then each postage batch used will be used a maximum of $n$ times. Although this non-uniformity implies a higher unit price, if pinners choose to pin content out of altruism (i.e. not for compensation), only a minimum postage price needs to be paid.
 }
 
-These solutions can already accomplish persistence, but they reintroduce a degree of centralisation and also require publishers to maintain and control server infrastructure. Surely, they also suffer from the usual drawbacks of server-client architecture, namely decreased fault-tolerance and the likelihood of compromised performance due to the fact that requests will be more concentrated. These solutions also do not address the question of how pinner nodes are provided the content and disregard any privacy considerations. For these reasons, although the low-level pinning API is provided for swarm users, usage of it is considered to be a less desirable alternative to the gold standard of incentivised file insurance discussed elsewhere. As such use cases should be carefully considered to ensure that they would not benefit from the enhanced privacy and resilience provided by the incentivised system.
+These solutions can achieve persistence, but they also reintroduce a degree of centralisation and place the burden of maintaining and controlling server infrastructure on publishers. Additionally, they suffer from the usual drawbacks of server-client architecture, namely decreased fault-tolerance and the likelihood of compromised performance due to more concentrated requests. These solutions also fail to address the question of content distribution to pinner nodes and neglect privacy considerations. For these reasons, although the low-level pinning API is provided for Swarm users, it is a less desirable alternative to the incentivised file insurance system, which is seen as the gold standard. As such, use cases should be carefully evaluated to ensure that they would not benefit from the enhanced privacy and resilience provided by the incentivised system.
 
 
 
 \subsection{Recovery \statusyellow}\label{sec:recovery-chunks}
 
 
-In what follows we describe a simple protocol for notifying pinners of the loss of a chunk, which they can react to by (1) re-uploading the lost chunk to the network and at the same time (2) responding to the notifier by delivering to them the missing chunk. 
+In the following section, we outline a simple protocol for notifying pinners about the loss of a chunk. Pinners can then react by (1) re-uploading the lost chunk to the network and at the same time (2) responding to the notifier by delivering to them the missing chunk. 
 
-If replicas of a chunk are distributed among willing hosts (pinners), then downloaders not finding a chunk can fall back to a \gloss{recovery} process requesting it from one of these hosts using the \gloss{missing chunk notification protocol} called \gloss{prod}.
+When replicas of a chunk are distributed among willing hosts (pinners), downloaders who cannot locate a particular chunk can fall back to a \gloss{recovery} process by requesting it from one of these hosts using the \gloss{missing chunk notification protocol} called \gloss{prod}.
 As usual, the resolutions of this acronym capture the properties of the protocol:
 
 \begin{itemize}[noitemsep]
-\item \emph{protocol for recovery on deletion} - A protocol between requestor and pinners to orchestrate chunk recovery after garbage collection. The process is triggered by downloaders if they fail to retrieve a chunk.
+\item \emph{protocol for recovery on deletion} - A protocol between requestor and pinners to orchestrate chunk recovery after garbage collection. The process is triggered by downloaders when they fail to retrieve a chunk.
 \item \emph{process request of downloader} - Recovery hosts continuously listen for potential recovery requests from downloaders.
 \item \emph{provide repair of DISC} - 
-Prod provides a service to repair the Swarm DISC, in the event of data loss.
+Prod provides a service to repair the Swarm DISC in the event of data loss.
 \item \emph{pin and re-upload of data} -     
-Hosts pin the data and re-upload it to its designated area when prompted with a recovery request. 
-\item \emph{prompt response on demand}  - If the requestor demands a prompt direct response, the host will post the missing chunk using a recovery response envelope and accompanying postage stamp.
+Hosts pin the data and re-upload it to its designated area upon receiving a recovery request. 
+\item \emph{prompt response on demand}  - If the requestor demands a prompt direct response, the host will post the missing chunk using a recovery response envelope along with the required postage stamp.
 \end{itemize}
 
 \subsubsection{Recovery hosts}
 
-\glossupperplural{recovery host} are pinners that are willing to provide pinned chunks in the context of recovery. These pinners are supposed to have indicated that they will take on this task to the publisher and to have downloaded all the relevant chunks and have pinned them all in their local instance. 
+\glossupperplural{recovery host} are pinners who voluntarily provide pinned chunks for the purpose of recovery. These pinners have explicitly indicated their willingness to take on this task to the publisher and to have downloaded all the relevant chunks and have pinned them in their local instance. 
 
-The publisher that wishes to advertise its publication as globally pinned or repairable would then gather the overlay addresses of these volunteering recovery hosts. In fact, it is sufficient to collect just the prefixes of the overlay with a length greater than Swarm's depth. We will call these partial addresses \gloss{recovery targets}.
+To advertise their publication as globally pinned or repairable, publishers gather the overlay addresses of these volunteering recovery hosts. In fact, it is sufficient to collect just the prefixes of the overlay with a length greater than Swarm's depth. These partial addresses are referred to as \gloss{recovery targets}.
 
-Publishers will advertise the recovery targets for their content to the consumers of their data via a feed called a \gloss{recovery feed}. This feed can be tracked by consumers of the publisher's data based on the convention of constructing the topic using a simple sequential indexing scheme. 
+Publishers will advertise the recovery targets for their content to data consumers via a feed called a \gloss{recovery feed}. Consumers can track this feed following a convention that constructs the topic using a simple sequential indexing scheme. 
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=.8\textwidth]{fig/missing-chunk-notification.pdf} \caption[Missing chunk notification process \statusgreen]{The missing chunk notification process is similar to the targeted chunk delivery. Here a downloader mines the identifier to match their own address, i.e. a self-notification. If downloader $D$ encounters a missing chunk (a request times out), they send a recovery request to one of several neighbourhoods where there is a chance of finding the chunk. A successful response then will comprise a single owner chunk wrapping the missing chunk which is sent to the downloader. The chunk is also re-uploaded to the proper place in the network.}
+\includegraphics[width=.8\textwidth]{fig/missing-chunk-notification.pdf} \caption[Missing chunk notification process \statusgreen]{The process of notifying about a missing chunk is similar to that of targeted chunk delivery. Here, a downloader mines the identifier to match their own address, i.e. a self-notification. If downloader $D$ encounters a missing chunk (a request times out), they send a recovery request to one of several neighbourhoods where there is a possibility of finding the missing chunk. If the recovery request is successful, $D$ receives a response in the form of a single owner chunk that wraps the missing chunk. The chunk is also re-uploaded to the appropriate location within the network.}
 \label{fig:missing-chunk-notification}
 \end{figure}
 
 \subsubsection{Recovery request}
 
-Once the recovery hosts overlay targets are revealed to the downloader node, upon encountering a missing chunk, they should "prod" one of the recovery hosts by sending them a notification called a \gloss{recovery request}. This instance of targeted chunk delivery (see \ref{sec:notification-requests}) is a public unencrypted Trojan message containing at least the missing chunk address, see Figure \ref{fig:recovery-request}.
+Once the recovery host's overlay targets are revealed to the downloader node, the downloader should "prod" one of the recovery hosts by sending them a \gloss{recovery request} whenever a missing chunk is encountered. This instance of targeted chunk delivery (see \ref{sec:notification-requests}) is a public unencrypted Trojan message that contains at least the address of the missing chunk (see Figure \ref{fig:recovery-request}).
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{fig/recovery-request.pdf}
-  \caption[Recovery request \statusgreen]{A recovery request is a Trojan chunk that is used as missing chunk notification. It is unencrypted and its payload is structured as a pss message containing the address of the chunk to be recovered. Optionally, it also includes a special recovery response envelope, an identifier with a signature attesting to the association of the identifier and the missing chunk hash.}
+  \caption[Recovery request \statusgreen]{A recovery request is a Trojan chunk used for missing chunk notification. It is unencrypted and its payload is structured as a pss message containing the address of the chunk that needs to be recovered. Optionally, the recovery request also includes a special recovery response envelope, which is an identifier with a signature verifying the association between the identifier and the missing chunk hash.}
   \label{fig:recovery-request}
 \end{figure}
 
-In order to create a recovery request, a downloader needs to (1) create the payload of the message (2) find a nonce which when prepended to the payload results in a content address that matches one of the \gloss{recovery targets} indicated by the publisher. The matching target means that by push-syncing the chunk, it will be sent to the neighbourhood of the recovery host represented by a target prefix. 
+In order to create a recovery request, a downloader needs to (1) create the payload of the message (2) find a nonce that, when prepended to the payload, produces a content address that matches one of the \gloss{recovery targets} indicated by the publisher. The matching target indicates that push-syncing the chunk will send it to the recovery host's neighbourhood associated with that target prefix. 
 
-If the targeted recovery host is online, they will receive the recovery request, extract the missing chunk address, retrieve the corresponding chunk that is pinned in their local storage and re-upload it to the network with a new postage stamp.
+If the targeted recovery host is online, they will receive the recovery request, extract the address of the missing chunk, retrieve the corresponding chunk from their locally pinned storage, and re-upload it to the network with a new postage stamp.
 
 \subsubsection{Recovery response envelope}
 
-A \gloss{recovery response envelope} serves to provide a way for recovery hosts to be able to respond directly to the originator of the recovery request, promptly and without associated cost or computational burden. It is an instance of targeted chunk delivery response (see \ref{sec:notification-requests}), an addressed envelope construct which is neutral to the poster but fixed for the content. The request message includes the components prospective posters will need to create the valid targeted chunk delivery response: an identifier with a signature attesting to the association of the identifier and the missing chunk hash. The identifier is chosen so that the address of the single owner chunk (the hash of the id with the owner account) falls into the requestor's neighbourhood and so it is automatically delivered there by the network's implementation of the push-sync protocol.
+A \gloss{recovery response envelope} is used to enable recovery hosts to promptly and directly respond to the originator of the recovery request, without incurring additional costs or computational burdens. It is a form of targeted chunk delivery response (see \ref{sec:notification-requests}), which is an addressed envelope construct that remains neutral to the poster but fixed for the content. The request message includes the necessary components for prospective posters to create the valid targeted chunk delivery response: an identifier with a signature that verifies the association between the identifier and the missing chunk hash. The identifier is chosen so that the address of the single owner chunk (the hash of the ID with the owner account) falls into the requestor's neighbourhood and is automatically delivered by the network's push-sync protocol implementation.
 
 \begin{figure}[htbp]
 \centering
@@ -1938,7 +1938,7 @@ A \gloss{recovery response envelope} serves to provide a way for recovery hosts 
 \label{fig:recovery-response}
 \end{figure}
 
-If the targeted recovery host is online, they will receive the recovery request and extract the missing chunk address as well as the identifier and the signature from the recovery response. After retrieving the corresponding chunk they pinned in their local storage they can simply create the recovery response. The hash of the identifier and the payload hash concatenated together forms the plain text of the signature. The signature received in the recovery request allows her to recover the public key of the requestor. From this public key they are able to calculate the requestor's address and finally, hashing this with the identifier results in the address of the single owner chunk. This scheme makes more sense if a postage stamp is also attached to the request which can be sent along with the recovery response as requestors are able to cover the Swap costs of returning the chunk which compensates the global pinner. In this way, it is possible for downloaders to intelligently cover the operating costs of nodes using micro-payments, hence ensuring the availability of data for the whole of the network.
+If the targeted recovery host is online, they receive the recovery request and extract the missing chunk address, identifier, and signature from the recovery response. After retrieving the corresponding chunk pinned in their local storage, they can proceed to create the recovery response. To create the recovery response, the recovery host combines the hash of the identifier and the payload hash to form the plain text of the signature. The signature received in the recovery request allows her to recover the public key of the requestor. Using this public key, they are able to calculate the requestor's address and finally, by hashing the requestor's address with the identifier, obtain the address of the single owner chunk. It is beneficial to attach a postage stamp to the request, which can be sent along with the recovery response. Requestors have the ability to cover the Swap costs associated with returning the chunk, compensating the global pinner. This scheme enables downloaders to intelligently cover the operating costs of nodes through micro-payments, thus ensuring the availability of data throughout the network.
 
 \section{Dream: deletion and immutable content}\label{sec:dream}
 \input{dream}
