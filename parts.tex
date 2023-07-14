@@ -1081,7 +1081,7 @@ in which individual trie nodes are serialised as chunks. The paths are associate
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{fig/manifest-entry.pdf}
-\caption[Manifest entry \statusgreen]{Manifest entry is a data  structure that contains the reference to a file including metadata about a file or directory  pertaining to the assembler, access control, and http headers.}
+\caption[Manifest entry \statusgreen]{Manifest entry is a data  structure that contains the reference to a file including metadata about a file or directory  pertaining to the assembler, access control, and HTTP headers.}
 \label{fig:manifest-entry}
 \end{figure}
 
@@ -1948,34 +1948,34 @@ If the targeted recovery host is online, they receive the recovery request and e
 
 \chapter{User experience}\label{sec:ux}
 
-This chapter approaches Swarm features introduced in the previous chapters from the user's perspective. In \ref{sec:upload}, we discuss the user experience related to configuring uploads including aspects of postage, pinning, erasure coding, as well as tracking the progress of chunks propagating into the network with the help of upload tags. Then we turn to the user's experience of the storage API, uploading collections in \ref{sec:storage-ux} then turn to a description of the options available for communication in \ref{sec:messaging}.
+This chapter approaches the Swarm features introduced in the previous chapters from the user's perspective. In \ref{sec:upload}, we discuss the user experience of configuring uploads including aspects of postage, pinning, erasure coding, as well as tracking the progress of chunk propagation into the network using upload tags. Then we turn to the user's experience of the storage API, specifically uploading collections, in \ref{sec:storage-ux}. Finally, we provide an overview of the communication options available in \ref{sec:messaging}.
 % Finally, in \ref{sec:buzz-apiary}, we present a complete framework for web3 dapp development.
 
 \section{Configuring and tracking uploads \statusgreen}\label{sec:upload}
 
 \green{}
 
-Upload is the most important interface for Swarm. Section \ref{sec:headers} presents the request headers (or alternatively, query parameters) used for configuring the upload APIs. In \ref{sec:tags} we introduce upload tags which can be used to track the state of the entire upload and displayed using progress bars together with an estimate of how long it will take for the process to complete. Tags also record partial root hashes which can then be used to resume an upload in the event it is interrupted before completion. In \ref{sec:postage-ux}, we sketch the scenarios relating to payment for upload and dispersal into the network, in particular how users can buy and attach stamps to chunks. Finally, \ref{sec:features} runs through optional parameters such as encryption, \gloss{pinning}, and \glossplural{erasure code}.
+The upload interface is the cornerstone of Swarm's functionality, allowing users to easily transfer their data into the network. Section \ref{sec:headers} presents the request headers (or alternatively, query parameters) used for configuring the upload APIs. In \ref{sec:tags}, we introduce upload tags that allow tracking the upload process through progress bars together with an estimate of how long it will take for the process to complete. Additionally, tags also record partial root hashes, enabling the resumption of interrupted uploads. In \ref{sec:postage-ux}, we sketch the scenarios relating to payment for upload and dispersal into the network, including how users can purchase and attach stamps to chunks. Finally, \ref{sec:features} runs through optional parameters such as encryption, \gloss{pinning}, and \glossplural{erasure code}.
 
 \subsection{Upload options \statusgreen}\label{sec:headers}
 
-The local http proxy offers the \lstinline{bzz} URL scheme as a storage API. Requests can specify Swarm specific options such as:
+The local HTTP proxy offers the \lstinline{bzz} URL scheme as a storage API. Requests can specify Swarm-specific options such as:
 
 \begin{itemize}[noitemsep]
 \item \lstinline{tag} -- use this upload tag -- generated and returned in response header if not specified. 
 \item \lstinline{stamp} -- upload using this postage subscription -- if not given, the one used most recently is used. 
-\item \lstinline{encryption} -- encrypt content if set, if set to a 64-byte hex value encoding a 256 bit integer, then that is used instead of a randomly generated key. 
+\item \lstinline{encryption} -- encrypt content if set, if set to a 64-byte hex value encoding a 256-bit integer, then that is used instead of a randomly generated key. 
 \item \lstinline{pin} -- pin all chunks of the upload if set. 
 \item \lstinline{parities} -- apply RS erasure coding to all intermediate chunks using this number of parities per child batch.
 \end{itemize}
 
-These options can be used as URL query parameters or specified as  headers. The name of the header is obtained by capitalising the parameter name and prefixing it with \lstinline{SWARM-},  i.e. \lstinline{SWARM-PARITIES}.  
+These options can be used as URL query parameters or specified as  headers. The name of the header is obtained prefixing the parameter name with \lstinline{SWARM-}, written in uppercase, e.g., \lstinline{SWARM-PARITIES}.  
 
 
 \subsection{Upload tags and progress bar \statusgreen}\label{sec:tags}                                                                                        
-When uploading a file or collection, it is useful to the user to know when the upload is complete in the sense that all newly created chunks are synced to the network and arrived at the neighbourhood where they can be retrieved. At this point, the uploader can "disappear", i.e. can quit their client. A publisher can disseminate the root hash and be assured, the file or collection is retrievable from every node on Swarm. 
+When uploading a file or collection, it is useful for the user to know when the upload is complete, meaning that all newly created chunks are synced to the network and have arrived at the neighbourhood where they can be retrieved. At this point, the uploader can "disappear", i.e. they can quit their client. A publisher can disseminate the root hash and be assured that the file or collection is retrievable from every node on Swarm. 
 
-Since the push-sync protocol provided statements of custody receipts for individual chunks we only need to collect and count those for an upload. Tracking the ratio of sent chunks and returned receipts provides the data to a \emph{progress bar}. An \gloss{upload tag} is an object representing an upload and tracking the progress by counting how many chunks have reached a particular state. The states are: 
+To track the progress of an upload, we utilise the push-sync protocol's statements of custody receipts for individual chunks. By collecting and counting these receipts, we can track the ratio of sent chunks and returned receipts, which provides the data to a \emph{progress bar}. An \gloss{upload tag} is an object that represents an upload and tracks its progress by counting how many chunks have reached a particular state. The states are: 
 
 \begin{itemize}[noitemsep]
 \item \emph{split} -- Number of chunks split; count chunk instances.
@@ -1985,79 +1985,79 @@ Since the push-sync protocol provided statements of custody receipts for individ
 \item \emph{synced} -- Number of distinct chunks for which the statement of custody arrived.
 \end{itemize}
 
-With the help of these counts, one can monitor progress of 1) chunking 2) storing 3) push-syncing, and 4) receipts.
-If the upload tag is not specified in the header, one is randomly generated and is returned as a response header after the file is fully chunked. In order to monitor 1) and  2) during the upload, the tag needs to be created before the upload and supplied in the request header. Thus, the tag can be queried concurrently while the uploaded content is being processed. 
+With the help of these counts, it is possible to monitor the progress of 1) chunking 2) storing 3) push-syncing, and 4) receipts.
+If the upload tag is not specified in the header, a random tag will be generated and returned as a response header once the file is fully chunked. In order to monitor the progress of chunking and storing during the upload, the tag needs to be created beforehand and supplied in the request header. Thus, the tag can be queried concurrently while the uploaded content is being processed. 
 
 \subsubsection{Known vs unknown file sizes}
 
-If the file size is known, the total number of chunks can be calculated, so that progress of chunking and storage can be meaningful from the beginning in proportion to the total.
+If the file size is known, it is possible to calculate the total number of chunks that will be generated. This allows for meaningful progress tracking of both chunking and storage from the beginning, in proportion to the total number of chunks.
 
-If the size and total number of chunks split is not known prior to the upload, the progress of split is undefined. After the chunker has finished splitting, one can set the total count to the split count and from that point on, a percentage progress as well as ETA are available for the rest of the counts.
+However, if the size and total number of chunks split are not known prior to the upload, the progress of chunk splitting is undefined. After the chunker has finished splitting the file, the total count can be set to the split count. From that point on, a percentage progress and estimated time of arrival (ETA) are available for the rest of the counts.
 
-Note that if the upload also includes a manifest, the total count will serve only as an estimation until the total is set to the split count. This estimation converges to the correct value as the size of the file grows.
+Note that if the upload also includes a manifest, the total count will only serve as an estimation until it is set to the split count. This estimation converges to the correct value as the size of the file increases during the upload process.
 
 
 \subsubsection{Duplicate chunks}
 
-\glossupperplural{duplicate chunk} are chunks that occur multiple times within an upload or across uploads. In order to have a locally verifiable definition, we define a chunk as a duplicate (or seen) if and only if it is already found in the local store.
-When chunks enter the local store via upload they are push synced, therefore seen chunks need not be push-synced again.
+\glossupperplural{duplicate chunk} refer to chunks that occur multiple times within an upload or across different uploads. In order to have a locally verifiable definition, we define a chunk as a duplicate (or seen) if and only if it already exists in the local store.
+Since chunks enter the local store via upload and are push-synced, there is no need for seen chunks to be push-synced again.
 
-In other words, only newly stored chunks need to be counted when assessing the estimated time of syncing an upload. If we want progress on sent and synced counts, they must report completeness in proportion to stored distinct chunks.
+In other words, only newly stored chunks need to be counted when assessing the estimated time of syncing an upload. If we want to track progress based on sent and synced counts, they must reflect the completeness of stored distinct chunks in proportion to the overall progress.
 
 \subsubsection{Tags API} 
 
-The http server's \lstinline{bzz} URL scheme provides the \lstinline{tags} endpoint for the tags API. It supports creating, listing and viewing individual tags. Most importantly there is an option to track the changes of a tag in real time using http streams.
+The HTTP server's \lstinline{bzz} URL scheme provides the \lstinline{tags} endpoint for the tags API. This endpoint supports the creation, listing, and viewing of individual tags. Most importantly, it offers an option to track the changes of a tag in real time using HTTP streams.
 
 
 
 \subsection{Postage \statusgreen}\label{sec:postage-ux}
 
-To impose a cost on uploads and efficiently allocate storage resources in the network, all uploads must be paid for.  This is somewhat unusual for the web, so a novel user experience needs to be developed. The closest and most familiar metaphor is a subscription.
+To impose a cost on uploads and efficiently allocate storage resources in the network, all uploads must be paid for.  This concept may be unfamiliar in the context of the web, so a novel user experience needs to be developed. The closest and most relatable metaphor is that of a subscription.
 
 \subsubsection{Postage subscriptions}
 
-The user creates a subscription for a certain amount of time and storage (e.g. 1 month for 100 megabytes) and pays for it according to a price they learn from the client software (this is similar to how transaction fees are determined for the blockchain). Estimates for price can be read from the postage lottery contract. Subscriptions are named, but these names are only meaningful locally. The API will offer a few default options for the chosen storage period, on a logarithmic scale, e.g.: 
+The user can create a subscription for a specific duration and storage capacity (e.g. 1 month for 100 megabytes) and make the corresponding payment based on the price provided by the client software (similar to how transaction fees are determined for the blockchain). Price estimates can be obtained from the postage lottery contract. Subscriptions are named, but these names are only meaningful locally. The API will offer a few default options for the chosen storage period, on a logarithmic scale, e.g.: 
 
 \begin{itemize}[noitemsep]
-\item \emph{minimal (a few hours)} -- Useful for immediate delivery of pss messages or single owner chunks part of ephemeral chat or other temporary files.
-\item \emph{temporary (week)} -- Files or mailboxed messages meant not to be stored long but to be picked up by third parties asynchronously.
-\item \emph{long term (year)} -- Default long term storage. 
-\item \emph{forever (10 years)} -- Important content not to be lost/forgotten; to survive the growth of the network and subsequent increase of batch depth even if the uploader remains completely offline.
+\item \emph{minimal (a few hours)} -- Useful for immediate delivery of pss messages or single owner chunks that are part of ephemeral chat or other temporary files.
+\item \emph{temporary (week)} -- Files or mailboxed messages that are not meant to be stored for long, but rather picked up by third parties asynchronously.
+\item \emph{long term (year)} -- The default option for long-term storage. 
+\item \emph{forever (10 years)} -- Important content that should not be lost/forgotten; intended to survive the network's growth and subsequent increase of batch depth even if the uploader remains completely offline.
 \end{itemize}
 
-When the user uploads files, they can also indicate which subscription to use as the value of the \lstinline{stamp} upload parameter. If this is not given, the most recent one is used as default. If the size of the upload is known, the user can be warned if it is larger than the postage capacity. 
+When uploading files, the user can indicate which subscription they would like to use by specifying the value of the \lstinline{stamp} upload parameter. If no subscription is specified, the most recent one is used as the default. If the size of the upload is known, the user can receive a warning if it exceeds the available postage capacity. 
 
 \subsubsection{Postage reuse strategies}
 
-As mentioned in \ref{sec:postage-stamps}, encryption can be used to mine chunks to make sure they fall into \glossplural{collision slot} of postage batches. This strategy of mining chunks into batches makes sense for users that only want to upload a particular file/collection for a particular period or want to keep the option open to change the storage period for the file/collection independently of other uploads.
+As mentioned in \ref{sec:postage-stamps}, encryption can be used to mine chunks to make sure they align with the \glossplural{collision slot} of postage batches. This strategy of mining chunks into batches makes sense for users who only want to upload a particular file/collection for a particular period or want to keep the option open to change the storage period for the file/collection independently of other uploads.
 
-The alternative is to prepay a large set of postage batches and always keep a fixed number of them open for every period. This way we can make sure that we have a free \gloss{collision slot} in one of the batches for any chunk. The postage batches are ordered by time of purchase and when attaching a stamp to a chunk, the first batch is used that has a free slot for the chunk address in question. This more profitable strategy is used most effectively by power users including insurers who can afford to tie up liquidity for long time periods. The choice of strategy must be specified when creating a subscription.
+The alternative is to prepay a large set of postage batches and maintain a fixed number of them open for every period. This ensures that there is always an available  \gloss{collision slot} in one of the batches for any chunk. The postage batches are ordered based on the time of purchase, and when attaching a stamp to a chunk, the first batch with a free slot for the chunk address is utilised. This profitable strategy is used most effectively by power users including insurers who can afford to tie up liquidity for longer time periods. The choice of the preferred strategy must be specified when creating a subscription.
 
 \subsubsection{The postage subscription API}
 
-In order to manage subscriptions, the \lstinline{bzz} URL-scheme provides the \lstinline{stamp} endpoint for the postage API. With this API the user can create postage subscriptions, list them, view them, top them up, or drain and expire them. 
+In order to manage subscriptions, the \lstinline{bzz} URL-scheme provides the \lstinline{stamp} endpoint for the postage API. This API allows users to perform various actions such as creating postage subscriptions, listing them, viewing details, topping them up, or draining and expiring them. 
 
-When checking their subscription(s), the user is informed how much data has already been uploaded to that subscription and how long it can be stored given the current price (e.g. $88/100$ megabytes for $23$ days). If the estimated storage period is low, the files using the subscription are in danger of being garbage collected and therefore, to prevent that, topping up their subscription is instructive.
+When checking their subscription(s), the user is informed how much data has already been uploaded to that subscription and how long it can be stored given the current price (e.g. $88/100$ megabytes for $23$ days). If the estimated storage period is low, indicating the risk of the files using the subscription being garbage collected, users are encouraged to top up their subscription to ensure the content remains protected.
 
 
 \subsection{Additional upload features \statusgreen}\label{sec:features}
 
-Additional features such as swap costs, encryption, pinning and erasure coding can be set on upload using request headers. 
+Additional features such as swap costs, encryption, pinning, and erasure coding can be specified during upload by using relevant request headers. 
 
 
 \subsubsection{Swap costs}
 
-Uploading incurs swap costs coming from the push-sync protocol showing up in \gloss{SWAP} accounting (\ref{sec:accounting}). On every peer connection, if the balance tilts beyond the effective payment threshold, a cheque is to be issued and sent to the peer. If, however, the checkbook contract does not exist or is lacking sufficient funds to cover the outstanding debt, the peer connection is blocked. This may lead to unsaturated Kademlia and during that time, the node will count as a light node. The download can continue potentially using a smaller number of peers but, since some chunks will need to be sent to peers not closer to the request address than the node itself, the average cost of retrieving a chunk will be higher. 
+Uploading content incurs swap costs, which are associated with the push-sync protocol and reflected in the \gloss{SWAP} accounting system (\ref{sec:accounting}). When the balance tilts beyond the effective payment threshold on a peer connection, a cheque is issued and sent to the peer. If, however, the checkbook contract does not exist or lacks sufficient funds to cover the outstanding debt, the peer connection is blocked. This may lead to unsaturated Kademlia and during that time, the node is considered a light node. While the download process can still continue with potentially fewer peers, the average cost of retrieving a chunk may be higher since some chunks may need to be sent to peers that are not closer to the request address than the node itself. 
 
-It is useful to show this average number to the user as well as the average swap balance and the number of peer connections not available due to insufficient funds. This is accomplished through the SWAP API.
+To provide transparency to the user, information such as the average number of peers, average swap balance, and the number of unavailable peer connections due to insufficient funds can be accessed through the SWAP API.
 
 \subsubsection{Encryption}
 
-Encrypted upload is available by setting the upload option \lstinline{encryption} to a non-zero value. If the value is a hexadecimal representation of a 32 byte seed, that is used as a seed for encryption. Since encryption and decryption are handled by Swarm itself, it must only be used in situations where the transport between the http client and Swarm's proxy server can be guaranteed to be private. As such, this is not be used on public gateways, but only through local Swarm nodes or those that are private with well configured TLS and self-signed certificates.
+Encrypted upload is available by setting the upload option \lstinline{encryption} to a non-zero value. If the value is a hexadecimal representation of a 32 byte seed, that is used as a seed for encryption. Since encryption and decryption are handled by Swarm itself, it must only be used in situations where the transport between the HTTP client and Swarm's proxy server can be guaranteed to be private. As such, this is not be used on public gateways, but only through local Swarm nodes or those that are private with well configured TLS and self-signed certificates.
 
 \subsubsection{Pinning}
 
-When uploading, the user can specify directly if they want the content to be pinned locally by setting the \lstinline{pin} upload option to a non-zero value. Beyond this, the local http server's \lstinline{bzz} URL scheme provides the \lstinline{pin} endpoint for the pinning API. With this API, users can manage pinned content. A \lstinline{GET} request on the pinning endpoint gives a list of pinned files or connections.  The API also accepts \lstinline{PUT} and \lstinline{DELETE} requests on a hash (or domain name that resolves to a hash) to pin and unpin content, respectively.  
+When uploading, the user can specify directly if they want the content to be pinned locally by setting the \lstinline{pin} upload option to a non-zero value. Beyond this, the local HTTP server's \lstinline{bzz} URL scheme provides the \lstinline{pin} endpoint for the pinning API. With this API, users can manage pinned content. A \lstinline{GET} request on the pinning endpoint gives a list of pinned files or connections.  The API also accepts \lstinline{PUT} and \lstinline{DELETE} requests on a hash (or domain name that resolves to a hash) to pin and unpin content, respectively.  
 
 When pinning a file or collection, it is supposed to be retrieved and stored. Pinning triggers traversal of the hash tree and increments the reference count on each chunk; if a chunk is found missing locally, it is retrieved. After pinning, the root hash is saved locally. Unpinning triggers traversal of the hash and decrements the reference count of each chunk; if a chunk is found missing locally, it is ignored and a warning is included in the response. After unpinning, the hash is removed from the list of pinned hashes. 
 
@@ -2096,7 +2096,7 @@ As described in \ref{sec:collections}, a manifest can represent a generic index 
 
 Manifest entries are also needed for single files since they contain key information about the file such as content type, erasure coding which is needed for correct retrieval. A manifest that would contain a single entry to a file on  the empty path is called a \gloss{singleton manifest}. This contains no more information than the the entry itself.  
 
-The http server provides the \lstinline{bzz} URL scheme that implements the collection storage API. When a single file is uploaded via a \lstinline{POST} request the \lstinline{bzz} scheme, the manifest entry is created and stored and the response contains the reference to it.
+The HTTP server provides the \lstinline{bzz} URL scheme that implements the collection storage API. When a single file is uploaded via a \lstinline{POST} request the \lstinline{bzz} scheme, the manifest entry is created and stored and the response contains the reference to it.
 
 \subsubsection{Uploading and updating collections}
 
@@ -2207,7 +2207,7 @@ Swarm core offers the lowest level entry-points for communication-related functi
 
 % \subsection{Pss \statusorange}\label{sec:pss-ux}
 
-Since trojan message handling differs significantly from storage operations, it deserves its  own URL-scheme called \lstinline{pss}. The pss scheme provides an API for sending messages. When sending a \lstinline{POST} request, the URL is interpreted as referencing the X3DH pre-key bundle feed update chunk. This contains the public key needed to encrypt as well as the destination targets,    one of which should match the trojan message address (see \ref{sec:trojan}). 
+Since Trojan message handling differs significantly from storage operations, it deserves its own URL-scheme called \lstinline{pss}. The pss scheme provides an API for sending messages. When sending a \lstinline{POST} request, the URL is interpreted as referencing the X3DH pre-key bundle feed update chunk. This contains the public key needed to encrypt as well as the destination targets,    one of which should match the trojan message address (see \ref{sec:trojan}). 
 
 Destination targets are represented as the buzz serialisation of the target prefixes as a file. The URL path points to this file or is a top-level domain. The topic is specified as a query parameter and the message as the request body.
 

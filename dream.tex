@@ -195,22 +195,21 @@ Beside our sensitive content $C$, let us consider $A$, any uncontroversial conte
 \subsubsection{Resolution of attacks}
 
 
-A powerful adversary can infiltrate every neighborhood of Swarm and archive all information that has ever been uploaded (without being able to decipher it surely) and keep logs of what has been uploaded in what order, which would allow it to serve up deleted content on demand. But there is a huge price on such indiscriminate archiving of all Swarm's content and that is the only way to reliably defeat the dream construction.
+A powerful adversary could potentially infiltrate every neighborhood of Swarm and archive all information that has ever been uploaded (even without being able to decipher it). They could also keep logs of what has been uploaded in what order, which would allow it to serve up deleted content on demand. But there is a huge price on such indiscriminate archiving of all Swarm's content, and that is the only way to reliably defeat the dream construction.
 
-We now turn to the discussion how to calibrate the step-count given a security model. Let us assume a network-wide neighbourhood infiltration rate of $\frac{1}{2}$, meaning that  half of the neighbourhoods in the network is assumed  to be  malicious and colluding. 
+We now turn to the discussion how to calibrate the step-count in relation to the security model. Let us assume a network-wide neighbourhood infiltration rate of $\frac{1}{2}$, meaning that  half of the neighbourhoods in the network is assumed  to be  malicious and colluding. 
 
-Assuming that when  revoking access, the owner uploaded new chunks in each neighbourhood on the dream path. 
-Given a particular dream chain, 
-However, if even  a single neighbourhood on the dream path is honest they respect the newly arrived chunks and divert the dream path, making it never terminate with the grantee. 
+When access is revoked, the owner uploads new chunks in each neighbourhood along the dream path. 
+Given a particular dream chain, however, if even a single neighbourhood on the dream path is honest, they will respect the newly arrived chunks and divert the dream path, preventing it from terminating with the grantee. 
 
 
-Thus for  a breach of access to happen, all neighbourhoods must be malicious.
-In our security model a neighbourhood is malicious with  uniform and independent probability.  For an overall infiltration rate of 1 out of $k$, the chance of all neighbourhoods on a given random dream path being malicious is $k^{-n}$. For a security requirement of success rate of $\sigma$ "nines", i.e error rate less than $10^{-\sigma}$,  we can formulate the requirement as
+Thus, for a breach of access to happen, all neighbourhoods must be malicious.
+In our security model, a neighbourhood is malicious with  uniform and independent probability.  For an overall infiltration rate of 1 out of $k$, the chance of all neighbourhoods on a given random dream path being malicious is $k^{-n}$. For a security requirement of success rate of $\sigma$ "nines", where the error rate is less than $10^{-\sigma}$,  we can formulate the requirement as
 %
 \begin{equation}
     \frac{1}{k^n}< \frac{1}{10^{-\sigma}}
 \end{equation}
-Now, expressing $k$ as $10^\kappa$, taking the logarithm of both sides and multiply by $-1$, we get
+Now, expressing $k$ as $10^\kappa$, taking the logarithm of both sides and multiplying by $-1$, we get
 %
 \begin{equation}
     n > \frac{\sigma}{\kappa}
