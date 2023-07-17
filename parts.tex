@@ -1331,7 +1331,7 @@ In fact, the integrity of a feed can only be guaranteed by the owner. However, i
 \subsubsection{Authoritative version history}
 
 Mutable resource update feeds track versions pretty much the same way as the Ethereum Name Service does.  
-When a version is consolidated, such as a website update, the owner wants to register the content address of the current version. In order to guarantee that there is no dispute over history, the payload needs to incorporate the hash of the previous payload. This requirement implies that the payload must be a composite structure. However, if the goal is to have a payload consisting of solely a manifest or manifest entry so that it can be rooted to a URL path or directly displayed, this is not possible. Additionally, if in cases where the feed content is not a payload hash, ENS registers a payload hash despite the abscence of the corresponding chunk in Swarm, thus violating the semantics of ENS.
+When a version is consolidated, such as a website update, the owner wants to register the content address of the current version. In order to guarantee that there is no dispute over history, the payload needs to incorporate the hash of the previous payload. This requirement implies that the payload must be a composite structure. However, if the goal is to have a payload consisting of solely a manifest or manifest entry so that it can be rooted to a URL path or directly displayed, this is not possible. Additionally, if in cases where the feed content is not a payload hash, ENS registers a payload hash despite the absence of the corresponding chunk in Swarm, thus violating the semantics of ENS.
 
 An indexing scheme that incorporates the previous payload hash into the subsequent index operates in a similar manner to a blockchain. It expresses the owner's unambiguous commitment to a particular history and requires any consumer who reads and uses it to acknowledge and accept that history. 
 Looking up such feeds is only possible by retrieving each update since the last known one. The address refers to the update chunk, so registering the update address both guarantees historic integrity and preserves ENS semantics so that the registered address is just a Swarm reference to a chunk.
@@ -1536,7 +1536,7 @@ After the recipient has opened the envelope using asymmetric decryption, they pr
 
 \subsubsection{Mailboxing for asynchronous delivery}
 
-If the recipient is not online, the Trojan chunk will prevail as any other chunk would, depending on the postage stamp it has. Whenever the recipient node comes online, it pull-syncs the chunks from the closest neighbourhood, including all Trojan chunks and their own unreceived messages. In other words, through Trojan messages, pss automatically provides asynchronous \emph{mailboxing} functionality, allowing undelivered messages to be preserved and accessible to the recipient when they come online without any additional action needed from the sender. The duration of mailboxing is controlled with postage stamps, just like the storage of chunks, in fact, it is indistinguishable from regular chuck storage.
+If the recipient is not online, the Trojan chunk will prevail as any other chunk would, depending on the postage stamp it has. Whenever the recipient node comes online, it pull-syncs the chunks from the closest neighbourhood, including all Trojan chunks and their own unreceived messages. In other words, through Trojan messages, pss automatically provides asynchronous \emph{mailboxing} functionality, allowing undelivered messages to be preserved and accessible to the recipient when they come online without any additional action needed from the sender. The duration of mailboxing is controlled with postage stamps, just like the storage of chunks, in fact, it is indistinguishable from regular chunk storage.
 
 \subsubsection{Mining for proximity}
 
@@ -2053,81 +2053,81 @@ To provide transparency to the user, information such as the average number of p
 
 \subsubsection{Encryption}
 
-Encrypted upload is available by setting the upload option \lstinline{encryption} to a non-zero value. If the value is a hexadecimal representation of a 32 byte seed, that is used as a seed for encryption. Since encryption and decryption are handled by Swarm itself, it must only be used in situations where the transport between the HTTP client and Swarm's proxy server can be guaranteed to be private. As such, this is not be used on public gateways, but only through local Swarm nodes or those that are private with well configured TLS and self-signed certificates.
+Encrypted upload can be enabled by setting the upload option \lstinline{encryption} to a non-zero value. If the value provided is a hexadecimal representation of a 32-byte seed, that seed is used for encryption. Since encryption and decryption are handled by Swarm itself, it must only be used in situations where the transport between the HTTP client and Swarm's proxy server can be guaranteed to be private. As such, it should not be used on public gateways, but rather through local Swarm nodes or private environments with well-configured TLS and self-signed certificates to ensure the necessary privacy and security.
 
 \subsubsection{Pinning}
 
-When uploading, the user can specify directly if they want the content to be pinned locally by setting the \lstinline{pin} upload option to a non-zero value. Beyond this, the local HTTP server's \lstinline{bzz} URL scheme provides the \lstinline{pin} endpoint for the pinning API. With this API, users can manage pinned content. A \lstinline{GET} request on the pinning endpoint gives a list of pinned files or connections.  The API also accepts \lstinline{PUT} and \lstinline{DELETE} requests on a hash (or domain name that resolves to a hash) to pin and unpin content, respectively.  
+When uploading content, users have the option to specify if they want the content to be pinned locally by setting the \lstinline{pin} upload option to a non-zero value. Beyond this, the local HTTP server's \lstinline{bzz} URL scheme provides the \lstinline{pin} endpoint for the pinning API, which allows users to manage pinned content. By making a \lstinline{GET} request on the pinning endpoint, users can retrieve a list of pinned files or connections. The API also accepts \lstinline{PUT} and \lstinline{DELETE} requests on a hash (or domain name that resolves to a hash) to pin and unpin content, respectively.  
 
-When pinning a file or collection, it is supposed to be retrieved and stored. Pinning triggers traversal of the hash tree and increments the reference count on each chunk; if a chunk is found missing locally, it is retrieved. After pinning, the root hash is saved locally. Unpinning triggers traversal of the hash and decrements the reference count of each chunk; if a chunk is found missing locally, it is ignored and a warning is included in the response. After unpinning, the hash is removed from the list of pinned hashes. 
+When a file or collection is pinned, it is supposed to be retrieved and stored. Pinning triggers the traversal of the hash tree and increments the reference count on each chunk. If a chunk is found to be missing locally, it will be retrieved. After pinning, the root hash is saved locally for future access. Unpinning triggers the traversal of the hash and decrements the reference count of each chunk. If a chunk is missing locally, it is ignored and a warning is included in the response. After unpinning, the hash is removed from the list of pinned hashes. 
 
 
 
 \subsubsection{Erasure coding}
 
-Erasure coding (see \ref{sec:erasure}) is triggered on an upload by setting the \lstinline{parities} upload option to the number of parity chunks among the children of each intermediate chunk. It is important that erasure coded files cannot be retrieved using the default Swarm downloader so erasure coding settings should be indicated in the encapsulating manifest entry by setting the \lstinline{rs} attribute to the number of parity chunks. 
+Erasure coding (see \ref{sec:erasure}) can be enabled during an upload by setting the \lstinline{parities} upload option to specify the number of parity chunks among the children of each intermediate chunk. It is worth noting that erasure coded files cannot be retrieved using the default Swarm downloader. Therefore, when using erasure coding, it is important to indicate the erasure coding settings in the encapsulating manifest entry by setting the \lstinline{rs} attribute to the number of parity chunks. 
 
 \section{Storage \statusgreen}\label{sec:storage-ux}
 
 \green{}
 
 
-In this section, we introduce the storage API provided through the \lstinline{bzz} family of URL schemes by Swarm's local HTTP proxy.
+In this section, we will introduce the storage API provided through the \lstinline{bzz} family of URL schemes by Swarm's local HTTP proxy.
 
 \subsection{Uploading files \statusgreen}\label{sec:file-api}
 
-The \lstinline{bzz} scheme allows for uploading files directly through the \lstinline{file} API. The file is expected to be encoded in the request body or in a multipart form. All the query paramaters (or corresponding headers)  introduced in \ref{sec:headers} can be used with this scheme. The \lstinline{POST} request chunks and uploads the file. A manifest entry is created containing the reference to the uploaded content together with some attributes reflecting the configuration of the upload, e.g. \lstinline{rs} specifying the number of parities per batch for erasure codes.
-The manifest entry is provided as a response. The upload tag that we can use to monitor the status of the upload will contain the reference to the uploaded file as well as the manifest entry.
+The \lstinline{bzz} scheme allows for uploading files directly through the \lstinline{file} API. The file is expected to be encoded in the request body or in a multipart form. All the query paramaters (or corresponding headers)  introduced in \ref{sec:headers} can be used with this scheme. The \lstinline{POST} request will chunk and upload the file. A manifest entry is created, which includes the reference to the uploaded content and reflects the configuration of the upload, e.g. the number of parities per batch for erasure codes specified by the \lstinline{rs} attribute.
+The manifest entry is provided as a response. The upload tag. which allows us to monitor the status of the upload, will contain the reference to the uploaded file as well as the manifest entry.
 
 \subsubsection{Appending to existing files}\label{sec:append}
 
-The \lstinline{PUT} request implements appending to pre-existing data in the swarm and expects the URL to point to that file. If the file is referenced directly, settings such as the number of parities for erasure coding are taken from upload headers otherwise those in the enclosing manifest entry are used. The response is the same as in the case of \lstinline{POST} request.
+The \lstinline{PUT} request is used to append data to pre-existing data in the swarm and requires the URL to point to the specific file. If the file is directly referenced, the settings, such as the number of parities for erasure coding, are taken from the upload headers. Otherwise, if the file is not directly referenced, the settings obtained from the enclosing manifest entry will be used. The response follows the same format as in the case of a \lstinline{POST} request.
 
 
 \subsubsection{Resuming incomplete uploads}\label{sec:resume}
 
-As a special case, append is used when resuming uploads after a crash or user initiated abort. For this, one needs to keep track of partial uploads by periodically recording root hashes on the upload tag. When the upload tag specified in the header is not complete, we assume the request is meant to resume the same upload. The last recorded root hash in the tag is used as an append target: the right edge of the existing file is retrieved to initialise the state of the chunker. The file sent with the request is read from where the partial upload ended, i.e. the offset is set to the span of the root chunk recorded on the tag.
+As a special case, append is used when resuming uploads after a crash or user-initiated abort. In order to facilitate this, it is necessary to track partial uploads by periodically recording root hashes on the upload tag. When the specified upload tag in the header is not complete, it is assumed that the request is intended to resume the same upload. The last recorded root hash in the tag is used as an append target: the right edge of the existing file is retrieved to initialise the state of the chunker. The file sent with the request is read from where the partial upload ended, with the offset set to the span of the root chunk recorded on the tag.
 
 \subsection{Collections and manifests \statusgreen}\label{sec:manifests-ux}
 
-As described in \ref{sec:collections}, a manifest can represent a generic index mapping string paths to entries, and therefore can serve as the routing table to a virtual web-site, as the directory tree of a file collection or as a key--value store. 
+As described in Section \ref{sec:collections}, a manifest can represent a generic index that maps string paths to entries. This means that a manifest can serve as the routing table for a virtual website, the directory tree of a file collection, or even as a key--value store. 
 
 \subsubsection{Manifest entries vs singleton manifests}
 
-Manifest entries are also needed for single files since they contain key information about the file such as content type, erasure coding which is needed for correct retrieval. A manifest that would contain a single entry to a file on  the empty path is called a \gloss{singleton manifest}. This contains no more information than the the entry itself.  
+Manifest entries are essential not only for collections, but also for single files as they contain key information about the file, including content type and erasure coding details necessary for correct retrieval. A manifest with a single entry for a file located on the empty path is called a \gloss{singleton manifest}. In this case, the manifest contains no additional information beyond the entry itself.  
 
-The HTTP server provides the \lstinline{bzz} URL scheme that implements the collection storage API. When a single file is uploaded via a \lstinline{POST} request the \lstinline{bzz} scheme, the manifest entry is created and stored and the response contains the reference to it.
+To facilitate the storage of collections, the HTTP server provides the \lstinline{bzz} URL scheme, which implements the collection storage API. When a single file is uploaded via a \lstinline{POST} request using the \lstinline{bzz} scheme, a manifest entry is created and stored, and the response contains the reference to the created entry.
 
 \subsubsection{Uploading and updating collections}
 
-The API provided by the \lstinline{bzz} URL scheme supports uploading and updating collections too. The \lstinline{POST} and \lstinline{PUT} requests expect a multipart with a \gloss{tar stream}. The directory tree encoded in the tar stream is translated into a manifest while all the files are chunked and uploaded and their Swarm reference is included in the respective manifest entry. The \lstinline{POST} request uploads the resulting manifest and responds with its Swarm reference. The \lstinline{PUT} request requires the request URL to reference an already existing manifest which is updated with the one coming from the tar stream. Updating here means all the new paths are merged with the paths of the existing manifest. In case of identical paths, the entry coming from the upload replaces the old entry.
+The \lstinline{bzz} URL scheme provides an API that supports uploading and updating collections. When utilising the \lstinline{POST} and \lstinline{PUT} requests with a multipart payload containing a \gloss{tar stream}, the directory tree structure encoded within the tar stream is translated into a manifest. Simultaneously, the files within the collection are chunked and uploaded, with their respective Swarm references included in the corresponding manifest entries. The \lstinline{POST} request is used to upload the resulting manifest, and the response includes the Swarm reference associated with it. The \lstinline{PUT} request requires the request URL to reference an existing manifest that will be updated with the contents of the tar stream. The update process involves merging the new paths with the paths of the existing manifest. If there are identical paths, the entry coming from the upload will replace the corresponding entry in the existing manifest.
 
-The API enables inserting a path into a manifest, updating a path in a manifest (\lstinline{PUT}) and deleting (\lstinline{DELETE}) a path from a manifest. In case of a \lstinline{PUT} request, a file is expected in the request body which is uploaded and its manifest entry is inserted at the path present in the URL. If the path already existed in the manifest, the entry is replaced with the entry generated with the upload, implementing an update; otherwise if the path is new, it implements an insert. 
+The API enables inserting a path into a manifest, updating a path in a manifest (\lstinline{PUT}), and deleting (\lstinline{DELETE}) a path from a manifest. In case of a \lstinline{PUT} request, a file is expected in the request body, which is uploaded and its manifest entry is inserted at the path present in the URL. If the path already exists in the manifest, the existing entry is replaced with the entry generated with the upload, effectively performing an update. If the path is new, the upload inserts a new entry into the manifest. 
 
-The collection API supports the same headers as the file upload endpoint, namely the ones configuring postage subscription, tags, encryption, erasure coding and pinning.
+The collection API supports the same headers as the file upload endpoint, including those that configure postage subscription, tags, encryption, erasure coding, and pinning.
 
 \subsubsection{Updating manifests directly}
 
-Manipulating manifests is also supported directly: the \lstinline{bzz} URL scheme \lstinline{manifest} endpoint supports the \lstinline{PUT} and the \lstinline{DELETE} methods and behaves similarly to the collection endpoint except that it does not deal with the files referenced in the entries. The  URL path is expected to references a manifest with a path $p$. For \lstinline{PUT}, the request body requires a manifest entry which will be placed at path $p$. The chunks needed for the new manifest are created and stored and the root  hash of the  new manifest is returned in the response. The  \lstinline{DELETE} method expects empty request body  and deletes the entry on the path from the manifest: i.e., it creates a new manifest with the referenced path in  the URL missing. 
+Manipulating manifests is also supported directly: the \lstinline{bzz} URL scheme \lstinline{manifest} endpoint supports the \lstinline{PUT} and the \lstinline{DELETE} methods and behaves similarly to the collection endpoint. However, unlike the collection endpoint, the manifest endpoint does not handle the files referenced in the manifest entries. When using a manifest endpoint, the URL path is expected to reference a manifest with a path $p$. For \lstinline{PUT}, the request body should contain a manifest entry which will be placed at path $p$. The chunks needed for the new manifest are created and stored, and the root  hash of the new manifest is returned in the response. The  \lstinline{DELETE} method expects empty request body and removes the entry on the path from the manifest: i.e., it creates a new manifest where the referenced path in the URL is no longer present. 
 
-The \lstinline{POST} request directly on the manifest API endpoint installs a manifest entry. Practically, calling manifest     \lstinline{POST} on the output of file \lstinline{POST} is equivalent to \lstinline{POST} on the generic storage endpoint.  
+The \lstinline{POST} request made directly on the manifest API endpoint installs a manifest entry. Practically, calling a manifest \lstinline{POST} on the output of a file \lstinline{POST} is equivalent to making a \lstinline{POST} request on the generic storage endpoint.  
 
 Given manifest references $a$ and $b$ , sending a \lstinline{POST} request on \lstinline{manifest/merge/<a>/<b>} 
-merges $b$ onto $a$ (merge with giving preference to $b$ in case of conflicts), creates and stores all the chunks constituting the merged manifest and returns its root reference as a response.
+merges $b$ onto $a$ (merge with giving preference to $b$ in case of conflicts), creates and stores all the chunks constituting the merged manifest, and the root reference of the merged manifest is returned as a response.
 
 
-In case the URL path references a manifest, another manifest is accepted in the request body which is then merged into the one referenced. In case of conflicts, the one that is uploaded wins. 
+In case the URL path references a manifest, another manifest can be included in the request body, which is then merged into the referenced manifest. In case of conflicts, the one that is uploaded wins. 
 
 
 \subsection{Access control \statusgreen}\label{sec:access-control-ux}
 
-\glossupper{access control}, as described in  \ref{sec:access-control}, is facilitated through  the \lstinline{bzz} URL scheme, which provides the \lstinline{access} API endpoint. This API is meant as a convenience for users and supports putting a file/collection/site under access control as well as adding and removing grantees.
+\glossupper{access control}, as described in  \ref{sec:access-control}, is facilitated through  the \lstinline{bzz} URL scheme, which provides the \lstinline{access} API endpoint. This API offers a convenient way for users to apply access control to files, collections, or sites, as well as manage grantees.
 
-If the URL path references a collection manifest, then a \lstinline{POST} request with \gloss{AC} settings sent as JSON encoded request body will encrypt the manifest reference and wrap it with the submitted AC settings in a so called \gloss{root access manifest}. This manifest is then uploaded and the unencrypted reference to it is returned as the response body. 
+If the URL path references a collection manifest, then a \lstinline{POST} request with \gloss{AC} settings sent as a JSON-encoded request body will encrypt the manifest reference and wrap it with the submitted AC settings in a so-called \gloss{root access manifest}. This manifest is then uploaded, and the unencrypted reference to it is returned as the response body. 
 
-If the URL path references a root access manifest and the access control settings specify an \gloss{ACT} then this can be created or updated using \lstinline{POST}, \lstinline{PUT} and \lstinline{DELETE} requests. All requests expect a JSON array of grantee public keys or URLs in the request body. If the grantee is referenced by URL, the resolver is used to extract the owner public key through ENS.
+If the URL path references a root access manifest and the access control settings specify an \gloss{ACT}, then the ACT can be created or updated using \lstinline{POST}, \lstinline{PUT}, and \lstinline{DELETE} requests. All requests expect a JSON array of grantee public keys or URLs in the request body. If a grantee is referenced by a URL, the resolver is used to extract the owner's public key through ENS.
 
-The \lstinline{POST} request will create the ACT with the list of grantees. \lstinline{PUT} will update an existing ACT by merging the grantees in the body. \lstinline{DELETE} removes all the grantees listed in the request body. The new ACT root hash is then updated in the root access manifest which is uploaded and its Swarm address is returned in the response.
+The \lstinline{POST} request will create the ACT with the list of grantees. \lstinline{PUT} will update an existing ACT by merging the grantees specified in the request body. \lstinline{DELETE} removes all the grantees listed in the request body. The new ACT root hash is then updated in the root access manifest, which is uploaded, and its Swarm address is returned in the response.
 
 
 
@@ -2135,45 +2135,45 @@ The \lstinline{POST} request will create the ACT with the list of grantees. \lst
 
 Downloading is supported by the \lstinline{bzz} URL scheme. This URL scheme assumes that the domain part of the URL is referencing a manifest as the entry point. 
 
-Although the title of this section is Download, the same  processes are at work if a file is only partially retrieved. As shown in \ref{sec:files}, random access to a file at arbitrary offset is supported at the lowest level. Therefore GET requests on a URL pointing to a file accept \gloss{range queries} in the header. The range queries will trigger the retrieval of all but only those chunks of the file that cover the desired range.  
+It is worth noting that the processes involved in downloading are the same, even if a file is only partially retrieved. As shown in \ref{sec:files}, random access to a file at an arbitrary offset is supported at the lowest level. Therefore, \lstinline{GET} requests on a URL pointing to a file can include \gloss{range queries} in the header. These range queries will trigger the retrieval of only the necessary chunks of the file that cover the desired range.  
 
 \subsubsection{Retrieval costs}
 
-Downloading involves retrieving chunks through the network which in turn entails costs showing up as SWAP accounting (\ref{sec:accounting}). On every peer connection, if the balance tilts beyond the effective payment threshold, a cheque is to be issued and sent to the peer. If, however, the checkbook contract does not exist or is lacking sufficient funds to cover the outstanding debt, the peer connection is blocked. This may lead to non-saturated Kademlia and during that time, the node will count as a light node. The download can continue potentially using a smaller number of peers, but since some chunks will need to be sent to peers not closer to the request address than the node itself, the average cost of retrieving a chunk will be higher. 
+Downloading files in Swarm incurs costs in terms of SWAP accounting (as described in Section \ref{sec:accounting}). These costs are associated with retrieving chunks from the network. When a node's balance tilts beyond the effective payment threshold on a peer connection, a cheque is issued and sent to that peer. If, however, the checkbook contract does not exist or lacks sufficient funds to cover the outstanding debt, the peer connection is blocked. This may lead to non-saturated Kademlia and during that time, the node will count as a light node. The download can continue potentially using a smaller number of peers, however, since some chunks will need to be sent to peers that are not closer to the request address than the node itself, the average cost of retrieving a chunk will be higher. 
 
-It is useful to show this average number to the user as well as the average swap balance and the number of peer connections not available to receive retrieve requests due to insufficient funds. This is done through the SWAP API that is provided on the \lstinline{swap} endpoint of the \lstinline{bzz} URL scheme.
+To provide transparency to the user, it is valuable to display the average number of retrieve requests, the average swap balance, and the number of peer connections not unavailable due to insufficient funds. This information can be accessed through the SWAP API, which is available on the \lstinline{swap} endpoint of the \lstinline{bzz} URL scheme.
 
 
 \subsubsection{Domain Name Resolution}
 
-The domain part of the URL can be a human readable domain or subdomain with a \gloss{TLD} extension. Depending on the TLD, various name resolvers can be invoked. The TLD \lstinline{eth} is linked to the Ethereum Name Service contract on the Ethereum main chain. If you register a Swarm hash to an \gloss{ENS} domain, Swarm is able to resolve that by calling the ENS contract as a nameserver would. 
+The domain part of the URL can be a human-readable domain or subdomain with a \gloss{TLD} extension. Depending on the TLD, various name resolvers can be invoked. The TLD \lstinline{eth} is linked to the Ethereum Name Service contract on the Ethereum main chain. If you register a Swarm hash to an \gloss{ENS} domain, Swarm is able to resolve that by calling the ENS contract as a nameserver would. 
 
 \subsubsection{Authentication for access control}
 
-If the domain resolved referenced a \gloss{root access manifest}, the URL retrieved is under \gloss{access control} (see \ref{sec:access-control}). 
-Depending on the credentials used, the user is prompted for a password or possibly a pair of keys (key 1 for lookup, key 2 for decrypting the access key). 
-The Diffie--Hellmann shared secret is hashed with $0x00$ to derive \emph{the lookup key} and with $0x01$ to derive the \emph{access key decryption key}. The Swarm address of the ACT manifest root chunk is taken from the root access manifest. 
-Next the lookup key is appended to the ACT address. The resulting URL is used to retrieve the manifest entry. The reference on this entry is then decrypted with the access key decryption key, and the resulting access key is used to decrypt the original encrypted reference found in the root access manifest.
+If the resolved domain references a \gloss{root access manifest}, the retrieved URL is subject to \gloss{access control} (see \ref{sec:access-control}). 
+Depending on the credentials used, the user may be prompted for a password or a pair of keys (key 1 for lookup and key 2 for decrypting the access key). 
+The Diffie--Hellmann shared secret is hashed with $0x00$ to derive \emph{the lookup key} and with $0x01$ to derive the \emph{access key decryption key}. The Swarm address of the ACT manifest root chunk is obtained from the root access manifest. 
+The lookup key is then appended to the ACT address, resulting in a URL used to retrieve the manifest entry. The reference within this entry is then decrypted using the access key decryption key, and the resulting access key is used to decrypt the original encrypted reference stored in the root access manifest.
 
-Next the manifest entry matching the path of the URL is retrieved. The following attributes are taken into account:
+Next the manifest entry corresponding to the path of the URL is retrieved. The retrieval process considers the following attributes:
 
 
 \begin{itemize}[noitemsep]
     \item \lstinline{rs} -- {
-    structure with attributes needed to use RS erasure coding for retrieval, e.g. number of parity chunks}.
-    \item \lstinline{sw3} -- { structure with attributes needed for litigation, i.e. challenge insurer on a missing chunk}. 
+    structure with attributes needed to use RS erasure coding for retrieval, e.g. the number of parity chunks required}.
+    \item \lstinline{sw3} -- { structure with attributes needed for litigation, which includes challenging insurer regarding a missing chunk}. 
 \end{itemize}
 
 
-If the \lstinline{rs} attribute is given, there are three strategies to follow: 
+If the \lstinline{rs} attribute is provided, there are three strategies that can be followed: 
 
 
 \begin{itemize}[noitemsep]
-\item \emph{fallback} -- For all intermediate chunks, the RS parity chunks are ignored first and only if there is a missing non-parity chunk will they be used. This saves some bandwidth and the corresponding costs at the expense of speed: if a chunk is missing, fallback to RS is delayed.
-\item \emph{race} -- for all intermediate chunks, the RS parities are retrieved right away together with the rest of the children chunks. The first $n$ (assuming $k$ as value of \lstinline{rs}, i.e, $n$ out of $n+k$ coding scheme) chunks will be able to reconstruct all the $n$ real children. This is equivalent to saying that the $k$ slowest chunk retrievals can be ignored.  
+\item \emph{fallback} -- In this strategy, the RS parity chunks are initially ignored for all intermediate chunks. Only if a non-parity chunk is missing, the RS parity chunks are used. This approach helps save bandwidth and corresponding costs at the expense of speed: if a chunk is missing, fallback to RS is delayed.
+\item \emph{race} -- The RS parities are retrieved immediately alongside the rest of the children chunks for all intermediate chunks. The first $n$ (assuming $k$ as the value of \lstinline{rs}, i.e, $n$ out of $n+k$ coding scheme) chunks are sufficient to reconstruct all the $n$ real children. This is equivalent to saying that the $k$ slowest chunk retrievals can be ignored.  
 \end{itemize}
 
-The default strategy choice is \lstinline{race}, if the user wants to save on download, then the fallback strategy can be enforced by setting the header \lstinline{SWARM-RS-STRATEGY=fallback} or completely disabled by setting \lstinline{SWARM-RS-STRATEGY=disabled}. The number of parities for an erasure coded batch is taken from the enclosing manifest's \lstinline{rs} attribute but can be overridden with the header \lstinline{SWARM-RS-PARITIES}.
+The default strategy choice is \lstinline{race}, if the user wants to prioritise saving on downloads, then the fallback strategy can be enforced by setting the header \lstinline{SWARM-RS-STRATEGY=fallback}. Alternatively, the RS strategy can be completely disabled by setting \lstinline{SWARM-RS-STRATEGY=disabled}. The number of parities for an erasure coded batch is taken from the \lstinline{rs} attribute in the enclosing manifest. However, this can be overridden with the header \lstinline{SWARM-RS-PARITIES}.
 
 \subsubsection{Missing chunks}
 
@@ -2207,7 +2207,7 @@ Swarm core offers the lowest level entry-points for communication-related functi
 
 % \subsection{Pss \statusorange}\label{sec:pss-ux}
 
-Since Trojan message handling differs significantly from storage operations, it deserves its own URL-scheme called \lstinline{pss}. The pss scheme provides an API for sending messages. When sending a \lstinline{POST} request, the URL is interpreted as referencing the X3DH pre-key bundle feed update chunk. This contains the public key needed to encrypt as well as the destination targets,    one of which should match the trojan message address (see \ref{sec:trojan}). 
+Since Trojan message handling differs significantly from storage operations, it deserves its own URL-scheme called \lstinline{pss}. The pss scheme provides an API for sending messages. When sending a \lstinline{POST} request, the URL is interpreted as referencing the X3DH pre-key bundle feed update chunk. This contains the public key needed to encrypt as well as the destination targets,    one of which should match the Trojan message address (see \ref{sec:trojan}). 
 
 Destination targets are represented as the buzz serialisation of the target prefixes as a file. The URL path points to this file or is a top-level domain. The topic is specified as a query parameter and the message as the request body.
 
