@@ -13,13 +13,13 @@ The Swarm project is set out to build permissionless storage and communication i
 This part details the design and architecture of the system. In accordance with the principles laid out in \ref{sec:design-principles}, we put an emphasis on modular design, and conceive of Swarm as having clearly separable layers, each dependent on the previous one (see Figure \ref{fig:Swarm-layered-design}):
 
 \begin{itemize}[noitemsep]
-\item (1) \emph{a peer-to-peer network protocol to serve as underlay transport,}
-\item (2) \emph{an overlay network with protocols powering a distributed immutable storage of \glossplural{chunk} (fixed size data blocks),}
-\item (3) \emph{a component providing high-level data access and defining APIs for base-layer features, and}
-\item (4) \emph{an application layer defining standards, and outlining best practices for more elaborate use-cases.}
+\item (1) \emph{A peer-to-peer network protocol to serve as underlay transport.}
+\item (2) \emph{An overlay network with protocols powering a distributed immutable storage of \glossplural{chunk} (fixed size data blocks).}
+\item (3) \emph{A component providing high-level data access and defining APIs for base-layer features.}
+\item (4) \emph{An application layer defining standards and outlining best practices for more elaborate use-cases.}
 \end{itemize}
 
-We regard (2) and (3) as the core of Swarm. Since the network layer relies on it, we will formulate also the requirements for (1), but we consider the detailed treatment of both (1) and (4) outside the scope of this book.
+We regard (2) and (3) as the core of Swarm. Since the network layer relies on it, we will also formulate the requirements for (1), but we consider the detailed treatment of both (1) and (4) outside the scope of this book.
 
 
 Central to the design, the architecture of Swarm's overlay network (layer 2 in Figure \ref{fig:Swarm-layered-design}) is discussed in Chapter \ref{sec:network} and complemented by Chapter \ref{sec:incentivisation}, describing the system of economic incentives which makes Swarm self-sustaining. In Chapter \ref{sec:high-level-functionality}, we introduce the algorithms and conventions that allow Swarm to map data concepts on to the chunk layer to enable the high-level functionalities for storage and communication, notably data structures such as filesystems and databases, \gloss{access control}, indexed \gloss{feeds} and direct messaging  which comprise layer 3 of Swarm.
@@ -42,20 +42,20 @@ Swarm is a network operated by its users. Each node in the network is supposed t
 In its overall design, Swarm is agnostic of the particular underlay transport used as long as it satisfies the following requirements.
 
 \begin{enumerate}[noitemsep]
-    \item \emph{addressing} -- Nodes are identified by their \gloss{underlay address}.
-    \item \emph{dialling} -- Nodes can initiate a direct connection to a peer by dialing them on their underlay address.
-    \item \emph{listening} -- Nodes can listen to other peers dialing them and can accept incoming connections. Nodes that do not accept incoming connections are called \glossplural{light node}.
-    \item \emph{live connection} -- A node connection establishes a channel of communication which is kept alive until explicit disconnection, so that the existence of a connection means the remote peer is online and accepting messages.
-    \item \emph{channel security} -- 
+    \item \emph{Addressing} -- Nodes are identified by their \gloss{underlay address}.
+    \item \emph{Dialling} -- Nodes can initiate a direct connection to a peer by dialing them on their underlay address.
+    \item \emph{Listening} -- Nodes can listen to other peers dialing them and can accept incoming connections. Nodes that do not accept incoming connections are called \glossplural{light node}.
+    \item \emph{Live connection} -- A node connection establishes a channel of communication which is kept alive until explicit disconnection, so that the existence of a connection means the remote peer is online and accepting messages.
+    \item \emph{Channel security} -- 
     The channel provides identity verification and implements encrypted and authenticated transport resisting man-in-the-middle attacks.
-    \item \emph{protocol multiplexing} -- 
+    \item \emph{Protocol multiplexing} -- 
     The underlay network service can accommodate several protocols running on the same connection. Peers communicate the protocols with the name and versions that they implement, and the underlay service identifies compatible protocols and starts up peer connections on each matched protocol. 
-    \item \emph{delivery guarantees} -- 
+    \item \emph{Delivery guarantees} -- 
     Protocol messages have \gloss{guaranteed delivery}, i.e. delivery failures due to network problems result in direct error response. 
     Order of delivery of messages within each protocol is guaranteed. 
     Ideally, the underlay protocol provides prioritisation. 
     If protocol multiplexing occurs on the same transport channel, this most likely implies framing to prevent long messages from blocking higher priority messages.
-    \item \emph{serialisation} -- 
+    \item \emph{Serialisation} -- 
     The protocol message construction supports arbitrary data structure serialisation conventions.
     
 \end{enumerate}
@@ -69,7 +69,7 @@ The \gloss{libp2p} library can provide all the needed functionality and is the d
 
 While clients use the \gloss{underlay address} to establish connections to peers, each node running Swarm is additionally identified with an \gloss{overlay address}. It is this address that determines which peers a node will connect to and directs the way that messages are forwarded. The overlay address is assumed to be stable as it defines a node's identity across sessions and ultimately affects which content is most worth storing in the node's local storage.
 
-The node's \gloss{overlay address} is derived from an Ethereum account by hashing the corresponding elliptic curve public key with the \gloss{BZZ network ID}, using the 256-bit Keccak algorithm. The decision to include the BZZ network ID is rooted in the fact that there can be multiple Swarm networks (e.g.\ test net, main net, or private Swarms), and serves to ensure that the same address cannot be used across different networks. Assuming any sample of base accounts are independently selected, the resulting overlay addresses are expected to have a uniform distribution in the address space of 256-bit integers. It is important to derive the address from a public key, as it allows the nodes to issue commitments associated with an overlay location using cryptographic signatures that are verifiable by 3rd parties. 
+The node's \gloss{overlay address} is derived from an Ethereum account by hashing the corresponding elliptic curve public key with the \gloss{BZZ network ID} using the 256-bit Keccak algorithm. The decision to include the BZZ network ID is rooted in the fact that there can be multiple Swarm networks (e.g.\ test net, main net, or private Swarms), and serves to ensure that the same address cannot be used across different networks. Assuming any sample of base accounts are independently selected, the resulting overlay addresses are expected to have a uniform distribution in the address space of 256-bit integers. It is important to derive the address from a public key, as it allows the nodes to issue commitments associated with an overlay location using cryptographic signatures that are verifiable by 3rd parties. 
 
 Using the long-lived communication channels of the \gloss{underlay network}, Swarm nodes form a network with \emph{quasi-permanent} peer connections. The resulting connectivity graph can then realise a particular topology defined over the address space. The \gloss{overlay topology} chosen is called \gloss{Kademlia}: It enables communication between any two arbitrary nodes in the Swarm network by providing a strategy to relay messages using only underlay peer connections. The protocol that describes how nodes share information with each other about themselves and other peers is called 'Hive'. How nodes use this protocol to bootstrap the \gloss{overlay topology} is discussed in \ref{sec:bootstrapping}. 
 % The  theoretical basis for \gloss{Kademlia topology} is formalised rigorously in \ref{sec:kademlia-connectivity}. 
@@ -2177,9 +2177,9 @@ The default strategy choice is \lstinline{race}, if the user wants to prioritise
 
 \subsubsection{Missing chunks}
 
-If a chunk is found missing, we can fall back on the missing chunk notification protocol (see \ref{sec:reupload}). Reference to the root of the data structure representing the set of \gloss{recovery targets} is found at the latest update of the recovery feed. 
+If a requested chunk is found to be missing, we can fall back on the missing chunk notification protocol (see \ref{sec:reupload}). The reference to the root of the data structure representing the set of \gloss{recovery targets} can be found at the latest update of the recovery feed. 
 
-When a chunk request times out, the client can start creating the recovery message using the set of pinner hosts. Once created it is sent to the host. If this times out, the next recovery chunk is tried using a different pinner host node. This is repeated until the recovery chunk arrives or all the pinners and insurers are exhausted.
+When a chunk request times out, the client can initiate the creation of a recovery message using the set of pinner hosts. Once the recovery message is created, it is sent to the host. If this request also times out, the next recovery chunk is tried using a different pinner host node. This process is repeated until the recovery chunk is successfully retrieved or all the pinners and insurers have been exhausted.
 
 % \subsubsection{Litigation}
 
@@ -2189,13 +2189,13 @@ When a chunk request times out, the client can start creating the recovery messa
 
 \red{yet to cover}
 
-Somewhat surprisingly, Swarm's network layer can serve as  an efficient  communication platform with exceptionally strong privacy properties. This section aims to demonstrate that a small set of primitives can serve as the building blocks for a foundational communication infrastructure. The areas cover the full range of communication modalities including real-time anonymous chat, sending and receiving messages from previously  unconnected and potentially anonymous senders, mailboxing for asynchronous delivery, long-term notifications, and  publish/subscribe interfaces. 
+Somewhat surprisingly, Swarm's network layer can serve as  a highly efficient  communication platform with robust privacy features. This section aims to showcase how a small set of primitives can be utilised as the fundamental building blocks for a comprehensive communication infrastructure. The capabilities cover the full range of communication modalities including real-time anonymous chat, sending and receiving messages from previously unconnected and potentially anonymous senders, mailboxing for asynchronous delivery, long-term notifications, and  publish/subscribe interfaces. 
 
-Swarm core offers the lowest level entry-points for communication-related functionality:
+Swarm core offers the lowest-level entry-points for communication-related functionality:
 
 \begin{itemize}[noitemsep]
-    \item pss offers an API for sending and receiving trojan chunks
-    \item bzz offers a way to upload single owner chunks. single owner chunk retrieval requires nothing beyond what is provided by the storage APIs
+    \item The pss module provides an API for sending and receiving Trojan chunks
+    \item The bzz module offers a way to upload single owner chunks. The retrieval of single owner chunks only requires the functionality provided by the storage APIs, without any additional requirements
 \end{itemize}
 
 
@@ -2207,9 +2207,9 @@ Swarm core offers the lowest level entry-points for communication-related functi
 
 % \subsection{Pss \statusorange}\label{sec:pss-ux}
 
-Since Trojan message handling differs significantly from storage operations, it deserves its own URL-scheme called \lstinline{pss}. The pss scheme provides an API for sending messages. When sending a \lstinline{POST} request, the URL is interpreted as referencing the X3DH pre-key bundle feed update chunk. This contains the public key needed to encrypt as well as the destination targets,    one of which should match the Trojan message address (see \ref{sec:trojan}). 
+Since Trojan message handling has distinct characteristics from storage operations, Swarm introduces its own URL-scheme called \lstinline{pss}. The pss scheme provides an API specifically for sending messages. When sending a \lstinline{POST} request, the URL is interpreted as referencing the X3DH pre-key bundle feed update chunk. This chunk contains the necessary public key for encryption as well as the destination targets.    One of the destination targets should match the address for the Trojan message (see \ref{sec:trojan}). 
 
 Destination targets are represented as the buzz serialisation of the target prefixes as a file. The URL path points to this file or is a top-level domain. The topic is specified as a query parameter and the message as the request body.
 
-Receiving messages is supported only by registering topic handlers internally. In an API context this means push notifications via web-sockets.
+Receiving messages is supported only by registering topic handlers internally. In the context of the API, this typically involves push notifications via web-sockets.
 
