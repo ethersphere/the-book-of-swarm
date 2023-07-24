@@ -1,7 +1,7 @@
 
 \green{}
 
-The Swarm project is set out to build permissionless storage and communication infrastructure for tomorrow's self-sovereign digital society. From a developer's perspective, Swarm is best seen as public infrastructure that powers real-time interactive web applications familiar from the \gloss{Web 2.0} era. It provides a low-level API to primitives that serve as building blocks of complex applications, as well as the basis for the tools and libraries for a Swarm-based \gloss{Web 3.0} development stack. The API and the tools are designed to allow access to the Swarm network from any traditional web browser, so that Swarm can immediately provide a private and decentralised alternative to today's \gloss{World Wide Web} (\gloss{WWW}).
+The Swarm project is set out to build a permissionless storage and communication infrastructure for the self-sovereign digital society of tomorrow. From a developer's perspective, Swarm is best seen as public infrastructure that powers real-time interactive web applications familiar from the \gloss{Web 2.0} era. It provides a low-level API to primitives that serve as building blocks of complex applications, as well as the basis for the tools and libraries for a Swarm-based \gloss{Web 3.0} development stack. Designed to allow access from any traditional web browser, the API and tools ensure that Swarm can swiftly offer a private and decentralised alternative to today's \gloss{World Wide Web} (\gloss{WWW}).
 
 \begin{figure}[htbp]
   \centering
@@ -10,7 +10,7 @@ The Swarm project is set out to build permissionless storage and communication i
 \label{fig:Swarm-layered-design}
 \end{figure}
 
-This part details the design and architecture of the system. In accordance with the principles laid out in \ref{sec:design-principles}, we put an emphasis on modular design, and conceive of Swarm as having clearly separable layers, each dependent on the previous one (see Figure \ref{fig:Swarm-layered-design}):
+This part details the design and architecture of the system. In accordance with the principles laid out in \ref{sec:design-principles}, we prioritise a modular design approach for Swarm, conceiving it with clearly separable layers, each dependent on the previous one (see Figure \ref{fig:Swarm-layered-design}):
 
 \begin{itemize}[noitemsep]
 \item (1) \emph{A peer-to-peer network protocol to serve as underlay transport.}
@@ -19,11 +19,11 @@ This part details the design and architecture of the system. In accordance with 
 \item (4) \emph{An application layer defining standards and outlining best practices for more elaborate use-cases.}
 \end{itemize}
 
-We regard (2) and (3) as the core of Swarm. Since the network layer relies on it, we will also formulate the requirements for (1), but we consider the detailed treatment of both (1) and (4) outside the scope of this book.
+We regard (2) and (3) as the core of Swarm. Since the network layer relies on it, we will also formulate the requirements for (1), but consider the detailed treatment of both (1) and (4) outside the scope of this book.
 
 
-Central to the design, the architecture of Swarm's overlay network (layer 2 in Figure \ref{fig:Swarm-layered-design}) is discussed in Chapter \ref{sec:network} and complemented by Chapter \ref{sec:incentivisation}, describing the system of economic incentives which makes Swarm self-sustaining. In Chapter \ref{sec:high-level-functionality}, we introduce the algorithms and conventions that allow Swarm to map data concepts on to the chunk layer to enable the high-level functionalities for storage and communication, notably data structures such as filesystems and databases, \gloss{access control}, indexed \gloss{feeds} and direct messaging  which comprise layer 3 of Swarm.
-In Chapter \ref{sec:persistence}, we present ways to prevent garbage collected chunks from disappearing from the network, including: \glossplural{erasure code}, \gloss{pinning} and insurance, and also provide ways to monitor, recover and re-upload them using missing chunk notifications and insurance challenges. 
+Central to the design is the architecture of Swarm's overlay network (layer 2 in Figure \ref{fig:Swarm-layered-design}), which is discussed in Chapter \ref{sec:network}. Chapter \ref{sec:incentivisation} complements this by describing the system of economic incentives which makes Swarm self-sustaining. In Chapter \ref{sec:high-level-functionality}, we introduce the algorithms and conventions that allow Swarm to map data concepts onto the chunk layer to enable the high-level functionalities for storage and communication, notably data structures such as filesystems and databases, \gloss{access control}, indexed \gloss{feeds}, and direct messaging which comprise layer 3 of Swarm.
+In Chapter \ref{sec:persistence}, we present ways to prevent garbage-collected chunks from disappearing from the network, including: \glossplural{erasure code}, \gloss{pinning} and insurance, and also provide ways to monitor, recover and re-upload them using missing chunk notifications and insurance challenges. 
 Finally, in Chapter \ref{sec:ux}, we will look at functionality from a user-experience perspective.
 
 \chapter{Network}\label{sec:network}
@@ -32,29 +32,28 @@ This chapter elaborates on how the Swarm overlay network is built on top of a \g
 
 \section{Topology and routing \statusgreen}\label{sec:topology-routing}
 
-This section sets the scene (\ref{sec:underlay-transport}) for the \gloss{overlay network} (layer 2) of Swarm by making explicit the assumptions about the underlay network (layer 1). \ref{sec:overlay-addressing} introduces the \gloss{overlay address space} and explains how nodes are assigned an address. In  \ref{sec:kademlia-routing}, we present the \gloss{Kademlia} \gloss{overlay topology} (connectivity pattern) and explain how it solves routing between nodes. In \ref{sec:bootstrapping} we show how nodes running the Swarm client can discover each other, bootstrap and then maintain the overlay topology.
+This section sets the scene (\ref{sec:underlay-transport}) for the \gloss{overlay network} (layer 2) of Swarm by making explicit the assumptions about the underlay network (layer 1). \ref{sec:overlay-addressing} introduces the \gloss{overlay address space} and explains how nodes are assigned an address. In  \ref{sec:kademlia-routing}, we present the \gloss{Kademlia} \gloss{overlay topology} (connectivity pattern) and explain how it solves routing between nodes. In \ref{sec:bootstrapping}, we show how nodes running the Swarm client can discover each other, bootstrap, and then maintain the overlay topology.
 
 \subsection{Requirements for underlay network \statusyellow}\label{sec:underlay-transport} 
 
 \yellow{}
 
 Swarm is a network operated by its users. Each node in the network is supposed to run a client complying with the protocol specifications. On the lowest level, the nodes in the network connect using a peer-to-peer network protocol as their transport layer. This is called the \gloss{underlay network}. 
-In its overall design, Swarm is agnostic of the particular underlay transport used as long as it satisfies the following requirements.
+In its overall design, Swarm is agnostic of the particular underlay transport used as long as it satisfies the following requirements:
 
 \begin{enumerate}[noitemsep]
     \item \emph{Addressing} -- Nodes are identified by their \gloss{underlay address}.
     \item \emph{Dialling} -- Nodes can initiate a direct connection to a peer by dialing them on their underlay address.
     \item \emph{Listening} -- Nodes can listen to other peers dialing them and can accept incoming connections. Nodes that do not accept incoming connections are called \glossplural{light node}.
-    \item \emph{Live connection} -- A node connection establishes a channel of communication which is kept alive until explicit disconnection, so that the existence of a connection means the remote peer is online and accepting messages.
+    \item \emph{Live connection} -- A node connection establishes a channel of communication, indicating that the remote peer is online and accepting messages until explicitly disconnected.
     \item \emph{Channel security} -- 
     The channel provides identity verification and implements encrypted and authenticated transport resisting man-in-the-middle attacks.
     \item \emph{Protocol multiplexing} -- 
     The underlay network service can accommodate several protocols running on the same connection. Peers communicate the protocols with the name and versions that they implement, and the underlay service identifies compatible protocols and starts up peer connections on each matched protocol. 
     \item \emph{Delivery guarantees} -- 
-    Protocol messages have \gloss{guaranteed delivery}, i.e. delivery failures due to network problems result in direct error response. 
-    Order of delivery of messages within each protocol is guaranteed. 
-    Ideally, the underlay protocol provides prioritisation. 
-    If protocol multiplexing occurs on the same transport channel, this most likely implies framing to prevent long messages from blocking higher priority messages.
+    Protocol messages have \gloss{guaranteed delivery}, i.e. any delivery failures due to network problems prompt direct error responses. 
+    The sequence in which messages are delivered is guaranteed within each protocol, and ideally, the underlay protocol provides prioritisation. 
+    If protocol multiplexing takes place on the same transport channel, framing is likely implemented to prevent long messages from blocking higher-priority ones.
     \item \emph{Serialisation} -- 
     The protocol message construction supports arbitrary data structure serialisation conventions.
     
@@ -67,14 +66,14 @@ The \gloss{libp2p} library can provide all the needed functionality and is the d
 \subsection{Overlay addressing\statusgreen}\label{sec:overlay-addressing} 
 \green{}
 
-While clients use the \gloss{underlay address} to establish connections to peers, each node running Swarm is additionally identified with an \gloss{overlay address}. It is this address that determines which peers a node will connect to and directs the way that messages are forwarded. The overlay address is assumed to be stable as it defines a node's identity across sessions and ultimately affects which content is most worth storing in the node's local storage.
+While clients use the \gloss{underlay address} to establish connections to peers, each node running Swarm is additionally identified with an \gloss{overlay address}. It is this address that determines which peers a node will connect to and also directs the way messages are forwarded. The overlay address is assumed to be stable as it defines a node's identity across sessions and ultimately affects which content is prioritised for storage in the node's local storage.
 
-The node's \gloss{overlay address} is derived from an Ethereum account by hashing the corresponding elliptic curve public key with the \gloss{BZZ network ID} using the 256-bit Keccak algorithm. The decision to include the BZZ network ID is rooted in the fact that there can be multiple Swarm networks (e.g.\ test net, main net, or private Swarms), and serves to ensure that the same address cannot be used across different networks. Assuming any sample of base accounts are independently selected, the resulting overlay addresses are expected to have a uniform distribution in the address space of 256-bit integers. It is important to derive the address from a public key, as it allows the nodes to issue commitments associated with an overlay location using cryptographic signatures that are verifiable by 3rd parties. 
+The node's \gloss{overlay address} is derived from an Ethereum account by hashing the corresponding elliptic curve public key with the \gloss{BZZ network ID} using the 256-bit Keccak algorithm. The inclusion of the bzz network ID is rooted in the fact that there can be multiple Swarm networks (e.g.\ test net, main net, or private Swarms). It serves to ensure that the same address cannot be used across different networks. Assuming any sample of base accounts are independently selected, the resulting overlay addresses are expected to have a uniform distribution in the address space of 256-bit integers. It is important to derive the address from a public key, as it allows the nodes to issue commitments associated with an overlay location using cryptographic signatures that are verifiable by third parties. 
 
-Using the long-lived communication channels of the \gloss{underlay network}, Swarm nodes form a network with \emph{quasi-permanent} peer connections. The resulting connectivity graph can then realise a particular topology defined over the address space. The \gloss{overlay topology} chosen is called \gloss{Kademlia}: It enables communication between any two arbitrary nodes in the Swarm network by providing a strategy to relay messages using only underlay peer connections. The protocol that describes how nodes share information with each other about themselves and other peers is called 'Hive'. How nodes use this protocol to bootstrap the \gloss{overlay topology} is discussed in \ref{sec:bootstrapping}. 
+Using the long-lived communication channels of the \gloss{underlay network}, Swarm nodes form a network with \emph{quasi-permanent} peer connections. The resulting connectivity graph can then realise a particular topology defined over the address space. The \gloss{overlay topology} chosen is called \gloss{Kademlia}: It enables communication between any two arbitrary nodes in the Swarm network by providing a strategy to relay messages using only underlay peer connections. The protocol that describes how nodes share information with each other about themselves and other peers is called 'hive'. How nodes use this protocol to bootstrap the \gloss{overlay topology} is discussed in \ref{sec:bootstrapping}. 
 % The  theoretical basis for \gloss{Kademlia topology} is formalised rigorously in \ref{sec:kademlia-connectivity}. 
 
-Crucially, the overlay address space encompasses the full range of 256-bit integers. Central to Swarm is the concept of \gloss{proximity order} (\gloss{PO}), which quantifies the relatedness of two addresses on a discrete scale.%
+It is crucial that the overlay address space encompasses the full range of 256-bit integers. One central concept in Swarm is \gloss{proximity order} (\gloss{PO}), which quantifies the relatedness of two addresses on a discrete scale.%
 %
 \footnote{Proximity order is the discrete logarithmic scale of proximity, which, in turn is the inverse of normalised XOR distance.% \cite{specs}. 
 % See \ref{sec:proximity} for a formal definition.
@@ -87,7 +86,7 @@ Given two addresses, $x$ and $y$, $\mathit{PO}(x,y)$ counts the matching bits of
 
 \glossupper{Kademlia topology} can be used to route messages between nodes in a network using overlay addressing. It has excellent scalability as it allows for universal routing such that both (1) the number of hops and (2) the number of peer connections are always logarithmic to the size of the network. 
 
-In what follows, we show the two common flavours of routing: \emph{iterative/zooming} and \emph{recursive/forwarding}. Swarm's design crucially relies on choosing the latter, forwarding flavour. However, this is unusual, and, as the iterative flavour predominates within much of the peer-to-peer literature and most other implementations are using iterative routing  (see \cite{maymounkov2002kademlia,baumgart2007s,lua2005survey}), we consider it useful to walk the reader through both approaches so their idiosyncrasies may be revealed.
+In what follows, we show the two common flavours of routing: \emph{iterative/zooming} and \emph{recursive/forwarding}. Swarm's design crucially relies on the latter, forwarding flavour, which sets it apart as a less common approach compared to the more prevalent iterative flavour found in much of the peer-to-peer literature and used in most other implementations (see \cite{maymounkov2002kademlia,baumgart2007s,lua2005survey}). To provide a comprehensive understanding, we will walk the reader through both approaches to reveal their idiosyncrasies.
 
 \subsubsection{Iterative and forwarding Kademlia}
 
@@ -392,7 +391,7 @@ If the Kademlia connectivity is defined over storer nodes, then in a network wit
 Let us define \gloss{neighbourhood size} $\mathit{NHS}_x(d)$  as the cardinality of the neighbourhood defined by depth $d$ of node $x$. 
 Then, a node has Kademlia connectivity with redundancy factor $r$ if there exists a depth $d$ such that (1) each proximity order bin lower than $d$ contains at least $k$ storer peers ($k$ is the bin density parameter, see \ref{sec:bindensity}), and (2) all storer nodes with proximity order $d$ or higher are actually connected peers, and (3) $\mathit{NHS}_x(d)\geq r$.
 
-We can then take the highest depth $d'$ such that (1) and (2) are satisfied. Such a $d$ is guaranteed to exist and the \glossupper{hive protocol} is always able to bootstrap it. As we decrease $d'$, the number of distinct neighbourhoods grow proportionally, so for any redundancy parameter not greater than the network size $r\leq N=\mathit{NHS}_x(0)$, there will be a highest $0<d_r\leq d'$ such that $\mathit{NHS}_x(d_r)\geq r$. Therefore, \gloss{redundant Kademlia connectivity} is always achievable. 
+We can then take the highest depth $d'$ such that (1) and (2) are satisfied. Such a $d$ is guaranteed to exist and the \gloss{hive protocol} is always able to bootstrap it. As we decrease $d'$, the number of distinct neighbourhoods grow proportionally, so for any redundancy parameter not greater than the network size $r\leq N=\mathit{NHS}_x(0)$, there will be a highest $0<d_r\leq d'$ such that $\mathit{NHS}_x(d_r)\geq r$. Therefore, \gloss{redundant Kademlia connectivity} is always achievable. 
 
 
 
