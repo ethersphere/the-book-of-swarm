@@ -17,6 +17,12 @@
 \setlist{noitemsep}
 % \setlist[1]{labelindent=\parindent} % < Usually a good idea
 \setlist[itemize]{label={---}}
+% the following code puts a line break after a description label even if label is shorter than leftmargin 
+\renewcommand*{\descriptionlabel}[1]{\hspace\labelsep
+\parbox{\linewidth}{#1}}
+% \parbox{\linewidth}{\emph{#1}}}
+\newlist{labelledlist}{description}{2}
+\setlist[labelledlist]{style=nextline, leftmargin=2em, before=\renewcommand*{\descriptionlabel}[1]{\hspace\labelsep}}
 \usepackage{multirow}
 \usepackage{epigraph} % quotations (at start of chapter)
 \usepackage{csquotes}

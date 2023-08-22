@@ -12,11 +12,11 @@ The Swarm project is set out to build a permissionless storage and communication
 
 This part details the design and architecture of the system. In accordance with the principles laid out in \ref{sec:design-principles}, we prioritise a modular design approach for Swarm, conceiving it with clearly separable layers, each dependent on the previous one (see Figure \ref{fig:Swarm-layered-design}):
 
-\begin{itemize}[noitemsep]
-\item (1) \emph{A peer-to-peer network protocol to serve as underlay transport.}
-\item (2) \emph{An overlay network with protocols powering a distributed immutable storage of \glossplural{chunk} (fixed size data blocks).}
-\item (3) \emph{A component providing high-level data access and defining APIs for base-layer features.}
-\item (4) \emph{An application layer defining standards and outlining best practices for more elaborate use-cases.}
+\begin{itemize}
+\item[(1)] {A peer-to-peer network protocol to serve as underlay transport.}
+\item[(2)] {An overlay network with protocols powering a distributed immutable storage of \glossplural{chunk} (fixed size data blocks).}
+\item[(3)] {A component providing high-level data access and defining APIs for base-layer features.}
+\item[(4)] {An application layer defining standards and outlining best practices for more elaborate use-cases.}
 \end{itemize}
 
 We regard (2) and (3) as the core of Swarm. Since the network layer relies on it, we will also formulate the requirements for (1), but consider the detailed treatment of both (1) and (4) outside the scope of this book.
@@ -24,7 +24,7 @@ We regard (2) and (3) as the core of Swarm. Since the network layer relies on it
 
 Central to the design is the architecture of Swarm's overlay network (layer 2 in Figure \ref{fig:Swarm-layered-design}), which is discussed in Chapter \ref{sec:network}. Chapter \ref{sec:incentivisation} complements this by describing the system of economic incentives which makes Swarm self-sustaining. In Chapter \ref{sec:high-level-functionality}, we introduce the algorithms and conventions that allow Swarm to map data concepts onto the chunk layer to enable the high-level functionalities for storage and communication, notably data structures such as filesystems and databases, \gloss{access control}, indexed \gloss{feeds}, and direct messaging which comprise layer 3 of Swarm.
 In Chapter \ref{sec:persistence}, we present ways to prevent garbage-collected chunks from disappearing from the network, including: \glossplural{erasure code}, \gloss{pinning} and insurance, and also provide ways to monitor, recover and re-upload them using missing chunk notifications and insurance challenges. 
-Finally, in Chapter \ref{sec:ux}, we will look at functionality from a user-experience perspective.
+Finally, in Chapter \ref{sec:ux}, we will look at functionality from the perspective of the developer who builds on Swarm.
 
 \chapter{Network}\label{sec:network}
 
@@ -41,23 +41,22 @@ This section sets the scene (\ref{sec:underlay-transport}) for the \gloss{overla
 Swarm is a network operated by its users. Each node in the network is supposed to run a client complying with the protocol specifications. On the lowest level, the nodes in the network connect using a peer-to-peer network protocol as their transport layer. This is called the \gloss{underlay network}. 
 In its overall design, Swarm is agnostic of the particular underlay transport used as long as it satisfies the following requirements:
 
-\begin{enumerate}[noitemsep]
-    \item \emph{Addressing} -- Nodes are identified by their \gloss{underlay address}.
-    \item \emph{Dialling} -- Nodes can initiate a direct connection to a peer by dialing them on their underlay address.
-    \item \emph{Listening} -- Nodes can listen to other peers dialing them and can accept incoming connections. Nodes that do not accept incoming connections are called \glossplural{light node}.
-    \item \emph{Live connection} -- A node connection establishes a channel of communication, indicating that the remote peer is online and accepting messages until explicitly disconnected.
-    \item \emph{Channel security} -- 
+\begin{labelledlist}
+    \item[\emph{Addressing}] Nodes are identified by their \gloss{underlay address}.
+    \item[\emph{Dialling}] Nodes can initiate a direct connection to a peer by dialing them on their underlay address.
+    \item[\emph{Listening}] Nodes can listen to other peers dialing them and can accept incoming connections. Nodes that do not accept incoming connections are called \glossplural{light node}.
+    \item[\emph{Live connection}] A node connection establishes a channel of communication, indicating that the remote peer is online and accepting messages until explicitly disconnected.
+    \item[\emph{Channel security}] 
     The channel provides identity verification and implements encrypted and authenticated transport resisting man-in-the-middle attacks.
-    \item \emph{Protocol multiplexing} -- 
+    \item[\emph{Protocol multiplexing}] 
     The underlay network service can accommodate several protocols running on the same connection. Peers communicate the protocols with the name and versions that they implement, and the underlay service identifies compatible protocols and starts up peer connections on each matched protocol. 
-    \item \emph{Delivery guarantees} -- 
+    \item[\emph{Delivery guarantees}] 
     Protocol messages have \gloss{guaranteed delivery}, i.e. any delivery failures due to network problems prompt direct error responses. 
     The sequence in which messages are delivered is guaranteed within each protocol, and ideally, the underlay protocol provides prioritisation. 
     If protocol multiplexing takes place on the same transport channel, framing is likely implemented to prevent long messages from blocking higher-priority ones.
-    \item \emph{Serialisation} -- 
+    \item[\emph{Serialisation}] 
     The protocol message construction supports arbitrary data structure serialisation conventions.
-    
-\end{enumerate}
+\end{labelledlist}
 
 The \gloss{libp2p} library can provide all the needed functionality and is the designated underlay connectivity driver in the specification.%
 %
@@ -224,12 +223,11 @@ As is customary in Swarm, we provide a few resolutions of this acronym, which su
 
 
 \begin{itemize}
-\item \emph{decentralised infrastructure for storage and communication}, 
-\item \emph{distributed immutable store for chunks}, 
-\item \emph{data integrity by signature or content address},
+\item {decentralised infrastructure for storage and communication}, 
+\item {distributed immutable store for chunks}, 
+\item {data integrity by signature or content address},
 % \item \emph{downloadable incentivised secure communications}
-\item \emph{driven by incentives with smart contracts}. 
-
+\item {driven by incentives with smart contracts}. 
 \end{itemize}
  
 \subsubsection{From DHT to DISC}
@@ -258,12 +256,12 @@ DHTs used for \gloss{distributed storage} typically associate content identifier
 \subsubsection{Constraints}
 The \gloss{DISC} storage model is opinionated about which nodes store what content and this implies the following restrictions: 
 
-\begin{enumerate}
-    \item \emph{fixed-size chunks} -- Load balancing of content is required among nodes and is realised by splitting content into equal-sized units called \glossplural{chunk} (see \ref{sec:chunks}).
-    \item \emph{syncing} -- There must be a process whereby chunks get to where they are supposed to be stored, no matter which node uploads them (see \ref{sec:push-syncing}).
-    \item \emph{plausible deniability} -- Since nodes do not have a say in what they store, measures should be employed that serve as the basis of legal protection for node operators. They need to be able to plausibly deny knowing (or even being able to know) anything about the chunks' contents (see \ref{sec:chunk-encryption}).
-    \item \emph{garbage collection} -- Since nodes commit to store any data close to them, there needs to be a strategy to select which chunks are kept and which are discarded in the presence of storage space constraints. 
-\end{enumerate}
+\begin{labelledlist}
+    \item[\emph{fixed-size chunks}] Load balancing of content is required among nodes and is realised by splitting content into equal-sized units called \glossplural{chunk} (see \ref{sec:chunks}).
+    \item[\emph{syncing}] There must be a process whereby chunks get to where they are supposed to be stored, no matter which node uploads them (see \ref{sec:push-syncing}).
+    \item[\emph{plausible deniability}] Since nodes do not have a say in what they store, measures should be employed that serve as the basis of legal protection for node operators. They need to be able to plausibly deny knowing (or even being able to know) anything about the chunks' contents (see \ref{sec:chunk-encryption}).
+    \item[\emph{garbage collection}] Since nodes commit to store any data close to them, there needs to be a strategy to select which chunks are kept and which are discarded in the presence of storage space constraints. 
+\end{labelledlist}
 
 \subsubsection{Chunks}\label{sec:chunks}
 
@@ -275,11 +273,11 @@ The deterministic and collision-free nature of addressing implies that chunks ar
 
 To sum up, chunk addressing needs to fulfill the following requirements:
 
-\begin{enumerate}
-    \item \emph{deterministic} -- To enable local validation.
-    \item \emph{collision-free} -- To provide integrity guarantee.
-    \item \emph{uniformly distributed} -- To deliver load balancing.
-\end{enumerate}
+\begin{labelledlist}
+    \item[\emph{deterministic}] To enable local validation.
+    \item[\emph{collision-free}] To provide integrity guarantee.
+    \item[\emph{uniformly distributed}] To deliver load balancing.
+\end{labelledlist}
 
 In the current version of Swarm, we support two types of chunks: \glossplural{content addressed chunk} and \glossplural{single owner chunk}. 
 
@@ -325,16 +323,16 @@ This structure allows for compact \gloss{inclusion proofs} with a 32-byte resolu
 
 With \glossplural{single owner chunk}, a user can assign arbitrary data to an address and attest chunk integrity with their digital signature. The address is calculated as the hash of an \gloss{identifier} and an \gloss{owner}. The chunk content is presented in a  structure composed of the identifier, the \gloss{payload}, and a signature attesting to the association of identifier and payload (see Figure \ref{fig:single-owner-chunks}).
 
-\begin{itemize}
-    \item \emph{content}: 
-\begin{itemize}
-    \item \emph{identifier} -- 32 bytes arbitrary identifier, 
-    \item \emph{signature} -- 65 bytes $\langle r,s,v \rangle$ representation of an EC signature (32+32+1 bytes),
-    \item \emph{span} -- an 8-byte little-endian binary of uint64 chunk span,
-    \item \emph{payload} -- maximum 4096 bytes of regular chunk data.
-\end{itemize}
-    \item \emph{address} -- Keccak256 hash of identifier + owner account.
-\end{itemize}
+\begin{labelledlist}
+    \item[\emph{content}] payload
+\begin{labelledlist}
+    \item[\emph{identifier}] 32 bytes arbitrary identifier
+    \item[\emph{signature}] 65 bytes $\langle r,s,v \rangle$ representation of an EC signature (32+32+1 bytes),
+    \item[\emph{span}] an 8-byte little-endian binary of uint64 chunk span,
+    \item[\emph{payload}] maximum 4096 bytes of regular chunk data.
+\end{labelledlist}
+    \item[\emph{address}] Keccak256 hash of identifier + owner account.
+\end{labelledlist}
 
 \begin{figure}[htbp]
    \centering
@@ -436,11 +434,11 @@ In a distributed chunk store, we say that a chunk is an \gloss{accessible chunk}
 
 For retrieval, accessibility needs to be complemented with a process to have the content delivered back to the requesting node, preferably using only the chunk address. There are at least three alternative ways to achieve this (see Figure \ref{fig:chunk-delivery}):
 
-\begin{enumerate}
-    \item \gloss{direct delivery} -- The chunk delivery is sent via a direct underlay connection. 
-    \item \gloss{routed delivery} -- The chunk delivery is sent as message using routing.
-    \item \gloss{backwarding} -- The chunk delivery response simply follows the route along which the request was forwarded, just backwards all the way to the originator.
-\end{enumerate}
+\begin{labelledlist}
+    \item[\gloss{direct delivery}] The chunk delivery is sent via a direct underlay connection. 
+    \item[\gloss{routed delivery}] The chunk delivery is sent as message using routing.
+    \item[\gloss{backwarding}] The chunk delivery response simply follows the route along which the request was forwarded, just backwards all the way to the originator.
+\end{labelledlist}
 
 
 \begin{figure}[htbp]
@@ -526,12 +524,12 @@ In this section, we described how the logistics of chunk uploads can be organise
 
 \glossupper{pull syncing} is the protocol that is responsible for the following two properties: 
 
-\begin{itemize}
-    \item \emph{eventual consistency} -- Syncing neighbourhoods as and when the topology changes due to churn or new nodes joining.
-    \item \emph{maximum resource utilisation} -- Nodes can pull chunks from their peers to fill up their surplus storage.%
+\begin{labelledlist}
+    \item[\emph{eventual consistency}] Syncing neighbourhoods as and when the topology changes due to churn or new nodes joining.
+    \item[\emph{maximum resource utilisation}] Nodes can pull chunks from their peers to fill up their surplus storage.%
 %
 \footnote{Maximum storage utilisation may not be optimal in terms of the profitability of nodes. Put differently, storer nodes have an optimal storage capacity based on how often content is requested from them. This means that in practice, profit-optimised maximum utilisation of storage capacity requires operators to run multiple node instances.}
-\end{itemize}
+\end{labelledlist}
 
 Pull syncing is node-centric as opposed to chunk-centric, i.e. it makes sure that a node's storage is filled if needed, as well as syncing chunks within a neighbourhood. When two nodes are connected, they will start syncing both ways so that on each peer connection there is bidirectional chunk traffic. The two directions of syncing are managed by distinct and independent \emph{streams}. In the context of a stream, the consumer of the stream is called \gloss{downstream peer} or client, while the provider is called the \gloss{upstream peer} or server. 
 
@@ -760,12 +758,13 @@ In particular we introduce the concept of a. \glossplural{cheque} and the \gloss
 
 \cite{ethersphere2016sw3} introduces a protocol for peer-to-peer accounting, called \gloss{swap}. Swap is a tit-for-tat accounting scheme that scales microtransactions. The scheme allows directly connected peers to swap payments or payment commitments. The system's key characteristics are captured playfully with different mnemonic resolutions of the acronym SWAP:
 
-\begin{itemize}[noitemsep]
-    \item \emph{Swarm accounting protocol} for \emph{service wanted and provided} -- An account service for service exchange.
-    \item \emph{settle with automated payments} -- Send a \gloss{cheque} when \gloss{payment threshold} is exceeded.
-    \item \emph{send waiver as payment} -- Debt can be waived in the value of un-cashed cheques. 
-    \item \emph{start without a penny} and \emph{send with a peer} -- Zero-cash entry is supported by unidirectional swap.
-\end{itemize}
+\begin{labelledlist}
+    \item[\emph{Swarm accounting protocol}] A scheme used by Swarm for keeping a record of reciprocal sharing of bandwidth.
+    \item[\emph{service wanted and provided}] Allows service exchange.
+    \item[\emph{settle with automated payments}] Send a \gloss{cheque} when \gloss{payment threshold} is exceeded.
+    \item[\emph{send waiver as payment}] Debt can be waived in the value of un-cashed cheques. 
+    \item[\emph{start without a penny}] Zero-cash entry is supported by unidirectional swap.
+\end{labelledlist}
 
 \subsubsection{Service for service}
 
@@ -854,13 +853,13 @@ Let us imagine a system analogous to cheques being returned to the issuer. Assum
 
 These implementations share the characteristics of not allowing the instantaneous cashing of cheques in the chequebook. Upon receiving a cheque-cashing request, the contract must wait to allow the other party to submit potentially missing information about cancelled cheques or reduced totals. To accommodate (semi-)bidirectional payments using a single chequebook, we introduce the following modifications:
 
-\begin{enumerate}[noitemsep]
+\begin{itemize}[noitemsep]
     \item All cheques from user A to user B must contain a serial number.
     \item Each new cheque issued by A to B must have a serial number higher than the previous one.
     \item A's chequebook contract records the serial number of the last cheque that B cashed.
     \item During the cashing delay, any valid cheque with a higher serial number supersedes any previously submitted cheques, regardless of their face value.
     \item Any submitted cheque which decreases the payout of the previously submitted cheque is only valid if it is signed by the beneficiary.
-\end{enumerate}
+\end{itemize}
 
 
 \begin{figure}[htbp]
@@ -948,7 +947,7 @@ Blacklists serve as a reference when accepting incoming connections as well as i
 
 In the first two chapters of the architecture part of the book, we introduced the core of Swarm: the peer-to peer-network layer described in Chapter \ref{sec:network} implements a distributed immutable storage for chunks, which is complemented by the incentive system described in the following chapter. The resulting base layer system provides:
 
-\begin{enumerate}[noitemsep]
+\begin{itemize}
     \item permissionless participation and access,
     \item zero-cash entry for node operators,
     \item maximum resource utilisation, 
@@ -965,7 +964,7 @@ In the first two chapters of the architecture part of the book, we introduced th
     \item DoS resistance and spam protection,
     \item positive (i.e., motivated by reward) incentives for storage,
     \item negative (i.e., discouraged through threat of punitive measures) incentives against data loss.
-\end{enumerate}
+\end{itemize}
 
 
 \chapter{High-level functionality}\label{sec:high-level-functionality}
@@ -1050,12 +1049,12 @@ Note that such inclusion proofs are possible even in the case of encrypted data.
 
 In this section, we have presented the Swarm hash, a data structure over chunks that represents files, which supports the following functionalities:
 
-\begin{itemize}[noitemsep]
-    \item \emph{random access} -- The file can be read from any arbitrary offset with no extra cost.
-    \item \emph{append} -- Supports appending without duplication. 
-    \item \emph{length-preserving edits} -- Supports length-preserving edits without the duplication of unmodified parts.
-    \item \emph{compact inclusion proofs} -- Allow inclusion proofs with resolution of 32 bytes in space logarithmic in file size.
-\end{itemize}
+\begin{labelledlist}
+    \item[\emph{random access}] The file can be read from any arbitrary offset with no extra cost.
+    \item[\emph{append}] Supports appending without duplication. 
+    \item[\emph{length-preserving edits}] Supports length-preserving edits without the duplication of unmodified parts.
+    \item[\emph{compact inclusion proofs}] Allow inclusion proofs with resolution of 32 bytes in space logarithmic in file size.
+\end{labelledlist}
 
 
 
@@ -1089,9 +1088,9 @@ The metadata pertains to the following areas of concern:
 
 \begin{itemize}
   \item Parameters for the downloader component, responsible for assembling chunks into a byte stream. This includes access control information, erasure coding parameters, and the publisher needed for chunk recovery.
-  
+%
   \item Information relevant to client-side rendering, handled by the browser. This may include content type headers, or generically HTTP headers, that are picked up by the local swarm client's API and set in the response header when the file is retrieved.
-  
+%  
   \item File information mapped to the file system during downloading, such as file permissions.
 \end{itemize}
 
@@ -1104,11 +1103,11 @@ Analogously, in Swarm, domain names resolve to references to the root manifests,
 
 When the HTTP API serves a URL, the following steps are performed:
 
-\begin{enumerate}
-    \item \emph{domain name resolution} -- Swarm resolves the host part to a reference to a root manifest,
-    \item \emph{manifest traversal} -- recursively traverse embedded manifests along the path matching the URL path to arrive at a manifest entry,
-    \item \emph{serving the file} -- the file referenced in the manifest entry is retrieved and rendered in the browser with headers (notably content type) obtained from  the metadata of manifest entry.
-\end{enumerate}
+\begin{labelledlist}
+    \item[\emph{domain name resolution}] Swarm resolves the host part to a reference to a root manifest,
+    \item[\emph{manifest traversal}] recursively traverse embedded manifests along the path matching the URL path to arrive at a manifest entry,
+    \item[\emph{serving the file}] the file referenced in the manifest entry is retrieved and rendered in the browser with headers (notably content type) obtained from  the metadata of manifest entry.
+\end{labelledlist}
 
 Swarm supports domain name resolution using the \gloss{Ethereum Name Service} (\gloss{ENS}). \gloss{ENS} is the system that, analogously to the DNS of the old web, translates human-readable names into system-specific identifiers, i.e., references in the case of Swarm.
 %
@@ -1474,16 +1473,16 @@ This is guaranteed if the authenticity of A's  messages to B affects the subsequ
 This section introduces \emph{pss}, Swarm's direct node-to-node push messaging solution. 
 Functionalities of and motivation for its existence are playfully captured by alternative resolutions of the term:
 
-\begin{itemize}[noitemsep]
-\item \emph{postal service on Swarm} -- Delivering messages if recipient is online or depositing for download if not.
-\item \emph{pss is bzz whispered} -- Beyond the association to Chinese whispers, it surely carries the spirit and aspiration of Ethereum Whisper.%
+\begin{labelledlist}
+\item[\emph{postal service on Swarm}] Delivering messages if recipient is online or depositing for download if not.
+\item[\emph{pss is bzz whispered}] Beyond the association to Chinese whispers, it surely carries the spirit and aspiration of Ethereum Whisper.%
 %
 \footnote{Whisper is a gossip-based dark messaging system, which is no longer developed. It never saw wide adoption due to its (obvious) lack of scalability. Whisper, alongside Swarm and the Ethereum blockchain, was the communication component of the holy trinity, the basis for Ethereum's original vision of web3.}
 %
 Pss piggybacks on Swarm's \gloss{distributed storage} for chunks and hence inherits their full incentivisation for relaying and persistence. At the same time it borrows from Whisper's crypto, envelope structure and API.
-\item \emph{pss! instruction to hush/whisper} -- Evokes an effort to not disclose information to third parties, which is found exactly in the tagline for pss: truly zero-leak messaging where beside anonymity and confidentiality, the very act of messaging is also undetectable.
-\item  \emph{pub/sub system} -- The API allows publishing and subscription to a topic.
-\end{itemize}
+\item[\emph{pss! instruction to hush/whisper}] Evokes an effort to not disclose information to third parties, which is found exactly in the tagline for pss: truly zero-leak messaging where beside anonymity and confidentiality, the very act of messaging is also undetectable.
+\item[\emph{pub/sub system}] The API allows publishing and subscription to a topic.
+\end{labelledlist}
 
 First, in \ref{sec:trojan}, we introduce Trojan Chunks, which are messages sent to storers that masquerade as chunks whose content address happens to fall in the proximity of their intended recipient. 
 Section \ref{sec:pss-key-exchange} discusses the use of pss to send contact messages to establish real-time communication channels.
@@ -1495,17 +1494,17 @@ Cutting-edge systems that promise private messaging often struggle to offer trul
 
 We define a \gloss{Trojan chunk} as a content-addressed chunk with a fixed internal content structure (see Figure \ref{fig:trojan-chunk}):
 
-\begin{enumerate}
-    \item \emph{span} -- 8-byte little-endian uint64 representation of the length of the message  
-    \item \emph{nonce} -- 32-byte arbitrary nonce 
-    \item \emph{Trojan message} -- 4064-byte asymmetrically encrypted message ciphertext with underlying plaintext composed of
-    \begin{enumerate}
-        \item \emph{length} -- 2-byte little-endian encoding of the length of the message in bytes $0\leq l\leq 4030$,
-        \item \emph{topic} -- $32$ byte obfuscated topic ID   
-        \item \emph{payload} -- $m$ bytes of a message 
-        \item \emph{padding} -- $4030-m$ random bytes.
-    \end{enumerate}
-\end{enumerate}
+\begin{labelledlist}
+    \item[\emph{span}] 8-byte little-endian uint64 representation of the length of the message  
+    \item[\emph{nonce}] 32-byte arbitrary nonce 
+    \item[\emph{Trojan message}] 4064-byte asymmetrically encrypted message ciphertext with underlying plaintext composed of
+    \begin{labelledlist}
+        \item[\emph{length}] 2-byte little-endian encoding of the length of the message in bytes $0\leq l\leq 4030$,
+        \item[\emph{topic}] $32$ byte obfuscated topic ID   
+        \item[\emph{payload}] $m$ bytes of a message 
+        \item[\emph{padding}] $4030-m$ random bytes.
+    \end{labelledlist}
+\end{labelledlist}
 
 \begin{figure}[htbp]
 \centering
@@ -1568,12 +1567,12 @@ X3DH uses the following keys:%
 %
 \footnote{The protocol specifies one-time pre-keys for the responder, but these can be safely ignored since they only serve as replay protection, which is solved by other means in this implementation.}
 
-\begin{itemize}[noitemsep]
-\item responder long-term public identity key - $K^{\mathrm{ENS}}_r$,
-\item responder resident key (aka signed pre-key) - $K^{\mathrm{Res}}_r$,
-\item initiator long-term identity key - $K^{\mathrm{ID}}_i$,
-\item initiator ephemeral key for the conversation - $K^{\mathrm{EPH}}_i$.
-\end{itemize}{}
+\begin{labelledlist}
+\item[$K^{\mathrm{ENS}}_r$] responder long-term public identity key
+\item[$K^{\mathrm{Res}}_r$] responder resident key (aka signed pre-key)
+\item[$K^{\mathrm{ID}}_i$] initiator long-term identity key
+\item[$K^{\mathrm{EPH}}_i$] initiator ephemeral key for the conversation
+\end{labelledlist}
 
 
 
@@ -1620,13 +1619,13 @@ The question immediately arises whether it is feasible to mine single owner chun
 
 Let us make explicit the roles relevant to this construct:
 
-\begin{itemize}[noitemsep]
-\item \emph{issuer} ($I$) - creates the envelope by mining an address. 
-\item \emph{poster} ($P$) - puts the content into the envelope and posts it as a valid single owner chunk to Swarm.
-\item \emph{owner} ($O$) - possesses the private key to the account part of the address and can thus sign off on the association of the payload to the identifier. This effectively decides on the contents of the envelope.
-\item \emph{target} ($T$) - the constraint for mining: a bit sequence that must form the prefix of the mined address. It represents a neighbourhood in the overlay address space where the envelope will be sent. The length of the target sequence corresponds to the difficulty for mining. The longer this target is, the smaller the neighbourhood that the envelope will be able to reach.
-\item \emph{recipient} ($R$) - the party whose overlay address has the target sequence as its prefix and therefore the destination of the message.
-\end{itemize}
+\begin{labelledlist}
+\item[\emph{issuer} ($I$)] creates the envelope by mining an address. 
+\item[\emph{poster} ($P$)] puts the content into the envelope and posts it as a valid single owner chunk to Swarm.
+\item[\emph{owner} ($O$)] possesses the private key to the account part of the address and can thus sign off on the association of the payload to the identifier. This effectively decides on the contents of the envelope.
+\item[\emph{target} ($T$)] the constraint for mining: a bit sequence that must form the prefix of the mined address. It represents a neighbourhood in the overlay address space where the envelope will be sent. The length of the target sequence corresponds to the difficulty for mining. The longer this target is, the smaller the neighbourhood that the envelope will be able to reach.
+\item[\emph{recipient} ($R$)] the party whose overlay address has the target sequence as its prefix and therefore the destination of the message.
+\end{labelledlist}
 
 The envelope can be perceived as open: since the poster is also the owner of the response single owner chunk, they are able to control what content is placed into the chunk. By constructing such an envelope, the issuer effectively allows the poster to send an arbitrary message to the target without the need for computational resources to mine the chunk. See Figure \ref{fig:addressed-envelope-events}. 
 
@@ -1657,13 +1656,13 @@ These chunks exhibit the same behaviour as normal Trojan messages, maintaining t
 
 Issuing a stamped addressed envelope involves the following process:
 
-\begin{enumerate}[noitemsep]
-\item \emph{assume} -- issuer $I$, prospective poster $P$, and prospective recipient $R$ with public keys $K_I, K_P, K_R$ and overlay addresses $A_I, A_P, A_R$.
-\item \emph{mine} -- $I$ finds a nonce $N_R$ such that when used as an identifier to create a \gloss{single owner chunk}, the  address of the chunk hashes to $H_R$, which is in the nearest neighbourhood of $A_R$.
-\item \emph{pay postage} -- $I$ signs $H_R$ to produce a witness for an appropriate postage payment to produce stamp $PS_R$.
-\item \emph{encapsulate} -- package $N_R$ and $PS_R$, which represent the pre-paid envelope pre-addressed to recipient address, and encrypt it with $K_P$ then wrap it as a Trojan chunk.
-\item \emph{mine} -- find a nonce $N_P$ such that the Trojan chunk hashes to $H_P$, which is in the nearest neighbourhood of $A_P$. 
-\end{enumerate}
+\begin{labelledlist}
+\item[\emph{assume}] issuer $I$, prospective poster $P$, and prospective recipient $R$ with public keys $K_I, K_P, K_R$ and overlay addresses $A_I, A_P, A_R$.
+\item[\emph{mine}] $I$ finds a nonce $N_R$ such that when used as an identifier to create a \gloss{single owner chunk}, the  address of the chunk hashes to $H_R$, which is in the nearest neighbourhood of $A_R$.
+\item[\emph{pay postage}] $I$ signs $H_R$ to produce a witness for an appropriate postage payment to produce stamp $PS_R$.
+\item[\emph{encapsulate}] package $N_R$ and $PS_R$, which represent the pre-paid envelope pre-addressed to recipient address, and encrypt it with $K_P$ then wrap it as a Trojan chunk.
+\item[\emph{mine}] find a nonce $N_P$ such that the Trojan chunk hashes to $H_P$, which is in the nearest neighbourhood of $A_P$. 
+\end{labelledlist}
 
 
 
@@ -1672,35 +1671,35 @@ Issuing a stamped addressed envelope involves the following process:
 
 A prospective poster $P$ is assumed to receive a Trojan message that consists of pre-paid envelope $E$. In order to open it, she carries out the following steps:
 
-\begin{enumerate}[noitemsep]
-    \item \emph{decrypt} message with the private key belonging to $K_P$
-    \item \emph{deserialise} unpack and identify $PS_R$ and $N_R$, extract $H_R$ from $PS_R$
-    \item \emph{verify} postage stamp $PS_R$ and check if $N_R$ hashed with the account for $K_P$ results in $H_R$ to ensure the associated address is in fact owned by $P$.
-    \item \emph{store} $N_R$ and $PS_R$ 
-\end{enumerate}
+\begin{labelledlist}
+    \item[\emph{decrypt}] decrypt message with the private key belonging to $K_P$
+    \item[\emph{deserialise}] unpack and identify $PS_R$ and $N_R$, extract $H_R$ from $PS_R$
+    \item[\emph{verify}] postage stamp $PS_R$ and check if $N_R$ hashed with the account for $K_P$ results in $H_R$ to ensure the associated address is in fact owned by $P$.
+    \item[\emph{store}] store $N_R$ and $PS_R$ 
+\end{labelledlist}
 
 \subsubsection{Posting a stamped addressed envelope}
 
 When the poster wants to use the envelope to send an arbitrary message $M$ to $R$ (with recipient $R$ potentially unknown to the sender), they must follow the following steps:
 
-\begin{enumerate}[noitemsep]
-\item \emph{encrypt} the message content $M$ with $K_R$ to create a payload and wrap it in Trojan message $T$
-\item \emph{hash} the encrypted Trojan message resulting in $H_T$
-\item \emph{sign} $H_T$ against the identifier $N_R$ using the private key that belongs to $K_P$, producing signature $W$
-\item \emph{encapsulate} nonce $N_R$ as ID, the signature $W$ and the Trojan message $T$ as the payload of a valid single owner chunk with address $H_R$
-\item \emph{post} the chunk with the valid stamp $PS_R$
-\end{enumerate}
+\begin{labelledlist}
+\item[\emph{encrypt}] encrypt the message content $M$ with $K_R$ to create a payload and wrap it in Trojan message $T$
+\item[\emph{hash}] hash the encrypted Trojan message resulting in $H_T$
+\item[\emph{sign}] sign $H_T$ against the identifier $N_R$ using the private key that belongs to $K_P$, producing signature $W$
+\item[\emph{encapsulate}] include nonce $N_R$ as ID, the signature $W$ and the Trojan message $T$ as the payload of a valid single owner chunk with address $H_R$
+\item[\emph{post}] post the chunk with the valid stamp $PS_R$
+\end{labelledlist}
 
 \subsubsection{Receiving a posted addressed envelope}
 
 When $R$ receives chunk with address $H_R$
 
-\begin{enumerate}[noitemsep]
-\item \emph{verify} postage stamp $PS_R$ and validate the chunk as a single owner chunk with payload $T$.
-\item \emph{decrypt} $T$ with the private key belonging to $K_R$.
-\item \emph{deserialise} the plaintext as a Trojan message, identify the message payload $M$ and check its integrity.
-\item \emph{consume} $M$.
-\end{enumerate}
+\begin{labelledlist}
+\item[\emph{verify}] verify postage stamp $PS_R$ and validate the chunk as a single owner chunk with payload $T$.
+\item[\emph{decrypt}] decrypt $T$ with the private key belonging to $K_R$.
+\item[\emph{deserialise}] deserialise the plaintext as a Trojan message, identify the message payload $M$ and check its integrity.
+\item[\emph{consume}] consume $M$.
+\end{labelledlist}
 
 \subsection{Notification requests\statusgreen}\label{sec:notification-requests} 
 
@@ -1887,15 +1886,15 @@ In the following section, we outline a simple protocol for notifying pinners abo
 When replicas of a chunk are distributed among willing hosts (pinners), downloaders who cannot locate a particular chunk can fall back to a \gloss{recovery} process by requesting it from one of these hosts using the \gloss{missing chunk notification protocol} called \gloss{prod}.
 As usual, the resolutions of this acronym capture the properties of the protocol:
 
-\begin{itemize}[noitemsep]
-\item \emph{protocol for recovery on deletion} - A protocol between requestor and pinners to orchestrate chunk recovery after garbage collection. The process is triggered by downloaders when they fail to retrieve a chunk.
-\item \emph{process request of downloader} - Recovery hosts continuously listen for potential recovery requests from downloaders.
-\item \emph{provide repair of DISC} - 
+\begin{labelledlist}
+\item[\emph{protocol for recovery on deletion}] A protocol between requestor and pinners to orchestrate chunk recovery after garbage collection. The process is triggered by downloaders when they fail to retrieve a chunk.
+\item[\emph{process request of downloader}] Recovery hosts continuously listen for potential recovery requests from downloaders.
+\item[\emph{provide repair of DISC}] 
 Prod provides a service to repair the Swarm DISC in the event of data loss.
-\item \emph{pin and re-upload of data} -     
+\item[\emph{pin and re-upload of data}]    
 Hosts pin the data and re-upload it to its designated area upon receiving a recovery request. 
-\item \emph{prompt response on demand}  - If the requestor demands a prompt direct response, the host will post the missing chunk using a recovery response envelope along with the required postage stamp.
-\end{itemize}
+\item[\emph{prompt response on demand}] If the requestor demands a prompt direct response, the host will post the missing chunk using a recovery response envelope along with the required postage stamp.
+\end{labelledlist}
 
 \subsubsection{Recovery hosts}
 
@@ -1945,9 +1944,9 @@ If the targeted recovery host is online, they receive the recovery request and e
 
 
 
-\chapter{User experience}\label{sec:ux}
+\chapter{Developer interface}\label{sec:ux}
 
-This chapter approaches the Swarm features introduced in the previous chapters from the user's perspective. In \ref{sec:upload}, we discuss the user experience of configuring uploads including aspects of postage, pinning, erasure coding, as well as tracking the progress of chunk propagation into the network using upload tags. Then we turn to the user's experience of the storage API, specifically uploading collections, in \ref{sec:storage-ux}. Finally, we provide an overview of the communication options available in \ref{sec:messaging}.
+This chapter approaches the Swarm features introduced in the previous chapters from the user's perspective. In \ref{sec:upload}, we discuss the developer interface for configuring uploads including aspects of postage, pinning, erasure coding, as well as tracking the progress of chunk propagation into the network using upload tags. Then we turn to the storage API, specifically uploading collections, in \ref{sec:storage-ux}. Finally, we provide an overview of the communication options available in \ref{sec:messaging}.
 % Finally, in \ref{sec:buzz-apiary}, we present a complete framework for web3 dapp development.
 
 \section{Configuring and tracking uploads \statusgreen}\label{sec:upload}
@@ -1960,13 +1959,13 @@ The upload interface is the cornerstone of Swarm's functionality, allowing users
 
 The local HTTP proxy offers the \lstinline{bzz} URL scheme as a storage API. Requests can specify Swarm-specific options such as:
 
-\begin{itemize}[noitemsep]
-\item \lstinline{tag} -- use this upload tag -- generated and returned in response header if not specified. 
-\item \lstinline{stamp} -- upload using this postage subscription -- if not given, the one used most recently is used. 
-\item \lstinline{encryption} -- encrypt content if set, if set to a 64-byte hex value encoding a 256-bit integer, then that is used instead of a randomly generated key. 
-\item \lstinline{pin} -- pin all chunks of the upload if set. 
-\item \lstinline{parities} -- apply RS erasure coding to all intermediate chunks using this number of parities per child batch.
-\end{itemize}
+\begin{labelledlist}
+\item[\lstinline{tag}] use this upload tag] generated and returned in response header if not specified. 
+\item[\lstinline{stamp}] upload using this postage subscription] if not given, the one used most recently is used. 
+\item[\lstinline{encryption}] encrypt content if set] if set to a 64-byte hex value encoding a 256-bit integer, then that is used instead of a randomly generated key. 
+\item[\lstinline{pin}] pin chunks] pin all chunks of the upload if set. 
+\item[\lstinline{parities}] apply RS erasure coding]  use this number of parities per child batch for all intermediate chunks
+\end{labelledlist}
 
 These options can be used as URL query parameters or specified as  headers. The name of the header is obtained prefixing the parameter name with \lstinline{SWARM-}, written in uppercase, e.g., \lstinline{SWARM-PARITIES}.  
 
@@ -1976,13 +1975,13 @@ When uploading a file or collection, it is useful for the user to know when the 
 
 To track the progress of an upload, we utilise the push-sync protocol's statements of custody receipts for individual chunks. By collecting and counting these receipts, we can track the ratio of sent chunks and returned receipts, which provides the data to a \emph{progress bar}. An \gloss{upload tag} is an object that represents an upload and tracks its progress by counting how many chunks have reached a particular state. The states are: 
 
-\begin{itemize}[noitemsep]
-\item \emph{split} -- Number of chunks split; count chunk instances.
-\item \emph{stored} -- Number of chunks stored locally; count chunk instances.
-\item \emph{seen} -- Count of chunks previously stored (duplicates).
-\item \emph{sent} -- Number of distinct chunks sent with push-sync.
-\item \emph{synced} -- Number of distinct chunks for which the statement of custody arrived.
-\end{itemize}
+\begin{labelledlist}
+\item[\emph{split}] Number of chunks split; count chunk instances.
+\item[\emph{stored}] Number of chunks stored locally; count chunk instances.
+\item[\emph{seen}] Count of chunks previously stored (duplicates).
+\item[\emph{sent}] Number of distinct chunks sent with push-sync.
+\item[\emph{synced}] Number of distinct chunks for which the statement of custody arrived.
+\end{labelledlist}
 
 With the help of these counts, it is possible to monitor the progress of 1) chunking 2) storing 3) push-syncing, and 4) receipts.
 If the upload tag is not specified in the header, a random tag will be generated and returned as a response header once the file is fully chunked. In order to monitor the progress of chunking and storing during the upload, the tag needs to be created beforehand and supplied in the request header. Thus, the tag can be queried concurrently while the uploaded content is being processed. 
@@ -2017,12 +2016,12 @@ To impose a cost on uploads and efficiently allocate storage resources in the ne
 
 The user can create a subscription for a specific duration and storage capacity (e.g. 1 month for 100 megabytes) and make the corresponding payment based on the price provided by the client software (similar to how transaction fees are determined for the blockchain). Price estimates can be obtained from the postage lottery contract. Subscriptions are named, but these names are only meaningful locally. The API will offer a few default options for the chosen storage period, on a logarithmic scale, e.g.: 
 
-\begin{itemize}[noitemsep]
-\item \emph{minimal (a few hours)} -- Useful for immediate delivery of pss messages or single owner chunks that are part of ephemeral chat or other temporary files.
-\item \emph{temporary (week)} -- Files or mailboxed messages that are not meant to be stored for long, but rather picked up by third parties asynchronously.
-\item \emph{long term (year)} -- The default option for long-term storage. 
-\item \emph{forever (10 years)} -- Important content that should not be lost/forgotten; intended to survive the network's growth and subsequent increase of batch depth even if the uploader remains completely offline.
-\end{itemize}
+\begin{labelledlist}[noitemsep]
+\item[\emph{minimal (a few hours)}] Useful for immediate delivery of pss messages or single owner chunks that are part of ephemeral chat or other temporary files.
+\item[\emph{temporary (week)}] Files or mailboxed messages that are not meant to be stored for long, but rather picked up by third parties asynchronously.
+\item[\emph{long term (year)}] The default option for long-term storage. 
+\item[\emph{forever (10 years)}] Important content that should not be lost/forgotten; intended to survive the network's growth and subsequent increase of batch depth even if the uploader remains completely offline.
+\end{labelledlist}
 
 When uploading files, the user can indicate which subscription they would like to use by specifying the value of the \lstinline{stamp} upload parameter. If no subscription is specified, the most recent one is used as the default. If the size of the upload is known, the user can receive a warning if it exceeds the available postage capacity. 
 
@@ -2157,20 +2156,20 @@ The lookup key is then appended to the ACT address, resulting in a URL used to r
 Next the manifest entry corresponding to the path of the URL is retrieved. The retrieval process considers the following attributes:
 
 
-\begin{itemize}[noitemsep]
-    \item \lstinline{rs} -- {
+\begin{labelledlist}[noitemsep]
+    \item[\lstinline{rs}] {
     structure with attributes needed to use RS erasure coding for retrieval, e.g. the number of parity chunks required}.
-    \item \lstinline{sw3} -- { structure with attributes needed for litigation, which includes challenging insurer regarding a missing chunk}. 
-\end{itemize}
+    \item[\lstinline{sw3}] { structure with attributes needed for litigation, which includes challenging insurer regarding a missing chunk}. 
+\end{labelledlist}
 
 
 If the \lstinline{rs} attribute is provided, there are three strategies that can be followed: 
 
 
-\begin{itemize}[noitemsep]
-\item \emph{fallback} -- In this strategy, the RS parity chunks are initially ignored for all intermediate chunks. Only if a non-parity chunk is missing, the RS parity chunks are used. This approach helps save bandwidth and corresponding costs at the expense of speed: if a chunk is missing, fallback to RS is delayed.
-\item \emph{race} -- The RS parities are retrieved immediately alongside the rest of the children chunks for all intermediate chunks. The first $n$ (assuming $k$ as the value of \lstinline{rs}, i.e, $n$ out of $n+k$ coding scheme) chunks are sufficient to reconstruct all the $n$ real children. This is equivalent to saying that the $k$ slowest chunk retrievals can be ignored.  
-\end{itemize}
+\begin{labelledlist}[noitemsep]
+\item[\emph{fallback}] In this strategy, the RS parity chunks are initially ignored for all intermediate chunks. Only if a non-parity chunk is missing, the RS parity chunks are used. This approach helps save bandwidth and corresponding costs at the expense of speed: if a chunk is missing, fallback to RS is delayed.
+\item[\emph{race}] The RS parities are retrieved immediately alongside the rest of the children chunks for all intermediate chunks. The first $n$ (assuming $k$ as the value of \lstinline{rs}, i.e, $n$ out of $n+k$ coding scheme) chunks are sufficient to reconstruct all the $n$ real children. This is equivalent to saying that the $k$ slowest chunk retrievals can be ignored.  
+\end{labelledlist}
 
 The default strategy choice is \lstinline{race}, if the user wants to prioritise saving on downloads, then the fallback strategy can be enforced by setting the header \lstinline{SWARM-RS-STRATEGY=fallback}. Alternatively, the RS strategy can be completely disabled by setting \lstinline{SWARM-RS-STRATEGY=disabled}. The number of parities for an erasure coded batch is taken from the \lstinline{rs} attribute in the enclosing manifest. However, this can be overridden with the header \lstinline{SWARM-RS-PARITIES}.
 

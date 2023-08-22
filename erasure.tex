@@ -141,17 +141,13 @@ In general, given $n, k$ at least $m$ miss has a probability of $\left(\frac{2^k
 \label{sec:strategies}
 
 When downloading, systemic per-level erasure codes allow for 3 strategies of use:
-\begin{itemize}[noitemsep]
-      \item[---]
-\emph{direct with no recovery}
-– For all intermediate chunks, RS parity chunks are ignored. Retrieval involves  only the original chunks, no recovery. This is the choice for random access.
-\item[---]
-\emph{selective with fallback}
-– For all intermediate chunks, first retrieve $ m$ chunks that are deemed to be the fastest to download (e.g., the $m$ closest to the node), and then fall back to $j\leq k$ if and only if the retrieval of $j$ out of $m$ chunks is unattainable. This saves
+\begin{labelledlist}
+      \item[\emph{direct with no recovery}] For all intermediate chunks, RS parity chunks are ignored. Retrieval involves  only the original chunks, no recovery. This is the choice for random access.
+\item[\emph{selective with fallback}] For all intermediate chunks, first retrieve $ m$ chunks that are deemed to be the fastest to download (e.g., the $m$ closest to the node), and then fall back to $j\leq k$ if and only if the retrieval of $j$ out of $m$ chunks is unattainable. This saves
 some bandwidth and the corresponding costs at the expense of speed: if a selected chunk
 is missing, fallback to RS is delayed.
-\item[---] \emph{race} – the client initiates requests for all $m+k$ and will need to wait only for the first $m$ chunks to be delivered in order to proceed. This is equivalent to saying that the  $k$ slowest chunk retrievals can be ignored, therefore this strategy is optimal for latency at the expense of cost.
-\end{itemize}
+\item[\emph{race}] the client initiates requests for all $m+k$ and will need to wait only for the first $m$ chunks to be delivered in order to proceed. This is equivalent to saying that the  $k$ slowest chunk retrievals can be ignored, therefore this strategy is optimal for latency at the expense of cost.
+\end{labelledlist}
 
 This technique can effectively overcome the occasional unavailability of chunks due to faults like network contention, connectivity gaps, node churn, prohibitively overpriced neighbourhoods, or even malicious attacks targeting certain localities. Given a particular fault model for churn and throughput, erasure codes can be calibrated to
 \emph{guarantee an upper limit on retrieval latencies}, a strong service quality proposition.

@@ -20,21 +20,21 @@ There is, by definition, no protection possible against such adversity. As a con
 
 Let us now define deletion as a scheme for uploading content with access revocation, meeting the following requirements: 
 
-\begin{itemize}
-    \item \emph{specialisation} -- The uploader is able to choose at the time of publishing a specialised construct%
+\begin{labelledlist}
+    \item[\emph{Specialisation}] The uploader is able to choose at the time of publishing a specialised construct%
 %
 \footnote{From a user's perspective, content that is meant to be reliably deleted should be uploaded as such. The costs of uploading such content is allowed to be a (small integer) multiple of the cost of regular, censorship-resistant but non-deletable uploads.}
 %
     allowing retrospective revocation of access.
-    \item \emph{sovereignty} -- The uploader is the sovereign owner of the data and is in sole possession of the means to revoke access from any party that was previously granted access.%
+    \item[\emph{Sovereignty}] The uploader is the sovereign owner of the data and is in sole possession of the means to revoke access from any party that was previously granted access.%
 %
 \footnote{The uploader's credentials are necessary to delete their own deletable content. Deletables must also allow access control, i.e., they are only available to a specific set of recipients.}
 %
-    \item \emph{security} -- After the revocation of access, a grantee is unable to access the content using the same reference or any other cue shorter than the deleted content.%
+    \item[\emph{Security}] After the revocation of access, a grantee is unable to access the content using the same reference or any other cue shorter than the deleted content.%
 %
 \footnote{In other words, if the downloader has \emph{not} stored at least as much information as the deleted information itself, they will have no way of retrieving it.}
 %
-\end{itemize}
+\end{labelledlist}
 
 Note that regularly uploaded content may be \emph{forgotten}: if nobody pays for storing it and the content is not accessed frequently, the chunks constituting it will be garbage collected. However, chunks with  expired postage stamps cannot be regarded as reliably deleted in order to satisfy the requirements of sovereignty and security. 
 
@@ -43,13 +43,13 @@ Note that regularly uploaded content may be \emph{forgotten}: if nobody pays for
 
 The goal of this section is to arrive at a formal construction of a DISC-based revocable access model. We will restrict our scheme to \emph{chunks}, the fundamental fixed-sized storage units of Swarm's DISC model.  The proposed \emph{dream} construct implements a  deletable content storage and access model that fulfills the requirements of specialisation, sovereignty, and security. The use of the word 'dream' alludes to the somewhat unexpected finding that such a construct is even possible in the immutable DISC model. On top of this, as customary in Swarm, it serves as a mnemonic acronym, resolving to the 5 \emph{dream attributes} expressing requirements of access control.
 
-\begin{itemize}
-    \item[\textbf{D}] \emph{deniable} -- the dream key serves as a one-time pad for decryption. Since multiple content chunks (in fact any arbitrary content) can use the same dream pad, the key's association to any content is plausibly deniable.
-    \item[\textbf{R}] \emph{revocable} -- access granted through  dream keys is revocable. Revoking access from all parties, including oneself, is considered as deletion.   
-    \item[\textbf{E}] \emph{expirable} -- the scheme allows for one-time use, i.e., the key can only be retrieved once.
-    \item[\textbf{A}] \emph{addressable} -- access can be granted to a neighbourhood, where only clients operating a node within a particular an overlay address range are able to access the content.
-    \item[\textbf{M}] \emph{malleable}  --  the construct is resilient to churn and dynamic changes in network size; it is reusable across independent grantees and upgradeable.
-\end{itemize}
+\begin{labelledlist}
+    \item[\textbf{D} -- \emph{deniable}] The dream key serves as a one-time pad for decryption. Since multiple content chunks (in fact any arbitrary content) can use the same dream pad, the key's association to any content is plausibly deniable.
+    \item[\textbf{R} -- \emph{revocable}] Access granted through  dream keys is revocable. Revoking access from all parties, including oneself, is considered as deletion.   
+    \item[\textbf{E} -- \emph{expirable}] The scheme allows for one-time use, i.e., the key can only be retrieved once.
+    \item[\textbf{A} -- \emph{addressable}] Access can be granted to a neighbourhood, where only clients operating a node within a particular an overlay address range are able to access the content.
+    \item[\textbf{M} -- \emph{malleable}]  The construct is resilient to churn and dynamic changes in network size; it is reusable across independent grantees and upgradeable.
+\end{labelledlist}
 
 The scheme is built on top of DISC's APIs and can be implemented entirely as a second-layer solution.  Despite its rich feature set, the scheme does not use complex cryptography, but instead leverages the interplay of various component subsystems.
 
@@ -159,7 +159,7 @@ calculates the "ciphertext" $C'=C \xor k$ and uploads it to Swarm, obtaining $r=
 %
 \footnote{So far, references to swarm content included an address (\emph{Swarm hash} for unencrypted content) or an address with a decryption key (for encrypted content). The dream reference now defines a third type of reference, serialised in four segments comprising the parity address, the batch ID, the initial generator, and a decryption key.}
 
-\subsection{Correctness, Security and Privacy}
+\subsection{Correctness, security and privacy}
 
 \subsubsection{Retrieval}
 % \label{def:retrieval}
