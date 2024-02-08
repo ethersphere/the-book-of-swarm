@@ -1,4 +1,4 @@
-First, in \ref{sec:error-correcting-codes}, we introduce \glossplural{erasure code} and their application to files in Swarm in \ref{sec:erasure-bmt}. In \ref{sec:dispersed-replicas}, we present a construct that enables cross-neighbourhood redundancy for singleton chunks that completes erasure coding. Finally, in \ref{sec:strategies}, we explore systematic codes that facilitate various retrieval strategies of erasure-coded files, while preserving random access capabilities.
+First, in \ref{sec:error-correcting-codes}, we introduce \glossplural{erasure code}. We then walk through in \ref{sec:erasure-bmt} how they are applied to files in Swarm. In \ref{sec:dispersed-replicas}, we present a construct that enables cross-neighbourhood redundancy for singleton chunks that completes erasure coding. Finally, in \ref{sec:strategies}, we explore systematic codes that facilitate various retrieval strategies of erasure-coded files, while preserving random access capabilities.
 
 \subsection{Error correcting codes \statusgreen}\label{sec:error-correcting-codes}
 % \enlargethispage*{\baselineskip}
@@ -17,25 +17,25 @@ Similarly, in the context of Swarm's distributed immutable chunk store, the prob
 \footnote{%
 It is safe to assume that the retrieval of any one chunk will fail with equal and independent probability.}
 
-\gloss{Reed-Solomon coding} (\gloss{RS}) \cite{lubyetal1995CRS,plank2006optimizing,li2013erasure} 
+\gloss{Reed-Solomon coding} (\gloss{RS}) \citep{lubyetal1995CRS,plank2006optimizing,li2013erasure} 
 is the father of all  error correcting codes and also the most widely used and implemented.%
 %
 \footnote{%
-For a thorough comparison of an earlier generation of implementations of RS, see \cite{plank2009performance}.}
+For a thorough comparison of an earlier generation of implementations of RS, see \citet{plank2009performance}.}
 % 
 When applied to data of $m$ fixed-size blocks (message of length $m$), it produces an encoding of $m+k$ \emph{codewords} (blocks of the same size) 
 in such a way that having any $m$ out of $m+k$ blocks is enough to reconstruct the original data. Conversely, $k$ puts an upper bound on the number of \emph{erasures} allowed (number of blocks unavailable) for full recoverability, i.e., it expresses (the maximum) \emph{loss tolerance}.%
 %
-\footnote{Error correcting codes that has a focus on correcting data loss are referred to as \emph{erasure codes}, a typical scheme of choice for distributed storage systems \cite{balaji2018erasure}.}
+\footnote{Error correcting codes that has a focus on correcting data loss are referred to as \emph{erasure codes}, a typical scheme of choice for distributed storage systems \citep{balaji2018erasure}.}
 %
 $k$ is also the count of \emph{parities}, quantifying the data blocks added during the encoding on top of the original volume, i.e., it expresses \emph{storage overhead}. While RS is, therefore, optimal for storage (since loss tolerance cannot exceed the storage overhead), 
 it has high bandwidth demands%
 %
-\footnote{Both the encoding and the decoding of RS codes takes $O(mk)$ time (with $m$ data chunks and $k$ parities). However, we found computational overhead both insignificant for a network setting as well as undifferentiating.}
+\footnote{Both the encoding and the decoding of RS codes takes $O(mk)$ time (with $m$ data chunks and $k$ parities). However, we found computational overhead insignificant in the context of chunk retrieval happening via network transfer.}
 %
 for local repair processes.%
 %
-\footnote{Entanglement codes \cite{estrada2018alpha, estrada2019building} require a minimal bandwidth overhead for a local repair, but at the cost of storage overhead that is in multiples of $100\%$.}
+\footnote{Entanglement codes \citep{estrada2018alpha, estrada2019building} require a minimal bandwidth overhead for a local repair, but at the cost of storage overhead that is in multiples of $100\%$.}
 %
 The decoder needs to retrieve $m$ chunks to recover a particular unavailable chunk. 
 Hence, ideally, RS is used on files which are supposed to be downloaded in full,%
@@ -44,7 +44,7 @@ Hence, ideally, RS is used on files which are supposed to be downloaded in full,
 %
  but it is inappropriate for use cases needing only local repairs.%
 %
-\footnote{Use cases requiring random access to small amounts of data (e.g., path lookup) benefit from simple replication to optimise on bandwidth, which is suboptimal in terms of storage \cite{weatherspoon2002erasure}.}
+\footnote{Use cases requiring random access to small amounts of data (e.g., path lookup) benefit from simple replication to optimise on bandwidth, which is suboptimal in terms of storage \citep{weatherspoon2002erasure}.}
 
 When using RS, it is customary to use \emph{systematic} encoding, which means that the original data forms part of the encoding, i.e., the parities are actually added to it.%
 %
@@ -57,7 +57,7 @@ When using RS, it is customary to use \emph{systematic} encoding, which means th
 \subsection{Erasure coding in the Swarm hash tree \statusgreen}
 \label{sec:erasure-bmt}
 
-Swarm uses the \emph{Swarm hash tree} to represent files. This structure is a Merkle tree \cite{merkle1980protocols}, whose leaves are the consecutive segments of the input data stream. These segments are turned into chunks and are distributed among the Swarm nodes for storage. The consecutive chunk references (either in the form of an address or an address and an encryption key) are written into a chunk on a higher level.
+Swarm uses the \emph{Swarm hash tree} to represent files. This structure is a Merkle tree \citep{merkle1980protocols}, whose leaves are the consecutive segments of the input data stream. These segments are turned into chunks and are distributed among the Swarm nodes for storage. The consecutive chunk references (either in the form of an address or an address and an encryption key) are written into a chunk on a higher level.
 These so-called \emph{packed address chunks} (PACs) constitute the intermediate chunks of the tree.
 The branching factor $b$ is chosen so that the references to its children fill up a full chunk.
 With a reference size of 32 or 64 (hash size 32) and a chunk size of 4096 bytes, $b$ is 128 for unencrypted, and 64 for encrypted content 
@@ -114,41 +114,74 @@ If the number of file chunks is not a multiple of $m$, it is not possible to pro
 %
 Overcompensating, we still require the same number of parity chunks even when there are fewer than $m$ data chunks.
 
-This leaves us with only one corner case: it is not possible to use our $m\text{-out-of-}n$ scheme on a single chunk ($m=1$) because it would amount to $k+1$ copies of the same chunk. The problem is that copies of the same chunk all have the same hash and therefore are automatically deduplicated. Whenever a single chunk is left over ($m=1$) (which is always the case for the root chunk itself), we would need to replicate the chunk in a way that (1) ideally, the replicas are dispersed in the address space in a balanced way, yet (2) their address can be known by retrievers who ideally only know the reference to the original chunk's address.%
+This leaves us with only one corner case: it is not possible to use our $m\text{-out-of-}n$ scheme on a single chunk ($m=1$) because it would amount to $k+1$ copies of the same chunk. The problem is that copies of the same chunk all have the same hash and therefore are automatically deduplicated. Whenever a single chunk is left over ($m=1$) (i.e., the root chunk itself), we would need to replicate the chunk in a way that (1) ideally, the replicas are dispersed in the address space in a balanced way, yet (2) their addresses can be known by retrievers who ideally only know the reference to the original chunk's address.
+
+ 
+Our solution uses Swarm's special construct,  the \emph{single owner chunk} (SOC; Figure~\ref{sec:single-owner-chunks}). Replicas of the root chunk are created by making the chunk data the payload of a number of SOCs. The addresses of these SOCs must be derivable from the original root hash following a deterministic convention shared by uploaders and downloaders.
+
+The address of a SOC is the hash of its ID and the Ethereum address of its owner. In order to create valid SOCs, uploaders need to sign the SOC with the owner's identity, therefore the owner of the SOC must be a consensual identity with their private key publicly revealed.
 %
-\footnote{We could create replicas by having the chunk data as the payload of one of more single owner chunks with an address that is deterministically derivable using the content owner's public key and the original root hash. This method has the disadvantage that replicas produced this way are not reuploadable by parties other than the publisher.}
+\footnote{This has the added benefit that third parties can also upload replicas of any chunk.}
 
-The solution is to reference the root hash with its BMT root hash (before it is hashed with the metadata). By making the metadata fully or partially non-semantic, we gain the flexibility to generate entropy to mine the overall chunk hash into a sufficient number of neighbourhoods. This construct is called \glossplural{dispersed replica} and the detailed method for finding them is as follows:
+The other component of the address, the SOC ID, must satisfy two criteria: (1) it needs to match the payload hash up to 31 bytes and (2) it must provide the entropy needed to mine the overall chunk into a sufficient number of distinct neighbourhoods. (1) is added as a validation criterion for the special case of replica SOCs, while (2) takes care that we can find replicas uniformly dispersed within the address space.
+This construct is called \emph{dispersed replica}:
 
-Let's assume $h$ is the BMT root hash of the chunk.
-Given $n$ bits available to find a nonces to generate  $2^k$  perfectly balanced replicas, initialise a chunk array $\rho$ of length $2^k$ and start with $i=0$ and $C=0$.
+Let us assume $c$ is the content-addressed chunk we need to replicate; $n$ is the number of bits of entropy available to find the nonces that generate  $2^k$  perfectly balanced replicas; initialise a chunk array $\rho$ of length $2^k$ and start with $n$-bit integer $i=0$ and replica counter $C=0$.
 
 \begin{enumerate}[noitemsep]
-    \item create the metadata by copying the bits of the big-endian binary encoding of $i$ onto the $n$ available bits, resulting in the metadata bytes $m$.
-    \item calculate the the chunk hash by prepending      $m$ to $h$ and use the Keccak256 base hash to hash them $a_i:=H(m\concat h)$, and record $c_i=\mathit{CAC}(d,m)$
-    \item calculate the bin this hash belongs to by decoding $k$-bit prefix as big-endian binary number $j$ between $0\leq j<2^k$.
-    \item if $\rho\idx{j}$ is unassigned, then let $\rho\idx{j}:=c_i$ and increment $C$.
-    \item if $C=2^k$, then quit
-    \item increment $i$, if $i=2^n$, then quit
-    \item repeat from Step 1 
+  \item Create the SOC ID by taking $\mathit{addr}(c)$ and changing the last byte (at index position 31) to  $i$.
+  \item Calculate the the SOC address by concatenating ID $id$ and owner $o$%
+%
+\footnote{The SOC owner of dispersed replicas has the arbitrary private key $\texttt{0x010...00}$
+and the corresponding ether address is 
+\texttt{0xdc5b20847f43d67928f49cd4f85d696b5a7617b5}.}
+%
+and hash the result using the Keccak256 base hash $a_i:=H(id\concat o)$, and record $c_i=\mathit{SOC}(id,o,c)$.
+  \item Calculate the bin this hash belongs to by taking the $k$-bit prefix as big-endian binary number $j$ between $0\leq j<2^k$.
+  \item If $\rho\idx{j}$ is unassigned, then let $\rho\idx{j}:=c_i$ and increment $C$.
+  \item If $C=2^k$, then quit.
+  \item Increment $i$ by one, if $i=2^n$, then quit.
+  \item Repeat from Step 1.
 \end{enumerate}
 
-With this solution, we are able to provide an arbitrary level redundancy for the storage of data of any length. Note that if $n$ is small, then generating all $2^k$ balanced replicas may not be achievable, and if $n<k$, this is certainly not possible.
-In general, given $n, k$ at least $m$ miss has a probability of $\left(\frac{2^k-m}{2^k}\right)^{2^n}$.
+With this solution, we are able to provide an arbitrary level of redundancy for the storage of data of any length.
+%
+%
+\footnote{Note that if $n$ is small, then generating all $2^k$ balanced replicas may not be achievable, and if $n<k$, this is certainly not possible.
+In general, given $n, k$ at least $m$ miss has a probability of $(1 - m/2^k)^{2^n}$.}
+
+Then, depending on the strategy, the downloader can choose which  address to retrieve the chunk from. The obvious choice is the replica closest to the requesting node's overlay address.
 
 
-\subsection{Strategies of retrieval}
+\subsection{Prefetching strategies for retrieval}
 \label{sec:strategies}
 
-When downloading, systemic per-level erasure codes allow for 3 strategies of use:
+When downloading, systematic per-level erasure codes allow for different \emph{prefetching strategies}:
 \begin{labelledlist}
-      \item[\emph{direct with no recovery}] For all intermediate chunks, RS parity chunks are ignored. Retrieval involves  only the original chunks, no recovery. This is the choice for random access.
-\item[\emph{selective with fallback}] For all intermediate chunks, first retrieve $ m$ chunks that are deemed to be the fastest to download (e.g., the $m$ closest to the node), and then fall back to $j\leq k$ if and only if the retrieval of $j$ out of $m$ chunks is unattainable. This saves
-some bandwidth and the corresponding costs at the expense of speed: if a selected chunk
-is missing, fallback to RS is delayed.
-\item[\emph{race}] the client initiates requests for all $m+k$ and will need to wait only for the first $m$ chunks to be delivered in order to proceed. This is equivalent to saying that the  $k$ slowest chunk retrievals can be ignored, therefore this strategy is optimal for latency at the expense of cost.
+\item[\textsc{NONE} = \emph{direct with no recovery; frugal}] No prefetching takes place, RS parity chunks are ignored if present. Retrieval involves  only the original chunks, no recovery. 
+\item[\textsc{DATA} = \emph{prefetching data but no recovery; cheap}] Prefetching data-only chunks, RS parity chunks are ignored if present, no recovery.
+\item[\textsc{PROX} = \emph{distance-based selection; cheap}] For all intermediate chunks, first retrieve $ m$ chunks that are expected to be the fastest to download (e.g., the $m$ closest to the node).
+\item[\textsc{RACE} = \emph{latency optimised; expensive}] Initiate requests for all chunks within the scope (max $m+k$) and will need to wait only for the first $m$ chunks to be delivered in order to proceed. This is equivalent to saying that the  $k$ slowest chunk retrievals can be ignored, therefore this strategy is optimal for latency at the expense of cost.
 \end{labelledlist}
 
-This technique can effectively overcome the occasional unavailability of chunks due to faults like network contention, connectivity gaps, node churn, prohibitively overpriced neighbourhoods, or even malicious attacks targeting certain localities. Given a particular fault model for churn and throughput, erasure codes can be calibrated to
-\emph{guarantee an upper limit on retrieval latencies}, a strong service quality proposition.
 
+
+All in all, strategies using recovery  can effectively overcome the occasional unavailability of chunks, be it due to faults such as network contention, connectivity gaps in the Kademlia table, node churn, overpriced neighbourhoods, or even malicious attacks targeting a specific neighbourhood. 
+
+Similarly, given a typical model of network latencies for chunk retrieval, erasure codes in \textsc{RACE} mode can guarantee an upper limit on retrieval latencies.%
+%
+\footnote{For instance, in the temporally sensitive case of real-time video streaming, for any quality setting (bitrate and FPS), buffering times can be guaranteed if the batch of chunks representing a time unit of media is encoded using its own scope(s) of erasure coding.}
+
+%When downloading, systemic per-level erasure codes allow for 3 strategies of use:
+%\begin{labelledlist}
+      %\item[\emph{direct with no recovery}] For all intermediate chunks, RS parity chunks are ignored. Retrieval involves  only the original chunks, no recovery. This is the choice for random access.
+%\item[\emph{selective with fallback}] For all intermediate chunks, first retrieve $ m$ chunks that are deemed to be the fastest to download (e.g., the $m$ closest to the node), and then fall back to $j\leq k$ if and only if the retrieval of $j$ out of $m$ chunks is unattainable. This saves
+%some bandwidth and the corresponding costs at the expense of speed: if a selected chunk
+%is missing, fallback to RS is delayed.
+%\item[\emph{race}] the client initiates requests for all $m+k$ and will need to wait only for the first $m$ chunks to be delivered in order to proceed. This is equivalent to saying that the  $k$ slowest chunk retrievals can be ignored, therefore this strategy is optimal for latency at the expense of cost.
+%\end{labelledlist}
+
+%This technique can effectively overcome the occasional unavailability of chunks due to faults like network contention, connectivity gaps, node churn, prohibitively overpriced neighbourhoods, or even malicious attacks targeting certain localities. Given a particular fault model for churn and throughput, erasure codes can be calibrated to
+%\emph{guarantee an upper limit on retrieval latencies}, a strong service quality proposition.
+
+%

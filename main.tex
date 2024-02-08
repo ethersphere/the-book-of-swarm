@@ -1,13 +1,272 @@
-\input{style}      
+\documentclass[12pt,openright,hyperfootnotes,hidelinks]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[titletoc,title]{appendix}
+\usepackage[cmyk]{xcolor}
+% \usepackage[linedheaders,parts,pdfspacing,manychapters]{classicthesis}
+\usepackage[]{fullpage}
+% \usepackage[standardsections]{scrhack} % https://tex.stackexchange.com/questions/511049/conflict-between-titlesec-package-and-scrbook-class-after-most-recent-update-of
+\usepackage[section=chapter,numberedsection,acronym,toc,nonumberlist,index,style=altlist]{glossaries}
+\usepackage[stylemods=bookindex,abbreviations]{glossaries-extra} % index style
+%
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{booktabs}
+% \usepackage{style/rest-api}
+\usepackage{style/lst}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage{url}
+\usepackage[authoryear]{natbib}
+% \usepackage{pxfonts}
+\usepackage{fourier}
+%\usepackage{libertine}
+\usepackage[protrusion=true,expansion=true]{microtype}
+\usepackage[bf, font={footnotesize}, margin=0.5cm]{caption}
+\usepackage[compact, medium, explicit]{titlesec}
+
+\usepackage{afterpage}
+
+\newcommand\blankpage{%
+    \null
+    \thispagestyle{empty}%
+    \addtocounter{page}{-1}%
+    \newpage}
+
+\usepackage{xhfill}
+
+\titleformat{\chapter}[block]
+  {\filcenter{\scshape}\Huge}
+  {\xrfill[0.4ex]{1pt}\ \thechapter.}
+  {0.3em}
+  {\textsc{#1}\ \xrfill[0.4ex]{1pt}}
+
+%\titlespacing{\section}{}{0cm}{0cm}
+%\titlespacing{\subsection}{}{0cm}{0cm}
+%\titlespacing{\subsubsection}{}{0cm}{0cm}
+
+\bibpunct{(}{)}{,}{a}{}{,}
+\setlist{noitemsep, topsep=0pt}
+% \setlist[1]{labelindent=\parindent} % < Usually a good idea
+\setlist[itemize]{label={---}, noitemsep, topsep=0pt}
+% the following code puts a line break after a description label even if label is shorter than leftmargin 
+\renewcommand*{\descriptionlabel}[1]{\hspace\labelsep
+\parbox{\linewidth}{#1}}
+% \parbox{\linewidth}{\emph{#1}}}
+\newlist{labelledlist}{description}{2}
+\setlist[labelledlist]{style=nextline, leftmargin=2em, before=\renewcommand*{\descriptionlabel}[1]{\hspace\labelsep}}
+\usepackage{multirow}
+\usepackage{epigraph} % quotations (at start of chapter)
+\usepackage{csquotes}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,fit,positioning,shapes}
+\setcounter{tocdepth}{2}
+
+\usepackage{geometry}
+\geometry{
+    b5paper,
+    total={176mm,250mm},
+    tmargin=2.2cm,
+    bmargin=2.7cm,
+    outer=2cm,
+    inner=3.3cm,
+    headsep=1.2cm,
+    footnotesep=0.9cm
+}
+
+\usepackage[hang,flushmargin]{footmisc}
+
+\raggedbottom
+
+\renewcommand{\baselinestretch}{1.1}
+\let\headheight=\baselineskip
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5\baselineskip}
+\usepackage[titles]{tocloft}
+\setlength{\cftbeforechapskip}{3pt}
+\interfootnotelinepenalty=10000 %% Completely prevent breaking of footnotes
+%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% csentered verbatim command
+\usepackage{varwidth}
+\newenvironment{centerverbatim}{%
+  \par
+  \centering
+  \varwidth{\linewidth}%
+  \verbatim
+}{%
+  \endverbatim
+  \endvarwidth
+  \par
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% make first use \emph
+% see: https://tex.stackexchange.com/questions/449104/how-to-style-first-acronym-and-first-glossary-appearance
+\newcommand{\firstuseformat}[1]{\emph{#1}}
+%
+\renewcommand{\glslinkpresetkeys}{% requires v1.26+
+  \ifglsused{\glslabel}%
+  {\letcs\glstextformat{@firstofone}}%
+  {\let\glstextformat\firstuseformat}%
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% make only the first mention of a term in a chapter hyperlinked
+% see: https://tex.stackexchange.com/questions/404051/glossaries-hyperlink-only-at-the-first-occurrence-in-every-chapter
+\GlsXtrEnableLinkCounting[section]{general,acronym,abbreviation}
+%
+% disable hyperlink if link count is greater than 1:
+\renewcommand*{\glslinkpresetkeys}{%
+ \ifnum\GlsXtrLinkCounterValue{\glslabel}>1
+  \setkeys{glslink}{hyper=false}%
+ \fi
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{apalike}
+\setabbreviationstyle{short-em-nolong} % abbreviation / acronym should be just short form and emphasis = short-em-nolong
+\input{glossary.tex}
+\input{acronyms.tex}
+%
+\newcommand\gloss[1]{\gls{#1}} %singular
+\newcommand\glossupper[1]{\Gls{#1}} %singular uppercase
+\newcommand\glossplural[1]{\glspl{#1}} % plural
+\newcommand\glossupperplural[1]{\Glspl{#1}} % plural uppercase
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% make condition to render text based on it
+%%% following example here: https://tex.stackexchange.com/questions/16711/minimal-option-for-cv/21642#21642
+\newif\ifdraft
+%\drafttrue % Uncomment to compile whole draft document / comment to compile only finished sections.
+\ifdraft
+\else 
+\fi
+\newif\iftodo
+% \todotrue % Uncomment to compile whole draft document / comment to compile only finished sections.
+\iftodo
+\else 
+\fi
+%%%
+%
+% make page number a link to jump to toc only in draft mode
+\ifdraft
+\renewcommand\pagemark{{%
+  \usekomafont{pagenumber} \hyperref[sec:toc]{\thepage}
+}}
+\fi
+% Statuses only shown in draft mode
+\newcommand\wip[1]{
+\iftodo \todo[inline,size=\Large]{work in progress: #1}\fi }
+\newcommand\orange[1]{
+\iftodo \todo[inline,size=\Large]{work in progress: #1}\fi}
+\newcommand\green[1]{
+\iftodo \todo[inline,size=\Large,backgroundcolor=green]{complete }\fi}
+\newcommand\yellow[1]{
+\iftodo \todo[inline,size=\Large,backgroundcolor=yellow]{incomplete:  #1}\fi}
+\newcommand\red[1]{
+\iftodo \todo[inline,size=\Large,backgroundcolor=red]{incomplete}\fi}
+% \newcommand\red[1]{
+% \todo[inline,size=\Large,backgroundcolor=red]{incomplete}}
+%
+% statuses in section names
+% for error explanation see: https://tex.stackexchange.com/questions/64298/error-with-xcolor-package
+
+\colorlet{GREEN}{green}
+\colorlet{ORANGE}{orange}
+\colorlet{RED}{red}
+% none of these work
+% \ifdraft
+% \usepackage{bbding}
+% \usepackage{pifont}
+% \newcommand{\cmark}{\ding{51}}%
+% \newcommand{\xmark}{\ding{55}}%
+% \usepackage{unicode-math}
+% \newcommand{\cmark}{\setmainfont{Linux Libertine O}\symbol{"2714}\par}
+% \newcommand{\xmark}{\setmainfont{Linux Libertine O}\symbol{"2718}\par}
+% \usepackage{fontawesome}
+% \def\cmark{\FA\symbol{"F00C}}
+% \def\xmark{\FA\symbol{"F00D}}
+% \fi
+% \newcommand{\cmark}{${\checkmark}$}
+% \newcommand{\xmark}{${\times}$}%'
+\newcommand{\cmark}{***}
+\newcommand{\xmark}{xxx}
+\newcommand\statusgreen{\ifdraft \textcolor{green}{\cmark}\fi} 
+\newcommand\statusyellow{\ifdraft \textcolor{green}{?}\fi} 
+\newcommand\statusorange{\ifdraft \textcolor{orange}{WIP}\fi} 
+\newcommand\statusred{\ifdraft \textcolor{red}{\xmark}\fi} 
+% \newcommand\statusred{ \textcolor{red}{\xmark}} 
+\newcommand\statuspriority{\ifdraft \textcolor{blue}{PRIORITY}\fi}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand\PO{\mathit{PO}}
+\newcommand\Keys{\mathcal{K}}
+\newcommand\nil{\varnothing}
+% \newcommand\swip[1]{\url[SWIP-#1]{https://github.com/ethersphere/SWIPs/blob/master/SWIPs/swip-#1.md}}
+\newcommand\defeq{\overset{\textrm{\tiny  def}}{=}}
+\providecommand{\xor}{\veebar}
+\newcommand{\idx}[1]{\texttt{[}\/#1\/\texttt{]}}
+\DeclareMathOperator{\concat}{\operatorname{\oplus}}
+\DeclareMathOperator{\Concat}{\operatornamewithlimits{\bigoplus}}
+\DeclareMathOperator{\rangedel}{:}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% new math environments
+\usepackage{thmtools}
+\makeatletter
+\def\ll@definition{%
+  \protect\numberline{\csname the\thmt@envname\endcsname}%
+  \ifx\@empty\thmt@shortoptarg
+    \thmt@thmname
+  \else
+    \thmt@shortoptarg
+  \fi}
+\def\l@thmt@definition{} 
+\makeatother
+\declaretheoremstyle[
+spaceabove=6pt, spacebelow=6pt,headfont=\normalfont\bfseries,notefont=\mdseries, notebraces={}{},bodyfont=\normalfont,postheadspace=1em]{theorem}
+\declaretheorem[style=theorem]{definition}
+\declaretheorem[style=theorem]{theorem}
+%\theoremstyle{definition}
+%\newtheorem{definition}{Definition}%[section]
+%%
+% \newtheorem{theorem}{Theorem}[section]
+% \newtheorem{lemma}{Lemma}[section]
+% \newtheorem{corollary}{Corollary}[section]
+\renewcommand{\listtheoremname}{List of definitions}
+%
+\makeatletter % legacy /sc command support
+%\DeclareOldFontCommand{\rm}{\normalfont\rmfamily}{\mathrm}
+%\DeclareOldFontCommand{\sf}{\normalfont\sffamily}{\mathsf}
+%\DeclareOldFontCommand{\tt}{\normalfont\ttfamily}{\mathtt}
+%\DeclareOldFontCommand{\bf}{\normalfont\bfseries}{\mathbf}
+%\DeclareOldFontCommand{\it}{\normalfont\itshape}{\mathit}
+%\DeclareOldFontCommand{\sl}{\normalfont\slshape}{\@nomath\sl}
+\DeclareOldFontCommand{\sc}{\normalfont\scshape}{\@nomath\sc}
+\makeatother
+
+\clubpenalty=10000
+\widowpenalty=10000
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead{} % clear all header fields
+\fancyhead[RO]{\thepage}
+\fancyhead[LE]{\thepage}
+\fancyfoot{}
+
+
+
+
+
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the book of swarm
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \makeglossaries
-\title{\Huge\sc the book of Swarm\\
-\Large storage and communication infrastructure for self-sovereign digital society\\
-back-end stack for the decentralised web}
-\author{Viktor Trón}
-\date{v2.0 pre-release 1.4 - worked on  \today}
+\title{\Huge\sc the book of swarm\\\vskip10pt
+\large storage and communication infrastructure\\\vskip-3pt for a self-sovereign digital society\\\vskip10pt}
+\author{\sc viktor tr{\'o}n}
+\date{}
+%\date{v2.0 pre-release 1.4 - worked on  \today}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
@@ -32,7 +291,9 @@ These are hidden if conditional text is not shown (when publishing a version).
 \end{enumerate}
 \fi
 %
+\newpage\pagestyle{empty}\ \newpage
 \input{front/00-quote.tex}
+\pagestyle{empty}\ \newpage
 \tableofcontents
 \listoffigures
 % \listoftables % remove if less than 5 tables?
@@ -43,6 +304,13 @@ These are hidden if conditional text is not shown (when publishing a version).
 \mainmatter
 \part{Prelude} 
 \label{part:preface}
+\pagestyle{fancy}
+\fancyhead{} % clear all header fields
+\fancyhead[LO]{\leftmark}
+\fancyhead[RO]{\thepage}
+\fancyhead[LE]{\thepage}
+\fancyhead[RE]{\leftmark} % \textsc{the book of Swarm}
+\fancyfoot{}
 \input{intro.tex}
 \part{Design and architecture} \label{part:designarchitecture}
 \input{parts.tex}
@@ -65,11 +333,18 @@ These are hidden if conditional text is not shown (when publishing a version).
 % maybe we don't need hierarchy in its current form (defined by parent)
 % although it looks good in the Index I suppose
 % \glossarystyle{listdotted} % listdotted is non-hierarchical
+\newglossarystyle{long-fixed}{%
+  \setglossarystyle{long}%
+  \renewenvironment{theglossary}%
+     {\begin{longtable}[l]{@{}p{\dimexpr 3cm-\tabcolsep}p{0.8\hsize}}}% <-- change the value here
+     {\end{longtable}}%
+  }
+
 \printglossary[type=main] 
 \label{sec:glossary}
 % index
 \printglossary[nonumberlist=false, style=bookindex, title={Index}]
 \label{sec:index}
 % acronyms
-\printglossary[type=\acronymtype,title={List of acronyms and abbreviations}]
+\printglossary[type=\acronymtype,title={Acronyms and abbreviations},style=long-fixed]
 \end{document}

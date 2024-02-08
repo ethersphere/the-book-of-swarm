@@ -138,7 +138,7 @@ The second rule expresses the constraint that the reserve for a PO is upward clo
 
 \begin{figure}[!ht]
   \centering
-    \includegraphics[width=.9\textwidth]{fig/supply-demand.pdf}
+    \includegraphics[width=.9\textwidth]{fig/supply-demand_new.pdf}
   \caption[Reserve capacity]{The total size of all batches with non-zero balance on the blockchain (left) indicates the potential demand for chunk storage. The lower bound on neighbourhood depth to store this capacity is the reserve depth (top right). The storage depth represents the effective volume of chunks uploaded and stored in a neighbourhood's reserve (bottom right). The difference between them is a result of partial batch utilisation. The uniformity of the volume of chunks across neighbourhoods is incentivised by the efficient utilisation of postage batches.}
 \label{fig:reserve-capacity}
 \end{figure}    
@@ -207,7 +207,7 @@ Figure \ref{fig:depths} details the potential relative orders of the three depth
 
 \begin{figure}[!ht]
   \centering
-    \includegraphics[width=.7\textwidth]{fig/depths-2.pdf}
+    \includegraphics[width=.9\textwidth]{fig/depths-2.pdf}
   \caption[Depths]{The 3 depths (reserve, storage, and neighbourhood) express the order of magnitude of reserved capacity (potential demand, red circle), uploaded chunks (effective demand, green circle), and the number of nodes (effective supply, orange circle), respectively. Their possible orderings reflect various scenarios that have distinct impacts on data availability. Storage depth cannot be greater than the reserve depth. A gap between the storage depth and the reserve depth quantifies the average batch utilisation rate. The gap between the storage depth and a deeper neighbourhood depth quantifies the elasticity of the storage: the difference expresses how many times the effective volume can double before redundancy falls below the required level. While such oversupply may be anticipatory of growth in demand, if the neighbourhood depth remains deeper than the storage depth long term, it may indicate excessive profits. The opposite order indicates undersupply (redundancy below the desired level).}
 \label{fig:depths}
 \end{figure}    
@@ -472,9 +472,9 @@ sufficient at the time of compilation and commitment.
 \item[\textsc{retrievability}] The chunk's retrievability is demonstrated through proximity-based routing, indicating that its address belongs to the range of addresses covered by the neighbourhood. The chunk's proximity order to the node's overlay address is not less than its reported storage depth. 
 \item[\textsc{resources}] Resource retention verifies the volume of resources constituting the reserve by estimating the sampled set size using the density of chunks and postage stamps. 
 \end{labelledlist}
-
-
-{\small \begin{longtable}{l|p{.4\textwidth}|p{.4\textwidth}}
+\vskip20pt
+% \enlargethispage{1cm}
+{\small \begin{longtable}{l|p{.35\textwidth}|p{.3\textwidth}}
 \toprule
  {proof of} & {construct used} & {attacks mitigated}\\\midrule
  \textsc{replication}& Shelling-game over reserve sample& non-syncing, laggy syncing\\
@@ -555,7 +555,7 @@ The rule for updating the price from one round to the next is that the current p
 
 \begin{figure}[!ht]
   \centering
-  \includegraphics[width=.7\textwidth]{fig/adaptive-pricing.pdf}
+  \includegraphics[width=.8\textwidth]{fig/adaptive-pricing.pdf}
   \caption[Adaptive pricing]{Adaptive pricing. The relative change in price (y-axis), mathematically expressed as the price in the next round divided by the price this round minus one ($p_{t+1} / p_t - 1$), is displayed against the number of honest revealers $r$ in the current round (x-axis). This is done so for three different values of the stability parameter $\sigma$ (colours). The points are the actual price change values; the connecting dashed lines are for visual aid only. The dotted horizontal line marks the point where no price change occurs. Price change is exactly zero for any $\sigma$ when the number of honest revealers is four. Otherwise, larger values of $\sigma$ lead to larger relative price changes as the number of honest revealers is varied.}
   \label{fig:adaptive-pricing}
 \end{figure}

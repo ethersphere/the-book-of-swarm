@@ -1,0 +1,166 @@
+
+\section{Insurance: negative incentives \statusorange}\label{sec:chunk-insurance}
+
+\orange{taken from earlier paper mostly - rewritten and shortened to reflect latest}
+
+The storage incentives presented so far refer to the ability of a system to encourage the preservation of content through monetary rewards given to storers. This was achieved using an on-chain game which instrumented the fair redistribution of postage payments to storers, thereby providing positive incentivisation at a collective level. Such a system,  however, is suspect to the \gloss{tragedy of the commons} problem in that disappearing content (any particular chunk missing) will have no negative consequence to storers (any one storer node punished). The lack of individual accountability renders the storage incentivisation limited as a security measure against data loss. Introducing competitive insurance, on the other hand, adds an additional layer of negative incentives, compelling storers to be very precise in their commitments to ensure reliability for users. Particular attention is required in the design of the incentive system to make sure that failure to store every last bit promised is not only unprofitable but outright catastrophic to the insurer. 
+
+\subsection{Punitive measures}
+
+Unlike in the case of bandwidth incentives where retrievals are immediately accounted and settled, long-term storage guarantees are promissory in nature and it can only be decided if the promise has been kept at the end of its validity. Merely losing reputation is not sufficient as a deterrent against foul play in these instances: since new nodes must be allowed to provide services right away, cheaters could just resort to new identities and keep selling (empty) storage promises.
+
+We need the threat of punitive measures to ensure compliance with storage promises. These can be achieved through a \emph{deposit system}. Nodes wanting to sell promissory storage receipts should have a stake verified and locked-in at the time of making their promise. This implies that nodes need to register in advance, agreeing to a contract and placing a \gloss{security deposit}. Once registered, a node may sell storage promises covering the time period for which their funds are locked. While their registration is active, if they are found to have lost a chunk that was covered by their promise, they stand to lose their deposit.
+
+% \subsection{Requirements}
+
+Let us start from some reasonable guiding principles:
+
+\begin{itemize}
+\item Owners need to express their risk preference when submitting to storage.
+\item Storers need to express their risk preference when committing to storage.
+\item There needs to be a reasonable market mechanism to match demand and supply.
+\item There needs to be guarantees for the owner that its content is securely stored.
+\item There needs to be a litigation system where storers can be charged for not keeping their promise.
+\end{itemize}
+
+Owners' risk preferences consist of the time period covered as well as a preference for the \emph{degrees of reliability}. These preferences should be specified on a per-chunk basis and they should be completely flexible at the protocol level.
+
+Satisfying storers' risk preferences means that they have ways to express their certainty of preserving what they store and factor that in their pricing. Some nodes may not wish to provide long-term storage guarantees, while others may be unable to commit large deposits. This differentiates nodes in their competition for service provision.
+
+A \emph{market mechanism} means there is flexible \emph{price negotiation} or discovery or automatic feedback loops that tend to respond to changes in supply and demand.
+
+In what follows we will elaborate on a class of incentive schemes we call "\gloss{swap}, \gloss{swear}, and \gloss{swindle}" due to the basic components:
+
+\begin{labelledlist}
+\item [\emph{swap}]
+  Nodes maintain a quasi-permanent, long-term contact with their registered peers. Along these connections, peers exchange chunks and receipts, triggering swap accounting (see \ref{sec:accounting}).
+  
+\item [\emph{swear}]
+  Nodes registered on the Swarm network are held accountable and stand to lose their deposit if they are found to violate the rules of the swarm in an on-chain \gloss{litigation} process.
+
+\item [\emph{swindle}]
+  Nodes monitor other nodes to check if they comply with their promise by submitting challenges according to a process of litigation.
+
+\end{labelledlist}
+
+\subsection{Contracts through receipts}
+
+A \gloss{litigation} procedure necessitates that there are contractual agreements between parties, ultimately linking an owner, who pays for securing future availability of content, and a storer, who gets rewarded for preserving it and making it immediately accessible at any point in the future. The incentive structure needs to make sure that litigation is used only as a last resort.
+
+The most straightforward approach to manage storage deals is through direct contracts between the owner and the storer. This can be implemented by having storers return signed receipts of chunks they accept to store. Owners then pay for the receipts either directly or via escrow. In the latter case, the storer is only awarded the locked funds if they are able to provide proof of storage. This procedure is analogous to the postage stamp lottery process. Insurance can be bought in the form of specially marked postage stamps. Statements of custody receipts can close the loop and represent a contract between the uploader and the storer. Outpayments conditional on proofs of custody can be implemented the same way as the lottery.
+
+Even if the consumer attempting to access the chunk was not a party to the agreement to store and provide the requested content, failure to deliver the stored content is subject to penalties. Litigation is therefore expected to be available to third parties who wish to retrieve content.
+
+If the pairing of chunks and receipts is public and accessible, then consumers/downloaders (not only creators/uploaders) of the content are able to litigate in case a chunk is found to be missing. 
+
+\subsubsection{Registration}
+
+Before a node can sell promises of long-term storage, it must first register via a contract on the blockchain we call the \gloss{SWEAR} contract. The SWEAR contract allows nodes to register their public key to become accountable participants in the swarm. Registration involves sending the deposit to the SWEAR contract, which serves as collateral in case the terms that registered nodes "swear" to keep are violated (i.e. nodes do not keep their promise to store). The \emph{registration} is valid only for a set period, at the end of which a Swarm node is eligible to reclaim their deposit. Users of Swarm should be able to count on the loss of deposit as a disincentive against foul play for as long as enrolled status is granted. Because of this the deposit must not be refunded before the registration expires. The expiry of the insurance period should therefore include a final phase during which the node is not allowed to issue new receipts but can still be challenged.
+
+When a registered insurer node receives a request to store a chunk that is closest to them, it can acknowledge the request with a signed receipt. It is these signed receipts that are used to enforce penalties for loss of content. Because of the locked collateral backing them, the receipts can be viewed as secured promises for storing and serving a particular chunk.
+
+
+
+\subsection{Submitting a challenge}
+
+
+If a node fails to observe the rules of the Swarm they swear to keep, enforcement of punitive measures must be preceded by a litigation procedure. The implementation of this process is called \gloss{SWINDLE}.
+
+When a user attempts to retrieve insured content and fails to find a chunk, they can report the loss by submitting a \gloss{challenge}. This scenario is the typical context for starting \gloss{litigation}. This is analogous to a court case in which the issuers of the receipts are the defendants who are guilty until proven innocent. Similarly to a court procedure, public litigation on the blockchain should be a last resort when the rules have been abused despite the deterrents and positive incentives.
+
+
+The challenge takes the form of a transaction sent to the SWINDLE contract, in which the challenger presents the receipt(s) for the lost chunk. Any node is allowed to send a challenge for a chunk as long as they have a valid receipt for it (although it may not have necessarily been issued to them). The same transaction also sends a deposit covering the price of the upload of a chunk. The validity of the challenge as well as its refutation need to be easily verifiable by the contract.
+The contract verifies if the receipt is valid, i.e. 1) authentic, 2) active and 3) funded, by checking the following conditions:
+
+\begin{labelledlist}
+    
+\item[\emph{authentic}]
+The receipt was signed with the public key of a registered node.
+\item[\emph{active}] The expiry date of the receipt has not passed.
+\item[\emph{funded}] Sufficient funds are sent alongside it to compensate the peer for uploading the chunk in case of a refuted challenge.
+\end{labelledlist}
+
+The last point above is designed to disincentivise frivolous litigation, i.e. bombarding the blockchain with bogus challenges and potentially causing a DoS attack.
+
+The contract comes with an accessor for checking that a given node is challenged (potentially liable for penalty), so the challenged nodes can be notified that they must present the chunk in a timely fashion. The challenge remains open for a fixed amount of time, the end of which essentially sets the deadline for refuting the challenge. 
+
+\wip{still pondered - fingerpointing is not necessary}
+
+% \subsubsection{Fingerpointing or proof of storage}
+
+
+% The node implicated can refute the challenge by sending a transaction to the blockchain with either the direct refutation (a proof of custody or the chunk itself depending on the size) or a receipt for the same chunk signed by another node. This receipt needs to be issued by a nearer neighbour (a registered peer closer to the chunk address than the node itself). In other words, if a node is accused with a receipt, they can  shift the blame and provide a valid receipt from a nearer neighbour.%
+% %
+% \footnote{The contract can easily verify if the newly challenged node (the one that signed the receipt submitted as a refutation) is closer to the chunk address than the originally challenged node.}
+% %
+% Thus litigation can trigger a chain of challenges with receipts pointing from the initially challenged node all the way to a node that can shift the blame no further and therefore must present the chunk or be punished. This way of refuting a challenge is called \gloss{fingerpointing}. 
+
+Upon verifying the format of the refutation, the contract checks its validity by checking the hash of the chunk payload against the hash that is litigated or validating the proof of custody. 
+
+If a challenge is refuted within the period the challenge is open, the deposit of the accused node remains untouched. The cost of uploading the chunk must be reimbursed to the uploader from the challenger's deposit. To prevent DoS attacks, this deposit should actually be substantially higher than the upload cost in any case (e.g. a small integer multiple of the corresponding gas price). After successful refutation the challenge is cleared from the blockchain state.
+
+This challenge scheme serves as the simplest method (1) for defendants to refute a challenge and (2) make the disputed data available to nodes that require it.
+
+\subsection{Successful challenge and enforcement}
+
+If the deadline passes without successful refutation of the challenge, then the charge is regarded as proven and the case enters into the enforcement stage. Nodes that are proven guilty of losing a chunk lose their deposit. Enforcement is guaranteed to be successful by the fact that deposits are kept locked up in the SWEAR contract.
+
+If, on litigation, it turns out that a chunk (that was covered by a receipt) was lost, the deposit must be at least partly \emph{burned}. Note that this is necessary because, if penalties were paid out as compensation to holders of receipts of lost chunks, it would provide an avenue of early exit for a registered node by "losing" bogus chunks that had been deposited by colluding users. Since users of Swarm are interested in their information being reliably stored, their primary incentive for keeping the receipts is to keep the swarm motivated to do so, not the potential for compensation in the case they do not. If deposits are substantial, we can get away with paying out compensation for initiating litigation, however we must have the majority (say 95\%) of the deposit burned in order to make sure this easy exit route remains closed.
+
+Punishment can entail \emph{suspension}, meaning a node found guilty is no longer considered a registered Swarm node. Such a node is only able to resume selling storage receipts once they create a new identity and put up a deposit once again.%
+%
+\footnote{Note that the stored chunks are in the proximity of the address, so having to create a new identity will also imply expending extra bandwidth to replenish storage. This is an extra pain inflicted on offending nodes.}
+
+
+% \subsubsection{Deposit}
+
+% Another important decision to make is whether maximum deposits staked for a single chunk should vary independently of price. It is hard to conceptualise what this would mean in the first place. Assume that a nodes' deposit varies and affects the probability that they are chosen as storers: a peer is chosen whose deposit is higher out of two advertising the same price. In this case, the nodes have an incentive to up the ante, and start a bidding war. In the case of normal operation, this bidding would not be measuring confidence in quality of service but would simply reflect the wealth of the prospective storers. We conclude that prices should be variable and entirely up to the node, but higher confidence or certainty should also be reflected directly in the amount of deposit that they stake: deposit staked per chunk should be a constant multiple of the price.
+
+% Assuming $s$ is a system-wide security constant dictating the ratio between price and deposit staked in case of loss, for an advertised price of $p$, the minimum deposit is $d=s\cdot p$. Price per chunk per epoch is freely configurable and dictated by supply and demand in the free market. Nodes are therefore free to follow any price oracle or form cartels agreeing on price.
+
+\subsubsection{Incentivising promissory services}
+
+Delayed payments without locked funds leave storers vulnerable to non-payment. Advance payments (i.e. payments settled at the time of contracting, not after the storage period ends) on the other hand, leave the buyers vulnerable to cheating. Without limiting the total value of receipts a node can sell, a malicious node can collect more than their deposit and disappear. Having forfeited their deposit, they still walk away with a profit even though they broke their promise. Given a network size and a relatively steady demand for insured storage, the deposit could be set sufficiently high so this attack is no longer economical.
+
+Locking the entire amount eliminates the storer's distrust due to potential insolvency of the insured party. When paying for insurance, the funds should cover the total price of storing a chunk for the entire storage period. This amount is locked and is released in installments contingent on the condition that the node provides a proof of custody. On the other hand, since payment is delayed it is no longer possible to collect funds before the work is complete, which eliminates a \gloss{collect-and-run attack} entirely.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% \section{Insurance \statusorange}\label{sec:insurance}
+ 
+% \wip{still working on this}
+
+% \subsection{Insurance pool \statusorange}
+% We saw in \ref{sec:chunk-insurance} that the reward mechanism for postage lottery can also be used to facilitate and enforce insurance against lost data: where staked nodes take on the responsibility to store certain chunks staked against financial assets using the blockchain. 
+
+% Finally, we will discuss  1) how chunks are insured 2) how chunks travel across the network to the insurer 3) how later, any third party is able to audit the receipt for a chunk and, if it is found to be missing, initiate a process of litigation.
+
+% Let us imagine an insurance pool, a smart contract where registrants contribute stake. The pool represents nodes that, in return for a higher storage premium, stand to lose their stake if they lose a chunk. 
+
+% \subsection{Buying insurance on a chunk \statusred}
+
+% \subsection{Uploading with insurance \statusred}
+
+
+% \subsection{Accessing receipts \statusred}
+
+% The manifest entry for the insured file contains the reference to the data structure that maps insurer addresses to their public keys at the time of insuring the file. Once these pivots are known, any third party can calculate which insurer is responsible for each chunk. Once the insurer is known, one can look up their receipt store, the current receipt store root is easily found by simply looking up the insurer's receipt store feed.%
+% %
+% \footnote{In fact, it is not necessary to have the most up to date root, any state that is later than the start time of insurance should work.}
+% %
+% The actual receipt for the chunk can then be retrieved by traversing the receipt store using the original chunk address as the key. The insurer is implicitly responsible for insuring all the chunks of their receipt store as well as the receipt store feed. So if any chunk is found missing during this lookup procedure, the Merkle proof of segment that corresponds to the address of the missing chunk can be used to litigate. 
+% Otherwise, we can assume that the lookup is successful and the receipt is obtained by the user who can thus initiate litigation by submitting the receipt. 
+
+
+% \begin{figure}[htbp]
+%   \centering
+%   \caption[From retrieval to litigation \statusred]{From retrieval to litigation}
+%   \label{fig:flowchart-retrieval-litigation}
+% \end{figure}
+
+
+% Figure \ref{fig:flowchart-retrieval-litigation} gives a complete timeline of events starting from a third party user retrieving a file all the way to the file original insurer being punished.
+
+
+

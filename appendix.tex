@@ -43,7 +43,7 @@ d & \text{ if } x=y\\
 \end{definition}
 
 
-In practice, $\PO(x,y)$ is the length of the longest common prefix in the big-endian binary representation of $x$ and $y$. It is therefore most practical to calculate by counting the matching bits of the binary form of the addresses from the left. Hence, Kademlia falls into the prefix matching class of DHT-s \cite{rowstron2001pastry,zhao2004tapestry}. The maximum possible value of proximity is the total number of bits $d$. 
+In practice, $\PO(x,y)$ is the length of the longest common prefix in the big-endian binary representation of $x$ and $y$. It is therefore most practical to calculate by counting the matching bits of the binary form of the addresses from the left. Hence, Kademlia falls into the prefix matching class of DHT-s \citep{rowstron2001pastry,zhao2004tapestry}. The maximum possible value of proximity is the total number of bits $d$. 
 
 Taking the proximity order relative to a fixed point $x_0$ partitions all points in
 the space, consisting of all possible bit sequences of length $d$ into equivalence classes. Points in each class are at
@@ -70,7 +70,7 @@ Given a set of points uniformly distributed in the space (e.g. the results of a 
 
 \section{Proximity orders in graph topology \statusgreen}
 
-This section outlines a graph theoretical  approach to Kademlia topology \cite{aspnes2007skip}.
+This section outlines a graph theoretical  approach to Kademlia topology \citep{aspnes2007skip}.
 Consider a set of points $V$ in the space with a logarithmic distance and 
 a binary relation $R$. Define a directed graph where every point in the set is a vertex and any two vertices $x$ and $y$ are connected with an edge if they are in relation $R$. 
 
@@ -177,7 +177,7 @@ Averaging for the whole batch ($n=2^D$) gives%
 \section{Average hop count for chunk retrieval  \statusred}
 
 This section gives a formal estimation of the expected hop count for a random non-cached chunk.  
-Hop-count in traditional kademlia has already been  analysed \cite{roos2013comprehending, roos2015determining}.
+Hop-count in traditional kademlia has already been  analysed \citep{roos2013comprehending, roos2015determining}.
 
 \section{Distribution of requests \statusred}
 
