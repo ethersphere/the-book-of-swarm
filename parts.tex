@@ -138,8 +138,8 @@ In this way, Swarm's underlay transport offers quasi-stable peer connections ove
 
 
 In a \gloss{forwarding Kademlia} network, a message is said to be \emph{routable} if there exists a path from sender to destination through which the message can be relayed. In a mature subnetwork with \gloss{Kademlia topology} every message is routable. 
-
 If all peer connections are stably online, a \gloss{thin Kademlia table}, i.e.\ a single \gloss{peer} for each bin up to $d$, is sufficient to guarantee routing between nodes. In reality, however, networks are subject to \gloss{churn}, i.e.\ nodes are expected to go offline regularly. In order to ensure \gloss{routability} in the face of churn, the network needs to maintain \gloss{Kademlia topology}. This means that each individual node needs to have a \gloss{saturated Kademlia table} at all times. By keeping several connected peers in each \gloss{proximity order bin}, a node can ensure that node dropouts do not damage the saturation of their Kademlia table. Given a model of node dropouts, we can calculate the minimum number of peers needed per bin to guarantee that nodes are saturated with a probability that is arbitrarily close to 1. The more peers a node keeps in a particular proximity order bin, the more likely that the message destination address and the peer will have a longer matching prefix. As a consequence of forwarding the message to that peer, the \gloss{proximity order} increases more quickly, and the message ends up closer to the destination than it would with less peers in each bin (see also Figure \ref{fig:bindensity}).
+
 
 
 
@@ -372,7 +372,7 @@ Chunks should be encrypted by default. Beyond client needs for confidentiality, 
 \end{figure}
 
 
-Chunks shorter than 4 kilobytes are padded with random bytes (generated from the chunk encryption seed). The full chunk plaintext is encrypted and decrypted using a XOR-based block cipher seeded with the corresponding symmetric key. In order not to increase the attack surface by introducing additional cryptographic primitives, the block cipher of choice is using Keccak256 in counter mode, i.e. hashing together the key with a counter for each consecutive segment of 32 bytes. In order to allow selective disclosure of individual segments that are part of an encrypted file, yet leak no information about the rest of the file, we add an additional step of hashing to derive the encryption key for a segment within the chunk. This scheme is easy and cheap to implement in the \gloss{EVM}, lending itself to use in smart contracts containing the plaintext of encrypted Swarm content. 
+Chunks shorter than 4 kilobytes are padded with random bytes (generated from the chunk encryption seed). The full chunk plaintext is encrypted and decrypted using stream cipher; XOR with a PRNG seeded with the corresponding symmetric key. In order not to increase the attack surface by introducing additional cryptographic primitives, the stream cipher of choice is using Keccak256 in counter mode, i.e. hashing together the key with a counter for each consecutive segment of 32 bytes. In order to allow selective disclosure of individual segments that are part of an encrypted file, yet leak no information about the rest of the file, we add an additional step of hashing to derive the encryption key for a segment within the chunk. This scheme is easy and cheap to implement in the \gloss{EVM}, lending itself to use in smart contracts containing the plaintext of encrypted Swarm content. 
 
 The prepended metadata encoding the chunk span is also encrypted as if it was a continuation of the chunk, i.e. with counter 128. Encrypted chunk content is hashed using the \gloss{BMT hash} digest just as unencrypted ones are. The fact that a chunk is encrypted may be guessed from the \gloss{span value}, but apart from this, in the network layer, encrypted chunks behave in exactly the same way as unencrypted ones.
 
@@ -967,7 +967,7 @@ In the first two chapters of the architecture part of the book, we introduced th
 \end{itemize}
 
 
-\chapter{High-level functionality}\label{sec:high-level-functionality}
+\chapter{Building on the DISC}\label{sec:high-level-functionality}
 
 
 This chapter builds on the distributed chunk store and introduces data structures and processes that enable higher-level functionality, offering a rich experience handling data. In particular, we show how chunks can be organised to represent files (\ref{sec:files}) and how files can be organised to represent collections (\ref{sec:collections}). We also introduce key--value maps (\ref{sec:maps}) and briefly discuss the potential of arbitrary functional data structures. We then shift our attention to presenting our solution for providing confidentiality and access control (\ref{sec:access-control}). 
@@ -2055,7 +2055,7 @@ To provide transparency to the user, information such as the average number of p
 
 \subsubsection{Encryption}
 
-Encrypted upload can be enabled by setting the upload option \lstinline{encryption} to a non-zero value. If the value provided is a hexadecimal representation of a 32-byte seed, that seed is used for encryption. Since encryption and decryption are handled by Swarm itself, it must only be used in situations where the transport between the HTTP client and Swarm's proxy server can be guaranteed to be private. As such, it should not be used on public gateways, but rather through local Swarm nodes or private environments with well-configured TLS and self-signed certificates to ensure the necessary privacy and security.
+Encrypted upload can be enabled by setting the option \lstinline{encryption} to a non-zero value. If the value provided is a hexadecimal representation of a 32-byte seed, that seed is used for encryption. Since encryption and decryption are handled by Swarm itself, it must only be used in situations where the transport between the HTTP client and Swarm's proxy server can be guaranteed to be private. As such, it should not be used on public gateways, but rather through local Swarm nodes or private environments with well-configured TLS and self-signed certificates to ensure the necessary privacy and security.
 
 \subsubsection{Pinning}
 
@@ -2167,13 +2167,7 @@ Next the manifest entry corresponding to the path of the URL is retrieved. The r
 \end{labelledlist}
 
 
-If the \lstinline{rs} attribute is provided, there are three strategies that can be followed: 
-
-
-\begin{labelledlist}[noitemsep]
-\item[\emph{fallback}] In this strategy, the RS parity chunks are initially ignored for all intermediate chunks. Only if a non-parity chunk is missing, the RS parity chunks are used. This approach helps save bandwidth and corresponding costs at the expense of speed: if a chunk is missing, fallback to RS is delayed.
-\item[\emph{race}] The RS parities are retrieved immediately alongside the rest of the children chunks for all intermediate chunks. The first $n$ (assuming $k$ as the value of \lstinline{rs}, i.e, $n$ out of $n+k$ coding scheme) chunks are sufficient to reconstruct all the $n$ real children. This is equivalent to saying that the $k$ slowest chunk retrievals can be ignored.  
-\end{labelledlist}
+If the \lstinline{rs} attribute is provided, the user can set the prefetching strategy for redundancy decoding (see \ref{sec:strategies}).
 
 The default strategy choice is \lstinline{race}, if the user wants to prioritise saving on downloads, then the fallback strategy can be enforced by setting the header \lstinline{SWARM-RS-STRATEGY=fallback}. Alternatively, the RS strategy can be completely disabled by setting \lstinline{SWARM-RS-STRATEGY=disabled}. The number of parities for an erasure coded batch is taken from the \lstinline{rs} attribute in the enclosing manifest. However, this can be overridden with the header \lstinline{SWARM-RS-PARITIES}.
 

@@ -66,10 +66,10 @@
 \geometry{
     b5paper,
     total={176mm,250mm},
-    tmargin=2.2cm,
-    bmargin=2.7cm,
-    outer=2cm,
-    inner=3.3cm,
+    tmargin=2.6cm,
+    bmargin=2.3cm,
+    outer=2.4cm,
+    inner=2.9cm,
     headsep=1.2cm,
     footnotesep=0.9cm
 }
@@ -252,12 +252,12 @@ spaceabove=6pt, spacebelow=6pt,headfont=\normalfont\bfseries,notefont=\mdseries,
 \fancyfoot{}
 
 
-
-
-
-
-
-
+\usepackage{hyperref}
+\usepackage[
+    type={CC},
+    modifier={by-nc-sa},
+    version={3.0},
+]{doclicense}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the book of swarm
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -291,7 +291,19 @@ These are hidden if conditional text is not shown (when publishing a version).
 \end{enumerate}
 \fi
 %
-\newpage\pagestyle{empty}\ \newpage
+\newpage
+\pagestyle{empty}
+\ \\\vskip14cm
+the book of swarm\\
+2024 by viktor trón\\\hrule
+
+{
+\footnotesize\raggedright\
+\doclicenseThis
+}
+\texttt{ISBN 978-615-01-9983-2}
+
+\newpage
 \input{front/00-quote.tex}
 \pagestyle{empty}\ \newpage
 \tableofcontents

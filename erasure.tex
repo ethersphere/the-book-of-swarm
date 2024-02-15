@@ -117,7 +117,7 @@ Overcompensating, we still require the same number of parity chunks even when th
 This leaves us with only one corner case: it is not possible to use our $m\text{-out-of-}n$ scheme on a single chunk ($m=1$) because it would amount to $k+1$ copies of the same chunk. The problem is that copies of the same chunk all have the same hash and therefore are automatically deduplicated. Whenever a single chunk is left over ($m=1$) (i.e., the root chunk itself), we would need to replicate the chunk in a way that (1) ideally, the replicas are dispersed in the address space in a balanced way, yet (2) their addresses can be known by retrievers who ideally only know the reference to the original chunk's address.
 
  
-Our solution uses Swarm's special construct,  the \emph{single owner chunk} (SOC; Figure~\ref{sec:single-owner-chunks}). Replicas of the root chunk are created by making the chunk data the payload of a number of SOCs. The addresses of these SOCs must be derivable from the original root hash following a deterministic convention shared by uploaders and downloaders.
+Our solution uses Swarm's special construct,  the \emph{single owner chunk} (SOC; see~\ref{sec:single-owner-chunks}). Replicas of the root chunk are created by making the chunk data the payload of a number of SOCs. The addresses of these SOCs must be derivable from the original root hash following a deterministic convention shared by uploaders and downloaders.
 
 The address of a SOC is the hash of its ID and the Ethereum address of its owner. In order to create valid SOCs, uploaders need to sign the SOC with the owner's identity, therefore the owner of the SOC must be a consensual identity with their private key publicly revealed.
 %
@@ -132,8 +132,7 @@ Let us assume $c$ is the content-addressed chunk we need to replicate; $n$ is th
   \item Create the SOC ID by taking $\mathit{addr}(c)$ and changing the last byte (at index position 31) to  $i$.
   \item Calculate the the SOC address by concatenating ID $id$ and owner $o$%
 %
-\footnote{The SOC owner of dispersed replicas has the arbitrary private key $\texttt{0x010...00}$
-and the corresponding ether address is 
+\footnote{The single-owner chunk representing the dispersed replicas must be signed by the arbitrary private key $\texttt{0x010000000...0000000}$. The corresponding ethereum address is 
 \texttt{0xdc5b20847f43d67928f49cd4f85d696b5a7617b5}.}
 %
 and hash the result using the Keccak256 base hash $a_i:=H(id\concat o)$, and record $c_i=\mathit{SOC}(id,o,c)$.

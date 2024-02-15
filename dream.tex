@@ -138,15 +138,9 @@ incentivised to compute the OTP update and forward the resulting output chunk to
 \end{itemize}
 
 
-\begin{figure}[htbp]
-  \centering
-    % \includegraphics[width=0.8\textwidth]{}
-  \caption{The dream protocol}
-\label{fig:protocol}
-\end{figure}
 
 
-Let us  define a network protocol called \emph{dream} (see Figure \ref{fig:protocol}). Participants in the protocol listen to single owner chunks that wrap the input.
+Let us  define a network protocol called \emph{dream}. Participants in the protocol listen to single owner chunks that wrap the input.
 We assume that they extract the batch identifier $b$, and the payload CAC $c$ as parameters to the OTP update function. They calculate the output pad, wrap it as a dream chunk, and send it to the network towards the address of the output chunk. This allows the destination neighbourhood 
 to calculate the next step. If the protocol is followed up to $n$ steps, then the target node receives $k=c(n)$ at address $a$. 
 
