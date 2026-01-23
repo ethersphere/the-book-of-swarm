@@ -45,20 +45,42 @@ else
     cp -r fig "$OUTPUT_DIR/"
 fi
 
-# Run make4ht conversion
+# Run make4ht conversion (split into chapters with "2" option in book.cfg)
 echo -e "${YELLOW}Running LaTeX to HTML conversion...${NC}"
+
+# First, run makeglossaries if .glo file exists from previous run
+if [ -f "main.glo" ]; then
+    echo -e "${YELLOW}Building glossary...${NC}"
+    makeglossaries main 2>/dev/null || true
+fi
+
 make4ht -c book.cfg -e build.mk4 "$MAIN_FILE" "html5,mathjax" 2>&1 | tee build.log
+
+# Run makeglossaries again after first pass
+if [ -f "main.glo" ]; then
+    echo -e "${YELLOW}Building glossary (second pass)...${NC}"
+    makeglossaries main 2>/dev/null || true
+    # Run make4ht again to incorporate glossary
+    make4ht -c book.cfg -e build.mk4 "$MAIN_FILE" "html5,mathjax" 2>&1 | tee -a build.log
+fi
 
 # Move generated files to output directory
 echo -e "${YELLOW}Organizing output files...${NC}"
 mv *.html "$OUTPUT_DIR/" 2>/dev/null || true
 cp swarm-book.css "$OUTPUT_DIR/"
-cp theme-toggle.js "$OUTPUT_DIR/" 2>/dev/null || true
+cp theme-toggle.js "$OUTPUT_DIR/"
 cp main.css "$OUTPUT_DIR/" 2>/dev/null || true
+# Copy any additional CSS files generated
+cp main*.css "$OUTPUT_DIR/" 2>/dev/null || true
 
 # Copy any generated images
 mv *.svg "$OUTPUT_DIR/" 2>/dev/null || true
 mv *.png "$OUTPUT_DIR/" 2>/dev/null || true
+
+# Copy doclicense image
+if [ -f ~/Library/TinyTeX/texmf-dist/tex/latex/doclicense/images/doclicense-CC-by-nc-sa-88x31.pdf ]; then
+    pdf2svg ~/Library/TinyTeX/texmf-dist/tex/latex/doclicense/images/doclicense-CC-by-nc-sa-88x31.pdf "$OUTPUT_DIR/doclicense-CC-by-nc-sa-88x31.svg" 2>/dev/null || true
+fi
 
 # Clean up stray text at beginning of HTML files
 for htmlfile in "$OUTPUT_DIR"/*.html; do
@@ -83,6 +105,24 @@ for htmlfile in "$OUTPUT_DIR"/*.html; do
         sed -i '' "s|fig/\([^'\"]*\).png|fig/\1.svg|g" "$htmlfile" 2>/dev/null || true
     fi
 done
+
+# Rename files to remove status markers from filenames
+echo -e "${YELLOW}Cleaning up filenames...${NC}"
+cd "$OUTPUT_DIR"
+for file in *statusgreen*.html *statusorange*.html *statusred*.html *statusyellow*.html 2>/dev/null; do
+    if [ -f "$file" ]; then
+        newname=$(echo "$file" | sed 's/statusgreen//g; s/statusorange//g; s/statusred//g; s/statusyellow//g')
+        if [ "$file" != "$newname" ]; then
+            mv "$file" "$newname"
+            echo "  Renamed: $file -> $newname"
+            # Update references in all HTML files
+            for htmlfile in *.html; do
+                sed -i '' "s|$file|$newname|g" "$htmlfile" 2>/dev/null || true
+            done
+        fi
+    fi
+done
+cd - > /dev/null
 
 # Create index.html that redirects to main content
 if [ -f "$OUTPUT_DIR/main.html" ]; then

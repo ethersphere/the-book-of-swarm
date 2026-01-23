@@ -2,8 +2,21 @@
 -- Usage: make4ht -c book.cfg -e build.mk4 main.tex "html5,mathjax"
 
 -- Build sequence with glossary support
+-- Run htlatex first pass
 Make:htlatex()
+
+-- Run makeglossaries for glossary generation
+Make:match("glo$", function(filename)
+  -- Run makeglossaries
+  local basename = filename:gsub("%.glo$", "")
+  os.execute("makeglossaries " .. basename)
+  return true
+end)
+
+-- Run makeindex for index generation
 Make:makeindex()
+
+-- Run htlatex again to incorporate glossary/index
 Make:htlatex()
 Make:htlatex()
 
@@ -22,6 +35,9 @@ Make:match("html$", function(filename)
 
   -- Clean up excessive whitespace
   content = content:gsub('\n%s*\n%s*\n', '\n\n')
+
+  -- Add theme-toggle.js script before </body>
+  content = content:gsub('</body>', '<script src="theme-toggle.js"></script></body>')
 
   local f = io.open(filename, "w")
   f:write(content)

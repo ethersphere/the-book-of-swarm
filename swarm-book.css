@@ -180,23 +180,86 @@ a:hover {
 }
 
 /* === Figures === */
-.book-figure {
+.book-figure,
+figure {
   margin: 2rem 0;
   text-align: center;
 }
 
-.book-figure img {
+.book-figure img,
+figure img,
+.figure img,
+img.graphics {
   max-width: 100%;
+  width: 90%;
   height: auto;
   border-radius: 4px;
   box-shadow: var(--shadow);
+  cursor: zoom-in;
+  transition: transform 0.3s ease;
 }
 
-.figure-caption {
+/* Wide figures - use full width */
+.wide-figure img,
+img[src*="kademlia"],
+img[src*="diagram"],
+img[src*="layered"],
+img[src*="epoch"],
+img[src*="forwarding"] {
+  width: 100%;
+  max-width: 100%;
+}
+
+.figure-caption,
+figcaption,
+.caption {
   margin-top: 1rem;
   font-size: 0.9rem;
   color: var(--text-muted);
   font-style: italic;
+}
+
+/* === Image Lightbox (click to magnify) === */
+.lightbox-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  cursor: zoom-out;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.lightbox-overlay.active {
+  display: flex;
+}
+
+.lightbox-overlay img {
+  max-width: 95vw;
+  max-height: 95vh;
+  object-fit: contain;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0.5rem;
+}
+
+.lightbox-close:hover {
+  color: var(--swarm-orange);
 }
 
 /* === Glossary Terms === */
