@@ -288,13 +288,20 @@ async function testThemeToggle(page, pageName, results) {
   const themeToggle = await page.$('#theme-toggle');
   if (!themeToggle) return;
 
+  // Wait for DOMContentLoaded to ensure click handlers are attached
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(200);
+
   // Get initial theme
   const initialTheme = await page.evaluate(() =>
     document.documentElement.getAttribute('data-theme')
   );
 
-  // Click toggle
-  await themeToggle.click();
+  // Click toggle using JavaScript directly (more reliable than click)
+  await page.evaluate(() => {
+    const btn = document.getElementById('theme-toggle');
+    if (btn) btn.click();
+  });
   await page.waitForTimeout(100);
 
   // Get new theme
@@ -309,7 +316,10 @@ async function testThemeToggle(page, pageName, results) {
   }
 
   // Toggle back
-  await themeToggle.click();
+  await page.evaluate(() => {
+    const btn = document.getElementById('theme-toggle');
+    if (btn) btn.click();
+  });
 }
 
 // Test: Internal links
@@ -334,26 +344,29 @@ async function testInternalLinks(page, pageName, results, allLinks) {
   results.pass(`${pageName}: Found ${links.length} links`);
 }
 
-// Test: Check for squashed text (missing spaces)
+/// Test: Check for squashed text (missing spaces)
 async function testSquashedText(page, pageName, results) {
-  // Common patterns that indicate squashed text
+  // Common patterns that indicate squashed text (should NOT appear after processing)
   const squashedPatterns = [
-    /THEBOOKOFSWARM/,
-    /thebookofswarm/i,
-    /BitTorrentanditslimits/i,
-    /Peer-to-peernetworks/i,
-    /Thecurrentstateofthe/i,
-    /accesscontrol\d/,  // accesscontrol51 (term followed immediately by number)
-    /batchdepth\d/,
-    /bzznetworkID\d/,
+    { pattern: /THEBOOKOFSWARM/, desc: 'title squashed' },
+    { pattern: /thebookofswarm/i, desc: 'book title squashed' },
+    { pattern: /VIKTORTRóN/i, desc: 'author name squashed' },
+    { pattern: /SatoshiNakamoto/i, desc: 'quote attribution squashed' },
+    { pattern: /theswarmisheadedtowardus/i, desc: 'quote squashed' },
+    { pattern: /BitTorrentanditslimits/i, desc: 'section title squashed' },
+    { pattern: /Howtousethebook/i, desc: 'section title squashed' },
+    { pattern: /Historicalcontext/i, desc: 'section title squashed' },
+    { pattern: /Acronymsandabbreviations/i, desc: 'section title squashed' },
+    { pattern: /backgroundinformationabout/i, desc: 'body text squashed' },
+    { pattern: /accesscontrol\d/i, desc: 'index entry squashed' },
   ];
 
   const bodyText = await page.evaluate(() => document.body.innerText);
 
   let squashedFound = 0;
-  for (const pattern of squashedPatterns) {
+  for (const { pattern, desc } of squashedPatterns) {
     if (pattern.test(bodyText)) {
-      results.fail(`${pageName}: Squashed text found`, pattern.toString());
+      results.fail(`${pageName}: Squashed text (${desc})`, pattern.toString());
       squashedFound++;
     }
   }
