@@ -783,6 +783,24 @@ tr:hover {
   margin: 2rem 0;
 }
 
+.thebibliography dl {
+  margin: 0;
+  padding: 0;
+}
+
+.thebibliography dt {
+  margin-top: 1.5rem;
+}
+
+.thebibliography dt:first-child {
+  margin-top: 0;
+}
+
+.thebibliography dd {
+  margin-left: 0;
+  margin-bottom: 0.5rem;
+}
+
 .bibitem {
   margin: 1rem 0;
   padding-left: 2rem;
