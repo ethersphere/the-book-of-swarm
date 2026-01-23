@@ -1,0 +1,483 @@
+/* Book of Swarm - Swarm-styled CSS
+ * Inspired by ethswarm.org aesthetic
+ * Supports light and dark themes
+ */
+
+/* === CSS Variables for Theming === */
+:root {
+  /* Swarm brand colors */
+  --swarm-orange: #F7931A;
+  --swarm-orange-light: #FFA940;
+  --swarm-orange-dark: #DD6B10;
+
+  /* Light theme (default) */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F8F9FA;
+  --bg-tertiary: #E9ECEF;
+  --text-primary: #1A1A2E;
+  --text-secondary: #4A4A68;
+  --text-muted: #6C757D;
+  --border-color: #DEE2E6;
+  --link-color: var(--swarm-orange);
+  --link-hover: var(--swarm-orange-dark);
+  --code-bg: #F4F4F4;
+  --blockquote-border: var(--swarm-orange);
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+  --bg-primary: #0D0D1A;
+  --bg-secondary: #1A1A2E;
+  --bg-tertiary: #2A2A4A;
+  --text-primary: #E8E8EC;
+  --text-secondary: #B8B8C8;
+  --text-muted: #8888A8;
+  --border-color: #3A3A5A;
+  --link-color: var(--swarm-orange-light);
+  --link-hover: var(--swarm-orange);
+  --code-bg: #1E1E2E;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* === Base Styles === */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  line-height: 1.7;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* === Typography === */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.3;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+h5 { font-size: 1.1rem; }
+h6 { font-size: 1rem; }
+
+p {
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+}
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--link-hover);
+  text-decoration: underline;
+}
+
+/* === Layout === */
+.book-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .book-content {
+    padding: 1rem;
+  }
+
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+}
+
+/* === Header / Title === */
+.book-header {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+  border-bottom: 3px solid var(--swarm-orange);
+  margin-bottom: 2rem;
+}
+
+.book-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--swarm-orange) 0%, var(--swarm-orange-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.book-author {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  font-variant: small-caps;
+}
+
+/* === Parts and Chapters === */
+.book-part {
+  margin: 4rem 0;
+  padding: 2rem 0;
+  border-top: 2px solid var(--border-color);
+}
+
+.part-title {
+  font-size: 2.5rem;
+  text-align: center;
+  color: var(--swarm-orange);
+  margin-bottom: 2rem;
+}
+
+.chapter {
+  margin: 3rem 0;
+  padding: 2rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.chapter-title {
+  color: var(--swarm-orange);
+  border-bottom: 2px solid var(--swarm-orange);
+  padding-bottom: 0.5rem;
+}
+
+.section {
+  margin: 2rem 0;
+}
+
+.section-title {
+  color: var(--text-primary);
+}
+
+.subsection {
+  margin: 1.5rem 0;
+  padding-left: 1rem;
+  border-left: 3px solid var(--border-color);
+}
+
+.subsubsection {
+  margin: 1rem 0;
+}
+
+/* === Figures === */
+.book-figure {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.book-figure img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: var(--shadow);
+}
+
+.figure-caption {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* === Glossary Terms === */
+.glossary-term {
+  color: var(--link-color);
+  border-bottom: 1px dotted var(--link-color);
+  cursor: help;
+}
+
+.glossary-term:first-of-type,
+em .glossary-term {
+  font-style: italic;
+}
+
+.glossary-term:hover {
+  background-color: var(--bg-tertiary);
+}
+
+/* === Definition and Theorem Blocks === */
+.definition,
+.theorem {
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background: var(--bg-tertiary);
+  border-left: 4px solid var(--swarm-orange);
+  border-radius: 0 8px 8px 0;
+}
+
+.definition::before {
+  content: "Definition";
+  display: block;
+  font-weight: 700;
+  color: var(--swarm-orange);
+  margin-bottom: 0.5rem;
+}
+
+.theorem::before {
+  content: "Theorem";
+  display: block;
+  font-weight: 700;
+  color: var(--swarm-orange);
+  margin-bottom: 0.5rem;
+}
+
+/* === Lists === */
+ul, ol {
+  margin: 1rem 0;
+  padding-left: 2rem;
+}
+
+li {
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+}
+
+.labelled-list {
+  margin: 1.5rem 0;
+}
+
+.labelled-list dt {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 1rem;
+}
+
+.labelled-list dd {
+  margin-left: 1.5rem;
+  color: var(--text-secondary);
+}
+
+/* === Blockquotes and Epigraphs === */
+blockquote,
+.epigraph {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: var(--bg-secondary);
+  border-left: 4px solid var(--blockquote-border);
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.epigraph {
+  text-align: right;
+  font-size: 1.1rem;
+}
+
+/* === Code === */
+code,
+.center-verbatim,
+pre {
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+  background: var(--code-bg);
+  border-radius: 4px;
+}
+
+code {
+  padding: 0.2rem 0.4rem;
+  font-size: 0.9em;
+}
+
+pre,
+.center-verbatim {
+  padding: 1.5rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.center-verbatim {
+  text-align: center;
+}
+
+/* === Tables === */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+th, td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+th {
+  background: var(--bg-tertiary);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+tr:hover {
+  background: var(--bg-secondary);
+}
+
+/* === Math (MathJax) === */
+.MathJax {
+  font-size: 1.1em !important;
+}
+
+.MathJax_Display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 1rem 0;
+}
+
+/* === Footnotes === */
+.footnote {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.footnote-mark {
+  color: var(--swarm-orange);
+  font-weight: 600;
+}
+
+/* === Table of Contents === */
+.toc {
+  background: var(--bg-secondary);
+  padding: 2rem;
+  border-radius: 8px;
+  margin: 2rem 0;
+}
+
+.toc h2 {
+  color: var(--swarm-orange);
+  margin-top: 0;
+}
+
+.toc ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.toc li {
+  margin: 0.5rem 0;
+}
+
+.toc a {
+  color: var(--text-secondary);
+}
+
+.toc a:hover {
+  color: var(--link-color);
+}
+
+/* === Navigation === */
+.book-nav {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+}
+
+#theme-toggle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: var(--swarm-orange);
+  color: white;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+#theme-toggle:hover {
+  transform: scale(1.1);
+  background: var(--swarm-orange-dark);
+}
+
+.theme-icon::before {
+  content: "☀️";
+  font-size: 1.25rem;
+}
+
+[data-theme="dark"] .theme-icon::before {
+  content: "🌙";
+}
+
+/* === Bibliography === */
+.thebibliography {
+  margin: 2rem 0;
+}
+
+.bibitem {
+  margin: 1rem 0;
+  padding-left: 2rem;
+  text-indent: -2rem;
+}
+
+/* === Glossary Page === */
+.glossary-list {
+  columns: 2;
+  column-gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .glossary-list {
+    columns: 1;
+  }
+}
+
+.glossary-entry {
+  break-inside: avoid;
+  margin-bottom: 1.5rem;
+}
+
+.glossary-entry dt {
+  font-weight: 700;
+  color: var(--swarm-orange);
+}
+
+.glossary-entry dd {
+  margin-left: 0;
+  color: var(--text-secondary);
+}
+
+/* === Print Styles === */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  .book-nav,
+  #theme-toggle {
+    display: none;
+  }
+
+  .chapter {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+
+  a {
+    color: black;
+    text-decoration: underline;
+  }
+}

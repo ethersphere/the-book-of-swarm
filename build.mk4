@@ -1,0 +1,30 @@
+-- make4ht build file for Book of Swarm HTML conversion
+-- Usage: make4ht -c book.cfg -e build.mk4 main.tex "html5,mathjax"
+
+-- Build sequence with glossary support
+Make:htlatex()
+Make:makeindex()
+Make:htlatex()
+Make:htlatex()
+
+-- Post-process HTML files to clean up
+Make:match("html$", function(filename)
+  local f = io.open(filename, "r")
+  if not f then return true end
+  local content = f:read("*all")
+  f:close()
+
+  -- Remove any residual status markers
+  content = content:gsub('<span class="statusgreen">[^<]*</span>', '')
+  content = content:gsub('<span class="statusorange">[^<]*</span>', '')
+  content = content:gsub('<span class="statusred">[^<]*</span>', '')
+  content = content:gsub('<span class="statusyellow">[^<]*</span>', '')
+
+  -- Clean up excessive whitespace
+  content = content:gsub('\n%s*\n%s*\n', '\n\n')
+
+  local f = io.open(filename, "w")
+  f:write(content)
+  f:close()
+  return true
+end)
