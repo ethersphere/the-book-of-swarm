@@ -6,11 +6,27 @@ Post-process HTML files for Book of Swarm.
 - Adds theme toggle and back-to-top buttons
 - Wraps content in proper layout containers
 - Styles index page numbers
+- Fixes accented characters in small caps (tex4ht HTF mapping issue)
 """
 
 import sys
 import re
 import os
+
+# Names with accented characters that tex4ht drops in small caps
+# tex4ht's HTF font mappings for small caps don't include Č, Š, Ž, ě, š, ć etc.
+# These are extracted from front/02-acknowledgements.tex
+SMALL_CAPS_NAME_FIXES = {
+    # Broken name -> Correct name
+    "rt Ahlin": "Črt Ahlin",
+    "Gregor avcer": "Gregor Žavcer",
+    "Vojtch imetka": "Vojtěch Šimetka",
+    "Jano Gulja": "Janoš Guljaš",
+    "Petar Radovi": "Petar Radović",
+    "Svetomir Smiljkovi": "Svetomir Smiljković",
+    "Marko Blazevi": "Marko Blazević",
+    "Vlado Paji": "Vlado Pajić",
+}
 
 # Navigation structure for the book
 NAV_STRUCTURE = [
@@ -77,6 +93,28 @@ def get_floating_buttons_html():
 '''
 
 
+def fix_small_caps_accents(content):
+    """
+    Fix accented characters in small caps that tex4ht drops.
+
+    tex4ht's HTF (HyperText Font) mappings for small caps fonts don't include
+    Central European characters like Č, Š, Ž, ě, ć. This causes names like
+    "Črt Ahlin" to appear as "rt Ahlin" in the HTML output.
+
+    This function replaces the broken names with the correct versions.
+    Works with both tex4ht's font class (ec-lmcsc-*) and custom small-caps class.
+    """
+    for broken, correct in SMALL_CAPS_NAME_FIXES.items():
+        # Match within any span containing the broken text (handles ec-lmcsc-* and small-caps)
+        # Handle potential newlines in the content (tex4ht sometimes breaks across lines)
+        # Convert broken name to allow whitespace between words
+        broken_pattern = r"\s+".join(re.escape(word) for word in broken.split())
+        pattern = f"(<span class=['\"][^'\"]*['\"]>){broken_pattern}(\\s*</span>)"
+        replacement = f"\\1{correct}\\2"
+        content = re.sub(pattern, replacement, content, flags=re.DOTALL)
+    return content
+
+
 def fix_index_hyperlinks(content, filename):
     """
     Style page numbers in index/glossary as references.
@@ -126,6 +164,9 @@ def fix_html(filepath):
     content = re.sub(r"<div[^>]*class=['\"]sidebar-overlay['\"][^>]*>.*?</div>", "", content, flags=re.DOTALL)
     content = re.sub(r"<script[^>]*theme-toggle[^>]*></script>", "", content)
     content = re.sub(r"<p>\s*</p>", "", content)
+
+    # Fix accented characters in small caps names
+    content = fix_small_caps_accents(content)
 
     # Fix index page numbers to be styled as references
     content = fix_index_hyperlinks(content, filename)
