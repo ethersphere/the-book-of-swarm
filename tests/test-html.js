@@ -334,6 +334,47 @@ async function testInternalLinks(page, pageName, results, allLinks) {
   results.pass(`${pageName}: Found ${links.length} links`);
 }
 
+// Test: Check for squashed text (missing spaces)
+async function testSquashedText(page, pageName, results) {
+  // Common patterns that indicate squashed text
+  const squashedPatterns = [
+    /THEBOOKOFSWARM/,
+    /thebookofswarm/i,
+    /BitTorrentanditslimits/i,
+    /Peer-to-peernetworks/i,
+    /Thecurrentstateofthe/i,
+    /accesscontrol\d/,  // accesscontrol51 (term followed immediately by number)
+    /batchdepth\d/,
+    /bzznetworkID\d/,
+  ];
+
+  const bodyText = await page.evaluate(() => document.body.innerText);
+
+  let squashedFound = 0;
+  for (const pattern of squashedPatterns) {
+    if (pattern.test(bodyText)) {
+      results.fail(`${pageName}: Squashed text found`, pattern.toString());
+      squashedFound++;
+    }
+  }
+
+  if (squashedFound === 0) {
+    results.pass(`${pageName}: No squashed text detected`);
+  }
+}
+
+// Test: Index page has styled page references
+async function testIndexPageRefs(page, pageName, results) {
+  if (!pageName.includes('glossarytitle')) return;
+
+  const pageRefs = await page.$$('.page-ref');
+  if (pageRefs.length > 0) {
+    results.pass(`${pageName}: Page references styled (${pageRefs.length} found)`);
+  } else {
+    results.warn(`${pageName}: No styled page references found in index`);
+  }
+}
+
 // Test: MathJax loaded (for pages with math)
 async function testMathJax(page, pageName, results) {
   const hasMath = await page.evaluate(() => {
@@ -480,6 +521,8 @@ async function runTests() {
         await testInternalLinks(page, pageName, results, allLinks);
         await testMathJax(page, pageName, results);
         await testResponsiveDesign(page, pageName, results);
+        await testSquashedText(page, pageName, results);
+        await testIndexPageRefs(page, pageName, results);
         await takeScreenshot(page, pageName);
       }
 

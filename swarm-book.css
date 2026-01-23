@@ -856,6 +856,29 @@ tr:hover {
   display: block;
 }
 
+/* === Index and Glossary Styles === */
+.page-ref {
+  color: var(--accent-primary);
+  cursor: default;
+  font-weight: 500;
+}
+
+.page-ref:hover {
+  text-decoration: underline;
+}
+
+/* Two-column layout for index */
+.columns-2 {
+  column-count: 2;
+  column-gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .columns-2 {
+    column-count: 1;
+  }
+}
+
 /* === Print Styles === */
 @media print {
   .top-nav,
