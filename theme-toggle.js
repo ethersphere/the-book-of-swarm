@@ -1,5 +1,5 @@
-// Theme toggle and image lightbox for Book of Swarm
-// Supports light and dark modes with localStorage persistence
+// Book of Swarm - Navigation and Theme Toggle
+// Supports light/dark modes, sidebar navigation, and image lightbox
 
 (function() {
   'use strict';
@@ -17,19 +17,67 @@
   // Set initial theme
   setTheme(getTheme());
 
-  // Add click handler to theme toggle button if it exists
+  // === DOM Ready ===
   document.addEventListener('DOMContentLoaded', function() {
-    var toggle = document.getElementById('theme-toggle');
-    if (toggle) {
-      toggle.addEventListener('click', function() {
+
+    // === Theme Toggle Button ===
+    var themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+      themeToggle.addEventListener('click', function() {
         var currentTheme = getTheme();
         var newTheme = currentTheme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
       });
     }
 
+    // === Mobile Menu Toggle ===
+    var menuToggle = document.querySelector('.menu-toggle');
+    var sidebar = document.querySelector('.sidebar');
+    var sidebarOverlay = document.querySelector('.sidebar-overlay');
+
+    if (menuToggle && sidebar) {
+      menuToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('open');
+        if (sidebarOverlay) {
+          sidebarOverlay.classList.toggle('active');
+        }
+      });
+    }
+
+    if (sidebarOverlay) {
+      sidebarOverlay.addEventListener('click', function() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+      });
+    }
+
+    // === Back to Top Button ===
+    var backToTop = document.getElementById('back-to-top');
+    if (backToTop) {
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 300) {
+          backToTop.classList.add('visible');
+        } else {
+          backToTop.classList.remove('visible');
+        }
+      });
+
+      backToTop.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    // === Highlight Active Sidebar Link ===
+    var currentPage = window.location.pathname.split('/').pop() || 'main.html';
+    var sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+    sidebarLinks.forEach(function(link) {
+      var href = link.getAttribute('href');
+      if (href && (href === currentPage || href.split('#')[0] === currentPage)) {
+        link.classList.add('active');
+      }
+    });
+
     // === Image Lightbox ===
-    // Create lightbox overlay
     var overlay = document.createElement('div');
     overlay.className = 'lightbox-overlay';
     overlay.innerHTML = '<button class="lightbox-close" aria-label="Close">&times;</button><img src="" alt="">';
@@ -61,6 +109,20 @@
         lightboxImg.src = this.src;
         lightboxImg.alt = this.alt || 'Figure';
         overlay.classList.add('active');
+      });
+    });
+
+    // === Smooth scroll for anchor links ===
+    document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+      anchor.addEventListener('click', function(e) {
+        var targetId = this.getAttribute('href');
+        if (targetId && targetId !== '#') {
+          var target = document.querySelector(targetId);
+          if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
       });
     });
   });
