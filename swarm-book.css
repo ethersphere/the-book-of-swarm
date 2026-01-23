@@ -26,7 +26,7 @@
   --shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.15);
 
   /* Layout */
-  --content-max-width: 900px;
+  --content-max-width: 1200px;
   --sidebar-width: 280px;
   --header-height: 0px;
 }
