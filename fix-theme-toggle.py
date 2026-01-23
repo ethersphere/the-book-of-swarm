@@ -29,12 +29,11 @@ SMALL_CAPS_NAME_FIXES = {
 }
 
 # Base navigation items (before TOC content)
+# Only items that don't appear in the parsed TOC
 NAV_BASE = [
     {"title": "Home", "href": "main.html", "type": "home"},
     {"title": "Contents", "href": "contentsname.html", "type": "chapter"},
     {"title": "Figures", "href": "listfigurename.html", "type": "chapter"},
-    {"title": "Prolegomena", "href": "Prolegomena.html", "type": "chapter"},
-    {"title": "Acknowledgments", "href": "Acknowledgments.html", "type": "chapter"},
 ]
 
 # Cached navigation structure (populated from TOC)
@@ -112,27 +111,60 @@ def get_top_nav_html():
 '''
 
 def get_sidebar_html(current_file, dist_dir):
-    """Generate the sidebar navigation HTML."""
+    """Generate the sidebar navigation HTML with collapsible sections."""
     nav_structure = parse_toc_for_nav(dist_dir)
 
     items = []
-    for nav in nav_structure:
-        if nav["type"] == "part":
-            css_class = "part-item"
-        elif nav["type"] == "section":
-            css_class = "section-item"
-        else:
-            css_class = "chapter-item"
+    sections_buffer = []
+    in_chapter = False
 
-        # Check if this nav item matches current file
+    def flush_sections():
+        """Add buffered sections as a collapsible group and close chapter li."""
+        nonlocal sections_buffer, in_chapter
+        if sections_buffer:
+            section_items = "\n      ".join(sections_buffer)
+            items.append(f'<ul class="section-list">\n      {section_items}\n    </ul>')
+            sections_buffer = []
+        if in_chapter:
+            items.append('</li>')
+            in_chapter = False
+
+    for nav in nav_structure:
         nav_file = nav["href"].split('#')[0] if '#' in nav["href"] else nav["href"]
         active = "active" if nav_file == current_file else ""
 
-        items.append(f'<li><a href="{nav["href"]}" class="{css_class} {active}">{nav["title"]}</a></li>')
+        if nav["type"] == "part":
+            flush_sections()
+            items.append(f'<li><a href="{nav["href"]}" class="part-item {active}">{nav["title"]}</a></li>')
+
+        elif nav["type"] == "chapter":
+            flush_sections()
+            # Check if this chapter has sections (will be expanded if current)
+            has_sections = any(
+                n["type"] == "section" and n["href"].split('#')[0] == nav_file
+                for n in nav_structure
+            )
+            expanded = "expanded" if nav_file == current_file and has_sections else ""
+            toggle = '<span class="chapter-toggle">›</span>' if has_sections else ''
+            items.append(f'<li class="chapter-container {expanded}"><a href="{nav["href"]}" class="chapter-item {active}">{toggle}{nav["title"]}</a>')
+            in_chapter = True
+            if not has_sections:
+                items.append('</li>')
+                in_chapter = False
+
+        elif nav["type"] == "home":
+            flush_sections()
+            items.append(f'<li><a href="{nav["href"]}" class="chapter-item {active}">{nav["title"]}</a></li>')
+
+        elif nav["type"] == "section":
+            sections_buffer.append(f'<li><a href="{nav["href"]}" class="section-item {active}">{nav["title"]}</a></li>')
+
+    flush_sections()
 
     nav_items = "\n    ".join(items)
 
     return f'''<aside class="sidebar">
+  <div class="sidebar-resize-handle"></div>
   <div class="sidebar-header">
     <a href="main.html" class="sidebar-brand">
       <span class="sidebar-brand-icon">S</span>

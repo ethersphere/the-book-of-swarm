@@ -99,11 +99,29 @@ body {
   width: var(--sidebar-width);
   height: 100vh;
   background: var(--bg-secondary);
-  border-right: 1px solid var(--border-color);
+  border-right: none;
   overflow-y: auto;
   padding: 0;
   z-index: 900;
   transition: transform 0.3s ease;
+}
+
+/* Resize handle */
+.sidebar-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 5px;
+  height: 100%;
+  background: var(--border-color);
+  cursor: col-resize;
+  transition: background 0.2s ease;
+  z-index: 901;
+}
+
+.sidebar-resize-handle:hover,
+.sidebar-resize-handle.dragging {
+  background: var(--swarm-orange);
 }
 
 .sidebar-header {
@@ -205,6 +223,36 @@ body {
 
 .sidebar-nav .chapter-item {
   padding-left: 1.25rem;
+}
+
+/* Collapsible chapter containers */
+.chapter-container {
+  list-style: none;
+}
+
+.chapter-toggle {
+  display: inline-block;
+  width: 1rem;
+  transition: transform 0.2s ease;
+  color: var(--text-muted);
+}
+
+.chapter-container.expanded .chapter-toggle {
+  transform: rotate(90deg);
+}
+
+.section-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.chapter-container.expanded + .section-list,
+.chapter-container.expanded .section-list {
+  max-height: 1000px;
 }
 
 .sidebar-nav .section-item {

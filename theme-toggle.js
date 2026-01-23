@@ -125,5 +125,79 @@
         }
       });
     });
+
+    // === Collapsible Chapter Sections ===
+    var chapterContainers = document.querySelectorAll('.chapter-container');
+    chapterContainers.forEach(function(container) {
+      var chapterLink = container.querySelector('.chapter-item');
+      var toggle = container.querySelector('.chapter-toggle');
+
+      if (toggle) {
+        // Click on toggle to expand/collapse
+        toggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          container.classList.toggle('expanded');
+        });
+
+        // Also allow clicking on chapter name to toggle (but still navigate on direct click)
+        chapterLink.addEventListener('click', function(e) {
+          // If clicking on the toggle span, don't navigate
+          if (e.target === toggle) {
+            e.preventDefault();
+          }
+        });
+      }
+    });
+
+    // === Resizable Sidebar ===
+    var resizeHandle = document.querySelector('.sidebar-resize-handle');
+    var sidebar = document.querySelector('.sidebar');
+    var mainContent = document.querySelector('.main-content');
+
+    if (resizeHandle && sidebar && mainContent) {
+      var isResizing = false;
+      var startX, startWidth;
+
+      resizeHandle.addEventListener('mousedown', function(e) {
+        isResizing = true;
+        startX = e.clientX;
+        startWidth = sidebar.offsetWidth;
+        resizeHandle.classList.add('dragging');
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+        e.preventDefault();
+      });
+
+      document.addEventListener('mousemove', function(e) {
+        if (!isResizing) return;
+
+        var newWidth = startWidth + (e.clientX - startX);
+        // Constrain width between 200px and 500px
+        newWidth = Math.max(200, Math.min(500, newWidth));
+
+        sidebar.style.width = newWidth + 'px';
+        mainContent.style.marginLeft = newWidth + 'px';
+
+        // Save to localStorage
+        localStorage.setItem('sidebarWidth', newWidth);
+      });
+
+      document.addEventListener('mouseup', function() {
+        if (isResizing) {
+          isResizing = false;
+          resizeHandle.classList.remove('dragging');
+          document.body.style.cursor = '';
+          document.body.style.userSelect = '';
+        }
+      });
+
+      // Restore saved width
+      var savedWidth = localStorage.getItem('sidebarWidth');
+      if (savedWidth) {
+        sidebar.style.width = savedWidth + 'px';
+        mainContent.style.marginLeft = savedWidth + 'px';
+      }
+    }
   });
 })();
