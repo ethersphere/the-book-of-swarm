@@ -89,10 +89,12 @@ for htmlfile in "$OUTPUT_DIR"/*.html; do
     fi
 done
 
-# Add fixed theme toggle at end of body (before </body>)
+# Remove duplicate theme toggle buttons (book.cfg already adds the correct one)
+# The build process sometimes adds broken inline onclick handlers - remove them
 for htmlfile in "$OUTPUT_DIR"/*.html; do
-    if [ -f "$htmlfile" ] && grep -q "</body>" "$htmlfile"; then
-        sed -i '' 's|</body>|<nav class="book-nav"><button id="theme-toggle" aria-label="Toggle dark mode" onclick="(function(){var t=document.documentElement.getAttribute('\''data-theme'\'')==='\'light'\''?'\''dark'\'':'\'light'\'';document.documentElement.setAttribute('\''data-theme'\'',t);localStorage.setItem('\''theme'\'',t);})()"><span class="theme-icon"></span></button></nav></body>|' "$htmlfile" 2>/dev/null || true
+    if [ -f "$htmlfile" ]; then
+        # Remove broken duplicate nav/button that gets added after the script tag
+        sed -i '' 's|<p><script src='\''theme-toggle.js'\''></script></p><nav class="book-nav"><button id="theme-toggle"[^<]*<span class="theme-icon"></span></button></nav>||g' "$htmlfile" 2>/dev/null || true
     fi
 done
 
@@ -109,7 +111,8 @@ done
 # Rename files to remove status markers from filenames
 echo -e "${YELLOW}Cleaning up filenames...${NC}"
 cd "$OUTPUT_DIR"
-for file in *statusgreen*.html *statusorange*.html *statusred*.html *statusyellow*.html 2>/dev/null; do
+shopt -s nullglob
+for file in *statusgreen*.html *statusorange*.html *statusred*.html *statusyellow*.html; do
     if [ -f "$file" ]; then
         newname=$(echo "$file" | sed 's/statusgreen//g; s/statusorange//g; s/statusred//g; s/statusyellow//g')
         if [ "$file" != "$newname" ]; then
@@ -122,6 +125,7 @@ for file in *statusgreen*.html *statusorange*.html *statusred*.html *statusyello
         fi
     fi
 done
+shopt -u nullglob
 cd - > /dev/null
 
 # Create index.html that redirects to main content

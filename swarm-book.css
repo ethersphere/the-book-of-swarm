@@ -197,6 +197,9 @@ img.graphics {
   box-shadow: var(--shadow);
   cursor: zoom-in;
   transition: transform 0.3s ease;
+  /* Ensure images with transparent/white backgrounds are visible on dark theme */
+  background-color: white;
+  padding: 0.5rem;
 }
 
 /* Wide figures - use full width */
@@ -244,6 +247,10 @@ figcaption,
   max-height: 95vh;
   object-fit: contain;
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+  /* White background for images with transparent backgrounds */
+  background-color: white;
+  padding: 1rem;
+  border-radius: 4px;
 }
 
 .lightbox-close {
