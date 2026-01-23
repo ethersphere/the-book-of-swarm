@@ -89,12 +89,11 @@ for htmlfile in "$OUTPUT_DIR"/*.html; do
     fi
 done
 
-# Remove duplicate theme toggle buttons (book.cfg already adds the correct one)
-# The build process sometimes adds broken inline onclick handlers - remove them
+# Fix theme toggle - remove all existing nav/script and add clean version before </body>
+echo -e "${YELLOW}Fixing theme toggle...${NC}"
 for htmlfile in "$OUTPUT_DIR"/*.html; do
     if [ -f "$htmlfile" ]; then
-        # Remove broken duplicate nav/button that gets added after the script tag
-        sed -i '' 's|<p><script src='\''theme-toggle.js'\''></script></p><nav class="book-nav"><button id="theme-toggle"[^<]*<span class="theme-icon"></span></button></nav>||g' "$htmlfile" 2>/dev/null || true
+        python3 fix-theme-toggle.py "$htmlfile"
     fi
 done
 

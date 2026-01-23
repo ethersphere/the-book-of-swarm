@@ -36,8 +36,32 @@ Make:match("html$", function(filename)
   -- Clean up excessive whitespace
   content = content:gsub('\n%s*\n%s*\n', '\n\n')
 
-  -- Add theme-toggle.js script before </body>
-  content = content:gsub('</body>', '<script src="theme-toggle.js"></script></body>')
+  -- Remove any existing theme toggle elements before </body>
+  -- Use a function to handle complex removal
+  local function removeThemeElements(s)
+    -- Remove nav with book-nav class (handles multiline)
+    s = s:gsub("<nav[^>]*book%-nav[^>]*>.-</nav>", "")
+    -- Remove any theme-toggle script tags
+    s = s:gsub("<script[^>]*theme%-toggle[^>]*></script>", "")
+    -- Remove script tags wrapped in p
+    s = s:gsub("<p>%s*<script[^>]*theme%-toggle[^>]*></script>%s*</p>", "")
+    s = s:gsub("<p><script[^>]*theme%-toggle[^>]*></script>\n</p>", "")
+    -- Clean empty p tags
+    s = s:gsub("<p>%s*</p>", "")
+    return s
+  end
+  content = removeThemeElements(content)
+
+  -- Add clean theme toggle nav and script before </body>
+  local navHtml = [[
+<nav class="book-nav">
+  <button id="theme-toggle" aria-label="Toggle dark mode">
+    <span class="theme-icon"></span>
+  </button>
+</nav>
+<script src="theme-toggle.js"></script>
+]]
+  content = content:gsub('</body>', navHtml .. '</body>')
 
   local f = io.open(filename, "w")
   f:write(content)
