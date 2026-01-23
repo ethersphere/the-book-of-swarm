@@ -33,21 +33,8 @@ NAV_STRUCTURE = [
 ]
 
 def get_top_nav_html():
-    """Generate the top navigation bar HTML."""
-    return '''<nav class="top-nav">
-  <a href="main.html" class="nav-brand">
-    <span class="nav-brand-icon">S</span>
-    <span>Book of Swarm</span>
-  </a>
-  <div class="nav-links">
-    <a href="main.html" class="nav-link">Home</a>
-    <a href="contentsname.html" class="nav-link">Contents</a>
-    <a href="glossarytitle.html" class="nav-link">Glossary</a>
-  </div>
-  <div class="nav-controls">
-    <button class="menu-toggle" aria-label="Toggle menu">☰</button>
-  </div>
-</nav>
+    """Generate mobile menu toggle and overlay (no top nav bar)."""
+    return '''<button class="menu-toggle" aria-label="Toggle menu">☰</button>
 <div class="sidebar-overlay"></div>
 '''
 
@@ -62,8 +49,14 @@ def get_sidebar_html(current_file):
     nav_items = "\n    ".join(items)
 
     return f'''<aside class="sidebar">
+  <div class="sidebar-header">
+    <a href="main.html" class="sidebar-brand">
+      <span class="sidebar-brand-icon">S</span>
+      <span>Book of Swarm</span>
+    </a>
+  </div>
   <div class="sidebar-section">
-    <div class="sidebar-title">Navigation</div>
+    <div class="sidebar-title">Contents</div>
     <ul class="sidebar-nav">
     {nav_items}
     </ul>

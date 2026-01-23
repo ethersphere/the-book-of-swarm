@@ -26,9 +26,9 @@
   --shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.15);
 
   /* Layout */
-  --content-max-width: 800px;
+  --content-max-width: 900px;
   --sidebar-width: 280px;
-  --header-height: 60px;
+  --header-height: 0px;
 }
 
 [data-theme="dark"] {
@@ -64,43 +64,71 @@ body {
   background-color: var(--bg-primary);
   margin: 0;
   padding: 0;
-  padding-top: var(--header-height);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* === Top Navigation Bar === */
+/* === Top Navigation Bar (hidden - using sidebar only) === */
 .top-nav {
+  display: none;
+}
+
+/* Menu toggle button (mobile) */
+.menu-toggle {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: var(--header-height);
+  top: 1rem;
+  left: 1rem;
+  z-index: 1001;
+  display: none;
   background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 1.5rem;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
   box-shadow: var(--shadow);
 }
 
-.nav-brand {
+/* === Sidebar Navigation === */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+  padding: 0;
+  z-index: 900;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-header {
+  padding: 1.5rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  background: var(--bg-secondary);
+  z-index: 1;
+}
+
+.sidebar-brand {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   font-weight: 600;
   color: var(--text-primary);
   text-decoration: none;
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
-.nav-brand:hover {
+.sidebar-brand:hover {
   color: var(--swarm-orange);
   text-decoration: none;
 }
 
-.nav-brand-icon {
+.sidebar-brand-icon {
   width: 32px;
   height: 32px;
   background: var(--swarm-orange);
@@ -110,87 +138,12 @@ body {
   justify-content: center;
   color: white;
   font-weight: 700;
-  font-size: 1.2rem;
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.nav-link {
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-size: 0.9rem;
-  padding: 0.5rem 0;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s ease;
-}
-
-.nav-link:hover,
-.nav-link.active {
-  color: var(--swarm-orange);
-  border-bottom-color: var(--swarm-orange);
-  text-decoration: none;
-}
-
-.nav-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-/* Menu toggle button (mobile) */
-.menu-toggle {
-  display: none;
-  background: none;
-  border: none;
-  color: var(--text-primary);
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0.25rem;
-}
-
-/* Theme toggle in nav */
-.nav-theme-toggle {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
   font-size: 1.1rem;
-}
-
-.nav-theme-toggle:hover {
-  background: var(--bg-tertiary);
-  border-color: var(--swarm-orange);
-}
-
-/* === Sidebar Navigation === */
-.sidebar {
-  position: fixed;
-  top: var(--header-height);
-  left: 0;
-  width: var(--sidebar-width);
-  height: calc(100vh - var(--header-height));
-  background: var(--bg-secondary);
-  border-right: 1px solid var(--border-color);
-  overflow-y: auto;
-  padding: 1.5rem 0;
-  z-index: 900;
-  transition: transform 0.3s ease;
+  flex-shrink: 0;
 }
 
 .sidebar-section {
-  padding: 0 1rem;
-  margin-bottom: 1.5rem;
+  padding: 1rem;
 }
 
 .sidebar-title {
@@ -260,13 +213,13 @@ body {
 /* === Main Content Area === */
 .main-content {
   margin-left: var(--sidebar-width);
-  min-height: calc(100vh - var(--header-height));
+  min-height: 100vh;
 }
 
 .content-wrapper {
   max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: 2rem 2rem 4rem;
+  padding: 2rem 3rem 4rem;
 }
 
 /* === Breadcrumb === */
@@ -827,16 +780,8 @@ tr:hover {
 }
 
 @media (max-width: 768px) {
-  :root {
-    --header-height: 56px;
-  }
-
   .menu-toggle {
     display: block;
-  }
-
-  .nav-links {
-    display: none;
   }
 
   .sidebar {
@@ -854,7 +799,7 @@ tr:hover {
   }
 
   .content-wrapper {
-    padding: 1.5rem 1rem 3rem;
+    padding: 4rem 1rem 3rem;
   }
 
   h1 { font-size: 1.75rem; }
@@ -863,7 +808,7 @@ tr:hover {
 
   .maketitle,
   .partHead {
-    margin: -1.5rem -1rem 1.5rem;
+    margin: -4rem -1rem 1.5rem;
     padding: 2rem 1rem;
   }
 
@@ -897,7 +842,7 @@ tr:hover {
 .sidebar-overlay {
   display: none;
   position: fixed;
-  top: var(--header-height);
+  top: 0;
   left: 0;
   right: 0;
   bottom: 0;
