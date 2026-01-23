@@ -1,9 +1,12 @@
 -- make4ht build file for Book of Swarm HTML conversion
 -- Usage: make4ht -c book.cfg -e build.mk4 main.tex "html5,mathjax"
 
--- Build sequence with glossary support
+-- Build sequence with glossary, bibliography, and index support
 -- Run htlatex first pass
 Make:htlatex()
+
+-- Run bibtex to process bibliography
+Make:bibtex()
 
 -- Run makeglossaries for glossary generation
 Make:match("glo$", function(filename)
@@ -16,7 +19,7 @@ end)
 -- Run makeindex for index generation
 Make:makeindex()
 
--- Run htlatex again to incorporate glossary/index
+-- Run htlatex again to incorporate glossary/index/bibliography
 Make:htlatex()
 Make:htlatex()
 

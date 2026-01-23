@@ -101,6 +101,11 @@ def parse_toc_for_nav(dist_dir):
                 "type": "section"
             })
 
+    # Fix bibliography link (tex4ht generates garbled filename)
+    for item in nav_items:
+        if item.get("title") == "Bibliography":
+            item["href"] = "bibliography.html"
+
     _nav_structure_cache = nav_items
     return nav_items
 

@@ -129,6 +129,17 @@ for file in *statusgreen*.html *statusorange*.html *statusred*.html *statusyello
     fi
 done
 shopt -u nullglob
+
+# Rename garbled bibliography filename (tex4ht MakeUppercase issue)
+if [ -f "bibnamemkbothMakeUppercasebibnameMakeUppercasebibname.html" ]; then
+    echo "  Renaming bibliography file..."
+    mv "bibnamemkbothMakeUppercasebibnameMakeUppercasebibname.html" "bibliography.html"
+    # Update references in all HTML files
+    for htmlfile in *.html; do
+        sed -i '' "s|bibnamemkbothMakeUppercasebibnameMakeUppercasebibname\.html|bibliography.html|g" "$htmlfile" 2>/dev/null || true
+    done
+fi
+
 cd - > /dev/null
 
 # Create index.html that redirects to main content
