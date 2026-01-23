@@ -237,33 +237,125 @@ Clear your browser cache and localStorage, then reload. The JavaScript requires 
 | `theme-toggle.js` | Theme toggle and lightbox JavaScript |
 | `fix-theme-toggle.py` | HTML post-processing script |
 
-## Testing with Playwright (Optional)
+## Automated Testing
 
-For automated visual testing and screenshots, you can use Playwright:
+The project includes a comprehensive test suite using Playwright for automated validation of the generated HTML site.
+
+### Setup
+
+Install testing dependencies:
 
 ```bash
-# Install Playwright
-npm install playwright
-npx playwright install chromium
+npm install
+```
 
-# Take a screenshot
-node -e "
-const { chromium } = require('playwright');
-(async () => {
-  const browser = await chromium.launch();
-  const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
-  await page.goto('http://localhost:8080/main.html');
-  await page.screenshot({ path: 'screenshot.png' });
-  await browser.close();
-  console.log('Screenshot saved');
-})();
-"
+This will install Playwright and automatically download the Chromium browser.
+
+### Running Tests
+
+**Full test suite** (recommended after builds):
+```bash
+npm test
+```
+
+**Quick smoke test** (tests 3 key pages only):
+```bash
+npm run test:quick
+```
+
+**Verbose output** (shows all check details):
+```bash
+npm run test:verbose
+```
+
+**Generate screenshots**:
+```bash
+npm run test:screenshots
+```
+
+**Full test with screenshots and verbose**:
+```bash
+npm run test:full
+```
+
+**Build and test** (complete workflow):
+```bash
+npm run build:test
+```
+
+### What the Tests Check
+
+The test suite validates:
+
+| Check | Description |
+|-------|-------------|
+| **Page Loading** | All 17 HTML pages load successfully (HTTP 200) |
+| **Required Elements** | Theme toggle button and sidebar navigation present |
+| **Images** | All images load correctly (no broken images) |
+| **JavaScript Errors** | No console errors on any page |
+| **Theme Toggle** | Light/dark mode toggle works correctly |
+| **Internal Links** | All internal links point to valid pages |
+| **MathJax** | Math rendering library loads on pages with equations |
+| **Responsive Design** | Basic mobile viewport compatibility |
+| **Accessibility** | Checks for missing alt text on images (warnings) |
+
+### Test Output
+
+Tests provide a summary like:
+
+```
+==================================================
+TEST SUMMARY
+==================================================
+✓ Passed:   142
+✗ Failed:   0
+⚠ Warnings: 3
+```
+
+Exit code 0 = all tests passed, exit code 1 = failures detected.
+
+### Legacy Audit Script
+
+A simpler audit script is also available:
+
+```bash
+# Start the preview server first
+npm run serve &
+
+# Run the audit
+npm run audit
+```
+
+### Screenshots
+
+When running with `--screenshots`, images are saved to `test-screenshots/`:
+
+```
+test-screenshots/
+├── main.png
+├── Network.png
+├── Incentives.png
+└── ...
 ```
 
 This is useful for:
-- Verifying CSS changes without a browser
-- Debugging layout issues programmatically
-- Automated testing of the build output
+- Visual regression testing
+- Verifying CSS changes without opening a browser
+- Documentation and debugging
+
+### NPM Scripts Reference
+
+| Script | Command | Description |
+|--------|---------|-------------|
+| `npm test` | `node tests/test-html.js` | Run full test suite |
+| `npm run test:quick` | `... --quick` | Quick smoke test (3 pages) |
+| `npm run test:screenshots` | `... --screenshots` | Generate page screenshots |
+| `npm run test:verbose` | `... --verbose` | Show detailed output |
+| `npm run test:full` | `... --verbose --screenshots` | Full test with all options |
+| `npm run audit` | `node site-audit.js` | Run legacy audit script |
+| `npm run serve` | `python3 -m http.server 8080` | Start preview server |
+| `npm run build` | `./build-html.sh` | Build HTML site |
+| `npm run build:test` | Build + test | Complete build and test workflow |
 
 ## License
 

@@ -47,6 +47,7 @@ package-lock.json
 
 # Screenshots from testing
 screenshot*.png
+test-screenshots/
 
 # Intermediate SVG files from tex4ht
 fig/*-.svg

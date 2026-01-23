@@ -1,0 +1,24 @@
+{
+  "name": "book-of-swarm-html",
+  "version": "1.0.0",
+  "description": "HTML build and testing tools for The Book of Swarm",
+  "private": true,
+  "scripts": {
+    "test": "node tests/test-html.js",
+    "test:quick": "node tests/test-html.js --quick",
+    "test:screenshots": "node tests/test-html.js --screenshots",
+    "test:verbose": "node tests/test-html.js --verbose",
+    "test:full": "node tests/test-html.js --verbose --screenshots",
+    "audit": "node site-audit.js",
+    "serve": "cd dist && python3 -m http.server 8080",
+    "build": "./build-html.sh",
+    "build:test": "./build-html.sh && npm test",
+    "postinstall": "npx playwright install chromium"
+  },
+  "dependencies": {
+    "playwright": "^1.58.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
