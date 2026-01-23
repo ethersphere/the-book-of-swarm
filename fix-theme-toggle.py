@@ -28,26 +28,82 @@ SMALL_CAPS_NAME_FIXES = {
     "Vlado Paji": "Vlado Pajić",
 }
 
-# Navigation structure for the book
-NAV_STRUCTURE = [
+# Base navigation items (before TOC content)
+NAV_BASE = [
     {"title": "Home", "href": "main.html", "type": "home"},
     {"title": "Contents", "href": "contentsname.html", "type": "chapter"},
     {"title": "Figures", "href": "listfigurename.html", "type": "chapter"},
     {"title": "Prolegomena", "href": "Prolegomena.html", "type": "chapter"},
     {"title": "Acknowledgments", "href": "Acknowledgments.html", "type": "chapter"},
-    {"title": "Part I: Prelude", "href": "Prelude.html", "type": "part"},
-    {"title": "1. The Evolution", "href": "Theevolution.html", "type": "chapter"},
-    {"title": "Part II: Design", "href": "Designandarchitecture.html", "type": "part"},
-    {"title": "2. Network", "href": "Network.html", "type": "chapter"},
-    {"title": "3. Incentives", "href": "Incentives.html", "type": "chapter"},
-    {"title": "4. Building on DISC", "href": "BuildingontheDISC.html", "type": "chapter"},
-    {"title": "5. Persistence", "href": "Persistence.html", "type": "chapter"},
-    {"title": "6. Developer Interface", "href": "Developerinterface.html", "type": "chapter"},
-    {"title": "Part III: Indexes", "href": "Indexes.html", "type": "part"},
-    {"title": "Glossary", "href": "glossarytitle.html", "type": "chapter"},
-    {"title": "Index", "href": "glossarytitle1.html", "type": "chapter"},
-    {"title": "Acronyms", "href": "glossarytitle2.html", "type": "chapter"},
 ]
+
+# Cached navigation structure (populated from TOC)
+_nav_structure_cache = None
+
+def parse_toc_for_nav(dist_dir):
+    """Parse the table of contents HTML to build navigation structure."""
+    global _nav_structure_cache
+    if _nav_structure_cache is not None:
+        return _nav_structure_cache
+
+    toc_path = os.path.join(dist_dir, "contentsname.html")
+    if not os.path.exists(toc_path):
+        # Fallback if TOC not yet generated
+        return NAV_BASE
+
+    with open(toc_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    nav_items = list(NAV_BASE)  # Start with base items
+
+    # Parse parts, chapters, and sections from TOC
+    # partToc: <span class='partToc'>I  <a href='Prelude.html#prelude'>Prelude</a></span>
+    # chapterToc: <span class='chapterToc'>1 <a href='Theevolution.html#the-evolution-'>The evolution </a></span>
+    # sectionToc: <span class='sectionToc'>1.1 <a href='Theevolution.html#historical-context-'>Historical context </a></span>
+
+    # Match all TOC entries
+    pattern = r"<span class='(partToc|chapterToc|sectionToc|likechapterToc)'>(.*?)<a href='([^']+)'>([^<]+)</a></span>"
+
+    for match in re.finditer(pattern, content, re.DOTALL):
+        toc_type = match.group(1)
+        number = match.group(2).strip()
+        href = match.group(3)
+        title = match.group(4).strip()
+
+        # Get just the filename part of href (before #anchor)
+        href_file = href.split('#')[0] if '#' in href else href
+
+        if toc_type == 'partToc':
+            # Part: "I" + "Prelude" -> "Part I: Prelude"
+            nav_items.append({
+                "title": f"Part {number}: {title}",
+                "href": href_file,
+                "type": "part"
+            })
+        elif toc_type in ('chapterToc', 'likechapterToc'):
+            # Chapter: "1" + "The evolution" -> "1. The evolution"
+            if number:
+                nav_items.append({
+                    "title": f"{number} {title}",
+                    "href": href_file,
+                    "type": "chapter"
+                })
+            else:
+                nav_items.append({
+                    "title": title,
+                    "href": href_file,
+                    "type": "chapter"
+                })
+        elif toc_type == 'sectionToc':
+            # Section: "1.1" + "Historical context" -> "1.1 Historical context"
+            nav_items.append({
+                "title": f"{number} {title}",
+                "href": href,  # Keep full href with anchor for sections
+                "type": "section"
+            })
+
+    _nav_structure_cache = nav_items
+    return nav_items
 
 def get_top_nav_html():
     """Generate mobile menu toggle and overlay (no top nav bar)."""
@@ -55,12 +111,23 @@ def get_top_nav_html():
 <div class="sidebar-overlay"></div>
 '''
 
-def get_sidebar_html(current_file):
+def get_sidebar_html(current_file, dist_dir):
     """Generate the sidebar navigation HTML."""
+    nav_structure = parse_toc_for_nav(dist_dir)
+
     items = []
-    for nav in NAV_STRUCTURE:
-        css_class = "part-item" if nav["type"] == "part" else "chapter-item"
-        active = "active" if nav["href"] == current_file else ""
+    for nav in nav_structure:
+        if nav["type"] == "part":
+            css_class = "part-item"
+        elif nav["type"] == "section":
+            css_class = "section-item"
+        else:
+            css_class = "chapter-item"
+
+        # Check if this nav item matches current file
+        nav_file = nav["href"].split('#')[0] if '#' in nav["href"] else nav["href"]
+        active = "active" if nav_file == current_file else ""
+
         items.append(f'<li><a href="{nav["href"]}" class="{css_class} {active}">{nav["title"]}</a></li>')
 
     nav_items = "\n    ".join(items)
@@ -153,6 +220,7 @@ def fix_index_hyperlinks(content, filename):
 def fix_html(filepath):
     """Process a single HTML file."""
     filename = os.path.basename(filepath)
+    dist_dir = os.path.dirname(filepath)
 
     with open(filepath, 'r', encoding='utf-8') as f:
         content = f.read()
@@ -176,7 +244,7 @@ def fix_html(filepath):
 
     # Add top nav after <body>
     top_nav = get_top_nav_html()
-    sidebar = get_sidebar_html(filename)
+    sidebar = get_sidebar_html(filename, dist_dir)
     content = re.sub(
         r'(<body[^>]*>)',
         r'\1\n' + top_nav + sidebar + '<main class="main-content"><div class="content-wrapper">',
