@@ -1,0 +1,53 @@
+# Build output
+dist/
+
+# LaTeX auxiliary files
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.glg-abr
+*.glo-abr
+*.gls-abr
+*.idx
+*.ilg
+*.ind
+*.ist
+*.4ct
+*.4tc
+*.dvi
+*.idv
+*.lg
+*.tmp
+*.xref
+
+# Generated CSS from tex4ht
+main.css
+test-intro.css
+
+# Test files
+test-intro.tex
+
+# Node.js
+node_modules/
+package-lock.json
+
+# Screenshots from testing
+screenshot*.png
+
+# OS files
+.DS_Store
+Thumbs.db

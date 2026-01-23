@@ -235,6 +235,34 @@ Clear your browser cache and localStorage, then reload. The JavaScript requires 
 | `theme-toggle.js` | Theme toggle and lightbox JavaScript |
 | `fix-theme-toggle.py` | HTML post-processing script |
 
+## Testing with Playwright (Optional)
+
+For automated visual testing and screenshots, you can use Playwright:
+
+```bash
+# Install Playwright
+npm install playwright
+npx playwright install chromium
+
+# Take a screenshot
+node -e "
+const { chromium } = require('playwright');
+(async () => {
+  const browser = await chromium.launch();
+  const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
+  await page.goto('http://localhost:8080/main.html');
+  await page.screenshot({ path: 'screenshot.png' });
+  await browser.close();
+  console.log('Screenshot saved');
+})();
+"
+```
+
+This is useful for:
+- Verifying CSS changes without a browser
+- Debugging layout issues programmatically
+- Automated testing of the build output
+
 ## License
 
 The Book of Swarm is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported (CC BY-NC-SA 3.0).
