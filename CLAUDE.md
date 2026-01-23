@@ -4,47 +4,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is "The Book of Swarm" - a LaTeX book by Viktor Trón about Swarm, a decentralized storage and communication infrastructure for Web 3.0. The primary goal is to convert this book into a **static HTML website** that can be served from Swarm storage.
+This is "The Book of Swarm" - a LaTeX book by Viktor Trón about Swarm, a decentralized storage and communication infrastructure for Web 3.0. The repository supports two output formats:
 
-## Build Commands
+1. **PDF** - Traditional LaTeX compilation (main branch)
+2. **Static HTML** - For hosting on Swarm storage (html-build branch)
 
-### Build HTML version
+## Quick Commands
+
+### Build HTML version (html-build branch)
 ```bash
-./build-html.sh
+./build-html.sh                          # Build to dist/
+cd dist && python3 -m http.server 8080   # Preview at http://localhost:8080/
 ```
 
-### Preview locally
+### Build PDF version (main branch)
 ```bash
-cd dist && python3 -m http.server 8080
-# Open http://localhost:8080/
+latexmk -pdf main.tex
 ```
 
-### Install TeX dependencies (if needed)
-```bash
-export PATH="$HOME/Library/TinyTeX/bin/universal-darwin:$PATH"
-tlmgr install make4ht tex4ht luaxml glossaries glossaries-extra
-```
+## HTML Build Documentation
 
-### Manual conversion (single file)
-```bash
-export PATH="$HOME/Library/TinyTeX/bin/universal-darwin:$PATH"
-make4ht -c book.cfg -e build.mk4 main.tex "html5,mathjax"
-```
-
-## Build System Files
-
-- `build-html.sh` - Main build script for HTML generation
-- `build.mk4` - make4ht build configuration (Lua)
-- `book.cfg` - tex4ht configuration for HTML output
-- `swarm-book.css` - Swarm-styled CSS (ethswarm.org aesthetic)
-- `theme-toggle.js` - Light/dark mode toggle
-
-## Target Design Style (ethswarm.org)
-
-- **Colors**: Orange/amber accents (#F7931A), dark mode support
-- **Theme**: Light/dark toggle with localStorage persistence
-- **Typography**: System sans-serif fonts, clean and readable
-- **Layout**: Responsive, card-based chapters, clear navigation
+See **[HTML-BUILD.md](HTML-BUILD.md)** for complete instructions including:
+- Prerequisites and installation
+- Required TeX packages
+- Build process details
+- Customization options
+- Troubleshooting guide
+- Deploying to Swarm
 
 ## Source Document Structure
 
@@ -75,28 +61,18 @@ make4ht -c book.cfg -e build.mk4 main.tex "html5,mathjax"
 - `\statusgreen`, `\statusorange`, `\statusred` - draft markers
 - `\wip{}`, `\green{}`, `\yellow{}`, `\red{}` - todo markers
 
-## Conversion Pipeline
+## HTML Build System Files
 
-1. **make4ht** converts LaTeX → HTML5 with MathJax
-2. **book.cfg** configures document structure and styling hooks
-3. **build.mk4** post-processes HTML to clean up artifacts
-4. **swarm-book.css** applies Swarm visual styling
-5. **pdf2svg** (optional) converts PDF figures to SVG
+| File | Purpose |
+|------|---------|
+| `build-html.sh` | Main build orchestration script |
+| `build.mk4` | make4ht Lua build configuration |
+| `book.cfg` | tex4ht HTML configuration |
+| `swarm-book.css` | Custom CSS (ethswarm.org style) |
+| `theme-toggle.js` | Theme toggle and lightbox JS |
+| `fix-theme-toggle.py` | HTML post-processing script |
 
-## Output Structure
+## Git Branches
 
-```
-dist/
-├── index.html          # Redirect to main content
-├── main.html           # Main book content
-├── *.html              # Chapter files (if split)
-├── swarm-book.css      # Styling
-├── theme-toggle.js     # Theme switcher
-└── fig/                # Figures (SVG or PDF)
-```
-
-## Known Issues
-
-- Glossary requires multiple LaTeX passes to resolve
-- Some complex TikZ figures may not convert perfectly
-- PDF figures need pdf2svg for best results (install via `brew install pdf2svg`)
+- `master` - Main branch with PDF-focused workflow
+- `html-build` - HTML build system and static site generation
