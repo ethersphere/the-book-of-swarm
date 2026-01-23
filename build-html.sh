@@ -54,14 +54,14 @@ if [ -f "main.glo" ]; then
     makeglossaries main 2>/dev/null || true
 fi
 
-make4ht -c book.cfg -e build.mk4 "$MAIN_FILE" "html5,mathjax" 2>&1 | tee build.log
+make4ht -c book.cfg -e build.mk4 -l "$MAIN_FILE" "html5,mathjax,svg" 2>&1 | tee build.log
 
 # Run makeglossaries again after first pass
 if [ -f "main.glo" ]; then
     echo -e "${YELLOW}Building glossary (second pass)...${NC}"
     makeglossaries main 2>/dev/null || true
     # Run make4ht again to incorporate glossary
-    make4ht -c book.cfg -e build.mk4 "$MAIN_FILE" "html5,mathjax" 2>&1 | tee -a build.log
+    make4ht -c book.cfg -e build.mk4 -l "$MAIN_FILE" "html5,mathjax,svg" 2>&1 | tee -a build.log
 fi
 
 # Move generated files to output directory
@@ -97,13 +97,17 @@ for htmlfile in "$OUTPUT_DIR"/*.html; do
     fi
 done
 
-# Fix image references: replace .png with .svg for figures
+# Fix image references: replace .png/.pdf with .svg for figures
 echo -e "${YELLOW}Fixing image references...${NC}"
 for htmlfile in "$OUTPUT_DIR"/*.html; do
     if [ -f "$htmlfile" ]; then
-        # Replace fig/*.png references with fig/*.svg
-        sed -i '' "s|fig/\([^'\"]*\)-.png|fig/\1.svg|g" "$htmlfile" 2>/dev/null || true
-        sed -i '' "s|fig/\([^'\"]*\).png|fig/\1.svg|g" "$htmlfile" 2>/dev/null || true
+        # Replace fig/*.png and fig/*.pdf references with fig/*.svg
+        sed -i '' "s|fig/\([^'\"]*\)\.png|fig/\1.svg|g" "$htmlfile" 2>/dev/null || true
+        sed -i '' "s|fig/\([^'\"]*\)\.pdf|fig/\1.svg|g" "$htmlfile" 2>/dev/null || true
+        # Remove any double hyphens that might have been introduced
+        sed -i '' "s|--\.svg|-\.svg|g" "$htmlfile" 2>/dev/null || true
+        # Fix trailing hyphen before .svg (from tex4ht quirk)
+        sed -i '' "s|-\.svg|.svg|g" "$htmlfile" 2>/dev/null || true
     fi
 done
 

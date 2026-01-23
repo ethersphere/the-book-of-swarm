@@ -42,6 +42,8 @@ tlmgr install \
     make4ht \
     tex4ht \
     luaxml \
+    luacode \
+    dvisvgm \
     glossaries \
     glossaries-extra \
     xcolor-solarized \

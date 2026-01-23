@@ -48,6 +48,12 @@ package-lock.json
 # Screenshots from testing
 screenshot*.png
 
+# Intermediate SVG files from tex4ht
+fig/*-.svg
+
+# Build log
+build.log
+
 # OS files
 .DS_Store
 Thumbs.db
