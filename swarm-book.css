@@ -170,7 +170,7 @@ body {
 
 .sidebar-nav a {
   display: block;
-  padding: 0.5rem 0.75rem;
+  padding: 0.35rem 0.75rem;
   color: var(--text-secondary);
   text-decoration: none;
   font-size: 0.9rem;
@@ -369,9 +369,17 @@ a:hover {
   margin: 2rem 0;
 }
 
+.tableofcontents {
+  line-height: 1.5;
+}
+
 .tableofcontents > span {
   display: block;
-  margin: 0.3rem 0;
+  margin: 0.2rem 0;
+}
+
+.tableofcontents br {
+  display: none;
 }
 
 .likechapterToc a,
@@ -395,13 +403,16 @@ a:hover {
 }
 
 .sectionToc {
-  padding-left: 1.5rem;
+  padding-left: 1rem;
+}
+
+.subsectionToc {
+  padding-left: 2rem;
   font-size: 0.9rem;
 }
 
 .likesectionToc {
-  padding-left: 1.5rem;
-  font-size: 0.9rem;
+  padding-left: 1rem;
 }
 
 /* === Parts and Chapters === */
@@ -576,15 +587,30 @@ li {
   margin: 1.5rem 0;
 }
 
-.labelled-list dt {
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-top: 1rem;
+/* The actual definition list inside labelled-list */
+.labelled-list dl,
+dl.enumerate-enumitem.enumitem-labelledlist {
+  display: grid;
+  grid-template-columns: minmax(7.5rem, auto) 1fr;
+  gap: 0.5rem 2rem;
+  margin: 0;
 }
 
-.labelled-list dd {
-  margin-left: 1.5rem;
+.labelled-list dt,
+dt.enumerate-enumitem.enumitem-labelledlist {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.labelled-list dd,
+dd.enumerate-enumitem {
+  margin-left: 0;
   color: var(--text-secondary);
+}
+
+/* Nested labelled-lists inside dd */
+.labelled-list dd .labelled-list {
+  margin: 0.5rem 0;
 }
 
 /* === Blockquotes === */
