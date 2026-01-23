@@ -46,6 +46,15 @@
   --shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
+/* Ensure images always have white background in both themes */
+[data-theme="dark"] .book-figure img,
+[data-theme="dark"] figure img,
+[data-theme="dark"] .figure img,
+[data-theme="dark"] img[alt="PIC"],
+[data-theme="dark"] img[alt="[Picture]"] {
+  background-color: #FFFFFF !important;
+}
+
 /* === Base Styles === */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -522,8 +531,8 @@ img.graphics {
   border-radius: 8px;
   box-shadow: var(--shadow);
   cursor: zoom-in;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background-color: white;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  background-color: white !important;
   padding: 0.5rem;
 }
 
