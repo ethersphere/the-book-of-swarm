@@ -291,6 +291,20 @@ def fix_html(filepath):
     # Keep only the one pointing to bibliography.html, remove the one pointing to Developerinterface.html#bibliography
     content = re.sub(r"<br\s*/>\s*<span[^>]*class=['\"]chapterToc['\"][^>]*>\s*<a[^>]*href=['\"]Developerinterface\.html#bibliography['\"][^>]*>Bibliography</a></span>", "", content)
 
+    # Remove Index entry from TOC (search functionality replaces it)
+    # Match specifically glossarytitle1.html#index which is the Index page
+    content = re.sub(r"<br\s*/>\s*<span[^>]*class=['\"]chapterToc['\"][^>]*>\s*<a[^>]*href=['\"]glossarytitle1\.html#index['\"][^>]*>Index</a></span>", "", content)
+
+    # Add Bibliography entry to TOC if missing (tex4ht doesn't include it in contentsname.html)
+    # Insert before Glossary entry
+    if 'contentsname' in filename and "href='bibliography.html'" not in content and "href=\"bibliography.html\"" not in content:
+        # Find the Glossary entry and insert Bibliography before it
+        content = re.sub(
+            r"(<br\s*/>\s*<span[^>]*class=['\"]chapterToc['\"][^>]*>\s*<a[^>]*href=['\"]glossarytitle\.html)",
+            r"<br /><span class='chapterToc'> <a href='bibliography.html'>Bibliography</a></span>\1",
+            content
+        )
+
     # Clean up multiple newlines
     content = re.sub(r"\n\s*\n\s*\n", "\n\n", content)
 
