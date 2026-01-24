@@ -46,13 +46,27 @@
   --shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
-/* Ensure images always have white background in both themes */
+/* Ensure images always have white background and no color inversion in both themes */
+.book-figure img,
+figure img,
+.figure img,
+img[alt="PIC"],
+img[alt="[Picture]"],
+img.graphics {
+  background-color: #FFFFFF !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
 [data-theme="dark"] .book-figure img,
 [data-theme="dark"] figure img,
 [data-theme="dark"] .figure img,
 [data-theme="dark"] img[alt="PIC"],
-[data-theme="dark"] img[alt="[Picture]"] {
+[data-theme="dark"] img[alt="[Picture]"],
+[data-theme="dark"] img.graphics {
   background-color: #FFFFFF !important;
+  filter: none !important;
+  -webkit-filter: none !important;
 }
 
 /* === Base Styles === */
