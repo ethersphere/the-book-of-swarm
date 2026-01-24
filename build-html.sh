@@ -159,6 +159,26 @@ if [ -f "$OUTPUT_DIR/main.html" ]; then
 EOF
 fi
 
+# Add white background to dvisvgm-generated SVGs (they have transparent backgrounds)
+echo -e "${YELLOW}Adding white backgrounds to SVGs...${NC}"
+for svg in "$OUTPUT_DIR"/main*.svg; do
+    if [ -f "$svg" ]; then
+        # Add a white rect element inside the SVG (more reliable than CSS)
+        if ! grep -q 'id="bg-rect"' "$svg"; then
+            # Get viewBox values
+            viewbox=$(grep -o "viewBox='[^']*'" "$svg" | head -1 | sed "s/viewBox='//;s/'//")
+            if [ -n "$viewbox" ]; then
+                minX=$(echo "$viewbox" | awk '{print $1}')
+                minY=$(echo "$viewbox" | awk '{print $2}')
+                w=$(echo "$viewbox" | awk '{print $3}')
+                h=$(echo "$viewbox" | awk '{print $4}')
+                rect="<rect id=\"bg-rect\" x=\"$minX\" y=\"$minY\" width=\"$w\" height=\"$h\" fill=\"white\"/>"
+                sed -i '' "s|</defs>|</defs>$rect|" "$svg"
+            fi
+        fi
+    fi
+done
+
 # Build search index
 echo -e "${YELLOW}Building search index...${NC}"
 cp search.js "$OUTPUT_DIR/"
