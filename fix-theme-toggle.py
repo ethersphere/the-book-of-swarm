@@ -296,14 +296,17 @@ def fix_html(filepath):
     content = re.sub(r"<br\s*/>\s*<span[^>]*class=['\"]chapterToc['\"][^>]*>\s*<a[^>]*href=['\"]glossarytitle1\.html#index['\"][^>]*>Index</a></span>", "", content)
 
     # Add Bibliography entry to TOC if missing (tex4ht doesn't include it in contentsname.html)
-    # Insert before Glossary entry
-    if 'contentsname' in filename and "href='bibliography.html'" not in content and "href=\"bibliography.html\"" not in content:
-        # Find the Glossary entry and insert Bibliography before it
-        content = re.sub(
-            r"(<br\s*/>\s*<span[^>]*class=['\"]chapterToc['\"][^>]*>\s*<a[^>]*href=['\"]glossarytitle\.html)",
-            r"<br /><span class='chapterToc'> <a href='bibliography.html'>Bibliography</a></span>\1",
-            content
-        )
+    # Insert before Part III (Indexes) to match Home page TOC structure
+    # Check specifically for chapterToc Bibliography, not sidebar link
+    if 'contentsname' in filename and "chapterToc'> <a href='bibliography.html'>Bibliography" not in content:
+        # Find the Part III (Indexes) entry and insert Bibliography before it
+        # Note: III is followed by non-breaking spaces (\xa0), need to match with [\s\xa0]+
+        # Note: tex4ht generates files with statusorange/statusgreen suffixes that get renamed later
+        old_content = content
+        pattern = r"(\n*<br\s*/>\s*<span[^>]*class=['\"]partToc['\"][^>]*>III[\s\xa0]+<a[^>]*href=['\"]Indexes(?:statusorange|statusgreen)?\.html)"
+        content = re.sub(pattern, r"\n<br /><span class='chapterToc'> <a href='bibliography.html'>Bibliography</a></span>\1", content)
+        if content == old_content:
+            print(f"  [WARNING] Bibliography regex did NOT match in {filename}", file=sys.stderr)
 
     # Clean up multiple newlines
     content = re.sub(r"\n\s*\n\s*\n", "\n\n", content)
