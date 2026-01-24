@@ -194,6 +194,7 @@ def get_floating_buttons_html():
   </button>
 </div>
 <script src="theme-toggle.js"></script>
+<script src="search.js"></script>
 '''
 
 

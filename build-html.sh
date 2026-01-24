@@ -159,6 +159,15 @@ if [ -f "$OUTPUT_DIR/main.html" ]; then
 EOF
 fi
 
+# Build search index
+echo -e "${YELLOW}Building search index...${NC}"
+cp search.js "$OUTPUT_DIR/"
+if command -v node >/dev/null 2>&1; then
+    node build-search-index.js
+else
+    echo -e "${RED}Node.js not found. Search index will not be built.${NC}"
+fi
+
 # Clean up auxiliary files
 echo -e "${YELLOW}Cleaning up auxiliary files...${NC}"
 rm -f *.aux *.log *.4ct *.4tc *.dvi *.idv *.lg *.tmp *.xref *.glo *.gls *.glg *.ist 2>/dev/null || true
