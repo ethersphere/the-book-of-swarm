@@ -287,6 +287,10 @@ def fix_html(filepath):
     # Fix index page numbers to be styled as references
     content = fix_index_hyperlinks(content, filename)
 
+    # Remove duplicate Bibliography entry in TOC (tex4ht generates two)
+    # Keep only the one pointing to bibliography.html, remove the one pointing to Developerinterface.html#bibliography
+    content = re.sub(r"<br\s*/>\s*<span[^>]*class=['\"]chapterToc['\"][^>]*>\s*<a[^>]*href=['\"]Developerinterface\.html#bibliography['\"][^>]*>Bibliography</a></span>", "", content)
+
     # Clean up multiple newlines
     content = re.sub(r"\n\s*\n\s*\n", "\n\n", content)
 
