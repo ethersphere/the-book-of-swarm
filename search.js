@@ -180,6 +180,9 @@
         var sidebar = document.querySelector('.sidebar-section');
         if (!sidebar) return;
 
+        // Don't create if already exists
+        if (document.querySelector('.search-container')) return;
+
         // Create search container
         searchContainer = document.createElement('div');
         searchContainer.className = 'search-container';

@@ -106,6 +106,9 @@ def parse_toc_for_nav(dist_dir):
         if item.get("title") == "Bibliography":
             item["href"] = "bibliography.html"
 
+    # Remove Index page (search replaces its functionality)
+    nav_items = [item for item in nav_items if item.get("title") != "Index"]
+
     _nav_structure_cache = nav_items
     return nav_items
 
@@ -268,8 +271,15 @@ def fix_html(filepath):
     content = re.sub(r"<nav[^>]*class=['\"]top-nav['\"][^>]*>.*?</nav>", "", content, flags=re.DOTALL)
     content = re.sub(r"<aside[^>]*class=['\"]sidebar['\"][^>]*>.*?</aside>", "", content, flags=re.DOTALL)
     content = re.sub(r"<div[^>]*class=['\"]sidebar-overlay['\"][^>]*>.*?</div>", "", content, flags=re.DOTALL)
+    content = re.sub(r"<button[^>]*class=['\"]menu-toggle['\"][^>]*>.*?</button>", "", content, flags=re.DOTALL)
     content = re.sub(r"<script[^>]*theme-toggle[^>]*></script>", "", content)
+    content = re.sub(r"<script[^>]*search\.js[^>]*></script>", "", content)
+    content = re.sub(r"<div[^>]*class=['\"]book-nav['\"][^>]*>.*?</div>", "", content, flags=re.DOTALL)
     content = re.sub(r"<p>\s*</p>", "", content)
+
+    # Remove existing main-content wrappers (to allow re-running)
+    content = re.sub(r"<main[^>]*class=['\"]main-content['\"][^>]*>\s*<div[^>]*class=['\"]content-wrapper['\"][^>]*>", "", content)
+    content = re.sub(r"</div>\s*</main>", "", content)
 
     # Fix accented characters in small caps names
     content = fix_small_caps_accents(content)
