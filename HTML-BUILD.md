@@ -82,6 +82,25 @@ Required for post-processing HTML files. Most systems have this pre-installed.
 python3 --version  # Should be 3.6+
 ```
 
+### 5. Node.js (Optional - for testing)
+
+Required only if you want to run the automated test suite:
+
+```bash
+node --version  # Should be 16+
+```
+
+**macOS:**
+```bash
+brew install node
+```
+
+**Linux (via NodeSource):**
+```bash
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
 ## Building
 
 ### Quick Build
@@ -97,8 +116,9 @@ This will:
 2. Convert PDF figures to SVG (if pdf2svg is available)
 3. Run make4ht to convert LaTeX to HTML5
 4. Build the glossary and index
-5. Post-process HTML files (fix theme toggle, clean up artifacts)
+5. Post-process HTML files (add sidebar navigation, fix theme toggle, clean up artifacts)
 6. Copy CSS and JavaScript assets
+7. Build the search index from HTML content
 
 ### Output
 
@@ -121,12 +141,14 @@ dist/
 ├── Persistence.html        # Chapter 5
 ├── Developerinterface.html # Chapter 6
 ├── Indexes.html            # Part III
+├── bibliography.html       # Bibliography
 ├── glossarytitle.html      # Glossary
-├── glossarytitle1.html     # Index
 ├── glossarytitle2.html     # Acronyms
 ├── main.css                # Generated CSS from tex4ht
 ├── swarm-book.css          # Custom Swarm styling
 ├── theme-toggle.js         # Light/dark mode toggle
+├── search.js               # Search functionality
+├── search-index.json       # Pre-built search index
 ├── fig/                    # Figures (SVG or PDF)
 │   ├── *.svg
 │   └── ...
@@ -145,6 +167,18 @@ python3 -m http.server 8080
 Then open http://localhost:8080/ in your browser.
 
 ## Features
+
+### Sidebar Navigation
+
+The sidebar provides hierarchical navigation with:
+- Collapsible chapter sections (click the arrow to expand/collapse)
+- Current page highlighting
+- Resizable width (drag the edge to resize, double-click to reset)
+- Mobile-friendly hamburger menu toggle
+
+### Search
+
+The search box in the sidebar header allows full-text search across all content. Type to search and click results to navigate directly to matches. The search index is pre-built during the build process.
 
 ### Light/Dark Theme
 
@@ -236,6 +270,8 @@ Clear your browser cache and localStorage, then reload. The JavaScript requires 
 | `swarm-book.css` | Custom CSS styling |
 | `theme-toggle.js` | Theme toggle and lightbox JavaScript |
 | `fix-theme-toggle.py` | HTML post-processing script |
+| `search.js` | Search functionality JavaScript |
+| `build-search-index.js` | Generates search-index.json from HTML |
 
 ## Automated Testing
 
@@ -296,6 +332,7 @@ The test suite validates:
 | **Theme Toggle** | Light/dark mode toggle works correctly |
 | **Internal Links** | All internal links point to valid pages |
 | **MathJax** | Math rendering library loads on pages with equations |
+| **Search** | Search functionality works and returns results |
 | **Responsive Design** | Basic mobile viewport compatibility |
 | **Accessibility** | Checks for missing alt text on images (warnings) |
 
